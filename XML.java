@@ -31,7 +31,7 @@ import java.util.Iterator;
  * This provides static methods to convert an XML text into a JSONObject,
  * and to covert a JSONObject into an XML text.
  * @author JSON.org
- * @version 2010-04-08
+ * @version 2010-12-23
  */
 public class XML {
 
@@ -226,7 +226,7 @@ public class XML {
                         if (!(t instanceof String)) {
                             throw x.syntaxError("Missing value");
                         }
-                        o.accumulate(s, JSONObject.stringToValue((String)t));
+                        o.accumulate(s, XML.stringToValue((String)t));
                         t = null;
                     } else {
                         o.accumulate(s, "");
@@ -258,7 +258,7 @@ public class XML {
                         } else if (t instanceof String) {
                             s = (String)t;
                             if (s.length() > 0) {
-                                o.accumulate("content", JSONObject.stringToValue(s));
+                                o.accumulate("content", XML.stringToValue(s));
                             }
 
 // Nested element
@@ -285,6 +285,60 @@ public class XML {
     }
 
 
+    /**
+     * Try to convert a string into a number, boolean, or null. If the string
+     * can't be converted, return the string. This is much less ambitious than
+     * JSONObject.stringToValue, especially because it does not attempt to
+     * convert plus forms, octal forms, hex forms, or E forms lacking decimal 
+     * points.
+     * @param string A String.
+     * @return A simple JSON value.
+     */
+    public static Object stringToValue(String string) {
+        if (string.equals("")) {
+            return string;
+        }
+        if (string.equalsIgnoreCase("true")) {
+            return Boolean.TRUE;
+        }
+        if (string.equalsIgnoreCase("false")) {
+            return Boolean.FALSE;
+        }
+        if (string.equalsIgnoreCase("null")) {
+            return JSONObject.NULL;
+        }
+
+// If it might be a number, try converting it. If that doesn't work, 
+// return the string.
+
+        try {
+	        char initial = string.charAt(0);
+	        boolean negative = false;
+	        if (initial == '-') {
+	        	initial = string.charAt(1);
+	        	negative = true;
+	        }
+	        if (initial == '0' && string.charAt(negative ? 2 : 1) == '0') {
+	        	return string;
+	        }
+	        if ((initial >= '0' && initial <= '9')) {
+                if (string.indexOf('.') >= 0) {
+                    return Double.valueOf(string);
+                } else if (string.indexOf('e') < 0 && string.indexOf('E') < 0) {
+                    Long myLong = new Long(string);
+                    if (myLong.longValue() == myLong.intValue()) {
+                        return new Integer(myLong.intValue());
+                    } else {
+                        return myLong;
+                    }
+                }
+	        }
+        }  catch (Exception ignore) {
+        }
+        return string;
+    }
+
+    
     /**
      * Convert a well-formed (but not necessarily valid) XML string into a
      * JSONObject. Some information may be lost in this transformation
