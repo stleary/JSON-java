@@ -163,10 +163,10 @@ public class JSONObject {
     public JSONObject(JSONObject jo, String[] names) {
         this();
         for (int i = 0; i < names.length; i += 1) {
-        	try {
-        		putOnce(names[i], jo.opt(names[i]));
-        	} catch (Exception ignore) {
-        	}
+            try {
+                putOnce(names[i], jo.opt(names[i]));
+            } catch (Exception ignore) {
+            }
         }
     }
 
@@ -197,9 +197,7 @@ public class JSONObject {
                 key = x.nextValue().toString();
             }
 
-            /*
-             * The key is followed by ':'. We will also tolerate '=' or '=>'.
-             */
+// The key is followed by ':'. We will also tolerate '=' or '=>'.
 
             c = x.nextClean();
             if (c == '=') {
@@ -211,9 +209,7 @@ public class JSONObject {
             }
             putOnce(key, x.nextValue());
 
-            /*
-             * Pairs are separated by ','. We will also tolerate ';'.
-             */
+// Pairs are separated by ','. We will also tolerate ';'.
 
             switch (x.nextClean()) {
             case ';':
@@ -247,7 +243,7 @@ public class JSONObject {
                 Map.Entry e = (Map.Entry)i.next();
                 Object value = e.getValue();
                 if (value != null) {
-                	this.map.put(e.getKey(), wrap(value));
+                    this.map.put(e.getKey(), wrap(value));
                 }
             }
         }
@@ -326,33 +322,33 @@ public class JSONObject {
     public JSONObject(String baseName, Locale locale) throws JSONException {
         this();
         ResourceBundle r = ResourceBundle.getBundle(baseName, locale, 
-        		Thread.currentThread().getContextClassLoader());
+                Thread.currentThread().getContextClassLoader());
 
 // Iterate through the keys in the bundle.
         
         Enumeration keys = r.getKeys();
         while (keys.hasMoreElements()) {
-        	Object key = keys.nextElement();
-        	if (key instanceof String) {
-	
+            Object key = keys.nextElement();
+            if (key instanceof String) {
+    
 // Go through the path, ensuring that there is a nested JSONObject for each 
 // segment except the last. Add the value using the last segment's name into
 // the deepest nested JSONObject.
-	            
-	            String[] path = ((String)key).split("\\.");
-	            int last = path.length - 1;
-	            JSONObject target = this;
-	            for (int i = 0; i < last; i += 1) {
-	                String segment = path[i];
+                
+                String[] path = ((String)key).split("\\.");
+                int last = path.length - 1;
+                JSONObject target = this;
+                for (int i = 0; i < last; i += 1) {
+                    String segment = path[i];
                     JSONObject nextTarget = target.optJSONObject(segment);
                     if (nextTarget == null) {
                         nextTarget = new JSONObject();
                         target.put(segment, nextTarget);
                     }
                     target = nextTarget;
-	            }
-	            target.put(path[last], r.getString((String)key));
-	        }
+                }
+                target.put(path[last], r.getString((String)key));
+            }
         }
     }
 
@@ -653,23 +649,23 @@ public class JSONObject {
      * that is not an Integer, Long, Double, or Float.
      */
     public JSONObject increment(String key) throws JSONException {
-    	Object value = opt(key);
-    	if (value == null) {
-    		put(key, 1);
-    	} else {
-    		if (value instanceof Integer) {
-    			put(key, ((Integer)value).intValue() + 1);
-    		} else if (value instanceof Long) {
-    			put(key, ((Long)value).longValue() + 1);    			
-    		} else if (value instanceof Double) {
-	    		put(key, ((Double)value).doubleValue() + 1);    			
-    		} else if (value instanceof Float) {
-	    		put(key, ((Float)value).floatValue() + 1);    			
-		    } else {
-		    	throw new JSONException("Unable to increment [" + key + "].");
-		    }
-	    }
-    	return this;
+        Object value = opt(key);
+        if (value == null) {
+            put(key, 1);
+        } else {
+            if (value instanceof Integer) {
+                put(key, ((Integer)value).intValue() + 1);
+            } else if (value instanceof Long) {
+                put(key, ((Long)value).longValue() + 1);                
+            } else if (value instanceof Double) {
+                put(key, ((Double)value).doubleValue() + 1);                
+            } else if (value instanceof Float) {
+                put(key, ((Float)value).floatValue() + 1);                
+            } else {
+                throw new JSONException("Unable to increment [" + key + "].");
+            }
+        }
+        return this;
     }
 
 
@@ -961,12 +957,12 @@ public class JSONObject {
                     String name = method.getName();
                     String key = "";
                     if (name.startsWith("get")) {
-                    	if (name.equals("getClass") || 
-                    			name.equals("getDeclaringClass")) {
-                    		key = "";
-                    	} else {
-                    		key = name.substring(3);
-                    	}
+                        if (name.equals("getClass") || 
+                                name.equals("getDeclaringClass")) {
+                            key = "";
+                        } else {
+                            key = name.substring(3);
+                        }
                     } else if (name.startsWith("is")) {
                         key = name.substring(2);
                     }
@@ -982,7 +978,7 @@ public class JSONObject {
 
                         Object result = method.invoke(bean, (Object[])null);
                         if (result != null) {
-                        	map.put(key, wrap(result));
+                            map.put(key, wrap(result));
                         }
                     }
                 }
@@ -1230,7 +1226,7 @@ public class JSONObject {
      * @param s A String.
      * @return A simple JSON value.
      */
-    static public Object stringToValue(String s) {
+    public static Object stringToValue(String s) {
         if (s.equals("")) {
             return s;
         }
@@ -1264,7 +1260,7 @@ public class JSONObject {
             }
             try {
                 if (s.indexOf('.') > -1 || 
-                		s.indexOf('e') > -1 || s.indexOf('E') > -1) {
+                        s.indexOf('e') > -1 || s.indexOf('E') > -1) {
                     return Double.valueOf(s);
                 } else {
                     Long myLong = new Long(s);
@@ -1558,8 +1554,8 @@ public class JSONObject {
                  return NULL;
              }
              if (object instanceof JSONObject || object instanceof JSONArray || 
-            		 NULL.equals(object)      || object instanceof JSONString || 
-            		 object instanceof Byte   || object instanceof Character ||
+                     NULL.equals(object)      || object instanceof JSONString || 
+                     object instanceof Byte   || object instanceof Character ||
                      object instanceof Short  || object instanceof Integer   ||
                      object instanceof Long   || object instanceof Boolean   || 
                      object instanceof Float  || object instanceof Double    ||
@@ -1579,8 +1575,8 @@ public class JSONObject {
              Package objectPackage = object.getClass().getPackage();
              String objectPackageName = ( objectPackage != null ? objectPackage.getName() : "" );
              if (objectPackageName.startsWith("java.") ||
-            		 objectPackageName.startsWith("javax.") ||
-            		 object.getClass().getClassLoader() == null) {
+                     objectPackageName.startsWith("javax.") ||
+                     object.getClass().getClassLoader() == null) {
                  return object.toString();
              }
              return new JSONObject(object);
