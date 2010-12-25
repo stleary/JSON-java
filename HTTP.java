@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * Convert an HTTP header to a JSONObject and back.
  * @author JSON.org
- * @version 2008-09-18
+ * @version 2010-12-24
  */
 public class HTTP {
 
@@ -69,27 +69,27 @@ public class HTTP {
      * @throws JSONException
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
-        JSONObject     o = new JSONObject();
+        JSONObject     jo = new JSONObject();
         HTTPTokener    x = new HTTPTokener(string);
-        String         t;
+        String         token;
 
-        t = x.nextToken();
-        if (t.toUpperCase().startsWith("HTTP")) {
+        token = x.nextToken();
+        if (token.toUpperCase().startsWith("HTTP")) {
 
 // Response
 
-            o.put("HTTP-Version", t);
-            o.put("Status-Code", x.nextToken());
-            o.put("Reason-Phrase", x.nextTo('\0'));
+            jo.put("HTTP-Version", token);
+            jo.put("Status-Code", x.nextToken());
+            jo.put("Reason-Phrase", x.nextTo('\0'));
             x.next();
 
         } else {
 
 // Request
 
-            o.put("Method", t);
-            o.put("Request-URI", x.nextToken());
-            o.put("HTTP-Version", x.nextToken());
+            jo.put("Method", token);
+            jo.put("Request-URI", x.nextToken());
+            jo.put("HTTP-Version", x.nextToken());
         }
 
 // Fields
@@ -97,10 +97,10 @@ public class HTTP {
         while (x.more()) {
             String name = x.nextTo(':');
             x.next(':');
-            o.put(name, x.nextTo('\0'));
+            jo.put(name, x.nextTo('\0'));
             x.next();
         }
-        return o;
+        return jo;
     }
 
 
@@ -119,41 +119,41 @@ public class HTTP {
      * }</pre>
      * Any other members of the JSONObject will be output as HTTP fields.
      * The result will end with two CRLF pairs.
-     * @param o A JSONObject
+     * @param jo A JSONObject
      * @return An HTTP header string.
      * @throws JSONException if the object does not contain enough
      *  information.
      */
-    public static String toString(JSONObject o) throws JSONException {
-        Iterator     keys = o.keys();
-        String       s;
+    public static String toString(JSONObject jo) throws JSONException {
+        Iterator     keys = jo.keys();
+        String       string;
         StringBuffer sb = new StringBuffer();
-        if (o.has("Status-Code") && o.has("Reason-Phrase")) {
-            sb.append(o.getString("HTTP-Version"));
+        if (jo.has("Status-Code") && jo.has("Reason-Phrase")) {
+            sb.append(jo.getString("HTTP-Version"));
             sb.append(' ');
-            sb.append(o.getString("Status-Code"));
+            sb.append(jo.getString("Status-Code"));
             sb.append(' ');
-            sb.append(o.getString("Reason-Phrase"));
-        } else if (o.has("Method") && o.has("Request-URI")) {
-            sb.append(o.getString("Method"));
+            sb.append(jo.getString("Reason-Phrase"));
+        } else if (jo.has("Method") && jo.has("Request-URI")) {
+            sb.append(jo.getString("Method"));
             sb.append(' ');
             sb.append('"');
-            sb.append(o.getString("Request-URI"));
+            sb.append(jo.getString("Request-URI"));
             sb.append('"');
             sb.append(' ');
-            sb.append(o.getString("HTTP-Version"));
+            sb.append(jo.getString("HTTP-Version"));
         } else {
             throw new JSONException("Not enough material for an HTTP header.");
         }
         sb.append(CRLF);
         while (keys.hasNext()) {
-            s = keys.next().toString();
-            if (!s.equals("HTTP-Version")      && !s.equals("Status-Code") &&
-                    !s.equals("Reason-Phrase") && !s.equals("Method") &&
-                    !s.equals("Request-URI")   && !o.isNull(s)) {
-                sb.append(s);
+            string = keys.next().toString();
+            if (!string.equals("HTTP-Version")      && !string.equals("Status-Code") &&
+                    !string.equals("Reason-Phrase") && !string.equals("Method") &&
+                    !string.equals("Request-URI")   && !jo.isNull(string)) {
+                sb.append(string);
                 sb.append(": ");
-                sb.append(o.getString(s));
+                sb.append(jo.getString(string));
                 sb.append(CRLF);
             }
         }

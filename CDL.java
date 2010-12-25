@@ -41,7 +41,7 @@ SOFTWARE.
  * The names for the elements in the JSONObjects can be taken from the names
  * in the first row.
  * @author JSON.org
- * @version 2009-09-11
+ * @version 2010-12-24
  */
 public class CDL {
 
@@ -135,6 +135,43 @@ public class CDL {
     }
 
     /**
+	 * Produce a comma delimited text row from a JSONArray. Values containing
+	 * the comma character will be quoted. Troublesome characters may be 
+	 * removed.
+	 * @param ja A JSONArray of strings.
+	 * @return A string ending in NEWLINE.
+	 */
+	public static String rowToString(JSONArray ja) {
+	    StringBuffer sb = new StringBuffer();
+	    for (int i = 0; i < ja.length(); i += 1) {
+	        if (i > 0) {
+	            sb.append(',');
+	        }
+	        Object object = ja.opt(i);
+	        if (object != null) {
+	            String string = object.toString();
+	            if (string.length() > 0 && (string.indexOf(',') >= 0 || 
+	            		string.indexOf('\n') >= 0 || string.indexOf('\r') >= 0 || 
+	            		string.indexOf(0) >= 0 || string.charAt(0) == '"')) {
+	                sb.append('"');
+	            	int length = string.length();
+	            	for (int j = 0; j < length; j += 1) {
+	            		char c = string.charAt(j);
+	            		if (c >= ' ' && c != '"') {
+	            			sb.append(c);
+	            		}
+	                }
+	                sb.append('"');
+	            } else {
+	                sb.append(string);
+	            }
+	        }
+	    }
+	    sb.append('\n');
+	    return sb.toString();
+	}
+
+	/**
      * Produce a JSONArray of JSONObjects from a comma delimited text string,
      * using the first row as a source of names.
      * @param string The comma delimited text.
@@ -196,43 +233,6 @@ public class CDL {
         return ja;
     }
 
-
-    /**
-     * Produce a comma delimited text row from a JSONArray. Values containing
-     * the comma character will be quoted. Troublesome characters may be 
-     * removed.
-     * @param ja A JSONArray of strings.
-     * @return A string ending in NEWLINE.
-     */
-    public static String rowToString(JSONArray ja) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < ja.length(); i += 1) {
-            if (i > 0) {
-                sb.append(',');
-            }
-            Object o = ja.opt(i);
-            if (o != null) {
-                String s = o.toString();
-                if (s.length() > 0 && (s.indexOf(',') >= 0 || s.indexOf('\n') >= 0 || 
-                		s.indexOf('\r') >= 0 || s.indexOf(0) >= 0 || 
-                		s.charAt(0) == '"')) {
-                    sb.append('"');
-                	int length = s.length();
-                	for (int j = 0; j < length; j += 1) {
-                		char c = s.charAt(j);
-                		if (c >= ' ' && c != '"') {
-                			sb.append(c);
-                		}
-                    }
-                    sb.append('"');
-                } else {
-                    sb.append(s);
-                }
-            }
-        }
-        sb.append('\n');
-        return sb.toString();
-    }
 
     /**
      * Produce a comma delimited text from a JSONArray of JSONObjects. The

@@ -54,7 +54,7 @@ SOFTWARE.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
- * @version 2010-03-11
+ * @version 2010-12-24
  */
 public class JSONWriter {
     private static final int maxdepth = 20;
@@ -103,12 +103,12 @@ public class JSONWriter {
 
     /**
      * Append a value.
-     * @param s A string value.
+     * @param string A string value.
      * @return this
      * @throws JSONException If the value is out of sequence.
      */
-    private JSONWriter append(String s) throws JSONException {
-        if (s == null) {
+    private JSONWriter append(String string) throws JSONException {
+        if (string == null) {
             throw new JSONException("Null pointer");
         }
         if (this.mode == 'o' || this.mode == 'a') {
@@ -116,7 +116,7 @@ public class JSONWriter {
                 if (this.comma && this.mode == 'a') {
                     this.writer.write(',');
                 }
-                this.writer.write(s);
+                this.writer.write(string);
             } catch (IOException e) {
                 throw new JSONException(e);
             }
@@ -150,17 +150,17 @@ public class JSONWriter {
 
     /**
      * End something.
-     * @param m Mode
+     * @param mode Mode
      * @param c Closing character
      * @return this
      * @throws JSONException If unbalanced.
      */
-    private JSONWriter end(char m, char c) throws JSONException {
-        if (this.mode != m) {
-            throw new JSONException(m == 'a' ? "Misplaced endArray." : 
+    private JSONWriter end(char mode, char c) throws JSONException {
+        if (this.mode != mode) {
+            throw new JSONException(mode == 'a' ? "Misplaced endArray." : 
             		"Misplaced endObject.");
         }
-        this.pop(m);
+        this.pop(mode);
         try {
             this.writer.write(c);
         } catch (IOException e) {
@@ -193,22 +193,22 @@ public class JSONWriter {
     /**
      * Append a key. The key will be associated with the next value. In an
      * object, every value must be preceded by a key.
-     * @param s A key string.
+     * @param string A key string.
      * @return this
      * @throws JSONException If the key is out of place. For example, keys
      *  do not belong in arrays or if the key is null.
      */
-    public JSONWriter key(String s) throws JSONException {
-        if (s == null) {
+    public JSONWriter key(String string) throws JSONException {
+        if (string == null) {
             throw new JSONException("Null key.");
         }
         if (this.mode == 'k') {
             try {
-                stack[top - 1].putOnce(s, Boolean.TRUE);
+                stack[top - 1].putOnce(string, Boolean.TRUE);
                 if (this.comma) {
                     this.writer.write(',');
                 }
-                this.writer.write(JSONObject.quote(s));
+                this.writer.write(JSONObject.quote(string));
                 this.writer.write(':');
                 this.comma = false;
                 this.mode = 'o';
@@ -259,7 +259,8 @@ public class JSONWriter {
             throw new JSONException("Nesting error.");
         }
         this.top -= 1;
-        this.mode = this.top == 0 ? 'd' : this.stack[this.top - 1] == null ? 'a' : 'k';
+        this.mode = this.top == 0 ? 
+        		'd' : this.stack[this.top - 1] == null ? 'a' : 'k';
     }
 
     /**
@@ -311,13 +312,12 @@ public class JSONWriter {
 
     /**
      * Append an object value.
-     * @param o The object to append. It can be null, or a Boolean, Number,
-     *   String, JSONObject, or JSONArray, or an object with a toJSONString()
-     *   method.
+     * @param object The object to append. It can be null, or a Boolean, Number,
+     *   String, JSONObject, or JSONArray, or an object that implements JSONString.
      * @return this
      * @throws JSONException If the value is out of sequence.
      */
-    public JSONWriter value(Object o) throws JSONException {
-        return this.append(JSONObject.valueToString(o));
+    public JSONWriter value(Object object) throws JSONException {
+        return this.append(JSONObject.valueToString(object));
     }
 }

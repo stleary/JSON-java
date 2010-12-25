@@ -36,7 +36,7 @@ SOFTWARE.
  * it. It is used by the JSONObject and JSONArray constructors to parse
  * JSON source strings.
  * @author JSON.org
- * @version 2010-12-20
+ * @version 2010-12-24
  */
 public class JSONTokener {
 
@@ -207,17 +207,17 @@ public class JSONTokener {
              return "";
          }
 
-         char[] buffer = new char[n];
+         char[] chars = new char[n];
          int pos = 0;
 
          while (pos < n) {
-             buffer[pos] = next();
+             chars[pos] = next();
              if (end()) {
                  throw syntaxError("Substring bounds error");                 
              }
              pos += 1;
          }
-         return new String(buffer);
+         return new String(chars);
      }
 
 
@@ -301,14 +301,14 @@ public class JSONTokener {
     /**
      * Get the text up but not including the specified character or the
      * end of line, whichever comes first.
-     * @param  d A delimiter character.
+     * @param  delimiter A delimiter character.
      * @return   A string.
      */
-    public String nextTo(char d) throws JSONException {
+    public String nextTo(char delimiter) throws JSONException {
         StringBuffer sb = new StringBuffer();
         for (;;) {
             char c = next();
-            if (c == d || c == 0 || c == '\n' || c == '\r') {
+            if (c == delimiter || c == 0 || c == '\n' || c == '\r') {
                 if (c != 0) {
                     back();
                 }
@@ -351,7 +351,7 @@ public class JSONTokener {
      */
     public Object nextValue() throws JSONException {
         char c = nextClean();
-        String s;
+        String string;
 
         switch (c) {
             case '"':
@@ -361,7 +361,6 @@ public class JSONTokener {
                 back();
                 return new JSONObject(this);
             case '[':
-            case '(':
                 back();
                 return new JSONArray(this);
         }
@@ -382,11 +381,11 @@ public class JSONTokener {
         }
         back();
 
-        s = sb.toString().trim();
-        if (s.equals("")) {
+        string = sb.toString().trim();
+        if (string.equals("")) {
             throw syntaxError("Missing value");
         }
-        return JSONObject.stringToValue(s);
+        return JSONObject.stringToValue(string);
     }
 
 
@@ -440,6 +439,7 @@ public class JSONTokener {
      * @return " at {index} [character {character} line {line}]"
      */
     public String toString() {
-        return " at " + index + " [character " + this.character + " line " + this.line + "]";
+        return " at " + index + " [character " + this.character + " line " + 
+        	this.line + "]";
     }
 }

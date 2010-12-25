@@ -154,7 +154,7 @@ public class JSONML {
 		                	break;
 		                }
 
-//		              attribute = value
+// attribute = value
 
 	                    attribute = (String)token;
 			        	if (!arrayForm && (attribute == "tagName" || attribute == "childNode")) {
@@ -259,7 +259,6 @@ public class JSONML {
     	return (JSONArray)parse(x, true, null);
     }
 
-
     
     /**
      * Convert a well-formed (but not necessarily valid) XML string into a
@@ -277,6 +276,8 @@ public class JSONML {
     public static JSONObject toJSONObject(XMLTokener x) throws JSONException {
        	return (JSONObject)parse(x, false, null);
     }
+    
+    
     /**
      * Convert a well-formed (but not necessarily valid) XML string into a
      * JSONObject using the JsonML transform. Each XML tag is represented as
@@ -302,15 +303,15 @@ public class JSONML {
      * @throws JSONException
      */
     public static String toString(JSONArray ja) throws JSONException {
-    	Object		 e;
     	int			 i;
     	JSONObject   jo;
-    	String       k;
+    	String       key;
 	    Iterator     keys;
 	    int			 length;
+    	Object		 object;
     	StringBuffer sb = new StringBuffer();
 	    String       tagName;
-	    String       v;
+	    String       value;
 	    
 // Emit <tagName	    
     	
@@ -320,24 +321,24 @@ public class JSONML {
 		sb.append('<');
 		sb.append(tagName);
 		
-		e = ja.opt(1);
-		if (e instanceof JSONObject) {
+		object = ja.opt(1);
+		if (object instanceof JSONObject) {
 			i = 2;
-			jo = (JSONObject)e;
+			jo = (JSONObject)object;
 			
 // Emit the attributes
 			
 	        keys = jo.keys();
 	        while (keys.hasNext()) {
-	            k = keys.next().toString();
-            	XML.noSpace(k);
-	            v = jo.optString(k);
-	            if (v != null) {
+	            key = keys.next().toString();
+            	XML.noSpace(key);
+	            value = jo.optString(key);
+	            if (value != null) {
 		            sb.append(' ');
-		            sb.append(XML.escape(k));
+		            sb.append(XML.escape(key));
 		            sb.append('=');
 		            sb.append('"');
-		            sb.append(XML.escape(v));
+		            sb.append(XML.escape(value));
 		            sb.append('"');
 	            }
 	        }  
@@ -354,15 +355,15 @@ public class JSONML {
 		} else {
 	        sb.append('>');
 			do {
-			    e = ja.get(i);
+			    object = ja.get(i);
 			    i += 1;
-			    if (e != null) {
-			    	if (e instanceof String) {
-			    		sb.append(XML.escape(e.toString()));
-					} else if (e instanceof JSONObject) {
-						sb.append(toString((JSONObject)e));
-					} else if (e instanceof JSONArray) {
-						sb.append(toString((JSONArray)e));
+			    if (object != null) {
+			    	if (object instanceof String) {
+			    		sb.append(XML.escape(object.toString()));
+					} else if (object instanceof JSONObject) {
+						sb.append(toString((JSONObject)object));
+					} else if (object instanceof JSONArray) {
+						sb.append(toString((JSONArray)object));
 					}
 			    }
 			} while (i < length);
@@ -385,14 +386,14 @@ public class JSONML {
      */
 	public static String toString(JSONObject jo) throws JSONException {
 	    StringBuffer sb = new StringBuffer();
-	    Object		 e;
 	    int          i;
 	    JSONArray    ja;
-	    String       k;
+	    String       key;
 	    Iterator     keys;
-	    int          len;
+	    int          length;
+	    Object		 object;
 	    String       tagName;
-	    String       v;
+	    String       value;
 	
 //Emit <tagName
 	
@@ -409,16 +410,16 @@ public class JSONML {
 	
         keys = jo.keys();
         while (keys.hasNext()) {
-            k = keys.next().toString();
-            if (!k.equals("tagName") && !k.equals("childNodes")) {
-            	XML.noSpace(k);
-	            v = jo.optString(k);
-	            if (v != null) {
+            key = keys.next().toString();
+            if (!key.equals("tagName") && !key.equals("childNodes")) {
+            	XML.noSpace(key);
+	            value = jo.optString(key);
+	            if (value != null) {
 		            sb.append(' ');
-		            sb.append(XML.escape(k));
+		            sb.append(XML.escape(key));
 		            sb.append('=');
 		            sb.append('"');
-		            sb.append(XML.escape(v));
+		            sb.append(XML.escape(value));
 		            sb.append('"');
 	            }
             }
@@ -432,16 +433,16 @@ public class JSONML {
 	        sb.append('>');
 		} else {
 	        sb.append('>');
-			len = ja.length();
-			for (i = 0; i < len; i += 1) {
-			    e = ja.get(i);
-			    if (e != null) {
-			    	if (e instanceof String) {
-			    		sb.append(XML.escape(e.toString()));
-					} else if (e instanceof JSONObject) {
-						sb.append(toString((JSONObject)e));
-					} else if (e instanceof JSONArray) {
-						sb.append(toString((JSONArray)e));
+			length = ja.length();
+			for (i = 0; i < length; i += 1) {
+			    object = ja.get(i);
+			    if (object != null) {
+			    	if (object instanceof String) {
+			    		sb.append(XML.escape(object.toString()));
+					} else if (object instanceof JSONObject) {
+						sb.append(toString((JSONObject)object));
+					} else if (object instanceof JSONArray) {
+						sb.append(toString((JSONArray)object));
 					}
 			    }
 			}

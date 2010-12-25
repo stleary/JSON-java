@@ -28,7 +28,7 @@ SOFTWARE.
  * Convert a web browser cookie specification to a JSONObject and back.
  * JSON and Cookies are both notations for name/value pairs.
  * @author JSON.org
- * @version 2008-09-18
+ * @version 2010-12-24
  */
 public class Cookie {
 
@@ -48,8 +48,8 @@ public class Cookie {
         char         c;
         String       s = string.trim();
         StringBuffer sb = new StringBuffer();
-        int          len = s.length();
-        for (int i = 0; i < len; i += 1) {
+        int          length = s.length();
+        for (int i = 0; i < length; i += 1) {
             c = s.charAt(i);
             if (c < ' ' || c == '+' || c == '%' || c == '=' || c == ';') {
                 sb.append('%');
@@ -79,29 +79,29 @@ public class Cookie {
      * @throws JSONException
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
-        String         n;
-        JSONObject     o = new JSONObject();
-        Object         v;
+        String         name;
+        JSONObject     jo = new JSONObject();
+        Object         value;
         JSONTokener x = new JSONTokener(string);
-        o.put("name", x.nextTo('='));
+        jo.put("name", x.nextTo('='));
         x.next('=');
-        o.put("value", x.nextTo(';'));
+        jo.put("value", x.nextTo(';'));
         x.next();
         while (x.more()) {
-            n = unescape(x.nextTo("=;"));
+            name = unescape(x.nextTo("=;"));
             if (x.next() != '=') {
-                if (n.equals("secure")) {
-                    v = Boolean.TRUE;
+                if (name.equals("secure")) {
+                    value = Boolean.TRUE;
                 } else {
                     throw x.syntaxError("Missing '=' in cookie parameter.");
                 }
             } else {
-                v = unescape(x.nextTo(';'));
+                value = unescape(x.nextTo(';'));
                 x.next();
             }
-            o.put(n, v);
+            jo.put(name, value);
         }
-        return o;
+        return jo;
     }
 
 
@@ -111,29 +111,29 @@ public class Cookie {
      * If the JSONObject contains "expires", "domain", "path", or "secure"
      * members, they will be appended to the cookie specification string.
      * All other members are ignored.
-     * @param o A JSONObject
+     * @param jo A JSONObject
      * @return A cookie specification string
      * @throws JSONException
      */
-    public static String toString(JSONObject o) throws JSONException {
+    public static String toString(JSONObject jo) throws JSONException {
         StringBuffer sb = new StringBuffer();
 
-        sb.append(escape(o.getString("name")));
+        sb.append(escape(jo.getString("name")));
         sb.append("=");
-        sb.append(escape(o.getString("value")));
-        if (o.has("expires")) {
+        sb.append(escape(jo.getString("value")));
+        if (jo.has("expires")) {
             sb.append(";expires=");
-            sb.append(o.getString("expires"));
+            sb.append(jo.getString("expires"));
         }
-        if (o.has("domain")) {
+        if (jo.has("domain")) {
             sb.append(";domain=");
-            sb.append(escape(o.getString("domain")));
+            sb.append(escape(jo.getString("domain")));
         }
-        if (o.has("path")) {
+        if (jo.has("path")) {
             sb.append(";path=");
-            sb.append(escape(o.getString("path")));
+            sb.append(escape(jo.getString("path")));
         }
-        if (o.optBoolean("secure")) {
+        if (jo.optBoolean("secure")) {
             sb.append(";secure");
         }
         return sb.toString();
@@ -142,28 +142,28 @@ public class Cookie {
     /**
      * Convert <code>%</code><i>hh</i> sequences to single characters, and
      * convert plus to space.
-     * @param s A string that may contain
+     * @param string A string that may contain
      *      <code>+</code>&nbsp;<small>(plus)</small> and
      *      <code>%</code><i>hh</i> sequences.
      * @return The unescaped string.
      */
-    public static String unescape(String s) {
-        int len = s.length();
-        StringBuffer b = new StringBuffer();
-        for (int i = 0; i < len; ++i) {
-            char c = s.charAt(i);
+    public static String unescape(String string) {
+        int length = string.length();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < length; ++i) {
+            char c = string.charAt(i);
             if (c == '+') {
                 c = ' ';
-            } else if (c == '%' && i + 2 < len) {
-                int d = JSONTokener.dehexchar(s.charAt(i + 1));
-                int e = JSONTokener.dehexchar(s.charAt(i + 2));
+            } else if (c == '%' && i + 2 < length) {
+                int d = JSONTokener.dehexchar(string.charAt(i + 1));
+                int e = JSONTokener.dehexchar(string.charAt(i + 2));
                 if (d >= 0 && e >= 0) {
                     c = (char)(d * 16 + e);
                     i += 2;
                 }
             }
-            b.append(c);
+            sb.append(c);
         }
-        return b.toString();
+        return sb.toString();
     }
 }
