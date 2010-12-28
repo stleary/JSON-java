@@ -87,7 +87,7 @@ import java.util.TreeSet;
  * <li>Numbers may have the <code>0x-</code> <small>(hex)</small> prefix.</li>
  * </ul>
  * @author JSON.org
- * @version 2010-12-24
+ * @version 2010-12-28
  */
 public class JSONObject {
 
@@ -627,10 +627,8 @@ public class JSONObject {
      * @throws   JSONException if the key is not found.
      */
     public String getString(String key) throws JSONException {
-        if(isNull(key)){
-            return null;
-        }
-        return get(key).toString();
+        Object object = get(key);
+        return object == NULL ? null : object.toString();
     }
 
 
