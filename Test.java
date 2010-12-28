@@ -1481,6 +1481,7 @@ public class Test extends TestCase {
         try {
             array = new JSONArray("[\n\r\n\r}");
             System.out.println(array.toString());
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Missing value at 5 [character 0 line 4]", jsone.getMessage());
         }
@@ -1488,6 +1489,7 @@ public class Test extends TestCase {
         try {
             array = new JSONArray("<\n\r\n\r      ");
             System.out.println(array.toString());
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("A JSONArray text must start with '[' at 1 [character 2 line 1]", jsone.getMessage());
         }
@@ -1497,6 +1499,7 @@ public class Test extends TestCase {
             array.put(Double.NEGATIVE_INFINITY);
             array.put(Double.NaN);
             System.out.println(array.toString());
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("JSON does not allow non-finite numbers.", jsone.getMessage());
         }
@@ -1504,54 +1507,63 @@ public class Test extends TestCase {
         json = new JSONObject();
         try {
             System.out.println(json.getDouble("stooge"));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("JSONObject[\"stooge\"] not found.", jsone.getMessage());
         }
 
         try {
             System.out.println(json.getDouble("howard"));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("JSONObject[\"howard\"] not found.", jsone.getMessage());
         }
 
         try {
             System.out.println(json.put(null, "howard"));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Null key.", jsone.getMessage());
         }
 
         try {
             System.out.println(array.getDouble(0));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("JSONArray[0] not found.", jsone.getMessage());
         }
 
         try {
             System.out.println(array.get(-1));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("JSONArray[-1] not found.", jsone.getMessage());
         }
 
         try {
             System.out.println(array.put(Double.NaN));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("JSON does not allow non-finite numbers.", jsone.getMessage());
         }
 
         try {
             json = XML.toJSONObject("<a><b>    ");
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Unclosed tag b at 11 [character 12 line 1]", jsone.getMessage());
         }
 
         try {
             json = XML.toJSONObject("<a></b>    ");
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Mismatched a and b at 6 [character 7 line 1]", jsone.getMessage());
         }
 
         try {
             json = XML.toJSONObject("<a></a    ");
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Misshaped element at 11 [character 12 line 1]", jsone.getMessage());
         }
@@ -1559,6 +1571,7 @@ public class Test extends TestCase {
         try {
             jsonArray = new JSONArray(new Object());
             System.out.println(jsonArray.toString());
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("JSONArray initial value should be a string or collection or array.", jsone.getMessage());
         }
@@ -1567,6 +1580,7 @@ public class Test extends TestCase {
             str = "[)";
             array = new JSONArray(str);
             System.out.println(array.toString());
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Expected a ',' or ']' at 3 [character 4 line 1]", jsone.getMessage());
         }
@@ -1575,6 +1589,7 @@ public class Test extends TestCase {
             str = "<xml";
             jsonArray = JSONML.toJSONArray(str);
             System.out.println(jsonArray.toString(4));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Misshaped element at 6 [character 7 line 1]", jsone.getMessage());
         }
@@ -1583,6 +1598,7 @@ public class Test extends TestCase {
             str = "<right></wrong>";
             jsonArray = JSONML.toJSONArray(str);
             System.out.println(jsonArray.toString(4));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Mismatched 'right' and 'wrong' at 15 [character 16 line 1]", jsone.getMessage());
         }
@@ -1591,6 +1607,7 @@ public class Test extends TestCase {
             str = "{\"koda\": true, \"koda\": true}";
             json = new JSONObject(str);
             System.out.println(json.toString(4));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Duplicate key \"koda\"", jsone.getMessage());
         }
@@ -1606,6 +1623,7 @@ public class Test extends TestCase {
                     .endObject()
                     .toString();
             System.out.println(json.toString(4));
+            fail("expecting JSONException here.");
         } catch (JSONException jsone) {
             assertEquals("Duplicate key \"bosanda\"", jsone.getMessage());
         }
