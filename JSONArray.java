@@ -78,7 +78,7 @@ import java.util.Map;
  * </ul>
 
  * @author JSON.org
- * @version 2010-12-24
+ * @version 2010-12-28
  */
 public class JSONArray {
 
@@ -322,7 +322,8 @@ public class JSONArray {
      * @throws JSONException If there is no value for the index.
      */
     public String getString(int index) throws JSONException {
-        return get(index).toString();
+        Object object = get(index);
+        return object == JSONObject.NULL ? null : object.toString();
     }
 
 
