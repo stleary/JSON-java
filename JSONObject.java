@@ -627,6 +627,9 @@ public class JSONObject {
      * @throws   JSONException if the key is not found.
      */
     public String getString(String key) throws JSONException {
+        if(isNull(key)){
+            return null;
+        }
         return get(key).toString();
     }
 

@@ -67,6 +67,18 @@ public class Test extends TestCase {
         assertEquals("<test><blank/><empty/></test>", XML.toString(j));
     }
 
+    public void testNull() throws Exception {
+        JSONObject j;
+
+        j = new JSONObject("{\"message\":\"null\"}");
+        assertFalse(j.isNull("message"));
+        assertEquals("null", j.getString("message"));
+
+        j = new JSONObject("{\"message\":null}");
+        assertTrue(j.isNull("message"));
+        assertEquals(null, j.getString("message"));
+    }
+
     public void testJSON() throws Exception {
         Iterator it;
         JSONArray a;
