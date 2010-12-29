@@ -582,7 +582,7 @@ public class Test extends TestCase {
 //                 XML.toString(j));
         assertEquals(98.6d, j.getDouble("String"));
         assertTrue(j.getBoolean("bool"));
-        assertEquals("null", j.getString("to"));
+        assertEquals(null, j.getString("to"));
         assertEquals("true", j.getString("true"));
         assertEquals("[true,false,9876543210,0,1.00000001,1.000000000001,1,1.0E-17,2,0.1,2.0E100,-32,[],{},\"string\",666,2001.99,\"so \\\"fine\\\".\",\"so <fine>.\",true,false,[],{}]",
                 j.getJSONArray("foo").toString());
@@ -1203,7 +1203,7 @@ public class Test extends TestCase {
         } catch (JSONException expected) {
         }
         try {
-            assertEquals(98.6, j.getInt("string"));
+            j.getInt("string");
             fail("should fail with - JSONObject[\"string\"] is not an int.");
         } catch (JSONException expected) {
         }
@@ -1218,7 +1218,7 @@ public class Test extends TestCase {
         } catch (JSONException expected) {
         }
         try {
-            assertEquals(98.6, j.getLong("string"));
+            j.getLong("string");
             fail("should fail with - JSONObject[\"string\"] is not a long.");
         } catch (JSONException expected) {
         }
