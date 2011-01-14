@@ -465,6 +465,7 @@ public class Test extends TestCase {
         int ar[] = {1, 2, 3};
         JSONArray ja = new JSONArray(ar);
         assertEquals("[1,2,3]", ja.toString());
+        assertEquals("<array>1</array><array>2</array><array>3</array>", XML.toString(ar));
 
         String sa[] = {"aString", "aNumber", "aBoolean"};
         jsonobject = new JSONObject(beanie, sa);
