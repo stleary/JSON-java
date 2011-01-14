@@ -41,7 +41,7 @@ SOFTWARE.
  *
  * @author JSON.org
  * @author yusuke at mac.com
- * @version 2010-12-29
+ * @version 2011-01-13
  */
 public class Test extends TestCase {
     public Test(String name) {
@@ -350,8 +350,8 @@ public class Test extends TestCase {
                 "}}", jsonobject.toString(4));
 
         jsonobject = new JSONObject(beanie);
-        //assertEquals("{\"string\":\"A beany object\",\"BENT\":\"All uppercase key\",\"boolean\":true,\"number\":42,\"x\":\"x\"}"
-        //        , jsonobject.toString());
+        assertEquals("{\"string\":\"A beany object\",\"BENT\":\"All uppercase key\",\"boolean\":true,\"number\":42,\"x\":\"x\"}"
+                , jsonobject.toString());
 
         string = "{ \"entity\": { \"imageURL\": \"\", \"name\": \"IXXXXXXXXXXXXX\", \"id\": 12336, \"ratingCount\": null, \"averageRating\": null } }";
         jsonobject = new JSONObject(string);
@@ -491,7 +491,7 @@ public class Test extends TestCase {
                 "  ],\n" +
                 "  \"slashes\": \"///\"\n" +
                 "}", jsonobject.toString(2));
-        assertEquals("<quotes>'</quotes><quotes>&quot;</quotes><slashes>///</slashes><ei><quotes>&quot;'</quotes></ei><eo><b>don't</b><a>&quot;quoted&quot;</a></eo><closetag>&lt;/script&gt;</closetag><backslash>\\</backslash>",
+        assertEquals("<quotes>&apos;</quotes><quotes>&quot;</quotes><slashes>///</slashes><ei><quotes>&quot;&apos;</quotes></ei><eo><b>don&apos;t</b><a>&quot;quoted&quot;</a></eo><closetag>&lt;/script&gt;</closetag><backslash>\\</backslash>",
                 XML.toString(jsonobject));
 
         jsonobject = new JSONObject(
@@ -520,7 +520,7 @@ public class Test extends TestCase {
         jsonarray.put(false);
         jsonarray.put(new JSONArray());
         jsonarray.put(new JSONObject());
-        jsonobject.put("keys", JSONObject.getNames(jsonobject));
+        jsonobject.put("keys", JSONObject.getNames(jsonobject));        
         assertEquals("{\n" +
                 "    \"JSONArray\": [],\n" +
                 "    \"JSONObject\": {},\n" +
@@ -581,8 +581,8 @@ public class Test extends TestCase {
                 "    \"true\": true,\n" +
                 "    \"zero\": -0\n" +
                 "}", jsonobject.toString(4));
-//        assertEquals("<to>null</to><ten>10</ten><JSONObject></JSONObject><op>Good</op><keys>[Ljava.lang.String;@4d125127</keys><int>57</int><true>true</true><foo>true</foo><foo>false</foo><foo>9876543210</foo><foo>0.0</foo><foo>1.00000001</foo><foo>1.000000000001</foo><foo>1.0</foo><foo>1.0E-17</foo><foo>2.0</foo><foo>0.1</foo><foo>2.0E100</foo><foo>-32</foo><foo></foo><foo></foo><foo>string</foo><foo>666</foo><foo>2001.99</foo><foo>so &quot;fine&quot;.</foo><foo>so &lt;fine&gt;.</foo><foo>true</foo><foo>false</foo><foo></foo><foo></foo><zero>-0.0</zero><double>1.2345678901234568E29</double><String>98.6</String><false>false</false><bool>true</bool><\\u2028>?</\\u2028><\\u2029>?</\\u2029><null>null</null>",
-//                 XML.toString(j));
+        assertEquals("<to>null</to><ten>10</ten><JSONObject></JSONObject><op>Good</op><keys>to</keys><keys>ten</keys><keys>JSONObject</keys><keys>JSONArray</keys><keys>op</keys><keys>int</keys><keys>true</keys><keys>foo</keys><keys>zero</keys><keys>double</keys><keys>String</keys><keys>false</keys><keys>bool</keys><keys>\\u2028</keys><keys>\\u2029</keys><keys>null</keys><int>57</int><true>true</true><foo>true</foo><foo>false</foo><foo>9876543210</foo><foo>0.0</foo><foo>1.00000001</foo><foo>1.000000000001</foo><foo>1.0</foo><foo>1.0E-17</foo><foo>2.0</foo><foo>0.1</foo><foo>2.0E100</foo><foo>-32</foo><foo></foo><foo></foo><foo>string</foo><foo>666</foo><foo>2001.99</foo><foo>so &quot;fine&quot;.</foo><foo>so &lt;fine&gt;.</foo><foo>true</foo><foo>false</foo><foo></foo><foo></foo><zero>-0.0</zero><double>1.2345678901234568E29</double><String>98.6</String><false>false</false><bool>true</bool><\\u2028>\u2028</\\u2028><\\u2029>\u2029</\\u2029><null>null</null>",
+                 XML.toString(jsonobject));
         assertEquals(98.6d, jsonobject.getDouble("String"), eps);
         assertTrue(jsonobject.getBoolean("bool"));
         assertEquals(null, jsonobject.getString("to"));
@@ -1057,7 +1057,7 @@ public class Test extends TestCase {
                 "  \"xmlns:xsi\": \"http://www.w3.org/1999/XMLSchema-instance\"\n" +
                 "}}", jsonobject.toString(2));
 
-        assertEquals("<SOAP-ENV:Envelope><SOAP-ENV:Body><ns1:doGoogleSearch><oe>latin1<xsi:type>xsd:string</xsi:type></oe><SOAP-ENV:encodingStyle>http://schemas.xmlsoap.org/soap/encoding/</SOAP-ENV:encodingStyle><lr><xsi:type>xsd:string</xsi:type></lr><start>0<xsi:type>xsd:int</xsi:type></start><q>'+search+'<xsi:type>xsd:string</xsi:type></q><ie>latin1<xsi:type>xsd:string</xsi:type></ie><safeSearch>false<xsi:type>xsd:boolean</xsi:type></safeSearch><xmlns:ns1>urn:GoogleSearch</xmlns:ns1><restrict><xsi:type>xsd:string</xsi:type></restrict><filter>true<xsi:type>xsd:boolean</xsi:type></filter><maxResults>10<xsi:type>xsd:int</xsi:type></maxResults><key>GOOGLEKEY<xsi:type>xsd:string</xsi:type></key></ns1:doGoogleSearch></SOAP-ENV:Body><xmlns:xsd>http://www.w3.org/1999/XMLSchema</xmlns:xsd><xmlns:xsi>http://www.w3.org/1999/XMLSchema-instance</xmlns:xsi><xmlns:SOAP-ENV>http://schemas.xmlsoap.org/soap/envelope/</xmlns:SOAP-ENV></SOAP-ENV:Envelope>",
+        assertEquals("<SOAP-ENV:Envelope><SOAP-ENV:Body><ns1:doGoogleSearch><oe>latin1<xsi:type>xsd:string</xsi:type></oe><SOAP-ENV:encodingStyle>http://schemas.xmlsoap.org/soap/encoding/</SOAP-ENV:encodingStyle><lr><xsi:type>xsd:string</xsi:type></lr><start>0<xsi:type>xsd:int</xsi:type></start><q>&apos;+search+&apos;<xsi:type>xsd:string</xsi:type></q><ie>latin1<xsi:type>xsd:string</xsi:type></ie><safeSearch>false<xsi:type>xsd:boolean</xsi:type></safeSearch><xmlns:ns1>urn:GoogleSearch</xmlns:ns1><restrict><xsi:type>xsd:string</xsi:type></restrict><filter>true<xsi:type>xsd:boolean</xsi:type></filter><maxResults>10<xsi:type>xsd:int</xsi:type></maxResults><key>GOOGLEKEY<xsi:type>xsd:string</xsi:type></key></ns1:doGoogleSearch></SOAP-ENV:Body><xmlns:xsd>http://www.w3.org/1999/XMLSchema</xmlns:xsd><xmlns:xsi>http://www.w3.org/1999/XMLSchema-instance</xmlns:xsi><xmlns:SOAP-ENV>http://schemas.xmlsoap.org/soap/envelope/</xmlns:SOAP-ENV></SOAP-ENV:Envelope>",
                 XML.toString(jsonobject));
 
         jsonobject = new JSONObject("{Envelope: {Body: {\"ns1:doGoogleSearch\": {oe: \"latin1\", filter: true, q: \"'+search+'\", key: \"GOOGLEKEY\", maxResults: 10, \"SOAP-ENV:encodingStyle\": \"http://schemas.xmlsoap.org/soap/encoding/\", start: 0, ie: \"latin1\", safeSearch:false, \"xmlns:ns1\": \"urn:GoogleSearch\"}}}}");
@@ -1073,7 +1073,7 @@ public class Test extends TestCase {
                 "  \"start\": 0,\n" +
                 "  \"xmlns:ns1\": \"urn:GoogleSearch\"\n" +
                 "}}}}", jsonobject.toString(2));
-        assertEquals("<Envelope><Body><ns1:doGoogleSearch><oe>latin1</oe><SOAP-ENV:encodingStyle>http://schemas.xmlsoap.org/soap/encoding/</SOAP-ENV:encodingStyle><start>0</start><q>'+search+'</q><ie>latin1</ie><safeSearch>false</safeSearch><xmlns:ns1>urn:GoogleSearch</xmlns:ns1><maxResults>10</maxResults><key>GOOGLEKEY</key><filter>true</filter></ns1:doGoogleSearch></Body></Envelope>",
+        assertEquals("<Envelope><Body><ns1:doGoogleSearch><oe>latin1</oe><SOAP-ENV:encodingStyle>http://schemas.xmlsoap.org/soap/encoding/</SOAP-ENV:encodingStyle><start>0</start><q>&apos;+search+&apos;</q><ie>latin1</ie><safeSearch>false</safeSearch><xmlns:ns1>urn:GoogleSearch</xmlns:ns1><maxResults>10</maxResults><key>GOOGLEKEY</key><filter>true</filter></ns1:doGoogleSearch></Body></Envelope>",
                 XML.toString(jsonobject));
 
         jsonobject = CookieList.toJSONObject("  f%oo = b+l=ah  ; o;n%40e = t.wo ");

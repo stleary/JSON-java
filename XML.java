@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import java.lang.reflect.Array;
 import java.util.Iterator;
 
 
@@ -31,7 +32,7 @@ import java.util.Iterator;
  * This provides static methods to convert an XML text into a JSONObject,
  * and to covert a JSONObject into an XML text.
  * @author JSON.org
- * @version 2010-12-24
+ * @version 2011-01-13
  */
 public class XML {
 
@@ -89,6 +90,9 @@ public class XML {
                 break;
             case '"':
                 sb.append("&quot;");
+                break;
+            case '\'':
+                sb.append("&apos;");
                 break;
             default:
                 sb.append(c);
@@ -443,18 +447,29 @@ public class XML {
                     ja = (JSONArray)value;
                     length = ja.length();
                     for (i = 0; i < length; i += 1) {
-                    	value = ja.get(i);
-                    	if (value instanceof JSONArray) {
+                        value = ja.get(i);
+                        if (value instanceof JSONArray) {
                             sb.append('<');
                             sb.append(key);
                             sb.append('>');
-                    		sb.append(toString(value));
+                            sb.append(toString(value));
                             sb.append("</");
                             sb.append(key);
                             sb.append('>');
-                    	} else {
-                    		sb.append(toString(value, key));
-                    	}
+                        } else {
+                            sb.append(toString(value, key));
+                        }
+                    }
+                } else if (value.getClass().isArray()) {
+                    length = Array.getLength(value);
+                    for (i = 0; i < length; i += 1) {
+                        sb.append('<');
+                        sb.append(key);
+                        sb.append('>');
+                        sb.append(Array.get(value, i).toString());
+                        sb.append("</");
+                        sb.append(key);
+                        sb.append('>');
                     }
                 } else if (value.equals("")) {
                     sb.append('<');
