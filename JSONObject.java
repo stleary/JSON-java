@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.TreeSet;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its
@@ -87,7 +86,7 @@ import java.util.TreeSet;
  * <li>Numbers may have the <code>0x-</code> <small>(hex)</small> prefix.</li>
  * </ul>
  * @author JSON.org
- * @version 2010-12-28
+ * @version 2011-01-31
  */
 public class JSONObject {
 
@@ -320,12 +319,12 @@ public class JSONObject {
      */
     public JSONObject(String baseName, Locale locale) throws JSONException {
         this();
-        ResourceBundle r = ResourceBundle.getBundle(baseName, locale, 
+        ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale, 
                 Thread.currentThread().getContextClassLoader());
 
 // Iterate through the keys in the bundle.
         
-        Enumeration keys = r.getKeys();
+        Enumeration keys = bundle.getKeys();
         while (keys.hasMoreElements()) {
             Object key = keys.nextElement();
             if (key instanceof String) {
@@ -346,7 +345,7 @@ public class JSONObject {
                     }
                     target = nextTarget;
                 }
-                target.put(path[last], r.getString((String)key));
+                target.put(path[last], bundle.getString((String)key));
             }
         }
     }
@@ -358,6 +357,10 @@ public class JSONObject {
      * JSONArray is stored under the key to hold all of the accumulated values.
      * If there is already a JSONArray, then the new value is appended to it.
      * In contrast, the put method replaces the previous value.
+     * 
+     * If only one value is accumulated that is not a JSONArray, then the
+     * result will be the same as using put. But if multiple values are 
+     * accumulated, then the result will be like append.
      * @param key   A key string.
      * @param value An object to be accumulated under the key.
      * @return this.
@@ -710,7 +713,7 @@ public class JSONObject {
      */
     public JSONArray names() {
         JSONArray ja = new JSONArray();
-        Iterator  keys = keys();
+        Iterator  keys = this.keys();
         while (keys.hasNext()) {
             ja.put(keys.next());
         }
@@ -1211,16 +1214,6 @@ public class JSONObject {
     }
 
     /**
-     * Get an enumeration of the keys of the JSONObject.
-     * The keys will be sorted alphabetically.
-     *
-     * @return An iterator of the keys.
-     */
-    public Iterator sortedKeys() {
-      return new TreeSet(this.map.keySet()).iterator();
-    }
-
-    /**
      * Try to convert a string into a number, boolean, or null. If the string
      * can't be converted, return the string.
      * @param string A String.
@@ -1332,7 +1325,7 @@ public class JSONObject {
      */
     public String toString() {
         try {
-            Iterator     keys = keys();
+            Iterator     keys = this.keys();
             StringBuffer sb = new StringBuffer("{");
 
             while (keys.hasNext()) {
@@ -1388,7 +1381,7 @@ public class JSONObject {
         if (length == 0) {
             return "{}";
         }
-        Iterator     keys = sortedKeys();
+        Iterator     keys = this.keys();
         int          newindent = indent + indentFactor;
         Object       object;
         StringBuffer sb = new StringBuffer("{");
@@ -1598,7 +1591,7 @@ public class JSONObject {
      public Writer write(Writer writer) throws JSONException {
         try {
             boolean  commanate = false;
-            Iterator keys = keys();
+            Iterator keys = this.keys();
             writer.write('{');
 
             while (keys.hasNext()) {
