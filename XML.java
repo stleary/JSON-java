@@ -31,7 +31,7 @@ import java.util.Iterator;
  * This provides static methods to convert an XML text into a JSONObject,
  * and to covert a JSONObject into an XML text.
  * @author JSON.org
- * @version 2011-01-13
+ * @version 2011-02-11
  */
 public class XML {
 
@@ -312,6 +312,9 @@ public class XML {
         }
         if (string.equalsIgnoreCase("null")) {
             return JSONObject.NULL;
+        }
+        if (string.equals("0")) {
+            return new Integer(0);
         }
 
 // If it might be a number, try converting it. If that doesn't work, 
