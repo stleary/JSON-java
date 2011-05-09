@@ -78,7 +78,7 @@ public class Test extends TestCase {
 
         jsonobject = new JSONObject("{\"message\":null}");
         assertTrue(jsonobject.isNull("message"));
-        assertEquals(null, jsonobject.getString("message"));
+        assertEquals(null, jsonobject.get("message"));
     }
 
     public void testJSON() throws Exception {
@@ -294,7 +294,7 @@ public class Test extends TestCase {
                  XML.toString(jsonobject));
         assertEquals(98.6d, jsonobject.getDouble("String"), eps);
         assertTrue(jsonobject.getBoolean("bool"));
-        assertEquals(null, jsonobject.getString("to"));
+        assertEquals(null, jsonobject.get("to"));
         assertEquals("true", jsonobject.getString("true"));
         assertEquals("[true,false,9876543210,0,1.00000001,1.000000000001,1,1.0E-17,2,0.1,2.0E100,-32,[],{},\"string\",666,2001.99,\"so \\\"fine\\\".\",\"so <fine>.\",true,false,[],{}]",
                 jsonobject.getJSONArray("foo").toString());

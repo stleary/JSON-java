@@ -78,7 +78,7 @@ import java.util.Map;
  * </ul>
 
  * @author JSON.org
- * @version 2010-12-28
+ * @version 2011-05-04
  */
 public class JSONArray {
 
@@ -319,11 +319,14 @@ public class JSONArray {
      * Get the string associated with an index.
      * @param index The index must be between 0 and length() - 1.
      * @return      A string value.
-     * @throws JSONException If there is no value for the index.
+     * @throws JSONException If there is no string value for the index.
      */
     public String getString(int index) throws JSONException {
         Object object = get(index);
-        return object == JSONObject.NULL ? null : object.toString();
+        if (object instanceof String) {
+            return (String)object;
+        }
+        throw new JSONException("JSONArray[" + index + "] not a string.");
     }
 
 
@@ -722,7 +725,7 @@ public class JSONArray {
 
     /**
      * Put a value in the JSONArray, where the value will be a
-     * JSONObject which is produced from a Map.
+     * JSONObject that is produced from a Map.
      * @param index The subscript.
      * @param value The Map value.
      * @return      this.

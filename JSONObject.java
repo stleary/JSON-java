@@ -86,7 +86,7 @@ import java.util.ResourceBundle;
  * <li>Numbers may have the <code>0x-</code> <small>(hex)</small> prefix.</li>
  * </ul>
  * @author JSON.org
- * @version 2011-01-31
+ * @version 2011-04-05
  */
 public class JSONObject {
 
@@ -367,8 +367,10 @@ public class JSONObject {
      * @throws JSONException If the value is an invalid number
      *  or if the key is null.
      */
-    public JSONObject accumulate(String key, Object value)
-            throws JSONException {
+    public JSONObject accumulate(
+        String key, 
+        Object value
+    ) throws JSONException {
         testValidity(value);
         Object object = opt(key);
         if (object == null) {
@@ -627,11 +629,15 @@ public class JSONObject {
      *
      * @param key   A key string.
      * @return      A string which is the value.
-     * @throws   JSONException if the key is not found.
+     * @throws   JSONException if there is no string value for the key.
      */
     public String getString(String key) throws JSONException {
         Object object = get(key);
-        return object == NULL ? null : object.toString();
+        if (object instanceof String) {
+            return (String)object;
+        }
+        throw new JSONException("JSONObject[" + quote(key) +
+            "] not a string.");
     }
 
 
@@ -1490,8 +1496,11 @@ public class JSONObject {
      *  with <code>}</code>&nbsp;<small>(right brace)</small>.
      * @throws JSONException If the object contains an invalid number.
      */
-     static String valueToString(Object value, int indentFactor, int indent)
-            throws JSONException {
+     static String valueToString(
+         Object value, 
+         int    indentFactor, 
+         int    indent
+     ) throws JSONException {
         if (value == null || value.equals(null)) {
             return "null";
         }
@@ -1566,10 +1575,13 @@ public class JSONObject {
                  return new JSONObject((Map)object);
              }
              Package objectPackage = object.getClass().getPackage();
-             String objectPackageName = ( objectPackage != null ? objectPackage.getName() : "" );
-             if (objectPackageName.startsWith("java.") ||
-                     objectPackageName.startsWith("javax.") ||
-                     object.getClass().getClassLoader() == null) {
+             String objectPackageName = objectPackage != null ? 
+                 objectPackage.getName() : "";
+             if (
+                 objectPackageName.startsWith("java.") ||
+                 objectPackageName.startsWith("javax.") ||
+                 object.getClass().getClassLoader() == null
+             ) {
                  return object.toString();
              }
              return new JSONObject(object);
