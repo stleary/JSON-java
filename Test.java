@@ -40,7 +40,7 @@ SOFTWARE.
  * comparisons of .toString to a string literal are likely to fail.
  *
  * @author JSON.org
- * @version 2011-02-09
+ * @version 2011-05-22
  */
 public class Test extends TestCase {
     public Test(String name) {
@@ -78,7 +78,6 @@ public class Test extends TestCase {
 
         jsonobject = new JSONObject("{\"message\":null}");
         assertTrue(jsonobject.isNull("message"));
-        assertEquals(null, jsonobject.get("message"));
     }
 
     public void testJSON() throws Exception {
@@ -294,8 +293,6 @@ public class Test extends TestCase {
                  XML.toString(jsonobject));
         assertEquals(98.6d, jsonobject.getDouble("String"), eps);
         assertTrue(jsonobject.getBoolean("bool"));
-        assertEquals(null, jsonobject.get("to"));
-        assertEquals("true", jsonobject.getString("true"));
         assertEquals("[true,false,9876543210,0,1.00000001,1.000000000001,1,1.0E-17,2,0.1,2.0E100,-32,[],{},\"string\",666,2001.99,\"so \\\"fine\\\".\",\"so <fine>.\",true,false,[],{}]",
                 jsonobject.getJSONArray("foo").toString());
         assertEquals("Good", jsonobject.getString("op"));
@@ -402,9 +399,6 @@ public class Test extends TestCase {
         assertTrue(jsonobject.has("nix"));
         assertEquals("<Request-URI>/</Request-URI><nix>null</nix><nux>false</nux><Method>GET</Method><HTTP-Version>HTTP/1.0</HTTP-Version><null>null</null>",
                 XML.toString(jsonobject));
-        assertEquals("GET \"/\" HTTP/1.0\r\n" +
-                "nux: false\r\n" +
-                "null: null\r\n\r\n", HTTP.toString(jsonobject));
 
         jsonobject = XML.toJSONObject("<?xml version='1.0' encoding='UTF-8'?>" + "\n\n" + "<SOAP-ENV:Envelope" +
                 " xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
