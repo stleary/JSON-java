@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.json</groupId>
+	<artifactId>json</artifactId>
+	<packaging>jar</packaging>
+	<version>20090211</version>
+	<name>JSON (JavaScript Object Notation)</name>
+	<url>http://www.json.org/java/index.html</url>
+	<description>
+		JSON (JavaScript Object Notation) is a lightweight data-interchange format. 
+		It is easy for humans to read and write. It is easy for machines to parse and generate. 
+		It is based on a subset of the JavaScript Programming Language, Standard ECMA-262 3rd Edition - December 1999. 
+		JSON is a text format that is completely language independent but uses conventions that are familiar to programmers of the C-family of languages, 
+		including C, C++, C#, Java, JavaScript, Perl, Python, and many others. These properties make JSON an ideal data-interchange language.
+	</description>
+	<licenses>
+		<license>
+			<name>provided without support or warranty</name>
+			<url>http://www.json.org/license.html</url>
+		</license>
+	</licenses>
+	<organization>
+		<name>JSON</name>
+		<url>http://json.org/</url>
+	</organization>
+  	<properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>5</source>
+					<target>5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
