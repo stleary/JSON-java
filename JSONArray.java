@@ -78,7 +78,7 @@ import java.util.Map;
  * </ul>
 
  * @author JSON.org
- * @version 2011-05-04
+ * @version 2011-08-25
  */
 public class JSONArray {
 
@@ -555,7 +555,7 @@ public class JSONArray {
      */
     public String optString(int index, String defaultValue) {
         Object object = opt(index);
-        return object != null ? object.toString() : defaultValue;
+        return JSONObject.NULL.equals(object) ? object.toString() : defaultValue;
     }
 
 
