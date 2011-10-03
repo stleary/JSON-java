@@ -40,7 +40,7 @@ SOFTWARE.
  * comparisons of .toString to a string literal are likely to fail.
  *
  * @author JSON.org
- * @version 2011-05-22
+ * @version 2011-10-03
  */
 public class Test extends TestCase {
     public Test(String name) {
@@ -91,7 +91,11 @@ public class Test extends TestCase {
 
         Beany beanie = new Beany("A beany object", 42, true);
 
-        string = "[0.1]";
+        string = "[001122334455]";
+        jsonarray = new JSONArray(string);
+        assertEquals("[1122334455]", jsonarray.toString());
+        
+        string = "[00.10]";
         jsonarray = new JSONArray(string);
         assertEquals("[0.1]", jsonarray.toString());
 
@@ -154,15 +158,16 @@ public class Test extends TestCase {
                 jsonarray.toString(4));
         assertEquals("<div id=\"demo\" class=\"JSONML\"><p>JSONML is a transformation between<b>JSON</b>and<b>XML</b>that preserves ordering of document features.</p><p>JSONML can work with JSON arrays or JSON objects.</p><p>Three<br/>little<br/>words</p></div>",
                 JSONML.toString(jsonarray));
+        
+        string = "{\"xmlns:soap\":\"http://www.w3.org/2003/05/soap-envelope\",\"tagName\":\"soap:Envelope\",\"childNodes\":[{\"tagName\":\"soap:Header\"},{\"tagName\":\"soap:Body\",\"childNodes\":[{\"tagName\":\"ws:listProducts\",\"childNodes\":[{\"tagName\":\"ws:delay\",\"childNodes\":[1]}]}]}],\"xmlns:ws\":\"http://warehouse.acme.com/ws\"}";
+        jsonobject = new JSONObject(string);
+        assertEquals("<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:ws=\"http://warehouse.acme.com/ws\"><soap:Header/><soap:Body><ws:listProducts><ws:delay>1</ws:delay></ws:listProducts></soap:Body></soap:Envelope>",
+            JSONML.toString(jsonobject));
 
         string = "<person created=\"2006-11-11T19:23\" modified=\"2006-12-31T23:59\">\n <firstName>Robert</firstName>\n <lastName>Smith</lastName>\n <address type=\"home\">\n <street>12345 Sixth Ave</street>\n <city>Anytown</city>\n <state>CA</state>\n <postalCode>98765-4321</postalCode>\n </address>\n </person>";
         jsonobject = XML.toJSONObject(string);
         assertEquals("{\"person\": {\n    \"lastName\": \"Smith\",\n    \"address\": {\n        \"postalCode\": \"98765-4321\",\n        \"street\": \"12345 Sixth Ave\",\n        \"state\": \"CA\",\n        \"type\": \"home\",\n        \"city\": \"Anytown\"\n    },\n    \"created\": \"2006-11-11T19:23\",\n    \"firstName\": \"Robert\",\n    \"modified\": \"2006-12-31T23:59\"\n}}",
                 jsonobject.toString(4));
-
-        jsonobject = new JSONObject(beanie);
-        assertEquals("{\"string\":\"A beany object\",\"BENT\":\"All uppercase key\",\"boolean\":true,\"number\":42,\"x\":\"x\"}"
-                , jsonobject.toString());
 
         string = "{ \"entity\": { \"imageURL\": \"\", \"name\": \"IXXXXXXXXXXXXX\", \"id\": 12336, \"ratingCount\": null, \"averageRating\": null } }";
         jsonobject = new JSONObject(string);

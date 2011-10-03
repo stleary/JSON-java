@@ -32,7 +32,7 @@ import java.util.Iterator;
  * JSONObject, and to covert a JSONArray or JSONObject into an XML text using 
  * the JsonML transform.
  * @author JSON.org
- * @version 2010-12-23
+ * @version 2011-10-03
  */
 public class JSONML {
 		
@@ -45,8 +45,11 @@ public class JSONML {
      * @return A JSONArray if the value is the outermost tag, otherwise null.
      * @throws JSONException
      */
-    private static Object parse(XMLTokener x, boolean arrayForm, 
-    		JSONArray ja) throws JSONException {
+    private static Object parse(
+        XMLTokener x, 
+        boolean    arrayForm, 
+		JSONArray  ja
+    ) throws JSONException {
         String     attribute;
         char       c;
         String	   closeTag = null;
@@ -439,8 +442,10 @@ public class JSONML {
 			    if (object != null) {
 			    	if (object instanceof String) {
 			    		sb.append(XML.escape(object.toString()));
-					} else if (object instanceof JSONObject) {
-						sb.append(toString((JSONObject)object));
+                    } else if (object instanceof Number) {
+                        sb.append(object.toString());
+                    } else if (object instanceof JSONObject) {
+                        sb.append(toString((JSONObject)object));
 					} else if (object instanceof JSONArray) {
 						sb.append(toString((JSONArray)object));
 					}
