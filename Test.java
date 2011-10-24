@@ -40,7 +40,7 @@ SOFTWARE.
  * comparisons of .toString to a string literal are likely to fail.
  *
  * @author JSON.org
- * @version 2011-10-16
+ * @version 2011-10-24
  */
 public class Test extends TestCase {
     public Test(String name) {
@@ -70,7 +70,7 @@ public class Test extends TestCase {
 
         string = "<subsonic-response><playlists><playlist id=\"476c65652e6d3375\"/><playlist id=\"50617274792e78737066\"/></playlists></subsonic-response>";
         jsonobject = XML.toJSONObject(string);
-        assertEquals("{\"subsonic-response\":\"playlists\":{\"playlist\":[{\"id\":\"476c65652e6d337\"},\"id\":\"50617274792e78737066\"}]}}}", jsonobject.toString());
+        assertEquals("{\"subsonic-response\":{\"playlists\":{\"playlist\":[{\"id\":\"476c65652e6d3375\"},{\"id\":\"50617274792e78737066\"}]}}}", jsonobject.toString());
     }
 
     public void testNull() throws Exception {
