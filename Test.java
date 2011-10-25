@@ -40,7 +40,7 @@ SOFTWARE.
  * comparisons of .toString to a string literal are likely to fail.
  *
  * @author JSON.org
- * @version 2011-10-24
+ * @version 2011-10-25
  */
 public class Test extends TestCase {
     public Test(String name) {
@@ -68,9 +68,9 @@ public class Test extends TestCase {
         assertEquals("{\"test\": {\n  \"blank\": \"\",\n  \"empty\": \"\"\n}}", jsonobject.toString(2));
         assertEquals("<test><blank/><empty/></test>", XML.toString(jsonobject));
 
-        string = "<subsonic-response><playlists><playlist id=\"476c65652e6d3375\"/><playlist id=\"50617274792e78737066\"/></playlists></subsonic-response>";
+        string = "<subsonic-response><playlists><playlist id=\"476c65652e6d3375\" int=\"12345678901234567890123456789012345678901234567890213991133777039355058536718668104339937\"/><playlist id=\"50617274792e78737066\"/></playlists></subsonic-response>";
         jsonobject = XML.toJSONObject(string);
-        assertEquals("{\"subsonic-response\":{\"playlists\":{\"playlist\":[{\"id\":\"476c65652e6d3375\"},{\"id\":\"50617274792e78737066\"}]}}}", jsonobject.toString());
+        assertEquals("{\"subsonic-response\":{\"playlists\":{\"playlist\":[{\"id\":\"476c65652e6d3375\",\"int\":\"12345678901234567890123456789012345678901234567890213991133777039355058536718668104339937\"},{\"id\":\"50617274792e78737066\"}]}}}", jsonobject.toString());
     }
 
     public void testNull() throws Exception {
