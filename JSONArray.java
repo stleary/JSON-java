@@ -916,4 +916,29 @@ public class JSONArray {
            throw new JSONException(e);
         }
     }
+
+    /**
+     *      * check if this JSONArray is equal to another.
+     *           * @param o The object to check for equality
+     *                * @return true if o is a JSONArray and all corresponding values stored in there are equal, otherwise false
+     *                     */
+    @Override
+    public boolean equals(Object o) {
+	    if(o == null || !(o instanceof JSONArray)) {
+		    return false;
+	    }
+
+	    JSONArray other = (JSONArray) o;
+	    for(int i = 0; i < other.length(); i++) {
+		    try {
+			    if(!this.get(i).equals(other.get(i))) {
+				    return false;
+			    }
+		    } catch (JSONException e) {
+			    return false;
+		    }
+	    }
+
+	    return true;
+    }
 }
