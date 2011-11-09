@@ -1633,4 +1633,35 @@ public class JSONObject {
             throw new JSONException(exception);
         }
      }
+
+     /**
+      * Check if two JSONObjects are equal
+      * @param o The object to check for equality
+      * @return true if o is a JSONObject and all fields are equal to those
+      * of this object, otherwise false
+      */
+     @Override
+     public boolean equals(Object o) {
+	     if (!(o instanceof JSONObject)) {
+		     return false;
+	     }
+
+	     JSONObject other = (JSONObject)  o;
+
+	     Iterator keys = this.keys();
+	     while (keys.hasNext()) {
+		     try {
+			     Object key = keys.next();
+			     Object mine = this.map.get(key);
+			     if(!other.get(key.toString()).equals(mine)) {
+				     return false;
+			     }
+		     } catch (JSONException ex) {
+			     return false;
+		     }
+
+	     }
+
+	     return true;
+     }
 }

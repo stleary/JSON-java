@@ -714,6 +714,28 @@ public class Test extends TestCase {
         ja = JSONML.toJSONArray(string);
         assertEquals("[\"Root\",[\"MsgType\",{\"type\":\"node\"},[\"BatchType\",{\"type\":\"string\"},111111111111111]]]",
                 ja.toString());
+
+	// equals method
+	jsonobject = new JSONObject();
+	jsonobject.put("val1", "blabla");
+	jsonobject.put("val2", "fooo");
+
+	JSONObject jso2 = new JSONObject();
+	jso2.put("val2", "fooo");
+	jso2.put("val1", "blabla");
+
+	JSONObject jso3 = new JSONObject();
+	jso3.put("val1", "nope");
+	jso3.put("val2", "fooo");
+
+	JSONObject jso4 = new JSONObject();
+	jso4.put("val2", "fooo");
+
+	assertTrue(jsonobject.equals(jso2));
+	assertFalse(jsonobject.equals(jso3));
+	assertFalse(jsonobject.equals(jso4));
+	assertFalse(jsonobject.equals(jsonarray));
+	assertFalse(jsonarray.equals(null));
     }
 
     public void testExceptions() throws Exception {
