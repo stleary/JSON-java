@@ -392,15 +392,15 @@ public class XML {
      */
     public static String toString(Object object, String tagName)
             throws JSONException {
-        StringBuffer sb = new StringBuffer();
-        int          i;
-        JSONArray    ja;
-        JSONObject   jo;
-        String       key;
-        Iterator     keys;
-        int          length;
-        String       string;
-        Object       value;
+        StringBuffer     sb = new StringBuffer();
+        int              i;
+        JSONArray        ja;
+        JSONObject       jo;
+        String           key;
+        Iterator<String> keys;
+        int              length;
+        String           string;
+        Object           value;
         if (object instanceof JSONObject) {
 
 // Emit <tagName>
