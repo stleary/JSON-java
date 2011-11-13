@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  vim:ts=8:sw=2
 
   Maven "Project Object Model" for JSON-Java
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,9 +18,9 @@
 
   <repositories>
       <repository>
-	  <id>douglascrockford-json-java</id>
-	  <name>Douglas Crockford's JSON-Java Maven Repository</name>
-	  <url>https://douglascrockford.github.com/JSON-java/repository/</url>
+          <id>douglascrockford-json-java</id>
+          <name>Douglas Crockford's JSON-Java Maven Repository</name>
+          <url>https://douglascrockford.github.com/JSON-java/repository/</url>
       </repository>
   </repositories>
 
@@ -79,52 +78,52 @@
     <testSourceDirectory>.</testSourceDirectory>
     <plugins>
       <plugin>
-	<groupId>org.codehaus.mojo</groupId>
-	<artifactId>exec-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
         <version>1.2.1</version>
-	<executions>
-	  <execution>
+        <executions>
+          <execution>
             <id>github-repository-update</id>
-	    <phase>deploy</phase>
+            <phase>deploy</phase>
             <goals>
-	      <goal>exec</goal>
-	    </goals>
-	    <configuration>
-	      <executable>bash</executable>
-	      <arguments>
-	        <!--
-		  "-x": verbose
-		  "-e": stop execution of script on errors
-		  "-c": execute the commands found in the next argument
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>bash</executable>
+              <arguments>
+                <!--
+                  "-x": verbose
+                  "-e": stop execution of script on errors
+                  "-c": execute the commands found in the next argument
                   -->
-		<argument>-xec</argument>
-		<!--
-		    a whole bunch of git commnds to deploy &
-		    make the generated jar accessible on github
+                <argument>-xec</argument>
+                <!--
+                    a whole bunch of git commnds to deploy &
+                    make the generated jar accessible on github
                     the index mus be clean
                     if it is dirty, the script will fail
                   -->
-		<argument>
-		  <![CDATA[
+                <argument>
+                  <![CDATA[
                   if ! git diff-index --quiet --cached HEAD
-		  then
-			echo You have uncommited changes in the index - please commit them first
-			exit 1
-		  fi
+                  then
+                        echo You have uncommited changes in the index - please commit them first
+                        exit 1
+                  fi
                   oldref=$(git symbolic-ref HEAD)
-		  git symbolic-ref HEAD refs/heads/gh-pages
-	          rm .git/index
-		  git add repository
-		  git commit -m "auto-publishing version $(git describe --always)"
-		  git push origin gh-pages;
-		  git symbolic-ref HEAD $oldref
-		  git reset
-		  ]]>
-		</argument>
-	      </arguments>
-	    </configuration>
-	  </execution>
-	</executions>
+                  git symbolic-ref HEAD refs/heads/gh-pages
+                  rm .git/index
+                  git add repository
+                  git commit -m "auto-publishing version $(git describe --always)"
+                  git push origin gh-pages;
+                  git symbolic-ref HEAD $oldref
+                  git reset
+                  ]]>
+                </argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
