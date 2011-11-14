@@ -54,10 +54,10 @@ SOFTWARE.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
- * @version 2010-12-24
+ * @version 2011-11-14
  */
 public class JSONWriter {
-    private static final int maxdepth = 20;
+    private static final int maxdepth = 200;
 
     /**
      * The comma flag determines if a comma should be output before the next
@@ -78,7 +78,7 @@ public class JSONWriter {
     /**
      * The object/array stack.
      */
-    private JSONObject stack[];
+    private final JSONObject stack[];
 
     /**
      * The stack top index. A value of 0 indicates that the stack is empty.
@@ -157,7 +157,7 @@ public class JSONWriter {
      */
     private JSONWriter end(char mode, char c) throws JSONException {
         if (this.mode != mode) {
-            throw new JSONException(mode == 'a' ? "Misplaced endArray." : 
+            throw new JSONException(mode == 'a' ? "Misplaced endArray." :
             		"Misplaced endObject.");
         }
         this.pop(mode);
@@ -204,7 +204,7 @@ public class JSONWriter {
         }
         if (this.mode == 'k') {
             try {
-                stack[top - 1].putOnce(string, Boolean.TRUE);
+                this.stack[this.top - 1].putOnce(string, Boolean.TRUE);
                 if (this.comma) {
                     this.writer.write(',');
                 }
@@ -259,7 +259,7 @@ public class JSONWriter {
             throw new JSONException("Nesting error.");
         }
         this.top -= 1;
-        this.mode = this.top == 0 ? 
+        this.mode = this.top == 0 ?
         		'd' : this.stack[this.top - 1] == null ? 'a' : 'k';
     }
 
