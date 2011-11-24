@@ -54,7 +54,7 @@ SOFTWARE.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
- * @version 2011-11-14
+ * @version 2011-11-24
  */
 public class JSONWriter {
     private static final int maxdepth = 200;
@@ -157,8 +157,9 @@ public class JSONWriter {
      */
     private JSONWriter end(char mode, char c) throws JSONException {
         if (this.mode != mode) {
-            throw new JSONException(mode == 'a' ? "Misplaced endArray." :
-            		"Misplaced endObject.");
+            throw new JSONException(mode == 'a'
+                ? "Misplaced endArray."
+                : "Misplaced endObject.");
         }
         this.pop(mode);
         try {
@@ -259,8 +260,11 @@ public class JSONWriter {
             throw new JSONException("Nesting error.");
         }
         this.top -= 1;
-        this.mode = this.top == 0 ?
-        		'd' : this.stack[this.top - 1] == null ? 'a' : 'k';
+        this.mode = this.top == 0
+            ? 'd'
+            : this.stack[this.top - 1] == null
+            ? 'a'
+            : 'k';
     }
 
     /**
