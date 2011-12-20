@@ -76,7 +76,7 @@ import java.util.Map;
  * </ul>
 
  * @author JSON.org
- * @version 2011-11-24
+ * @version 2011-12-19
  */
 public class JSONArray {
 
@@ -105,29 +105,29 @@ public class JSONArray {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
         if (x.nextClean() != ']') {
-	        x.back();
-	        for (;;) {
-	            if (x.nextClean() == ',') {
-	                x.back();
-	                this.myArrayList.add(JSONObject.NULL);
-	            } else {
-	                x.back();
-	                this.myArrayList.add(x.nextValue());
-	            }
-	            switch (x.nextClean()) {
-	            case ';':
-	            case ',':
-	                if (x.nextClean() == ']') {
-	                    return;
-	                }
-	                x.back();
-	                break;
-	            case ']':
-	            	return;
-	            default:
-	                throw x.syntaxError("Expected a ',' or ']'");
-	            }
-	        }
+            x.back();
+            for (;;) {
+                if (x.nextClean() == ',') {
+                    x.back();
+                    this.myArrayList.add(JSONObject.NULL);
+                } else {
+                    x.back();
+                    this.myArrayList.add(x.nextValue());
+                }
+                switch (x.nextClean()) {
+                case ';':
+                case ',':
+                    if (x.nextClean() == ']') {
+                        return;
+                    }
+                    x.back();
+                    break;
+                case ']':
+                    return;
+                default:
+                    throw x.syntaxError("Expected a ',' or ']'");
+                }
+            }
         }
     }
 
@@ -149,13 +149,13 @@ public class JSONArray {
      * @param collection     A Collection.
      */
     public JSONArray(Collection collection) {
-		this.myArrayList = new ArrayList();
-		if (collection != null) {
-			Iterator iter = collection.iterator();
-			while (iter.hasNext()) {
+        this.myArrayList = new ArrayList();
+        if (collection != null) {
+            Iterator iter = collection.iterator();
+            while (iter.hasNext()) {
                 this.myArrayList.add(JSONObject.wrap(iter.next()));
-			}
-		}
+            }
+        }
     }
 
 
@@ -555,8 +555,8 @@ public class JSONArray {
     public String optString(int index, String defaultValue) {
         Object object = this.opt(index);
         return JSONObject.NULL.equals(object)
-            ? object.toString()
-            : defaultValue;
+            ? defaultValue
+            : object.toString();
     }
 
 
@@ -775,7 +775,7 @@ public class JSONArray {
      * or null if there was no value.
      */
     public Object remove(int index) {
-    	Object o = this.opt(index);
+        Object o = this.opt(index);
         this.myArrayList.remove(index);
         return o;
     }
