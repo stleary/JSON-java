@@ -107,16 +107,16 @@ public class XML {
      * @throws JSONException
      */
     public static void noSpace(String string) throws JSONException {
-    	int i, length = string.length();
-    	if (length == 0) {
-    		throw new JSONException("Empty string.");
-    	}
-    	for (i = 0; i < length; i += 1) {
-		    if (Character.isWhitespace(string.charAt(i))) {
-		    	throw new JSONException("'" + string + 
-		    			"' contains a space character.");
-		    }
-		}
+        int i, length = string.length();
+        if (length == 0) {
+            throw new JSONException("Empty string.");
+        }
+        for (i = 0; i < length; i += 1) {
+            if (Character.isWhitespace(string.charAt(i))) {
+                throw new JSONException("'" + string + 
+                        "' contains a space character.");
+            }
+        }
     }
 
     /**
@@ -160,7 +160,7 @@ public class XML {
                 x.back();
             } else if (c == '[') {
                 token = x.nextToken();
-                if (token.equals("CDATA")) {
+                if ("CDATA".equals(token)) {
                     if (x.next() == '[') {
                         string = x.nextCDATA();
                         if (string.length() > 0) {
@@ -193,7 +193,7 @@ public class XML {
 
 // Close tag </
 
-        	token = x.nextToken();
+            token = x.nextToken();
             if (name == null) {
                 throw x.syntaxError("Mismatched close tag " + token);
             }            
@@ -230,7 +230,7 @@ public class XML {
                             throw x.syntaxError("Missing value");
                         }
                         jsonobject.accumulate(string, 
-                        		XML.stringToValue((String)token));
+                                XML.stringToValue((String)token));
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -245,7 +245,7 @@ public class XML {
                     if (jsonobject.length() > 0) {
                         context.accumulate(tagName, jsonobject);
                     } else {
-                    	context.accumulate(tagName, "");
+                        context.accumulate(tagName, "");
                     }
                     return false;
 
@@ -263,7 +263,7 @@ public class XML {
                             string = (String)token;
                             if (string.length() > 0) {
                                 jsonobject.accumulate("content", 
-                                		XML.stringToValue(string));
+                                        XML.stringToValue(string));
                             }
 
 // Nested element
@@ -275,7 +275,7 @@ public class XML {
                                 } else if (jsonobject.length() == 1 &&
                                        jsonobject.opt("content") != null) {
                                     context.accumulate(tagName, 
-                                    		jsonobject.opt("content"));
+                                            jsonobject.opt("content"));
                                 } else {
                                     context.accumulate(tagName, jsonobject);
                                 }
@@ -301,19 +301,19 @@ public class XML {
      * @return A simple JSON value.
      */
     public static Object stringToValue(String string) {
-        if (string.equals("")) {
+        if ("".equals(string)) {
             return string;
         }
-        if (string.equalsIgnoreCase("true")) {
+        if ("true".equalsIgnoreCase(string)) {
             return Boolean.TRUE;
         }
-        if (string.equalsIgnoreCase("false")) {
+        if ("false".equalsIgnoreCase(string)) {
             return Boolean.FALSE;
         }
-        if (string.equalsIgnoreCase("null")) {
+        if ("null".equalsIgnoreCase(string)) {
             return JSONObject.NULL;
         }
-        if (string.equals("0")) {
+        if ("0".equals(string)) {
             return new Integer(0);
         }
 
@@ -321,16 +321,16 @@ public class XML {
 // return the string.
 
         try {
-	        char initial = string.charAt(0);
-	        boolean negative = false;
-	        if (initial == '-') {
-	        	initial = string.charAt(1);
-	        	negative = true;
-	        }
-	        if (initial == '0' && string.charAt(negative ? 2 : 1) == '0') {
-	        	return string;
-	        }
-	        if ((initial >= '0' && initial <= '9')) {
+            char initial = string.charAt(0);
+            boolean negative = false;
+            if (initial == '-') {
+                initial = string.charAt(1);
+                negative = true;
+            }
+            if (initial == '0' && string.charAt(negative ? 2 : 1) == '0') {
+                return string;
+            }
+            if ((initial >= '0' && initial <= '9')) {
                 if (string.indexOf('.') >= 0) {
                     return Double.valueOf(string);
                 } else if (string.indexOf('e') < 0 && string.indexOf('E') < 0) {
@@ -341,7 +341,7 @@ public class XML {
                         return myLong;
                     }
                 }
-	        }
+            }
         }  catch (Exception ignore) {
         }
         return string;
@@ -419,7 +419,7 @@ public class XML {
                 key = keys.next().toString();
                 value = jo.opt(key);
                 if (value == null) {
-                	value = "";
+                    value = "";
                 }
                 if (value instanceof String) {
                     string = (String)value;
@@ -429,7 +429,7 @@ public class XML {
 
 // Emit content in body
 
-                if (key.equals("content")) {
+                if ("content".equals(key)) {
                     if (value instanceof JSONArray) {
                         ja = (JSONArray)value;
                         length = ja.length();
@@ -462,7 +462,7 @@ public class XML {
                             sb.append(toString(value, key));
                         }
                     }
-                } else if (value.equals("")) {
+                } else if ("".equals(value)) {
                     sb.append('<');
                     sb.append(key);
                     sb.append("/>");
