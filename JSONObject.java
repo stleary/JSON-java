@@ -967,8 +967,8 @@ public class JSONObject {
                     String name = method.getName();
                     String key = "";
                     if (name.startsWith("get")) {
-                        if (name.equals("getClass") ||
-                                name.equals("getDeclaringClass")) {
+                        if ("getClass".equals(name) ||
+                                "getDeclaringClass".equals(name)) {
                             key = "";
                         } else {
                             key = name.substring(3);
