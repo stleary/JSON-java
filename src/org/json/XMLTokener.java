@@ -165,52 +165,52 @@ public class XMLTokener extends JSONTokener {
 			c = next();
 		} while (Character.isWhitespace(c));
 		switch (c) {
-		case 0:
-			throw syntaxError("Misshaped meta tag");
-		case '<':
-			return XML.LT;
-		case '>':
-			return XML.GT;
-		case '/':
-			return XML.SLASH;
-		case '=':
-			return XML.EQ;
-		case '!':
-			return XML.BANG;
-		case '?':
-			return XML.QUEST;
-		case '"':
-		case '\'':
-			q = c;
-			for (;;) {
-				c = next();
-				if (c == 0) {
-					throw syntaxError("Unterminated string");
+			case 0 :
+				throw syntaxError("Misshaped meta tag");
+			case '<' :
+				return XML.LT;
+			case '>' :
+				return XML.GT;
+			case '/' :
+				return XML.SLASH;
+			case '=' :
+				return XML.EQ;
+			case '!' :
+				return XML.BANG;
+			case '?' :
+				return XML.QUEST;
+			case '"' :
+			case '\'' :
+				q = c;
+				for (;;) {
+					c = next();
+					if (c == 0) {
+						throw syntaxError("Unterminated string");
+					}
+					if (c == q) {
+						return Boolean.TRUE;
+					}
 				}
-				if (c == q) {
-					return Boolean.TRUE;
+			default :
+				for (;;) {
+					c = next();
+					if (Character.isWhitespace(c)) {
+						return Boolean.TRUE;
+					}
+					switch (c) {
+						case 0 :
+						case '<' :
+						case '>' :
+						case '/' :
+						case '=' :
+						case '!' :
+						case '?' :
+						case '"' :
+						case '\'' :
+							back();
+							return Boolean.TRUE;
+					}
 				}
-			}
-		default:
-			for (;;) {
-				c = next();
-				if (Character.isWhitespace(c)) {
-					return Boolean.TRUE;
-				}
-				switch (c) {
-				case 0:
-				case '<':
-				case '>':
-				case '/':
-				case '=':
-				case '!':
-				case '?':
-				case '"':
-				case '\'':
-					back();
-					return Boolean.TRUE;
-				}
-			}
 		}
 	}
 
@@ -231,70 +231,70 @@ public class XMLTokener extends JSONTokener {
 			c = next();
 		} while (Character.isWhitespace(c));
 		switch (c) {
-		case 0:
-			throw syntaxError("Misshaped element");
-		case '<':
-			throw syntaxError("Misplaced '<'");
-		case '>':
-			return XML.GT;
-		case '/':
-			return XML.SLASH;
-		case '=':
-			return XML.EQ;
-		case '!':
-			return XML.BANG;
-		case '?':
-			return XML.QUEST;
+			case 0 :
+				throw syntaxError("Misshaped element");
+			case '<' :
+				throw syntaxError("Misplaced '<'");
+			case '>' :
+				return XML.GT;
+			case '/' :
+				return XML.SLASH;
+			case '=' :
+				return XML.EQ;
+			case '!' :
+				return XML.BANG;
+			case '?' :
+				return XML.QUEST;
 
-			// Quoted string
+				// Quoted string
 
-		case '"':
-		case '\'':
-			q = c;
-			sb = new StringBuffer();
-			for (;;) {
-				c = next();
-				if (c == 0) {
-					throw syntaxError("Unterminated string");
+			case '"' :
+			case '\'' :
+				q = c;
+				sb = new StringBuffer();
+				for (;;) {
+					c = next();
+					if (c == 0) {
+						throw syntaxError("Unterminated string");
+					}
+					if (c == q) {
+						return sb.toString();
+					}
+					if (c == '&') {
+						sb.append(nextEntity(c));
+					} else {
+						sb.append(c);
+					}
 				}
-				if (c == q) {
-					return sb.toString();
-				}
-				if (c == '&') {
-					sb.append(nextEntity(c));
-				} else {
+			default :
+
+				// Name
+
+				sb = new StringBuffer();
+				for (;;) {
 					sb.append(c);
+					c = next();
+					if (Character.isWhitespace(c)) {
+						return sb.toString();
+					}
+					switch (c) {
+						case 0 :
+							return sb.toString();
+						case '>' :
+						case '/' :
+						case '=' :
+						case '!' :
+						case '?' :
+						case '[' :
+						case ']' :
+							back();
+							return sb.toString();
+						case '<' :
+						case '"' :
+						case '\'' :
+							throw syntaxError("Bad character in a name");
+					}
 				}
-			}
-		default:
-
-			// Name
-
-			sb = new StringBuffer();
-			for (;;) {
-				sb.append(c);
-				c = next();
-				if (Character.isWhitespace(c)) {
-					return sb.toString();
-				}
-				switch (c) {
-				case 0:
-					return sb.toString();
-				case '>':
-				case '/':
-				case '=':
-				case '!':
-				case '?':
-				case '[':
-				case ']':
-					back();
-					return sb.toString();
-				case '<':
-				case '"':
-				case '\'':
-					throw syntaxError("Bad character in a name");
-				}
-			}
 		}
 	}
 

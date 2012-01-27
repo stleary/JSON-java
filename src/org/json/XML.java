@@ -81,23 +81,23 @@ public class XML {
 		for (int i = 0, length = string.length(); i < length; i++) {
 			char c = string.charAt(i);
 			switch (c) {
-			case '&':
-				sb.append("&amp;");
-				break;
-			case '<':
-				sb.append("&lt;");
-				break;
-			case '>':
-				sb.append("&gt;");
-				break;
-			case '"':
-				sb.append("&quot;");
-				break;
-			case '\'':
-				sb.append("&apos;");
-				break;
-			default:
-				sb.append(c);
+				case '&' :
+					sb.append("&amp;");
+					break;
+				case '<' :
+					sb.append("&lt;");
+					break;
+				case '>' :
+					sb.append("&gt;");
+					break;
+				case '"' :
+					sb.append("&quot;");
+					break;
+				case '\'' :
+					sb.append("&apos;");
+					break;
+				default :
+					sb.append(c);
 			}
 		}
 		return sb.toString();
@@ -168,7 +168,7 @@ public class XML {
 				x.back();
 			} else if (c == '[') {
 				token = x.nextToken();
-				if (token.equals("CDATA")) {
+				if ("CDATA".equals(token)) {
 					if (x.next() == '[') {
 						string = x.nextCDATA();
 						if (string.length() > 0) {
@@ -310,19 +310,19 @@ public class XML {
 	 * @return A simple JSON value.
 	 */
 	public static Object stringToValue(String string) {
-		if (string.equals("")) {
+		if ("".equals(string)) {
 			return string;
 		}
-		if (string.equalsIgnoreCase("true")) {
+		if ("true".equalsIgnoreCase(string)) {
 			return Boolean.TRUE;
 		}
-		if (string.equalsIgnoreCase("false")) {
+		if ("false".equalsIgnoreCase(string)) {
 			return Boolean.FALSE;
 		}
-		if (string.equalsIgnoreCase("null")) {
+		if ("null".equalsIgnoreCase(string)) {
 			return JSONObject.NULL;
 		}
-		if (string.equals("0")) {
+		if ("0".equals(string)) {
 			return new Integer(0);
 		}
 
@@ -442,7 +442,7 @@ public class XML {
 
 				// Emit content in body
 
-				if (key.equals("content")) {
+				if ("content".equals(key)) {
 					if (value instanceof JSONArray) {
 						ja = (JSONArray) value;
 						length = ja.length();
@@ -475,7 +475,7 @@ public class XML {
 							sb.append(toString(value, key));
 						}
 					}
-				} else if (value.equals("")) {
+				} else if ("".equals(value)) {
 					sb.append('<');
 					sb.append(key);
 					sb.append("/>");
@@ -508,7 +508,8 @@ public class XML {
 				ja = (JSONArray) object;
 				length = ja.length();
 				for (i = 0; i < length; i += 1) {
-					sb.append(toString(ja.opt(i), tagName == null ? "array"
+					sb.append(toString(ja.opt(i), tagName == null
+							? "array"
 							: tagName));
 				}
 				return sb.toString();

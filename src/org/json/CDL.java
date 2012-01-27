@@ -64,29 +64,29 @@ public class CDL {
 			c = x.next();
 		} while (c == ' ' || c == '\t');
 		switch (c) {
-		case 0:
-			return null;
-		case '"':
-		case '\'':
-			q = c;
-			sb = new StringBuffer();
-			for (;;) {
-				c = x.next();
-				if (c == q) {
-					break;
+			case 0 :
+				return null;
+			case '"' :
+			case '\'' :
+				q = c;
+				sb = new StringBuffer();
+				for (;;) {
+					c = x.next();
+					if (c == q) {
+						break;
+					}
+					if (c == 0 || c == '\n' || c == '\r') {
+						throw x.syntaxError("Missing close quote '" + q + "'.");
+					}
+					sb.append(c);
 				}
-				if (c == 0 || c == '\n' || c == '\r') {
-					throw x.syntaxError("Missing close quote '" + q + "'.");
-				}
-				sb.append(c);
-			}
-			return sb.toString();
-		case ',':
-			x.back();
-			return "";
-		default:
-			x.back();
-			return x.nextTo(',');
+				return sb.toString();
+			case ',' :
+				x.back();
+				return "";
+			default :
+				x.back();
+				return x.nextTo(',');
 		}
 	}
 

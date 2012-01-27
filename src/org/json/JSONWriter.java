@@ -167,7 +167,8 @@ public class JSONWriter {
 	 */
 	private JSONWriter end(char mode, char c) throws JSONException {
 		if (this.mode != mode) {
-			throw new JSONException(mode == 'a' ? "Misplaced endArray."
+			throw new JSONException(mode == 'a'
+					? "Misplaced endArray."
 					: "Misplaced endObject.");
 		}
 		this.pop(mode);
@@ -279,8 +280,9 @@ public class JSONWriter {
 			throw new JSONException("Nesting error.");
 		}
 		this.top -= 1;
-		this.mode = this.top == 0 ? 'd'
-				: this.stack[this.top - 1] == null ? 'a' : 'k';
+		this.mode = this.top == 0 ? 'd' : this.stack[this.top - 1] == null
+				? 'a'
+				: 'k';
 	}
 
 	/**

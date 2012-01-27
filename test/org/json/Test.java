@@ -251,13 +251,13 @@ public class Test extends TestCase {
 				"[\n    1,\n    [\n        null,\n        [\n            {\n                \"empty-array\": [],\n                \"empty-object\": {},\n                \"answer\": 42,\n                \"true\": true,\n                \"false\": false,\n                \"long\": 9223372036854775807,\n                \"big\": 1.23456789E96,\n                \"small\": 1.23456789E-80,\n                \"null\": null\n            },\n            \"two\"\n        ],\n        true\n    ],\n    98.6,\n    -100,\n    {},\n    {\"one\": 1},\n    {\"A beany object\": 42}\n]",
 				new JSONArray(jsonstringer.toString()).toString(4));
 
-		int ar[] = { 1, 2, 3 };
+		int ar[] = {1, 2, 3};
 		JSONArray ja = new JSONArray(ar);
 		assertEquals("[1,2,3]", ja.toString());
 		assertEquals("<array>1</array><array>2</array><array>3</array>",
 				XML.toString(ar));
 
-		String sa[] = { "aString", "aNumber", "aBoolean" };
+		String sa[] = {"aString", "aNumber", "aBoolean"};
 		jsonobject = new JSONObject(beanie, sa);
 		jsonobject.put("Testing JSONString interface", beanie);
 		assertEquals(
@@ -552,8 +552,8 @@ public class Test extends TestCase {
 		assertTrue(jsonobject.getBoolean("true"));
 		assertFalse(jsonobject.getBoolean("false"));
 
-		jsonobject = new JSONObject(jsonobject, new String[] { "dec", "oct",
-				"hex", "missing" });
+		jsonobject = new JSONObject(jsonobject, new String[]{"dec", "oct",
+				"hex", "missing"});
 		assertEquals(
 				"{\n \"oct\": 666,\n \"dec\": 666,\n \"hex\": \"0x666\"\n}",
 				jsonobject.toString(1));

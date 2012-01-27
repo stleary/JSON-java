@@ -255,46 +255,46 @@ public class JSONTokener {
 		for (;;) {
 			c = this.next();
 			switch (c) {
-			case 0:
-			case '\n':
-			case '\r':
-				throw this.syntaxError("Unterminated string");
-			case '\\':
-				c = this.next();
-				switch (c) {
-				case 'b':
-					sb.append('\b');
+				case 0 :
+				case '\n' :
+				case '\r' :
+					throw this.syntaxError("Unterminated string");
+				case '\\' :
+					c = this.next();
+					switch (c) {
+						case 'b' :
+							sb.append('\b');
+							break;
+						case 't' :
+							sb.append('\t');
+							break;
+						case 'n' :
+							sb.append('\n');
+							break;
+						case 'f' :
+							sb.append('\f');
+							break;
+						case 'r' :
+							sb.append('\r');
+							break;
+						case 'u' :
+							sb.append((char) Integer.parseInt(this.next(4), 16));
+							break;
+						case '"' :
+						case '\'' :
+						case '\\' :
+						case '/' :
+							sb.append(c);
+							break;
+						default :
+							throw this.syntaxError("Illegal escape.");
+					}
 					break;
-				case 't':
-					sb.append('\t');
-					break;
-				case 'n':
-					sb.append('\n');
-					break;
-				case 'f':
-					sb.append('\f');
-					break;
-				case 'r':
-					sb.append('\r');
-					break;
-				case 'u':
-					sb.append((char) Integer.parseInt(this.next(4), 16));
-					break;
-				case '"':
-				case '\'':
-				case '\\':
-				case '/':
+				default :
+					if (c == quote) {
+						return sb.toString();
+					}
 					sb.append(c);
-					break;
-				default:
-					throw this.syntaxError("Illegal escape.");
-				}
-				break;
-			default:
-				if (c == quote) {
-					return sb.toString();
-				}
-				sb.append(c);
 			}
 		}
 	}
@@ -358,15 +358,15 @@ public class JSONTokener {
 		String string;
 
 		switch (c) {
-		case '"':
-		case '\'':
-			return this.nextString(c);
-		case '{':
-			this.back();
-			return new JSONObject(this);
-		case '[':
-			this.back();
-			return new JSONArray(this);
+			case '"' :
+			case '\'' :
+				return this.nextString(c);
+			case '{' :
+				this.back();
+				return new JSONObject(this);
+			case '[' :
+				this.back();
+				return new JSONArray(this);
 		}
 
 		/*
@@ -386,7 +386,7 @@ public class JSONTokener {
 		this.back();
 
 		string = sb.toString().trim();
-		if (string.equals("")) {
+		if ("".equals(string)) {
 			throw this.syntaxError("Missing value");
 		}
 		return JSONObject.stringToValue(string);

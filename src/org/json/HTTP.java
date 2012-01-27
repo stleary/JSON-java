@@ -176,10 +176,10 @@ public class HTTP {
 		sb.append(CRLF);
 		while (keys.hasNext()) {
 			string = keys.next().toString();
-			if (!string.equals("HTTP-Version") && !string.equals("Status-Code")
-					&& !string.equals("Reason-Phrase")
-					&& !string.equals("Method")
-					&& !string.equals("Request-URI") && !jo.isNull(string)) {
+			if (!"HTTP-Version".equals(string) && !"Status-Code".equals(string)
+					&& !"Reason-Phrase".equals(string)
+					&& !"Method".equals(string)
+					&& !"Request-URI".equals(string) && !jo.isNull(string)) {
 				sb.append(string);
 				sb.append(": ");
 				sb.append(jo.getString(string));

@@ -116,17 +116,17 @@ public class JSONArray {
 					this.myArrayList.add(x.nextValue());
 				}
 				switch (x.nextClean()) {
-				case ';':
-				case ',':
-					if (x.nextClean() == ']') {
+					case ';' :
+					case ',' :
+						if (x.nextClean() == ']') {
+							return;
+						}
+						x.back();
+						break;
+					case ']' :
 						return;
-					}
-					x.back();
-					break;
-				case ']':
-					return;
-				default:
-					throw x.syntaxError("Expected a ',' or ']'");
+					default :
+						throw x.syntaxError("Expected a ',' or ']'");
 				}
 			}
 		}
@@ -236,7 +236,8 @@ public class JSONArray {
 	public double getDouble(int index) throws JSONException {
 		Object object = this.get(index);
 		try {
-			return object instanceof Number ? ((Number) object).doubleValue()
+			return object instanceof Number
+					? ((Number) object).doubleValue()
 					: Double.parseDouble((String) object);
 		} catch (Exception e) {
 			throw new JSONException("JSONArray[" + index + "] is not a number.");
@@ -255,7 +256,8 @@ public class JSONArray {
 	public int getInt(int index) throws JSONException {
 		Object object = this.get(index);
 		try {
-			return object instanceof Number ? ((Number) object).intValue()
+			return object instanceof Number
+					? ((Number) object).intValue()
 					: Integer.parseInt((String) object);
 		} catch (Exception e) {
 			throw new JSONException("JSONArray[" + index + "] is not a number.");
@@ -311,7 +313,8 @@ public class JSONArray {
 	public long getLong(int index) throws JSONException {
 		Object object = this.get(index);
 		try {
-			return object instanceof Number ? ((Number) object).longValue()
+			return object instanceof Number
+					? ((Number) object).longValue()
 					: Long.parseLong((String) object);
 		} catch (Exception e) {
 			throw new JSONException("JSONArray[" + index + "] is not a number.");
@@ -571,8 +574,8 @@ public class JSONArray {
 	 */
 	public String optString(int index, String defaultValue) {
 		Object object = this.opt(index);
-		return JSONObject.NULL.equals(object) ? object.toString()
-				: defaultValue;
+		return JSONObject.NULL.equals(object) ? defaultValue : object
+				.toString();
 	}
 
 	/**

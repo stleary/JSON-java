@@ -200,13 +200,13 @@ public class JSONObject {
 		for (;;) {
 			c = x.nextClean();
 			switch (c) {
-			case 0:
-				throw x.syntaxError("A JSONObject text must end with '}'");
-			case '}':
-				return;
-			default:
-				x.back();
-				key = x.nextValue().toString();
+				case 0 :
+					throw x.syntaxError("A JSONObject text must end with '}'");
+				case '}' :
+					return;
+				default :
+					x.back();
+					key = x.nextValue().toString();
 			}
 
 			// The key is followed by ':'. We will also tolerate '=' or '=>'.
@@ -224,17 +224,17 @@ public class JSONObject {
 			// Pairs are separated by ','. We will also tolerate ';'.
 
 			switch (x.nextClean()) {
-			case ';':
-			case ',':
-				if (x.nextClean() == '}') {
+				case ';' :
+				case ',' :
+					if (x.nextClean() == '}') {
+						return;
+					}
+					x.back();
+					break;
+				case '}' :
 					return;
-				}
-				x.back();
-				break;
-			case '}':
-				return;
-			default:
-				throw x.syntaxError("Expected a ',' or '}'");
+				default :
+					throw x.syntaxError("Expected a ',' or '}'");
 			}
 		}
 	}
@@ -398,7 +398,8 @@ public class JSONObject {
 		Object object = this.opt(key);
 		if (object == null) {
 			this.put(key,
-					value instanceof JSONArray ? new JSONArray().put(value)
+					value instanceof JSONArray
+							? new JSONArray().put(value)
 							: value);
 		} else if (object instanceof JSONArray) {
 			((JSONArray) object).put(value);
@@ -523,7 +524,8 @@ public class JSONObject {
 	public double getDouble(String key) throws JSONException {
 		Object object = this.get(key);
 		try {
-			return object instanceof Number ? ((Number) object).doubleValue()
+			return object instanceof Number
+					? ((Number) object).doubleValue()
 					: Double.parseDouble((String) object);
 		} catch (Exception e) {
 			throw new JSONException("JSONObject[" + quote(key)
@@ -544,7 +546,8 @@ public class JSONObject {
 	public int getInt(String key) throws JSONException {
 		Object object = this.get(key);
 		try {
-			return object instanceof Number ? ((Number) object).intValue()
+			return object instanceof Number
+					? ((Number) object).intValue()
 					: Integer.parseInt((String) object);
 		} catch (Exception e) {
 			throw new JSONException("JSONObject[" + quote(key)
@@ -601,7 +604,8 @@ public class JSONObject {
 	public long getLong(String key) throws JSONException {
 		Object object = this.get(key);
 		try {
-			return object instanceof Number ? ((Number) object).longValue()
+			return object instanceof Number
+					? ((Number) object).longValue()
 					: Long.parseLong((String) object);
 		} catch (Exception e) {
 			throw new JSONException("JSONObject[" + quote(key)
@@ -994,8 +998,8 @@ public class JSONObject {
 					String name = method.getName();
 					String key = "";
 					if (name.startsWith("get")) {
-						if (name.equals("getClass")
-								|| name.equals("getDeclaringClass")) {
+						if ("getClass".equals(name)
+								|| "getDeclaringClass".equals(name)) {
 							key = "";
 						} else {
 							key = name.substring(3);
@@ -1218,40 +1222,40 @@ public class JSONObject {
 			b = c;
 			c = string.charAt(i);
 			switch (c) {
-			case '\\':
-			case '"':
-				sb.append('\\');
-				sb.append(c);
-				break;
-			case '/':
-				if (b == '<') {
+				case '\\' :
+				case '"' :
 					sb.append('\\');
-				}
-				sb.append(c);
-				break;
-			case '\b':
-				sb.append("\\b");
-				break;
-			case '\t':
-				sb.append("\\t");
-				break;
-			case '\n':
-				sb.append("\\n");
-				break;
-			case '\f':
-				sb.append("\\f");
-				break;
-			case '\r':
-				sb.append("\\r");
-				break;
-			default:
-				if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-						|| (c >= '\u2000' && c < '\u2100')) {
-					hhhh = "000" + Integer.toHexString(c);
-					sb.append("\\u" + hhhh.substring(hhhh.length() - 4));
-				} else {
 					sb.append(c);
-				}
+					break;
+				case '/' :
+					if (b == '<') {
+						sb.append('\\');
+					}
+					sb.append(c);
+					break;
+				case '\b' :
+					sb.append("\\b");
+					break;
+				case '\t' :
+					sb.append("\\t");
+					break;
+				case '\n' :
+					sb.append("\\n");
+					break;
+				case '\f' :
+					sb.append("\\f");
+					break;
+				case '\r' :
+					sb.append("\\r");
+					break;
+				default :
+					if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+							|| (c >= '\u2000' && c < '\u2100')) {
+						hhhh = "000" + Integer.toHexString(c);
+						sb.append("\\u" + hhhh.substring(hhhh.length() - 4));
+					} else {
+						sb.append(c);
+					}
 			}
 		}
 		sb.append('"');
@@ -1280,16 +1284,16 @@ public class JSONObject {
 	 */
 	public static Object stringToValue(String string) {
 		Double d;
-		if (string.equals("")) {
+		if ("".equals(string)) {
 			return string;
 		}
-		if (string.equalsIgnoreCase("true")) {
+		if ("true".equalsIgnoreCase(string)) {
 			return Boolean.TRUE;
 		}
-		if (string.equalsIgnoreCase("false")) {
+		if ("false".equalsIgnoreCase(string)) {
 			return Boolean.FALSE;
 		}
-		if (string.equalsIgnoreCase("null")) {
+		if ("null".equalsIgnoreCase(string)) {
 			return JSONObject.NULL;
 		}
 
