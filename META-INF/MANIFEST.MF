@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JSON-java
+Bundle-SymbolicName: JSON-java
+Bundle-Version: 0.0.1.prealpha
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Markus Holtermann
+Export-Package: org.json
