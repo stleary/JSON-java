@@ -1,5 +1,3 @@
-package org.json;
-
 /*
  Copyright (c) 2002 JSON.org
 
@@ -23,6 +21,8 @@ package org.json;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+package org.json;
 
 import java.util.Iterator;
 

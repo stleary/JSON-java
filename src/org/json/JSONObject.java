@@ -1,5 +1,3 @@
-package org.json;
-
 /*
  Copyright (c) 2002 JSON.org
 
@@ -24,11 +22,13 @@ package org.json;
  SOFTWARE.
  */
 
+package org.json;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;

@@ -1,13 +1,3 @@
-package org.json;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.io.StringWriter;
-import junit.framework.TestCase;
-
 /*
  Copyright (c) 2002 JSON.org
 
@@ -31,6 +21,17 @@ import junit.framework.TestCase;
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
  */
+
+package org.json;
+
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import junit.framework.TestCase;
 
 /**
  * Test class. This file is not formally a member of the org.json library. It is
