@@ -403,7 +403,7 @@ public class JSONTokener {
             int startIndex = this.index;
             int startCharacter = this.character;
             int startLine = this.line;
-            this.reader.mark(Integer.MAX_VALUE);
+            this.reader.mark(1000000);
             do {
                 c = this.next();
                 if (c == 0) {
