@@ -36,16 +36,16 @@ SOFTWARE.
  * it. It is used by the JSONObject and JSONArray constructors to parse
  * JSON source strings.
  * @author JSON.org
- * @version 2011-11-24
+ * @version 2012-02-16
  */
 public class JSONTokener {
 
-    private int     character;
+    private long    character;
     private boolean eof;
-    private int     index;
-    private int     line;
-    private char     previous;
-    private final Reader     reader;
+    private long    index;
+    private long    line;
+    private char    previous;
+    private Reader  reader;
     private boolean usePrevious;
 
 
@@ -400,9 +400,9 @@ public class JSONTokener {
     public char skipTo(char to) throws JSONException {
         char c;
         try {
-            int startIndex = this.index;
-            int startCharacter = this.character;
-            int startLine = this.line;
+            long startIndex = this.index;
+            long startCharacter = this.character;
+            long startLine = this.line;
             this.reader.mark(1000000);
             do {
                 c = this.next();
