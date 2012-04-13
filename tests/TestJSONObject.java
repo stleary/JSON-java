@@ -801,7 +801,7 @@ public class TestJSONObject extends TestCase
     {
         try
         {
-            Locale currentLocale = new Locale("en");
+            Locale currentLocale = new Locale("en", "US");
             assertEquals(
                     "{\"ASCII\":\"American Standard Code for Information Interchange\",\"JSON\":\"JavaScript Object Notation\",\"JAVA\":{\"desc\":\"Just Another Vague Acronym\",\"data\":\"Sweet language\"}}",
                     new JSONObject("org.json.tests.SampleResourceBundle",
