@@ -1401,8 +1401,8 @@ public class TestJSONObject extends TestCase
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("abc", "123");
             assertEquals("{\"abc\":\"123\"}", JSONObject.wrap(map).toString());
-            assertEquals("javax.print.PrintException",
-                    JSONObject.wrap(new javax.print.PrintException()));
+            assertEquals("java.io.IOException",
+                    JSONObject.wrap(new java.io.IOException()));
             Class<?> d = this.getClass();
             assertEquals("class org.json.tests.TestJSONObject",
                     JSONObject.wrap(d));
