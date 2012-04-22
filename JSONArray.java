@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -60,23 +61,23 @@ import java.util.Map;
  * accept:
  * <ul>
  * <li>An extra <code>,</code>&nbsp;<small>(comma)</small> may appear just
- *     before the closing bracket.</li>
- * <li>The <code>null</code> value will be inserted when there
- *     is <code>,</code>&nbsp;<small>(comma)</small> elision.</li>
+ * before the closing bracket.</li>
+ * <li>The <code>null</code> value will be inserted when there is <code>,</code>
+ * &nbsp;<small>(comma)</small> elision.</li>
  * <li>Strings may be quoted with <code>'</code>&nbsp;<small>(single
- *     quote)</small>.</li>
+ * quote)</small>.</li>
  * <li>Strings do not need to be quoted at all if they do not begin with a quote
- *     or single quote, and if they do not contain leading or trailing spaces,
- *     and if they do not contain any of these characters:
- *     <code>{ } [ ] / \ : , = ; #</code> and if they do not look like numbers
- *     and if they are not the reserved words <code>true</code>,
- *     <code>false</code>, or <code>null</code>.</li>
+ * or single quote, and if they do not contain leading or trailing spaces, and
+ * if they do not contain any of these characters:
+ * <code>{ } [ ] / \ : , = ; #</code> and if they do not look like numbers and
+ * if they are not the reserved words <code>true</code>, <code>false</code>, or
+ * <code>null</code>.</li>
  * <li>Values can be separated by <code>;</code> <small>(semicolon)</small> as
- *     well as by <code>,</code> <small>(comma)</small>.</li>
+ * well as by <code>,</code> <small>(comma)</small>.</li>
  * </ul>
-
+ *
  * @author JSON.org
- * @version 2011-12-19
+ * @version 2012-04-20
  */
 public class JSONArray {
 
@@ -555,8 +556,8 @@ public class JSONArray {
     public String optString(int index, String defaultValue) {
         Object object = this.opt(index);
         return JSONObject.NULL.equals(object)
-            ? defaultValue
-            : object.toString();
+ ? defaultValue : object
+                .toString();
     }
 
 
@@ -834,56 +835,15 @@ public class JSONArray {
      * @throws JSONException
      */
     public String toString(int indentFactor) throws JSONException {
-        return this.toString(indentFactor, 0);
+        StringWriter sw = new StringWriter();
+        synchronized (sw.getBuffer()) {
+            return this.write(sw, indentFactor, 0).toString();
+        }
     }
 
-
     /**
-     * Make a prettyprinted JSON text of this JSONArray.
-     * Warning: This method assumes that the data structure is acyclical.
-     * @param indentFactor The number of spaces to add to each level of
-     *  indentation.
-     * @param indent The indention of the top level.
-     * @return a printable, displayable, transmittable
-     *  representation of the array.
-     * @throws JSONException
-     */
-    String toString(int indentFactor, int indent) throws JSONException {
-        int len = this.length();
-        if (len == 0) {
-            return "[]";
-        }
-        int i;
-        StringBuffer sb = new StringBuffer("[");
-        if (len == 1) {
-            sb.append(JSONObject.valueToString(this.myArrayList.get(0),
-                    indentFactor, indent));
-        } else {
-            int newindent = indent + indentFactor;
-            sb.append('\n');
-            for (i = 0; i < len; i += 1) {
-                if (i > 0) {
-                    sb.append(",\n");
-                }
-                for (int j = 0; j < newindent; j += 1) {
-                    sb.append(' ');
-                }
-                sb.append(JSONObject.valueToString(this.myArrayList.get(i),
-                        indentFactor, newindent));
-            }
-            sb.append('\n');
-            for (i = 0; i < indent; i += 1) {
-                sb.append(' ');
-            }
-        }
-        sb.append(']');
-        return sb.toString();
-    }
-
-
-    /**
-     * Write the contents of the JSONArray as JSON text to a writer.
-     * For compactness, no whitespace is added.
+     * Write the contents of the JSONArray as JSON text to a writer. For
+     * compactness, no whitespace is added.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
@@ -891,25 +851,51 @@ public class JSONArray {
      * @throws JSONException
      */
     public Writer write(Writer writer) throws JSONException {
-        try {
-            boolean b = false;
-            int     len = this.length();
+        return this.write(writer, 0, 0);
+    }
 
+    /**
+     * Write the contents of the JSONArray as JSON text to a writer. For
+     * compactness, no whitespace is added.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @return The writer.
+     * @throws JSONException
+     */
+    Writer write(Writer writer, int indentFactor, int indent)
+            throws JSONException {
+        try {
+            boolean commanate = false;
+            int length = this.length();
             writer.write('[');
 
-            for (int i = 0; i < len; i += 1) {
-                if (b) {
-                    writer.write(',');
+            if (length == 1) {
+                JSONObject.writeValue(writer, this.myArrayList.get(0),
+                        indentFactor, indent);
+            } else if (length != 0) {
+                final int newindent = indent + indentFactor;
+
+                for (int i = 0; i < length; i += 1) {
+                    if (commanate) {
+                        writer.write(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.write('\n');
+                    }
+                    JSONObject.indent(writer, newindent);
+                    JSONObject.writeValue(writer, this.myArrayList.get(i),
+                            indentFactor, newindent);
+                    commanate = true;
                 }
-                Object v = this.myArrayList.get(i);
-                if (v instanceof JSONObject) {
-                    ((JSONObject)v).write(writer);
-                } else if (v instanceof JSONArray) {
-                    ((JSONArray)v).write(writer);
-                } else {
-                    writer.write(JSONObject.valueToString(v));
+                if (indentFactor > 0) {
+                    writer.write('\n');
                 }
-                b = true;
+                JSONObject.indent(writer, indent);
             }
             writer.write(']');
             return writer;

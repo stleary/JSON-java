@@ -25,10 +25,11 @@ SOFTWARE.
 */
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -38,54 +39,58 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * A JSONObject is an unordered collection of name/value pairs. Its
- * external form is a string wrapped in curly braces with colons between the
- * names and values, and commas between the values and names. The internal form
- * is an object having <code>get</code> and <code>opt</code> methods for
- * accessing the values by name, and <code>put</code> methods for adding or
- * replacing values by name. The values can be any of these types:
- * <code>Boolean</code>, <code>JSONArray</code>, <code>JSONObject</code>,
- * <code>Number</code>, <code>String</code>, or the <code>JSONObject.NULL</code>
- * object. A JSONObject constructor can be used to convert an external form
- * JSON text into an internal form whose values can be retrieved with the
- * <code>get</code> and <code>opt</code> methods, or to convert values into a
- * JSON text using the <code>put</code> and <code>toString</code> methods.
- * A <code>get</code> method returns a value if one can be found, and throws an
- * exception if one cannot be found. An <code>opt</code> method returns a
- * default value instead of throwing an exception, and so is useful for
- * obtaining optional values.
+ * A JSONObject is an unordered collection of name/value pairs. Its external
+ * form is a string wrapped in curly braces with colons between the names and
+ * values, and commas between the values and names. The internal form is an
+ * object having <code>get</code> and <code>opt</code> methods for accessing the
+ * values by name, and <code>put</code> methods for adding or replacing values
+ * by name. The values can be any of these types: <code>Boolean</code>,
+ * <code>JSONArray</code>, <code>JSONObject</code>, <code>Number</code>,
+ * <code>String</code>, or the <code>JSONObject.NULL</code> object. A JSONObject
+ * constructor can be used to convert an external form JSON text into an
+ * internal form whose values can be retrieved with the <code>get</code> and
+ * <code>opt</code> methods, or to convert values into a JSON text using the
+ * <code>put</code> and <code>toString</code> methods. A <code>get</code> method
+ * returns a value if one can be found, and throws an exception if one cannot be
+ * found. An <code>opt</code> method returns a default value instead of throwing
+ * an exception, and so is useful for obtaining optional values.
  * <p>
  * The generic <code>get()</code> and <code>opt()</code> methods return an
  * object, which you can cast or query for type. There are also typed
  * <code>get</code> and <code>opt</code> methods that do type checking and type
- * coercion for you. The opt methods differ from the get methods in that they
- * do not throw. Instead, they return a specified value, such as null.
+ * coercion for you. The opt methods differ from the get methods in that they do
+ * not throw. Instead, they return a specified value, such as null.
  * <p>
  * The <code>put</code> methods add or replace values in an object. For example,
- * <pre>myString = new JSONObject().put("JSON", "Hello, World!").toString();</pre>
+ *
+ * <pre>
+ * myString = new JSONObject().put(&quot;JSON&quot;, &quot;Hello, World!&quot;).toString();
+ * </pre>
+ *
  * produces the string <code>{"JSON": "Hello, World"}</code>.
  * <p>
  * The texts produced by the <code>toString</code> methods strictly conform to
- * the JSON syntax rules.
- * The constructors are more forgiving in the texts they will accept:
+ * the JSON syntax rules. The constructors are more forgiving in the texts they
+ * will accept:
  * <ul>
  * <li>An extra <code>,</code>&nbsp;<small>(comma)</small> may appear just
- *     before the closing brace.</li>
+ * before the closing brace.</li>
  * <li>Strings may be quoted with <code>'</code>&nbsp;<small>(single
- *     quote)</small>.</li>
+ * quote)</small>.</li>
  * <li>Strings do not need to be quoted at all if they do not begin with a quote
- *     or single quote, and if they do not contain leading or trailing spaces,
- *     and if they do not contain any of these characters:
- *     <code>{ } [ ] / \ : , = ; #</code> and if they do not look like numbers
- *     and if they are not the reserved words <code>true</code>,
- *     <code>false</code>, or <code>null</code>.</li>
- * <li>Keys can be followed by <code>=</code> or <code>=></code> as well as
- *     by <code>:</code>.</li>
+ * or single quote, and if they do not contain leading or trailing spaces, and
+ * if they do not contain any of these characters:
+ * <code>{ } [ ] / \ : , = ; #</code> and if they do not look like numbers and
+ * if they are not the reserved words <code>true</code>, <code>false</code>, or
+ * <code>null</code>.</li>
+ * <li>Keys can be followed by <code>=</code> or <code>=></code> as well as by
+ * <code>:</code>.</li>
  * <li>Values can be followed by <code>;</code> <small>(semicolon)</small> as
- *     well as by <code>,</code> <small>(comma)</small>.</li>
+ * well as by <code>,</code> <small>(comma)</small>.</li>
  * </ul>
+ *
  * @author JSON.org
- * @version 2011-11-24
+ * @version 2012-04-20
  */
 public class JSONObject {
 
@@ -1154,60 +1159,72 @@ public class JSONObject {
      * @return  A String correctly formatted for insertion in a JSON text.
      */
     public static String quote(String string) {
+        StringWriter sw = new StringWriter();
+        synchronized (sw.getBuffer()) {
+            try {
+                return quote(string, sw).toString();
+            } catch (IOException ignored) {
+                // will never happen - we are writing to a string writer
+                return "";
+            }
+        }
+    }
+
+    public static Writer quote(String string, Writer w) throws IOException {
         if (string == null || string.length() == 0) {
-            return "\"\"";
+            w.write("\"\"");
+            return w;
         }
 
-        char         b;
-        char         c = 0;
-        String       hhhh;
-        int          i;
-        int          len = string.length();
-        StringBuffer sb = new StringBuffer(len + 4);
+        char b;
+        char c = 0;
+        String hhhh;
+        int i;
+        int len = string.length();
 
-        sb.append('"');
+        w.write('"');
         for (i = 0; i < len; i += 1) {
             b = c;
             c = string.charAt(i);
             switch (c) {
             case '\\':
             case '"':
-                sb.append('\\');
-                sb.append(c);
+                w.write('\\');
+                w.write(c);
                 break;
             case '/':
                 if (b == '<') {
-                    sb.append('\\');
+                    w.write('\\');
                 }
-                sb.append(c);
+                w.write(c);
                 break;
             case '\b':
-                sb.append("\\b");
+                w.write("\\b");
                 break;
             case '\t':
-                sb.append("\\t");
+                w.write("\\t");
                 break;
             case '\n':
-                sb.append("\\n");
+                w.write("\\n");
                 break;
             case '\f':
-                sb.append("\\f");
+                w.write("\\f");
                 break;
             case '\r':
-                sb.append("\\r");
+                w.write("\\r");
                 break;
             default:
-                if (c < ' ' || (c >= '\u0080' && c < '\u00a0') ||
-                               (c >= '\u2000' && c < '\u2100')) {
+                if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                        || (c >= '\u2000' && c < '\u2100')) {
                     hhhh = "000" + Integer.toHexString(c);
-                    sb.append("\\u" + hhhh.substring(hhhh.length() - 4));
+                    w.write("\\u" + hhhh.substring(hhhh.length() - 4));
                 } else {
-                    sb.append(c);
+                    w.write(c);
                 }
             }
         }
-        sb.append('"');
-        return sb.toString();
+        w.write('"');
+        return w;
     }
 
     /**
@@ -1328,20 +1345,7 @@ public class JSONObject {
      */
     public String toString() {
         try {
-            Iterator     keys = this.keys();
-            StringBuffer sb = new StringBuffer("{");
-
-            while (keys.hasNext()) {
-                if (sb.length() > 1) {
-                    sb.append(',');
-                }
-                Object o = keys.next();
-                sb.append(quote(o.toString()));
-                sb.append(':');
-                sb.append(valueToString(this.map.get(o)));
-            }
-            sb.append('}');
-            return sb.toString();
+            return this.toString(0);
         } catch (Exception e) {
             return null;
         }
@@ -1361,66 +1365,11 @@ public class JSONObject {
      * @throws JSONException If the object contains an invalid number.
      */
     public String toString(int indentFactor) throws JSONException {
-        return this.toString(indentFactor, 0);
-    }
-
-
-    /**
-     * Make a prettyprinted JSON text of this JSONObject.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     * @param indentFactor The number of spaces to add to each level of
-     *  indentation.
-     * @param indent The indentation of the top level.
-     * @return a printable, displayable, transmittable
-     *  representation of the object, beginning
-     *  with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *  with <code>}</code>&nbsp;<small>(right brace)</small>.
-     * @throws JSONException If the object contains an invalid number.
-     */
-    String toString(int indentFactor, int indent) throws JSONException {
-        int i;
-        int length = this.length();
-        if (length == 0) {
-            return "{}";
+        StringWriter w = new StringWriter();
+        synchronized (w.getBuffer()) {
+            return this.write(w, indentFactor, 0).toString();
         }
-        Iterator     keys = this.keys();
-        int          newindent = indent + indentFactor;
-        Object       object;
-        StringBuffer sb = new StringBuffer("{");
-        if (length == 1) {
-            object = keys.next();
-            sb.append(quote(object.toString()));
-            sb.append(": ");
-            sb.append(valueToString(this.map.get(object), indentFactor,
-                    indent));
-        } else {
-            while (keys.hasNext()) {
-                object = keys.next();
-                if (sb.length() > 1) {
-                    sb.append(",\n");
-                } else {
-                    sb.append('\n');
-                }
-                for (i = 0; i < newindent; i += 1) {
-                    sb.append(' ');
-                }
-                sb.append(quote(object.toString()));
-                sb.append(": ");
-                sb.append(valueToString(this.map.get(object), indentFactor,
-                        newindent));
-            }
-            if (sb.length() > 1) {
-                sb.append('\n');
-                for (i = 0; i < indent; i += 1) {
-                    sb.append(' ');
-                }
-            }
-        }
-        sb.append('}');
-        return sb.toString();
     }
-
 
     /**
      * Make a JSON text of an Object value. If the object has an
@@ -1477,63 +1426,6 @@ public class JSONObject {
         }
         return quote(value.toString());
     }
-
-
-    /**
-     * Make a prettyprinted JSON text of an object value.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     * @param value The value to be serialized.
-     * @param indentFactor The number of spaces to add to each level of
-     *  indentation.
-     * @param indent The indentation of the top level.
-     * @return a printable, displayable, transmittable
-     *  representation of the object, beginning
-     *  with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *  with <code>}</code>&nbsp;<small>(right brace)</small>.
-     * @throws JSONException If the object contains an invalid number.
-     */
-     static String valueToString(
-         Object value,
-         int    indentFactor,
-         int    indent
-     ) throws JSONException {
-        if (value == null || value.equals(null)) {
-            return "null";
-        }
-        try {
-            if (value instanceof JSONString) {
-                Object o = ((JSONString)value).toJSONString();
-                if (o instanceof String) {
-                    return (String)o;
-                }
-            }
-        } catch (Exception ignore) {
-        }
-        if (value instanceof Number) {
-            return numberToString((Number) value);
-        }
-        if (value instanceof Boolean) {
-            return value.toString();
-        }
-        if (value instanceof JSONObject) {
-            return ((JSONObject)value).toString(indentFactor, indent);
-        }
-        if (value instanceof JSONArray) {
-            return ((JSONArray)value).toString(indentFactor, indent);
-        }
-        if (value instanceof Map) {
-            return new JSONObject((Map)value).toString(indentFactor, indent);
-        }
-        if (value instanceof Collection) {
-            return new JSONArray((Collection)value).toString(indentFactor, indent);
-        }
-        if (value.getClass().isArray()) {
-            return new JSONArray(value).toString(indentFactor, indent);
-        }
-        return quote(value.toString());
-    }
-
 
      /**
       * Wrap an object, if necessary. If the object is null, return the NULL
@@ -1599,27 +1491,98 @@ public class JSONObject {
       * @throws JSONException
       */
      public Writer write(Writer writer) throws JSONException {
+        return this.write(writer, 0, 0);
+    }
+
+
+    static final Writer writeValue(Writer writer, Object value,
+            int indentFactor, int indent) throws JSONException, IOException {
+        if (value instanceof JSONObject) {
+            ((JSONObject) value).write(writer, indentFactor, indent);
+        } else if (value instanceof JSONArray) {
+            ((JSONArray) value).write(writer, indentFactor, indent);
+        } else if (value instanceof Map) {
+            new JSONObject((Map) value).write(writer, indentFactor, indent);
+        } else if (value instanceof Collection) {
+            new JSONArray((Collection) value).write(writer, indentFactor,
+                    indent);
+        } else if (value.getClass().isArray()) {
+            new JSONArray(value).write(writer, indentFactor, indent);
+        } else if (value instanceof Number) {
+            writer.write(numberToString((Number) value));
+        } else if (value instanceof Boolean) {
+            writer.write(value.toString());
+        } else if (value instanceof JSONString) {
+            Object o;
+            try {
+                o = ((JSONString) value).toJSONString();
+            } catch (Exception e) {
+                throw new JSONException(e);
+            }
+            writer.write(o != null ? o.toString() : quote(value.toString()));
+        } else if (value == null || value.equals(null)) {
+            writer.write("null");
+        } else {
+            quote(value.toString(), writer);
+        }
+        return writer;
+    }
+
+    static final void indent(Writer writer, int indent) throws IOException {
+        for (int i = 0; i < indent; i += 1) {
+            writer.write(' ');
+        }
+    }
+
+    /**
+     * Write the contents of the JSONObject as JSON text to a writer. For
+     * compactness, no whitespace is added.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @return The writer.
+     * @throws JSONException
+     */
+    Writer write(Writer writer, int indentFactor, int indent)
+            throws JSONException {
         try {
-            boolean  commanate = false;
+            boolean commanate = false;
+            final int length = this.length();
             Iterator keys = this.keys();
             writer.write('{');
 
-            while (keys.hasNext()) {
-                if (commanate) {
-                    writer.write(',');
-                }
+            if (length == 1) {
                 Object key = keys.next();
                 writer.write(quote(key.toString()));
                 writer.write(':');
-                Object value = this.map.get(key);
-                if (value instanceof JSONObject) {
-                    ((JSONObject)value).write(writer);
-                } else if (value instanceof JSONArray) {
-                    ((JSONArray)value).write(writer);
-                } else {
-                    writer.write(valueToString(value));
+                if (indentFactor > 0) {
+                    writer.write(' ');
                 }
-                commanate = true;
+                writeValue(writer, this.map.get(key), indentFactor, indent);
+            } else if (length != 0) {
+                final int newindent = indent + indentFactor;
+                while (keys.hasNext()) {
+                    Object key = keys.next();
+                    if (commanate) {
+                        writer.write(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.write('\n');
+                    }
+                    indent(writer, newindent);
+                    writer.write(quote(key.toString()));
+                    writer.write(':');
+                    if (indentFactor > 0) {
+                        writer.write(' ');
+                    }
+                    writeValue(writer, this.map.get(key), indentFactor,
+                            newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.write('\n');
+                }
+                indent(writer, indent);
             }
             writer.write('}');
             return writer;
