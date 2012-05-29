@@ -31,8 +31,9 @@ import java.util.Iterator;
  * This provides static methods to convert an XML text into a JSONArray or
  * JSONObject, and to covert a JSONArray or JSONObject into an XML text using
  * the JsonML transform.
+ * 
  * @author JSON.org
- * @version 2011-11-24
+ * @version 2012-03-28
  */
 public class JSONML {
 
@@ -95,8 +96,9 @@ public class JSONML {
                         if (c == '-') {
                             if (x.next() == '-') {
                                 x.skipPast("-->");
+                            } else {
+                                x.back();
                             }
-                            x.back();
                         } else if (c == '[') {
                             token = x.nextToken();
                             if (token.equals("CDATA") && x.next() == '[') {
