@@ -90,7 +90,7 @@ import java.util.ResourceBundle;
  * </ul>
  *
  * @author JSON.org
- * @version 2012-04-20
+ * @version 2012-05-29
  */
 public class JSONObject {
 
@@ -1497,7 +1497,9 @@ public class JSONObject {
 
     static final Writer writeValue(Writer writer, Object value,
             int indentFactor, int indent) throws JSONException, IOException {
-        if (value instanceof JSONObject) {
+        if (value == null || value.equals(null)) {
+            writer.write("null");
+        } else if (value instanceof JSONObject) {
             ((JSONObject) value).write(writer, indentFactor, indent);
         } else if (value instanceof JSONArray) {
             ((JSONArray) value).write(writer, indentFactor, indent);
@@ -1520,8 +1522,6 @@ public class JSONObject {
                 throw new JSONException(e);
             }
             writer.write(o != null ? o.toString() : quote(value.toString()));
-        } else if (value == null || value.equals(null)) {
-            writer.write("null");
         } else {
             quote(value.toString(), writer);
         }
