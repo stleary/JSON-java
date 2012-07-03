@@ -250,6 +250,39 @@ public class TestJSONObject extends TestCase
         // Same Object
     }
 
+    /**
+     * Status Enum
+     */
+    public enum Status
+    {
+        INACTIVE,
+        ACTIVE
+    }
+
+    /**
+     * A class with enums as property
+     */
+    public class ObjectWithEnumProperty 
+    {
+        Status status;
+
+        /**
+         * Creates an object with active status
+         */
+        ObjectWithEnumProperty()
+        {
+            this.status = Status.ACTIVE;
+        }
+
+        /**
+         * Gets the status.
+         */
+        public Status getStatus()
+        {
+            return this.status;
+        }
+    }
+
     /** The jsonobject. */
     JSONObject jsonobject = new JSONObject();
 
@@ -825,6 +858,15 @@ public class TestJSONObject extends TestCase
     }
 
     /**
+     * Tests the constructor method using object with enum properties.
+     */
+    public void testConstructor_ObjectWithEnumProperty()
+    {
+        assertEquals("{\"status\":\"ACTIVE\"}",
+                new JSONObject(new ObjectWithEnumProperty()).toString());
+    }
+
+    /**
      * Tests the opt method.
      */
     public void testOpt()
@@ -1378,6 +1420,7 @@ public class TestJSONObject extends TestCase
             assertEquals(56456456L, JSONObject.wrap(56456456L));
             assertEquals(JSONObject.NULL, JSONObject.wrap(null));
             assertEquals(JSONObject.NULL, JSONObject.wrap(JSONObject.NULL));
+            assertEquals(Status.ACTIVE, JSONObject.wrap(Status.ACTIVE));
             BadJsonString a = new BadJsonString();
             assertEquals(a, JSONObject.wrap(a));
             NullJsonString q = new NullJsonString();
