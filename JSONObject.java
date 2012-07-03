@@ -90,7 +90,7 @@ import java.util.ResourceBundle;
  * </ul>
  *
  * @author JSON.org
- * @version 2012-05-29
+ * @version 2012-07-02
  */
 public class JSONObject {
 
@@ -1450,7 +1450,7 @@ public class JSONObject {
                      object instanceof Short  || object instanceof Integer    ||
                      object instanceof Long   || object instanceof Boolean    ||
                      object instanceof Float  || object instanceof Double     ||
-                     object instanceof String) {
+                     object instanceof String || object instanceof Enum) {
                  return object;
              }
 
