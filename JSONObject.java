@@ -90,7 +90,7 @@ import java.util.ResourceBundle;
  * </ul>
  *
  * @author JSON.org
- * @version 2012-07-02
+ * @version 2012-10-26
  */
 public class JSONObject {
 
@@ -1216,8 +1216,10 @@ public class JSONObject {
             default:
                 if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
                         || (c >= '\u2000' && c < '\u2100')) {
-                    hhhh = "000" + Integer.toHexString(c);
-                    w.write("\\u" + hhhh.substring(hhhh.length() - 4));
+                    w.write("\\u");
+                    hhhh = Integer.toHexString(c);
+                    w.write("0000", 0, 4 - hhhh.length());
+                    w.write(hhhh);
                 } else {
                     w.write(c);
                 }
@@ -1450,7 +1452,7 @@ public class JSONObject {
                      object instanceof Short  || object instanceof Integer    ||
                      object instanceof Long   || object instanceof Boolean    ||
                      object instanceof Float  || object instanceof Double     ||
-                     object instanceof String || object instanceof Enum) {
+                     object instanceof String) {
                  return object;
              }
 
