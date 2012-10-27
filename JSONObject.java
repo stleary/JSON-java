@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -90,7 +91,7 @@ import java.util.ResourceBundle;
  * </ul>
  *
  * @author JSON.org
- * @version 2012-10-26
+ * @version 2012-10-27
  */
 public class JSONObject {
 
@@ -702,7 +703,17 @@ public class JSONObject {
      * @return An iterator of the keys.
      */
     public Iterator keys() {
-        return this.map.keySet().iterator();
+        return this.keySet().iterator();
+    }
+
+
+    /**
+     * Get a set of keys of the JSONObject.
+     *
+     * @return A keySet.
+     */
+    public Set keySet() {
+        return this.map.keySet();
     }
 
 
