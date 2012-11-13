@@ -816,7 +816,7 @@ public class JSONArray {
      */
     public String toString() {
         try {
-            return '[' + this.join(",") + ']';
+            return toString(0);
         } catch (Exception e) {
             return null;
         }
