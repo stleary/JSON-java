@@ -41,7 +41,7 @@ SOFTWARE.
  * The names for the elements in the JSONObjects can be taken from the names
  * in the first row.
  * @author JSON.org
- * @version 2010-12-24
+ * @version 2012-11-13
  */
 public class CDL {
 
@@ -97,12 +97,12 @@ public class CDL {
         for (;;) {
             String value = getValue(x);
             char c = x.next();
-            if (value == null || 
+            if (value == null ||
                     (ja.length() == 0 && value.length() == 0 && c != ',')) {
                 return null;
             }
             ja.put(value);
-            for (;;) {                
+            for (;;) {
                 if (c == ',') {
                     break;
                 }
@@ -136,7 +136,7 @@ public class CDL {
 
     /**
      * Produce a comma delimited text row from a JSONArray. Values containing
-     * the comma character will be quoted. Troublesome characters may be 
+     * the comma character will be quoted. Troublesome characters may be
      * removed.
      * @param ja A JSONArray of strings.
      * @return A string ending in NEWLINE.
@@ -150,8 +150,8 @@ public class CDL {
             Object object = ja.opt(i);
             if (object != null) {
                 String string = object.toString();
-                if (string.length() > 0 && (string.indexOf(',') >= 0 || 
-                        string.indexOf('\n') >= 0 || string.indexOf('\r') >= 0 || 
+                if (string.length() > 0 && (string.indexOf(',') >= 0 ||
+                        string.indexOf('\n') >= 0 || string.indexOf('\r') >= 0 ||
                         string.indexOf(0) >= 0 || string.charAt(0) == '"')) {
                     sb.append('"');
                     int length = string.length();
