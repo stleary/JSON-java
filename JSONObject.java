@@ -91,9 +91,21 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2012-10-27
+ * @version 2012-12-01
  */
 public class JSONObject {
+    /**
+     * The maximum number of keys in the key pool.
+     */
+     private static final int keyPoolSize = 100;
+
+   /**
+     * Key pooling is like string interning, but without permanently tying up
+     * memory. To help conserve memory, storage of duplicated key strings in
+     * JSONObjects will be avoided by using a key pool to manage unique key
+     * string objects. This is used by JSONObject.put(string, object).
+     */
+     private static HashMap keyPool = new HashMap(keyPoolSize);
 
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
@@ -1110,11 +1122,21 @@ public class JSONObject {
      *  or if the key is null.
      */
     public JSONObject put(String key, Object value) throws JSONException {
+        String pooled;
         if (key == null) {
             throw new JSONException("Null key.");
         }
         if (value != null) {
             testValidity(value);
+            pooled = (String)keyPool.get(key);
+            if (pooled == null) {
+                if (keyPool.size() >= keyPoolSize) {
+                    keyPool = new HashMap(keyPoolSize);
+                }
+                keyPool.put(key, key);
+            } else {
+                key = pooled;
+            }
             this.map.put(key, value);
         } else {
             this.remove(key);
