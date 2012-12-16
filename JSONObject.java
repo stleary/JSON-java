@@ -248,7 +248,6 @@ public class JSONObject {
      *
      * @param map A map object that can be used to initialize the contents of
      *  the JSONObject.
-     * @throws JSONException
      */
     public JSONObject(Map map) {
         this.map = new HashMap();
@@ -1032,9 +1031,9 @@ public class JSONObject {
      * @param key   A key string.
      * @param value A boolean which is the value.
      * @return this.
-     * @throws JSONException If the key is null.
+		 * @throws NullPointerException If the key is null.
      */
-    public JSONObject put(String key, boolean value) throws JSONException {
+    public JSONObject put(String key, boolean value) {
         this.put(key, value ? Boolean.TRUE : Boolean.FALSE);
         return this;
     }
@@ -1046,9 +1045,9 @@ public class JSONObject {
      * @param key   A key string.
      * @param value A Collection value.
      * @return      this.
-     * @throws JSONException
+     * @throws NullPointerException If the key is null.
      */
-    public JSONObject put(String key, Collection value) throws JSONException {
+    public JSONObject put(String key, Collection value) {
         this.put(key, new JSONArray(value));
         return this;
     }
@@ -1060,7 +1059,8 @@ public class JSONObject {
      * @param key   A key string.
      * @param value A double which is the value.
      * @return this.
-     * @throws JSONException If the key is null or if the number is invalid.
+     * @throws IllegalArgumentException If the number is invalid.
+     * @throws NullPointerException If the key is null.
      */
     public JSONObject put(String key, double value) throws JSONException {
         this.put(key, new Double(value));
@@ -1074,9 +1074,9 @@ public class JSONObject {
      * @param key   A key string.
      * @param value An int which is the value.
      * @return this.
-     * @throws JSONException If the key is null.
+     * @throws NullPointerException If the key is null.
      */
-    public JSONObject put(String key, int value) throws JSONException {
+    public JSONObject put(String key, int value) {
         this.put(key, new Integer(value));
         return this;
     }
@@ -1088,9 +1088,9 @@ public class JSONObject {
      * @param key   A key string.
      * @param value A long which is the value.
      * @return this.
-     * @throws JSONException If the key is null.
+     * @throws NullPointerException If the key is null.
      */
-    public JSONObject put(String key, long value) throws JSONException {
+    public JSONObject put(String key, long value) {
         this.put(key, new Long(value));
         return this;
     }
@@ -1102,9 +1102,9 @@ public class JSONObject {
      * @param key   A key string.
      * @param value A Map value.
      * @return      this.
-     * @throws JSONException
+     * @throws NullPointerException If the key is null.
      */
-    public JSONObject put(String key, Map value) throws JSONException {
+    public JSONObject put(String key, Map value) {
         this.put(key, new JSONObject(value));
         return this;
     }
@@ -1118,13 +1118,13 @@ public class JSONObject {
      *  types: Boolean, Double, Integer, JSONArray, JSONObject, Long, String,
      *  or the JSONObject.NULL object.
      * @return this.
-     * @throws JSONException If the value is non-finite number
-     *  or if the key is null.
+     * @throws IllegalArgumentException If the value is non-finite number.
+     * @throws NullPointerException If the key is null.
      */
-    public JSONObject put(String key, Object value) throws JSONException {
+    public JSONObject put(String key, Object value) {
         String pooled;
         if (key == null) {
-            throw new JSONException("Null key.");
+            throw new NullPointerException("Null key.");
         }
         if (value != null) {
             testValidity(value);
@@ -1330,16 +1330,16 @@ public class JSONObject {
      * @param o The object to test.
      * @throws JSONException If o is a non-finite number.
      */
-    public static void testValidity(Object o) throws JSONException {
+    public static void testValidity(Object o) {
         if (o != null) {
             if (o instanceof Double) {
                 if (((Double)o).isInfinite() || ((Double)o).isNaN()) {
-                    throw new JSONException(
+                    throw new IllegalArgumentException(
                         "JSON does not allow non-finite numbers.");
                 }
             } else if (o instanceof Float) {
                 if (((Float)o).isInfinite() || ((Float)o).isNaN()) {
-                    throw new JSONException(
+                    throw new IllegalArgumentException(
                         "JSON does not allow non-finite numbers.");
                 }
             }
