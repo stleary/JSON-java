@@ -79,7 +79,7 @@ import java.util.Map;
  * @author JSON.org
  * @version 2012-11-13
  */
-public class JSONArray {
+public class JSONArray implements Iterable {
 
 
     /**
@@ -93,6 +93,15 @@ public class JSONArray {
      */
     public JSONArray() {
         this.myArrayList = new ArrayList();
+    }
+
+    /**
+     * Iteraror
+     * @return Iterator
+     */
+    @Override
+    public Iterator iterator() {
+        return myArrayList.iterator();
     }
 
     /**
