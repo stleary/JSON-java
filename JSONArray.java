@@ -348,15 +348,6 @@ public class JSONArray {
     }
 
     /**
-     * Returns an iterator.
-     *
-     * @return An iterator.
-     */
-    public Iterator iterator() {
-        return this.myArrayList.iterator();
-    }
-
-    /**
      * Make a string from the contents of this JSONArray. The
      * <code>separator</code> string is inserted between each element. Warning:
      * This method assumes that the data structure is acyclical.
