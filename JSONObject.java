@@ -38,6 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -144,9 +145,16 @@ public class JSONObject {
 
 
     /**
+     * For some applications (such as unit tests) it is important that
+     * the rendered json object fields are in known order.
+     */
+    private static final boolean useSortedMap = Boolean.getBoolean("org.json.fields.sort");
+
+
+    /**
      * The map where the JSONObject's properties are kept.
      */
-    private final Map map;
+    private final Map map = useSortedMap ? new TreeMap() : new HashMap();
 
 
     /**
@@ -162,7 +170,6 @@ public class JSONObject {
      * Construct an empty JSONObject.
      */
     public JSONObject() {
-        this.map = new HashMap();
     }
 
 
@@ -176,7 +183,6 @@ public class JSONObject {
      * @exception JSONException If a value is a non-finite number or if a name is duplicated.
      */
     public JSONObject(JSONObject jo, String[] names) {
-        this();
         for (int i = 0; i < names.length; i += 1) {
             try {
                 this.putOnce(names[i], jo.opt(names[i]));
@@ -193,7 +199,6 @@ public class JSONObject {
      *  or a duplicated key.
      */
     public JSONObject(JSONTokener x) throws JSONException {
-        this();
         char c;
         String key;
 
@@ -251,7 +256,6 @@ public class JSONObject {
      * @throws JSONException
      */
     public JSONObject(Map map) {
-        this.map = new HashMap();
         if (map != null) {
             Iterator i = map.entrySet().iterator();
             while (i.hasNext()) {
@@ -285,7 +289,6 @@ public class JSONObject {
      * to make a JSONObject.
      */
     public JSONObject(Object bean) {
-        this();
         this.populateMap(bean);
     }
 
@@ -302,7 +305,6 @@ public class JSONObject {
      * from the object.
      */
     public JSONObject(Object object, String names[]) {
-        this();
         Class c = object.getClass();
         for (int i = 0; i < names.length; i += 1) {
             String name = names[i];
@@ -335,7 +337,6 @@ public class JSONObject {
      * @throws JSONException If any JSONExceptions are detected.
      */
     public JSONObject(String baseName, Locale locale) throws JSONException {
-        this();
         ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale,
                 Thread.currentThread().getContextClassLoader());
 
