@@ -1129,14 +1129,16 @@ public class JSONObject {
         }
         if (value != null) {
             testValidity(value);
-            pooled = (String)keyPool.get(key);
-            if (pooled == null) {
-                if (keyPool.size() >= keyPoolSize) {
-                    keyPool = new HashMap(keyPoolSize);
+            synchronized (JSONObject.class) {
+                pooled = (String)keyPool.get(key);
+                if (pooled == null) {
+                    if (keyPool.size() >= keyPoolSize) {
+                      keyPool = new HashMap(keyPoolSize);
+                    }
+                    keyPool.put(key, key);
+                } else {
+                    key = pooled;
                 }
-                keyPool.put(key, key);
-            } else {
-                key = pooled;
             }
             this.map.put(key, value);
         } else {
