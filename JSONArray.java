@@ -69,15 +69,13 @@ import java.util.Map;
  * <li>Strings do not need to be quoted at all if they do not begin with a quote
  * or single quote, and if they do not contain leading or trailing spaces, and
  * if they do not contain any of these characters:
- * <code>{ } [ ] / \ : , = ; #</code> and if they do not look like numbers and
+ * <code>{ } [ ] / \ : , #</code> and if they do not look like numbers and
  * if they are not the reserved words <code>true</code>, <code>false</code>, or
  * <code>null</code>.</li>
- * <li>Values can be separated by <code>;</code> <small>(semicolon)</small> as
- * well as by <code>,</code> <small>(comma)</small>.</li>
  * </ul>
  *
  * @author JSON.org
- * @version 2012-11-13
+ * @version 2013-04-18
  */
 public class JSONArray {
 
@@ -117,7 +115,6 @@ public class JSONArray {
                     this.myArrayList.add(x.nextValue());
                 }
                 switch (x.nextClean()) {
-                case ';':
                 case ',':
                     if (x.nextClean() == ']') {
                         return;
