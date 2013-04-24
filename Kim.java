@@ -55,10 +55,9 @@ package org.json;
  * A kim object can be constructed from an ordinary UTF-16 string, or from a
  * byte array. A kim object can produce a UTF-16 string.
  *
- * As with UTF-8, Kim can be sorted, and it is possible to detect character
- * boundaries within a byte sequence. UTF-8 is one of the world's great
- * inventions. While Kim is more efficient, it is not clear that it is worth
- * the expense of transition.
+ * As with UTF-8, it is possible to detect character boundaries within a byte
+ * sequence. UTF-8 is one of the world's great inventions. While Kim is more
+ * efficient, it is not clear that it is worth the expense of transition.
  *
  * @version 2013-04-18
  */
@@ -70,7 +69,7 @@ public class Kim {
     private byte[] bytes = null;
 
     /**
-     * The kim's hashcode, conforming to Java's hashcode recommendations.
+     * The kim's hashcode, conforming to Java's hashcode conventions.
      */
     private int hashcode = 0;
 
@@ -158,7 +157,7 @@ public class Kim {
         this.length = 0;
 
 // First pass: Determine the length of the kim, allowing for the UTF-16
-// to UTF-32 conversion, and then the UTF-32 to kim conversion.
+// to UTF-32 conversion, and then the UTF-32 to Kim conversion.
 
         if (stringLength > 0) {
             for (int i = 0; i < stringLength; i += 1) {
@@ -320,7 +319,7 @@ public class Kim {
     }
 
     /**
-     *
+     * Get a byte from a kim.
      * @param at
      *            The position of the byte. The first byte is at 0.
      * @return The byte.
@@ -348,7 +347,7 @@ public class Kim {
      *
      * @return The string. A kim memoizes its string representation.
      * @throws JSONException
-     *             if the kim is invalid.
+     *             if the kim is not valid.
      */
     public String toString() throws JSONException {
         if (this.string == null) {
