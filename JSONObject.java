@@ -38,6 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -104,7 +105,9 @@ public class JSONObject {
      * JSONObjects will be avoided by using a key pool to manage unique key
      * string objects. This is used by JSONObject.put(string, object).
      */
-    private static HashMap keyPool = new HashMap(keyPoolSize);
+    private static volatile ConcurrentHashMap keyPool = new ConcurrentHashMap(keyPoolSize);
+
+    private static final Object keyPoolBarrier = new Object();
 
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
@@ -1156,9 +1159,13 @@ public class JSONObject {
             pooled = (String) keyPool.get(key);
             if (pooled == null) {
                 if (keyPool.size() >= keyPoolSize) {
-                    keyPool = new HashMap(keyPoolSize);
+                    synchronized (keyPoolBarrier) {
+                        if (keyPool.size() >= keyPoolSize) {
+                            keyPool = new ConcurrentHashMap(keyPoolSize);
+                        }
+                    }
                 }
-                keyPool.put(key, key);
+                keyPool.putIfAbsent(key, key);
             } else {
                 key = pooled;
             }
