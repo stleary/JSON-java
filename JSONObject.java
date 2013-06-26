@@ -389,6 +389,7 @@ public class JSONObject {
         if (object == null) {
             //this is the modified line  The old version would put the raw value
             //this forces an array when the accumulate version is used
+            
             this.put(key, new JSONArray().put(value));
         } else if (object instanceof JSONArray) {
             ((JSONArray) object).put(value);
