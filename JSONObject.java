@@ -135,7 +135,7 @@ public class JSONObject {
     /**
      * The map where the JSONObject's properties are kept.
      */
-    private final Map map;
+    private final Map<Object, Object> map;
 
     /**
      * It is sometimes more convenient and less ambiguous to have a
@@ -149,7 +149,7 @@ public class JSONObject {
      * Construct an empty JSONObject.
      */
     public JSONObject() {
-        this.map = new HashMap();
+        this.map = new HashMap<>();
     }
 
     /**
@@ -240,7 +240,7 @@ public class JSONObject {
      * @throws JSONException
      */
     public JSONObject(Map map) {
-        this.map = new HashMap();
+        this.map = new HashMap<>();
         if (map != null) {
             Iterator i = map.entrySet().iterator();
             while (i.hasNext()) {

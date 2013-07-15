@@ -164,7 +164,7 @@ public class XML {
                     if (x.next() == '[') {
                         string = x.nextCDATA();
                         if (string.length() > 0) {
-                            context.accumulate("content", string);
+                            context.accumulate("#text", string);
                         }
                         return false;
                     }
@@ -229,11 +229,11 @@ public class XML {
                         if (!(token instanceof String)) {
                             throw x.syntaxError("Missing value");
                         }
-                        jsonobject.accumulate(string,
+                        jsonobject.accumulate("@" + string,
                                 XML.stringToValue((String)token));
                         token = null;
                     } else {
-                        jsonobject.accumulate(string, "");
+                        jsonobject.accumulate("@" + string, "");
                     }
 
 // Empty tag <.../>
@@ -245,7 +245,7 @@ public class XML {
                     if (jsonobject.length() > 0) {
                         context.accumulate(tagName, jsonobject);
                     } else {
-                        context.accumulate(tagName, "");
+                        context.accumulate(tagName, JSONObject.NULL);
                     }
                     return false;
 
@@ -262,7 +262,7 @@ public class XML {
                         } else if (token instanceof String) {
                             string = (String)token;
                             if (string.length() > 0) {
-                                jsonobject.accumulate("content",
+                                jsonobject.accumulate("#text",
                                         XML.stringToValue(string));
                             }
 
@@ -271,11 +271,11 @@ public class XML {
                         } else if (token == LT) {
                             if (parse(x, jsonobject, tagName)) {
                                 if (jsonobject.length() == 0) {
-                                    context.accumulate(tagName, "");
+                                    context.accumulate(tagName, JSONObject.NULL);
                                 } else if (jsonobject.length() == 1 &&
-                                       jsonobject.opt("content") != null) {
+                                       jsonobject.opt("#text") != null) {
                                     context.accumulate(tagName,
-                                            jsonobject.opt("content"));
+                                            jsonobject.opt("#text"));
                                 } else {
                                     context.accumulate(tagName, jsonobject);
                                 }
@@ -356,7 +356,7 @@ public class XML {
      * collections of name/value pairs and arrays of values. JSON does not
      * does not like to distinguish between elements and attributes.
      * Sequences of similar elements are represented as JSONArrays. Content
-     * text may be placed in a "content" member. Comments, prologs, DTDs, and
+     * text may be placed in a "#text" member. Comments, prologs, DTDs, and
      * <code>&lt;[ [ ]]></code> are ignored.
      * @param string The source string.
      * @return A JSONObject containing the structured data from the XML string.
@@ -429,7 +429,7 @@ public class XML {
 
 // Emit content in body
 
-                if ("content".equals(key)) {
+                if ("#text".equals(key)) {
                     if (value instanceof JSONArray) {
                         ja = (JSONArray)value;
                         length = ja.length();
