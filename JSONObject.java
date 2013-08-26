@@ -92,7 +92,7 @@ import java.util.Set;
  * @author JSON.org
  * @version 2013-06-17
  */
-public class JSONObject {
+public class JSONObject implements java.io.Serializable {
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
      * whilst Java's null is equivalent to the value that JavaScript calls
