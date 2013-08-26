@@ -77,7 +77,7 @@ import java.util.Map;
  * @author JSON.org
  * @version 2013-04-18
  */
-public class JSONArray {
+public class JSONArray implements java.io.Serializable {
 
     /**
      * The arrayList where the JSONArray's properties are kept.
