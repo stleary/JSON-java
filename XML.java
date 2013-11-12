@@ -332,7 +332,12 @@ public class XML {
             }
             if ((initial >= '0' && initial <= '9')) {
                 if (string.indexOf('.') >= 0) {
-                    return Double.valueOf(string);
+                    Double value = Double.valueOf(string);
+                    if (string.equals(value.toString())) {
+                        return value;
+                    } else {
+                        return string;
+                    }
                 } else if (string.indexOf('e') < 0 && string.indexOf('E') < 0) {
                     Long myLong = new Long(string);
                     if (myLong.longValue() == myLong.intValue()) {
