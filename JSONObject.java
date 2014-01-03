@@ -38,6 +38,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -240,7 +242,11 @@ public class JSONObject {
      * @throws JSONException
      */
     public JSONObject(Map map) {
-        this.map = new HashMap();
+    	if (map instanceof SortedMap) {
+    		this.map = new TreeMap(map);
+    	} else {
+    		this.map = new HashMap();
+    	}
         if (map != null) {
             Iterator i = map.entrySet().iterator();
             while (i.hasNext()) {
@@ -252,7 +258,7 @@ public class JSONObject {
             }
         }
     }
-
+    
     /**
      * Construct a JSONObject from an Object using bean getters. It reflects on
      * all of the public methods of the object. For each of the methods with no
