@@ -772,7 +772,7 @@ public class JSONObject {
 
 // Shave off trailing zeros and decimal point, if possible.
         if (number.doubleValue() == number.longValue()) {
-            return "" + number.longValue();
+            return Long.toString(number.longValue());
         }
         else {
             return number.toString();
