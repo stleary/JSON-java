@@ -813,9 +813,8 @@ public class JSONArray {
      *         was no value.
      */
     public Object remove(int index) {
-        Object o = this.opt(index);
-        this.myArrayList.remove(index);
-        return o;
+        return (index < 0 || index >= this.length()) ? null : this.myArrayList
+                .remove(index);
     }
 
     /**
