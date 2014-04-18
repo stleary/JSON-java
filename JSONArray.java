@@ -75,7 +75,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2013-04-18
+ * @version 2014-04-18
  */
 public class JSONArray {
 
@@ -814,7 +814,9 @@ public class JSONArray {
      */
     public Object remove(int index) {
         Object o = this.opt(index);
-        this.myArrayList.remove(index);
+        if (index >= 0 && index < this.length()) {
+            this.myArrayList.remove(index);
+        }
         return o;
     }
 
