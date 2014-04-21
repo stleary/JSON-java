@@ -75,7 +75,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2014-04-18
+ * @version 2014-04-21
  */
 public class JSONArray {
 
@@ -813,11 +813,42 @@ public class JSONArray {
      *         was no value.
      */
     public Object remove(int index) {
-        Object o = this.opt(index);
-        if (index >= 0 && index < this.length()) {
-            this.myArrayList.remove(index);
+        return index >= 0 && index < this.length()
+            ? this.myArrayList.remove(index)
+            : null;
+    }
+
+    /**
+     * Determine if two JSONArrays are similar.
+     * They must contain similar sequences.
+     *
+     * @param other The other JSONArray
+     * @return true if they are equal
+     */
+    public boolean similar(Object other) {
+        if (!(other instanceof JSONArray)) {
+            return false;
         }
-        return o;
+        int len = this.length();
+        if (len != ((JSONArray)other).length()) {
+            return false;
+        }
+        for (int i = 0; i < len; i += 1) {
+            Object valueThis = this.get(i);
+            Object valueOther = ((JSONArray)other).get(i);
+            if (valueThis instanceof JSONObject) {
+                if (!((JSONObject)valueThis).similar(valueOther)) {
+                    return false;
+                }
+            } else if (valueThis instanceof JSONArray) {
+                if (!((JSONArray)valueThis).similar(valueOther)) {
+                    return false;
+                }
+            } else if (!valueThis.equals(valueOther)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
