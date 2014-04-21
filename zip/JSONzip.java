@@ -1,6 +1,5 @@
 package org.json.zip;
 
-
 /*
  Copyright (c) 2013 JSON.org
 
@@ -27,7 +26,9 @@ package org.json.zip;
 
 /**
  * JSONzip is a binary-encoded JSON dialect. It is designed to compress the
- * messages in a session. It is adaptive, so with each message seen, it should
+ * messages in a session in bandwidth constrained applications, such as mobile.
+ *
+ * JSONzip is adaptive, so with each message seen, it should
  * improve its compression. It minimizes JSON's overhead, reducing punctuation
  * to a small number of bits. It uses Huffman encoding to reduce the average
  * size of characters. It uses caches (or Keeps) to keep recently seen strings
@@ -43,7 +44,7 @@ package org.json.zip;
  * ADEQUATELY FOR PRODUCTION USE.
  *
  * @author JSON.org
- * @version 2013-04-18
+ * @version 2014-04-21
  */
 public abstract class JSONzip implements None, PostMortem {
     /**
@@ -230,12 +231,17 @@ public abstract class JSONzip implements None, PostMortem {
 
     /**
      * Write two integers, separated by ':' to the console.
+     * The second integer is suppressed if it is 1.
      *
      * @param integer
      * @param width
      */
     static void log(int integer, int width) {
-        log(integer + ":" + width + " ");
+        if (width == 1) {
+            log(integer);
+        } else {
+            log(integer + ":" + width + " ");
+        }
     }
 
     /**

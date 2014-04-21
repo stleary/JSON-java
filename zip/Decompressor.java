@@ -35,7 +35,7 @@ import org.json.Kim;
  * JSONzip is a compression scheme for JSON text.
  *
  * @author JSON.org
- * @version 2013-04-18
+ * @version 2014-04-21
  */
 
 public class Decompressor extends JSONzip {
@@ -221,7 +221,7 @@ public class Decompressor extends JSONzip {
         JSONObject jsonobject = new JSONObject();
         while (true) {
             if (probe) {
-                log("\n");
+                log();
             }
             String name = readName();
             jsonobject.put(name, !bit() ? readString() : readValue());
