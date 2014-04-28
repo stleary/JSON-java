@@ -35,7 +35,7 @@ import org.json.Kim;
  * JSONzip is a compression scheme for JSON text.
  *
  * @author JSON.org
- * @version 2014-04-21
+ * @version 2014-04-28
  */
 
 public class Decompressor extends JSONzip {
@@ -288,7 +288,17 @@ public class Decompressor extends JSONzip {
     private Object readValue() throws JSONException {
         switch (read(2)) {
         case 0:
-            return new Integer(read(!bit() ? 4 : !bit() ? 7 : 14));
+            int nr_bits = !bit() ? 4 : !bit() ? 7 : 14;
+            int integer = read(nr_bits);
+            switch (nr_bits) {
+            case 7:
+                integer += int4;
+                break;
+            case 14:
+                integer += int7;
+                break;
+            }
+            return new Integer(integer);
         case 1:
             byte[] bytes = new byte[256];
             int length = 0;

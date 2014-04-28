@@ -44,7 +44,7 @@ package org.json.zip;
  * ADEQUATELY FOR PRODUCTION USE.
  *
  * @author JSON.org
- * @version 2014-04-21
+ * @version 2014-04-28
  */
 public abstract class JSONzip implements None, PostMortem {
     /**
@@ -63,19 +63,19 @@ public abstract class JSONzip implements None, PostMortem {
     };
 
     /**
-     * The number of integers that can be encoded in 4 bits.
+     * The first positive integer than cannot be encoded in 4 bits.
      */
     public static final long int4 = 16;
 
     /**
-     * The number of integers that can be encoded in 7 bits.
+     * The first positive integer than cannot be encoded in 7 bits.
      */
-    public static final long int7 = 128;
+    public static final long int7 = 144;
 
     /**
-     * The number of integers that can be encoded in 14 bits.
+     * The first positive integer than cannot be encoded in 14 bits.
      */
-    public static final long int14 = 16384;
+    public static final long int14 = 16528;
 
     /**
      * The end of string code.

@@ -38,7 +38,7 @@ import org.json.Kim;
  * JSONzip is a compression scheme for JSON text.
  *
  * @author JSON.org
- * @version 2014-04-21
+ * @version 2014-04-28
  */
 
 /**
@@ -75,7 +75,7 @@ public class Compressor extends JSONzip {
      * 'e' is 13.
      *
      * @param digit
-     *            An ASCII character from a JSIN number.
+     *            An ASCII character from a JSON number.
      * @return
      */
     private static int bcd(char digit) {
@@ -514,11 +514,11 @@ public class Compressor extends JSONzip {
                     one();
                     if (longer < int7) {
                         zero();
-                        write((int) longer, 7);
+                        write((int)(longer - int4), 7);
                         return;
                     }
                     one();
-                    write((int) longer, 14);
+                    write((int)(longer - int7), 14);
                     return;
                 }
             }
