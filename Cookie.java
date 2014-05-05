@@ -149,7 +149,7 @@ public class Cookie {
      */
     public static String unescape(String string) {
         int length = string.length();
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(length);
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             if (c == '+') {
