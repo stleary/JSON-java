@@ -30,7 +30,7 @@ import java.io.OutputStream;
 /**
  * This is a big endian bit writer. It writes its bits to an OutputStream.
  *
- * @version 2013-04-18
+ * @version 2013-05-03
  *
  */
 public class BitOutputStream implements BitWriter {
@@ -85,25 +85,25 @@ public class BitOutputStream implements BitWriter {
     }
 
     /**
-     * Pad the rest of the block with zeroes and flush. pad(8) flushes the last
+     * Pad the rest of the block with zeros and flush. pad(8) flushes the last
      * unfinished byte. The underlying OutputStream will be flushed.
      *
-     * @param factor
-     *            The size of the block to pad. This will typically be 8, 16,
-     *            32, 64, 128, 256, etc.
-     * @return this
+     * @param width
+     *            The size of the block to pad in bits.
+     *            This will typically be 8, 16, 32, 64, 128, 256, etc.
      * @throws IOException
      */
-    public void pad(int factor) throws IOException {
-        int padding = factor - (int) (nrBits % factor);
-        int excess = padding & 7;
-        if (excess > 0) {
-            this.write(0, excess);
-            padding -= excess;
+    public void pad(int width) throws IOException {
+        int gap = (int)this.nrBits % width;
+        if (gap < 0) {
+            gap += width;
         }
-        while (padding > 0) {
-            this.write(0, 8);
-            padding -= 8;
+        if (gap != 0) {
+            int padding = width - gap;
+            while (padding > 0) {
+                this.zero();
+                padding -= 1;
+            }
         }
         this.out.flush();
     }
@@ -130,7 +130,7 @@ public class BitOutputStream implements BitWriter {
                 actual = this.vacant;
             }
             this.unwritten |= ((bits >>> (width - actual)) &
-                    BitInputStream.mask[actual]) << (this.vacant - actual);
+                    ((1 << actual) - 1)) << (this.vacant - actual);
             width -= actual;
             nrBits += actual;
             this.vacant -= actual;

@@ -3,6 +3,7 @@ package org.json.zip;
 import java.io.IOException;
 
 public interface BitReader {
+
     /**
      * Read one bit.
      *
@@ -18,16 +19,16 @@ public interface BitReader {
     public long nrBits();
 
     /**
-     * Check that the rest of the block has been padded with zeroes.
+     * Check that the rest of the block has been padded with zeros.
      *
-     * @param factor
+     * @param width
      *            The size in bits of the block to pad. This will typically be
      *            8, 16, 32, 64, 128, 256, etc.
      * @return true if the block was zero padded, or false if the the padding
      *         contained any one bits.
      * @throws IOException
      */
-    public boolean pad(int factor) throws IOException;
+    public boolean pad(int width) throws IOException;
 
     /**
      * Read some bits.

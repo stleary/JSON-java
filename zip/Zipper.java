@@ -1,6 +1,5 @@
 package org.json.zip;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,36 +34,36 @@ import org.json.Kim;
  */
 
 /**
- * JSONzip is a compression scheme for JSON text.
+ * JSONzip is a binary compression scheme for JSON text.
  *
  * @author JSON.org
- * @version 2014-04-28
+ * @version 2014-05-03
  */
 
 /**
- * A compressor implements the compression behavior of JSONzip. It provides a
+ * An encoder implements the compression behavior of JSONzip. It provides a
  * zip method that takes a JSONObject or JSONArray and delivers a stream of
  * bits to a BitWriter.
  *
  * FOR EVALUATION PURPOSES ONLY. THIS PACKAGE HAS NOT BEEN TESTED ADEQUATELY
  * FOR PRODUCTION USE.
  */
-public class Compressor extends JSONzip {
+public class Zipper extends JSONzip {
 
     /**
-     * A compressor outputs to a BitWriter.
+     * An encoder outputs to a BitWriter.
      */
     final BitWriter bitwriter;
 
     /**
-     * Create a new compressor. It may be used for an entire session or
+     * Create a new encoder. It may be used for an entire session or
      * subsession.
      *
      * @param bitwriter
-     *            The BitWriter this Compressor will output to. Don't forget to
-     *            flush.
+     *            The BitWriter this encoder will output to.
+     *            Don't forget to flush.
      */
-    public Compressor(BitWriter bitwriter) {
+    public Zipper(BitWriter bitwriter) {
         super();
         this.bitwriter = bitwriter;
     }
@@ -76,7 +75,7 @@ public class Compressor extends JSONzip {
      *
      * @param digit
      *            An ASCII character from a JSON number.
-     * @return
+     * @return The number code.
      */
     private static int bcd(char digit) {
         if (digit >= '0' && digit <= '9') {
@@ -107,7 +106,7 @@ public class Compressor extends JSONzip {
     /**
      * Output a one bit.
      *
-     * @throws IOException
+     * @throws JSONException
      */
     private void one() throws JSONException {
         write(1, 1);
@@ -116,15 +115,15 @@ public class Compressor extends JSONzip {
     /**
      * Pad the output to fill an allotment of bits.
      *
-     * @param factor
+     * @param width
      *            The size of the bit allotment. A value of 8 will complete and
      *            flush the current byte. If you don't pad, then some of the
      *            last bits might not be sent to the Output Stream.
      * @throws JSONException
      */
-    public void pad(int factor) throws JSONException {
+    public void pad(int width) throws JSONException {
         try {
-            this.bitwriter.pad(factor);
+            this.bitwriter.pad(width);
         } catch (Throwable e) {
             throw new JSONException(e);
         }
@@ -171,29 +170,19 @@ public class Compressor extends JSONzip {
      *            A kim containing the bytes to be written.
      * @param huff
      *            The Huffman encoder.
+     * @param ext
+     *            The Huffman encoder for the extended bytes.
      * @throws JSONException
      */
-    private void write(Kim kim, Huff huff) throws JSONException {
-        write(kim, 0, kim.length, huff);
-    }
-
-    /**
-     * Write a range of bytes from a Kim with Huffman encoding.
-     *
-     * @param kim
-     *            A Kim containing the bytes to be written.
-     * @param from
-     *            The index of the first byte to write.
-     * @param thru
-     *            The index after the last byte to write.
-     * @param huff
-     *            The Huffman encoder.
-     * @throws JSONException
-     */
-    private void write(Kim kim, int from, int thru, Huff huff)
-            throws JSONException {
-        for (int at = from; at < thru; at += 1) {
-            write(kim.get(at), huff);
+    private void write(Kim kim, Huff huff, Huff ext) throws JSONException {
+        for (int at = 0; at < kim.length; at += 1) {
+            int c = kim.get(at);
+            write(c, huff);
+            while ((c & 128) == 128) {
+                at += 1;
+                c = kim.get(at);
+                write(c, ext);
+            }
         }
     }
 
@@ -207,7 +196,7 @@ public class Compressor extends JSONzip {
      *            The Keep that the integer is one of.
      * @throws JSONException
      */
-    private void writeAndTick(int integer, Keep keep) throws JSONException {
+    private void write(int integer, Keep keep) throws JSONException {
         int width = keep.bitsize();
         keep.tick(integer);
         if (probe) {
@@ -219,10 +208,10 @@ public class Compressor extends JSONzip {
     /**
      * Write a JSON Array.
      *
-     * @param jsonarray
-     * @throws JSONException
+     * @param jsonarray The JSONArray to write.
+     * @throws JSONException If the write fails.
      */
-    private void writeArray(JSONArray jsonarray) throws JSONException {
+    private void write(JSONArray jsonarray) throws JSONException {
 
 // JSONzip has three encodings for arrays:
 // The array is empty (zipEmptyArray).
@@ -295,9 +284,9 @@ public class Compressor extends JSONzip {
                 value = new JSONArray(value);
             }
             if (value instanceof JSONObject) {
-                writeObject((JSONObject) value);
+                write((JSONObject) value);
             } else if (value instanceof JSONArray) {
-                writeArray((JSONArray) value);
+                write((JSONArray) value);
             } else {
                 throw new JSONException("Unrecognized object");
             }
@@ -308,7 +297,7 @@ public class Compressor extends JSONzip {
      * Write the name of an object property. Names have their own Keep and
      * Huffman encoder because they are expected to be a more restricted set.
      *
-     * @param name
+     * @param name The name string.
      * @throws JSONException
      */
     private void writeName(String name) throws JSONException {
@@ -320,13 +309,13 @@ public class Compressor extends JSONzip {
         int integer = this.namekeep.find(kim);
         if (integer != none) {
             one();
-            writeAndTick(integer, this.namekeep);
+            write(integer, this.namekeep);
         } else {
 
 // Otherwise, emit the string with Huffman encoding, and register it.
 
             zero();
-            write(kim, this.namehuff);
+            write(kim, this.namehuff, this.namehuffext);
             write(end, namehuff);
             this.namekeep.register(kim);
         }
@@ -335,17 +324,16 @@ public class Compressor extends JSONzip {
     /**
      * Write a JSON object.
      *
-     * @param jsonobject
-     * @return
+     * @param jsonobject The JSONObject to be written.
      * @throws JSONException
      */
-    private void writeObject(JSONObject jsonobject) throws JSONException {
+    private void write(JSONObject jsonobject) throws JSONException {
 
 // JSONzip has two encodings for objects: Empty Objects (zipEmptyObject) and
 // non-empty objects (zipObject).
 
         boolean first = true;
-        Iterator keys = jsonobject.keys();
+        Iterator<String> keys = jsonobject.keys();
         while (keys.hasNext()) {
             if (probe) {
                 log();
@@ -379,7 +367,7 @@ public class Compressor extends JSONzip {
     /**
      * Write a string.
      *
-     * @param string
+     * @param string The string to write.
      * @throws JSONException
      */
     private void writeString(String string) throws JSONException {
@@ -388,9 +376,7 @@ public class Compressor extends JSONzip {
 
         if (string.length() == 0) {
             zero();
-            zero();
-            write(end, this.substringhuff);
-            zero();
+            write(end, this.stringhuff);
         } else {
             Kim kim = new Kim(string);
 
@@ -400,90 +386,18 @@ public class Compressor extends JSONzip {
             int integer = this.stringkeep.find(kim);
             if (integer != none) {
                 one();
-                writeAndTick(integer, this.stringkeep);
+                write(integer, this.stringkeep);
             } else {
 
-// But if it is not found, emit the string's substrings. Register the string
-// so that the next lookup will succeed.
+// But if it is not found, emit the string's characters. Register the string
+// so that a later lookup can succeed.
 
-                writeSubstring(kim);
+                zero();
+                write(kim, this.stringhuff, this.stringhuffext);
+                write(end, this.stringhuff);
                 this.stringkeep.register(kim);
             }
         }
-    }
-
-    /**
-     * Write a string, attempting to match registered substrings.
-     *
-     * @param kim
-     * @throws JSONException
-     */
-    private void writeSubstring(Kim kim) throws JSONException {
-        this.substringkeep.reserve();
-        zero();
-        int from = 0;
-        int thru = kim.length;
-        int until = thru - JSONzip.minSubstringLength;
-        int previousFrom = none;
-        int previousThru = 0;
-
-// Find a substring from the substring keep.
-
-        while (true) {
-            int at;
-            int integer = none;
-            for (at = from; at <= until; at += 1) {
-                integer = this.substringkeep.match(kim, at, thru);
-                if (integer != none) {
-                    break;
-                }
-            }
-            if (integer == none) {
-                break;
-            }
-
-// If a substring is found, emit any characters that were before the matched
-// substring. Then emit the substring's integer and loop back to match the
-// remainder with another substring.
-
-            if (from != at) {
-                zero();
-                write(kim, from, at, this.substringhuff);
-                write(end, this.substringhuff);
-                if (previousFrom != none) {
-                    this.substringkeep.registerOne(kim, previousFrom,
-                            previousThru);
-                    previousFrom = none;
-                }
-            }
-            one();
-            writeAndTick(integer, this.substringkeep);
-            from = at + this.substringkeep.length(integer);
-            if (previousFrom != none) {
-                this.substringkeep.registerOne(kim, previousFrom,
-                        previousThru);
-                previousFrom = none;
-            }
-            previousFrom = at;
-            previousThru = from + 1;
-        }
-
-// If a substring is not found, then emit the remaining characters.
-
-        zero();
-        if (from < thru) {
-            write(kim, from, thru, this.substringhuff);
-            if (previousFrom != none) {
-                this.substringkeep.registerOne(kim, previousFrom, previousThru);
-            }
-        }
-        write(end, this.substringhuff);
-        zero();
-
-// Register the string's substrings in the trie in hopes of future substring
-// matching.
-
-        substringkeep.registerMany(kim);
     }
 
     /**
@@ -496,10 +410,10 @@ public class Compressor extends JSONzip {
     private void writeValue(Object value) throws JSONException {
         if (value instanceof Number) {
             String string = JSONObject.numberToString((Number) value);
-            int integer = this.values.find(string);
+            int integer = this.valuekeep.find(string);
             if (integer != none) {
                 write(2, 2);
-                writeAndTick(integer, this.values);
+                write(integer, this.valuekeep);
                 return;
             }
             if (value instanceof Integer || value instanceof Long) {
@@ -527,7 +441,7 @@ public class Compressor extends JSONzip {
                 write(bcd(string.charAt(i)), 4);
             }
             write(endOfNumber, 4);
-            this.values.register(string);
+            this.valuekeep.register(string);
         } else {
             write(3, 2);
             writeJSON(value);
@@ -538,32 +452,30 @@ public class Compressor extends JSONzip {
      * Output a zero bit.
      *
      * @throws JSONException
-     *
-     * @throws IOException
      */
     private void zero() throws JSONException {
         write(0, 1);
     }
 
     /**
-     * Compress a JSONObject.
+     * Encode a JSONObject.
      *
-     * @param jsonobject
+     * @param jsonobject The JSONObject.
      * @throws JSONException
      */
-    public void zip(JSONObject jsonobject) throws JSONException {
-        begin();
+    public void encode(JSONObject jsonobject) throws JSONException {
+        generate();
         writeJSON(jsonobject);
     }
 
     /**
-     * Compress a JSONArray.
+     * Encode a JSONArray.
      *
-     * @param jsonarray
+     * @param jsonarray The JSONArray.
      * @throws JSONException
      */
-    public void zip(JSONArray jsonarray) throws JSONException {
-        begin();
+    public void encode(JSONArray jsonarray) throws JSONException {
+        generate();
         writeJSON(jsonarray);
     }
 }

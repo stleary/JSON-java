@@ -137,7 +137,6 @@ public class Kim {
      *            The point at which to take bytes.
      * @param thru
      *            The point at which to stop taking bytes.
-     * @return the substring
      */
     public Kim(Kim kim, int from, int thru) {
         this(kim.bytes, from, thru);

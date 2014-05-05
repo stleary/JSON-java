@@ -41,7 +41,7 @@ SOFTWARE.
  * The names for the elements in the JSONObjects can be taken from the names
  * in the first row.
  * @author JSON.org
- * @version 2012-11-13
+ * @version 2014-05-03
  */
 public class CDL {
 
@@ -142,7 +142,7 @@ public class CDL {
      * @return A string ending in NEWLINE.
      */
     public static String rowToString(JSONArray ja) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ja.length(); i += 1) {
             if (i > 0) {
                 sb.append(',');

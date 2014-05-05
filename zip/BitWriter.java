@@ -7,10 +7,6 @@ import java.io.IOException;
  * Most IO interfaces only allow for writing at the byte level or higher.
  */
 public interface BitWriter {
-    /**
-     * Returns the number of bits that have been written to this bitwriter.
-     */
-    public long nrBits();
 
     /**
      * Write a 1 bit.
@@ -22,14 +18,12 @@ public interface BitWriter {
     /**
      * Pad the rest of the block with zeros and flush.
      *
-     * @param factor
+     * @param width
      *            The size in bits of the block to pad. This will typically be
      *            8, 16, 32, 64, 128, 256, etc.
-     * @return true if the block was zero padded, or false if the the padding
-     *         contains any one bits.
      * @throws IOException
      */
-    public void pad(int factor) throws IOException;
+    public void pad(int width) throws IOException;
 
     /**
      * Write some bits. Up to 32 bits can be written at a time.

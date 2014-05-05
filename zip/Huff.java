@@ -29,7 +29,7 @@ import org.json.JSONException;
 /**
  * JSONzip is a compression scheme for JSON text.
  * @author JSON.org
- * @version 2013-04-18
+ * @version 2014-05-03
  */
 
 /**
@@ -42,6 +42,9 @@ import org.json.JSONException;
  * symbol is incremented by the tick method. The generate method is used to
  * generate the encoding table. The table must be generated before encoding or
  * decoding. You may regenerate the table with the latest weights at any time.
+ *
+ * After a million ticks, it is assumed that the distribution is well
+ * understood and that no more regeneration will be required.
  */
 public class Huff implements None, PostMortem {
 
@@ -59,6 +62,11 @@ public class Huff implements None, PostMortem {
      * The root of the decoding table, and the terminal of the encoding table.
      */
     private Symbol table;
+
+    /**
+     * The number of characters left to learn to adapt the coding table.
+     */
+    private int toLearn;
 
     /**
      * Have any weights changed since the table was last generated?
@@ -100,7 +108,7 @@ public class Huff implements None, PostMortem {
             if (this.integer != that.integer || this.weight != that.weight) {
                 return false;
             }
-            if ((this.back != null) != (that.back != null)) {
+            if ((this.back == null) != (that.back == null)) {
                 return false;
             }
             Symbol zero = this.zero;
@@ -132,6 +140,7 @@ public class Huff implements None, PostMortem {
      */
     public Huff(int domain) {
         this.domain = domain;
+        this.toLearn = 1000000;
         int length = domain * 2 - 1;
         this.symbols = new Symbol[length];
 
@@ -141,7 +150,7 @@ public class Huff implements None, PostMortem {
             symbols[i] = new Symbol(i);
         }
 
-// SMake the links.
+// Make the links.
 
         for (int i = domain; i < length; i += 1) {
             symbols[i] = new Symbol(none);
@@ -151,8 +160,6 @@ public class Huff implements None, PostMortem {
     /**
      * Generate the encoding/decoding table. The table determines the bit
      * sequences used by the read and write methods.
-     *
-     * @return this
      */
     public void generate() {
         if (!this.upToDate) {
@@ -176,8 +183,8 @@ public class Huff implements None, PostMortem {
                     head = symbol;
                 } else {
 
-// To save time, we will start the search from the previous symbol instead
-// of the head unless the current symbol weights less than the previous symbol.
+// We will start the search from the previous symbol instead of the head unless
+// the current symbol weights less than the previous symbol.
 
                     if (symbol.weight < previous.weight) {
                         previous = head;
@@ -290,7 +297,7 @@ public class Huff implements None, PostMortem {
     public boolean postMortem(PostMortem pm) {
 
 // Go through every integer in the domain, generating its bit sequence, and
-// then proving that that bit sequence produces the same integer.
+// then prove that that bit sequence produces the same integer.
 
         for (int integer = 0; integer < this.domain; integer += 1) {
             if (!postMortem(integer)) {
@@ -330,29 +337,16 @@ public class Huff implements None, PostMortem {
     }
 
     /**
-     * Increase by 1 the weight associated with a value.
+     * Increase the weight associated with a value by 1.
      *
      * @param value
      *            The number of the symbol to tick
-     * @return this
      */
     public void tick(int value) {
-        this.symbols[value].weight += 1;
-        this.upToDate = false;
-    }
-
-    /**
-     * Increase by 1 the weight associated with a range of values.
-     *
-     * @param from
-     *            The first symbol to tick
-     * @param to
-     *            The last symbol to tick
-     * @return this
-     */
-    public void tick(int from, int to) {
-        for (int value = from; value <= to; value += 1) {
-            tick(value);
+        if (this.toLearn > 0) {
+            this.toLearn -= 1;
+            this.symbols[value].weight += 1;
+            this.upToDate = false;
         }
     }
 
@@ -392,7 +386,6 @@ public class Huff implements None, PostMortem {
      *            The number of the symbol to write
      * @param bitwriter
      *            The destination of the bits.
-     * @return this
      * @throws JSONException
      */
     public void write(int value, BitWriter bitwriter) throws JSONException {

@@ -30,15 +30,10 @@ import java.io.InputStream;
 /**
  * This is a big endian bit reader. It reads its bits from an InputStream.
  *
- * @version 2013-04-18
+ * @version 2013-05-03
  *
  */
 public class BitInputStream implements BitReader {
-    /**
-     * 2^n - 1
-     */
-    static final int[] mask = { 0, 1, 3, 7, 15, 31, 63, 127, 255 };
-
     /**
      * The number of bits remaining in the current byte.
      */
@@ -71,23 +66,6 @@ public class BitInputStream implements BitReader {
     }
 
     /**
-     * Make a BitReader. The first byte is passed in explicitly, the remaining
-     * bytes are obtained from the InputStream. This makes it possible to look
-     * at the first byte of a stream before deciding that it should be read as
-     * bits.
-     *
-     * @param in
-     *            An InputStream
-     * @param firstByte
-     *            The first byte, which was probably read from in.
-     */
-    public BitInputStream(InputStream in, int firstByte) {
-        this.in = in;
-        this.unread = firstByte;
-        this.available = 8;
-    }
-
-    /**
      * Read one bit.
      *
      * @return true if it is a 1 bit.
@@ -111,20 +89,26 @@ public class BitInputStream implements BitReader {
     /**
      * Check that the rest of the block has been padded with zeroes.
      *
-     * @param factor
-     *            The size of the block to pad. This will typically be 8, 16,
-     *            32, 64, 128, 256, etc.
+     * @param width
+     *            The size of the block to pad in bits.
+     *            This will typically be 8, 16, 32, 64, 128, 256, etc.
      * @return true if the block was zero padded, or false if the the padding
      *         contains any one bits.
      * @throws IOException
      */
-    public boolean pad(int factor) throws IOException {
-        int padding = factor - (int) (this.nrBits % factor);
+    public boolean pad(int width) throws IOException {
         boolean result = true;
-
-        for (int i = 0; i < padding; i += 1) {
-            if (bit()) {
-                result = false;
+        int gap = (int)this.nrBits % width;
+        if (gap < 0) {
+            gap += width;
+        }
+        if (gap != 0) {
+            int padding = width - gap;
+            while (padding > 0) {
+                if (bit()) {
+                    result = false;
+                }
+                padding -= 1;
             }
         }
         return result;
@@ -158,8 +142,8 @@ public class BitInputStream implements BitReader {
             if (take > this.available) {
                 take = this.available;
             }
-            result |= ((this.unread >>> (this.available - take)) & mask[take])
-                    << (width - take);
+            result |= ((this.unread >>> (this.available - take)) &
+                    ((1 << take) - 1)) << (width - take);
             this.nrBits += take;
             this.available -= take;
             width -= take;

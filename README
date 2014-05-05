@@ -21,7 +21,7 @@ The license includes this restriction: "The software shall be used for good,
 not evil." If your conscience cannot live with that, then choose a different
 package.
 
-The package compiles on Java 1.2 thru Java 1.4.
+The package compiles on Java 1.8.
 
 
 JSONObject.java: The JSONObject can parse text from a String or a JSONTokener

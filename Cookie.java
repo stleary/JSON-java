@@ -28,7 +28,7 @@ SOFTWARE.
  * Convert a web browser cookie specification to a JSONObject and back.
  * JSON and Cookies are both notations for name/value pairs.
  * @author JSON.org
- * @version 2010-12-24
+ * @version 2014-05-03
  */
 public class Cookie {
 
@@ -45,10 +45,10 @@ public class Cookie {
      * @return       The escaped result.
      */
     public static String escape(String string) {
-        char         c;
-        String       s = string.trim();
-        StringBuffer sb = new StringBuffer();
-        int          length = s.length();
+        char            c;
+        String          s = string.trim();
+        int             length = s.length();
+        StringBuilder   sb = new StringBuilder(length);
         for (int i = 0; i < length; i += 1) {
             c = s.charAt(i);
             if (c < ' ' || c == '+' || c == '%' || c == '=' || c == ';') {
@@ -116,7 +116,7 @@ public class Cookie {
      * @throws JSONException
      */
     public static String toString(JSONObject jo) throws JSONException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append(escape(jo.getString("name")));
         sb.append("=");
@@ -149,7 +149,7 @@ public class Cookie {
      */
     public static String unescape(String string) {
         int length = string.length();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder(length);
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             if (c == '+') {

@@ -31,7 +31,7 @@ import java.util.Properties;
 /**
  * Converts a Property file data into JSONObject and back.
  * @author JSON.org
- * @version 2013-05-23
+ * @version 2014-05-03
  */
 public class Property {
     /**
@@ -50,7 +50,6 @@ public class Property {
             }
         }
         return jo;
-
     }
 
     /**
@@ -62,10 +61,9 @@ public class Property {
     public static Properties toProperties(JSONObject jo)  throws JSONException {
         Properties  properties = new Properties();
         if (jo != null) {
-            Iterator keys = jo.keys();
-
+            Iterator<String> keys = jo.keys();
             while (keys.hasNext()) {
-                String name = keys.next().toString();
+                String name = keys.next();
                 properties.put(name, jo.getString(name));
             }
         }
