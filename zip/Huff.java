@@ -29,7 +29,7 @@ import org.json.JSONException;
 /**
  * JSONzip is a compression scheme for JSON text.
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2014-05-20
  */
 
 /**
@@ -52,6 +52,11 @@ public class Huff implements None, PostMortem {
      * The number of symbols known to the encoder.
      */
     private final int domain;
+
+    /**
+     * The number of characters to process before generation is no longer done.
+     */
+    public static final int education = 1000000;
 
     /**
      * An array that maps symbol values to symbols.
@@ -140,7 +145,7 @@ public class Huff implements None, PostMortem {
      */
     public Huff(int domain) {
         this.domain = domain;
-        this.toLearn = 1000000;
+        this.toLearn = education;
         int length = domain * 2 - 1;
         this.symbols = new Symbol[length];
 
