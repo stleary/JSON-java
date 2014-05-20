@@ -44,7 +44,7 @@ package org.json.zip;
  * ADEQUATELY FOR PRODUCTION USE.
  *
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2014-05-20
  */
 public abstract class JSONzip implements None, PostMortem {
     /**
@@ -55,21 +55,6 @@ public abstract class JSONzip implements None, PostMortem {
     };
 
     /**
-     * The first positive integer than cannot be encoded in 4 bits.
-     */
-    public static final long int4 = 16;
-
-    /**
-     * The first positive integer than cannot be encoded in 7 bits.
-     */
-    public static final long int7 = 144;
-
-    /**
-     * The first positive integer than cannot be encoded in 14 bits.
-     */
-    public static final long int14 = 16528;
-
-    /**
      * The end of string code.
      */
     public static final int end = 256;
@@ -78,6 +63,21 @@ public abstract class JSONzip implements None, PostMortem {
      * The end of number code.
      */
     public static final int endOfNumber = bcd.length;
+
+    /**
+     * The first positive integer that cannot be encoded in 4 bits.
+     */
+    public static final long int4 = 16;
+
+    /**
+     * The first positive integer that cannot be encoded in 7 bits.
+     */
+    public static final long int7 = 144;
+
+    /**
+     * The first positive integer that cannot be encoded in 14 bits.
+     */
+    public static final long int14 = 16528;
 
     /**
      * The package supports tracing for debugging.
@@ -177,6 +177,7 @@ public abstract class JSONzip implements None, PostMortem {
      */
     protected void generate() {
         this.namehuff.generate();
+        this.namehuffext.generate();
         this.stringhuff.generate();
         this.stringhuffext.generate();
     }
