@@ -30,10 +30,12 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -324,6 +326,66 @@ public class JSONObject {
         this(new JSONTokener(source));
     }
 
+    /**
+     * Method for checking does the object containing attributes
+     * attributes are keys with @ as first character
+     * @return returns true value if attributes are present
+     */
+    public boolean hasAttributeKeys(){
+        Set set = this.map.keySet();
+        Iterator keyIterator = set.iterator();
+        while(keyIterator.hasNext()){
+            String key  = (String) keyIterator.next();
+            if(key.startsWith("@")){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Find attribute values from children objects
+     * @return  Map containing attribute key value pairs
+     */    
+    protected Map<String,String> removeAttributeKeys(){
+        HashMap<String,String> attributeKeys = new HashMap<String,String>();
+        //search attributes and add them to map
+        Set set = this.map.keySet();        
+        Iterator keyIterator = set.iterator();
+        while(keyIterator.hasNext()){
+            String key  = (String) keyIterator.next();
+            if(key.startsWith("@")){
+                Object objValue =  map.get(key);
+                if(objValue instanceof String){ //attributes does not have arrays
+                    attributeKeys.put(key,objValue.toString());                    
+                }else if(objValue instanceof Integer){
+                    attributeKeys.put(key, objValue.toString());
+                }                
+            }
+        }        
+        //remove children attributes
+        Set attrSet = attributeKeys.keySet();
+        Iterator keyAttrIterator = attrSet.iterator();
+        while(keyAttrIterator.hasNext()){
+            String key  = (String) keyAttrIterator.next();
+            this.map.remove(key);
+        }        
+        return attributeKeys;
+    }
+    
+    public String transformXmlAtrributeString(){
+        String txt = "";
+        Map<String,String> attributes = this.removeAttributeKeys();
+        Iterator it = attributes.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry)it.next();
+            txt = txt + pairs.getKey().toString().substring(1) + "=\"" + pairs.getValue() + "\" ";
+        }
+        return txt;
+    }
+            
+    
+    
     /**
      * Construct a JSONObject from a ResourceBundle.
      *

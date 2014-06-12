@@ -25,6 +25,8 @@ SOFTWARE.
 */
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This provides static methods to convert an XML text into a JSONObject,
@@ -209,7 +211,7 @@ public class XML {
 
 // Open tag <
 
-        } else {
+        } else {                      
             tagName = (String)token;
             token = null;
             jsonobject = new JSONObject();
@@ -227,9 +229,12 @@ public class XML {
                         token = x.nextToken();
                         if (!(token instanceof String)) {
                             throw x.syntaxError("Missing value");
-                        }
-                        jsonobject.accumulate(string,
+                        }else{
+                            //attributes
+                            jsonobject.accumulate("@"+string,
                                 XML.stringToValue((String)token));
+                        }
+                        
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -390,11 +395,25 @@ public class XML {
         if (object instanceof JSONObject) {
 
 // Emit <tagName>
-
-            if (tagName != null) {
-                sb.append('<');
-                sb.append(tagName);
-                sb.append('>');
+            //TODO: check does the map (object) contain keys with @ value
+            // if contain add opening elemnt without > close character
+            // then add attributes and remove them from map and close the eleent
+            if (tagName != null) {  
+                if(object instanceof JSONObject){
+                    JSONObject jsonObj =(JSONObject)object;
+                    if(jsonObj.hasAttributeKeys()){
+                        String attributes = jsonObj.transformXmlAtrributeString();
+                        sb.append('<');
+                        sb.append(tagName); 
+                        sb.append(" ");                        
+                        sb.append(attributes);                        
+                        sb.append('>');                
+                    }
+                }else{                                   
+                    sb.append('<');
+                    sb.append(tagName);
+                    sb.append('>');                
+                }
             }
 
 // Loop thru the keys.
@@ -431,8 +450,8 @@ public class XML {
                     ja = (JSONArray)value;
                     length = ja.length();
                     for (i = 0; i < length; i += 1) {
-                        value = ja.get(i);
-                        if (value instanceof JSONArray) {
+                        value = ja.get(i);                        
+                        if (value instanceof JSONArray) {                            
                             sb.append('<');
                             sb.append(key);
                             sb.append('>');
@@ -452,6 +471,11 @@ public class XML {
 // Emit a new tag <k>
 
                 } else {
+                    //check that if key is attribute (@)
+                    //TODO: logic here
+                    if(key.charAt(0)=='@'){
+                        key = key.substring(1);                        
+                    }
                     sb.append(toString(value, key));
                 }
             }
