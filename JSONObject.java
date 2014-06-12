@@ -358,6 +358,8 @@ public class JSONObject {
                 Object objValue =  map.get(key);
                 if(objValue instanceof String){ //attributes does not have arrays
                     attributeKeys.put(key,objValue.toString());                    
+                }else if(objValue instanceof Integer){
+                    attributeKeys.put(key, objValue.toString());
                 }                
             }
         }        
