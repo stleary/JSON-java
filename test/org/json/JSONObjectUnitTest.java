@@ -90,4 +90,13 @@ public class JSONObjectUnitTest {
         assertEquals("ref:id=\"00000000000w_DSC\" data=\"http://schemas.flexim.fi/flexim6/2012/data\" in-use=\"restricted\" xmlns:ref=\"http://schemas.flexim.fi/flexim6/2012/ref\" ",attributeStr);
     
     }
+    @Test
+    public void transformXmlAttributeStringIntegerValue(){
+    //    jsonObject:{"ws:create-entity":{"@xmlns:ws":"http://flexim.fi/flexim6/2013/ws","@to":"terminalCreate","@gid":"suuryritys.com/","ws:create":{"actor":{"@ref:owner":"actor#valk|Valkeakoski","terminal":{"relays":{"lock-relay":{"@delay":4}},"control":{"mothercard_loop-control":{"mothercard_loop-control-4":{"control-line":{"@io-number":4,"@mode":"E","@id":"Lukko"}}}},"application-settings":{"work":{"@enabled":"Y"}},"@device-type":4,"inside":{"@ref:ref":"location#4","@reader-type":"M"},"outside":{"@ref:ref":"location#5","@reader-type":"A"},"expansion-cards":{"expansion-card":{"extracard_loop-control":{"control-line":{"@io-number":1,"time-group":{"@ref:ref":"group#kv01_TG"},"@mode":"E","@id":"koe","daily-schema":{"@ref:ref":"0000000000002_DSC"}}}}},"network":{"@ref:ref":"actor#valk|Valkeakoski"},"info":{"@address":103220,"@sw-version":"v2.22","@is-activated":"N"}},"@ref:id":"ta11","identification":"","roles":"","@ref:name":"Microteam TA-3011","@xmlns":"http://schemas.flexim.fi/flexim6/2012/data","groups":"","@xmlns:ref":"http://schemas.flexim.fi/flexim6/2012/ref"}}}}
+
+        String addressAttributes = "{\"@address\":103220,\"@sw-version\":\"v2.22\",\"@is-activated\":\"N\"}";
+        JSONObject jsonObjWithAddress= new JSONObject(addressAttributes);
+        String attributesForXml = jsonObjWithAddress.transformXmlAtrributeString();
+        assertEquals("address=\"103220\" sw-version=\"v2.22\" is-activated=\"N\" ",attributesForXml);
+    }
 }
