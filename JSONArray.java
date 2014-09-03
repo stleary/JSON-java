@@ -944,4 +944,8 @@ public class JSONArray {
             throw new JSONException(e);
         }
     }
+
+    public Boolean isEmpty(){
+        return this.length()==0;
+    }
 }

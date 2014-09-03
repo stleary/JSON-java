@@ -1625,4 +1625,8 @@ public class JSONObject {
             throw new JSONException(exception);
         }
      }
+
+    public Boolean isEmpty(){
+         return !this.keys().hasNext();
+     }
 }
