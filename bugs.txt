@@ -1,7 +1,0 @@
-Bugs
-[ 1 ]	if an JSONObject is created from a JSON file, and this file has some
-	string values like {"key" : "value"} then if one value containes
-	':' character, it seems that the second part after this character
-	will be ignored.
-	Example: {"key" : "value:2"} --write_to_JSONObject"--> {"key":"value"}
-    
