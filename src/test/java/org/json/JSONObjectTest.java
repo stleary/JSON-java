@@ -2,13 +2,14 @@ package org.json;
 
 import org.junit.Test;
 
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 public class JSONObjectTest {
 
-
-    @Test
-    public void testParse() throws Exception {
+    private static JSONObject jObject;
+    static {
         String sampleJson = "{" +
                 "'a':['a', 'r', 'r', 'a', 'y']," +
                 "'b' : true," +
@@ -16,7 +17,13 @@ public class JSONObjectTest {
                 "'d':12.252525," +
                 "'e':null" +
                 "}";
-        JSONObject jObject = new JSONObject(sampleJson);
+        jObject = new JSONObject(sampleJson);
+    }
+
+
+    @Test
+    public void testParse() throws Exception {
+
         assertNotNull(jObject);
         assertTrue(jObject.getBoolean("b"));
         assertEquals(jObject.getInt("c"), -25);
@@ -29,5 +36,15 @@ public class JSONObjectTest {
         assertEquals(jArray.get(2), "r");
         assertEquals(jArray.get(3), "a");
         assertEquals(jArray.get(4), "y");
+    }
+
+    @Test
+    public void testIterate() throws Exception {
+        for (Map.Entry<String, Object> entry : jObject) {
+            assertNotNull(entry.getKey());
+            assertNotNull(entry.getValue());
+        }
+
+
     }
 }
