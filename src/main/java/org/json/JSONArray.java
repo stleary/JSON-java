@@ -77,7 +77,7 @@ import java.util.Map;
  * @author JSON.org
  * @version 2014-05-03
  */
-public class JSONArray {
+public class JSONArray implements Iterable {
 
     /**
      * The arrayList where the JSONArray's properties are kept.
@@ -973,5 +973,14 @@ public class JSONArray {
         } catch (IOException e) {
             throw new JSONException(e);
         }
+    }
+
+    /**
+     * Gets iterator for the elements in the array
+     * @return
+     */
+    @Override
+    public Iterator iterator() {
+        return myArrayList.iterator();
     }
 }

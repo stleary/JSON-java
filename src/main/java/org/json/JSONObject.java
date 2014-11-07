@@ -93,7 +93,8 @@ import java.util.Set;
  * @author JSON.org
  * @version 2014-05-03
  */
-public class JSONObject {
+public class JSONObject implements Iterable<Entry<String, Object>>{
+
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
      * whilst Java's null is equivalent to the value that JavaScript calls
@@ -1679,5 +1680,14 @@ public class JSONObject {
         } catch (IOException exception) {
             throw new JSONException(exception);
         }
+    }
+
+    /**
+     * Gets the iterator of (key:value) entries
+     * @return Iterator for entries of (key:value)s
+     */
+    @Override
+    public Iterator<Entry<String, Object>> iterator() {
+        return map.entrySet().iterator();
     }
 }
