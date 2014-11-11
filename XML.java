@@ -120,14 +120,15 @@ public class XML {
 
     /**
      * Scan the content following the named tag, attaching it to the context.
-     * @param x       The XMLTokener containing the source string.
-     * @param context The JSONObject that will include the new material.
-     * @param name    The tag name.
+     * @param x          The XMLTokener containing the source string.
+     * @param context    The JSONObject that will include the new material.
+     * @param name       The tag name.
+     * @param textKey    The key used to contain text node content.
      * @return true if the close tag is processed.
      * @throws JSONException
      */
     private static boolean parse(XMLTokener x, JSONObject context,
-                                 String name) throws JSONException {
+                                 String name, String textKey) throws JSONException {
         char       c;
         int        i;
         JSONObject jsonobject = null;
@@ -163,7 +164,7 @@ public class XML {
                     if (x.next() == '[') {
                         string = x.nextCDATA();
                         if (string.length() > 0) {
-                            context.accumulate("content", string);
+                            context.accumulate(textKey, string);
                         }
                         return false;
                     }
@@ -261,20 +262,20 @@ public class XML {
                         } else if (token instanceof String) {
                             string = (String)token;
                             if (string.length() > 0) {
-                                jsonobject.accumulate("content",
+                                jsonobject.accumulate(textKey,
                                         XML.stringToValue(string));
                             }
 
 // Nested element
 
                         } else if (token == LT) {
-                            if (parse(x, jsonobject, tagName)) {
+                            if (parse(x, jsonobject, tagName, textKey)) {
                                 if (jsonobject.length() == 0) {
                                     context.accumulate(tagName, "");
                                 } else if (jsonobject.length() == 1 &&
-                                       jsonobject.opt("content") != null) {
+                                       jsonobject.opt(textKey) != null) {
                                     context.accumulate(tagName,
-                                            jsonobject.opt("content"));
+                                            jsonobject.opt(textKey));
                                 } else {
                                     context.accumulate(tagName, jsonobject);
                                 }
@@ -349,10 +350,31 @@ public class XML {
      * @throws JSONException
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
+        return toJSONObject(string, "content");
+    }
+
+
+    /**
+     * Convert a well-formed (but not necessarily valid) XML string into a
+     * JSONObject. Some information may be lost in this transformation
+     * because JSON is a data format and XML is a document format. XML uses
+     * elements, attributes, and content text, while JSON uses unordered
+     * collections of name/value pairs and arrays of values. JSON does not
+     * does not like to distinguish between elements and attributes.
+     * Sequences of similar elements are represented as JSONArrays. Content
+     * text may be placed in a member keyed by <code>textKey</code>.
+     * Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code> are ignored.
+     * @param string    The source string.
+     * @param textKey   The JSON key to contain text node content.
+     * @return A JSONObject containing the structured data from the XML string.
+     * @throws JSONException
+     */
+    public static JSONObject toJSONObject(String string,
+                                          String textKey) throws JSONException {
         JSONObject jo = new JSONObject();
         XMLTokener x = new XMLTokener(string);
         while (x.more() && x.skipPast("<")) {
-            parse(x, jo, null);
+            parse(x, jo, null, textKey);
         }
         return jo;
     }
@@ -371,12 +393,26 @@ public class XML {
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
-     * @param object A JSONObject.
+     * @param object  A JSONObject.
      * @param tagName The optional name of the enclosing tag.
      * @return A string.
      * @throws JSONException
      */
     public static String toString(Object object, String tagName)
+            throws JSONException {
+        return toString(object, tagName, "content");
+    }
+
+
+    /**
+     * Convert a JSONObject into a well-formed, element-normal XML string.
+     * @param object A JSONObject.
+     * @param tagName The optional name of the enclosing tag, or null for none.
+     * @param textKey The JSON key containing XML text node content.
+     * @return A string.
+     * @throws JSONException
+     */
+    public static String toString(Object object, String tagName, String textKey)
             throws JSONException {
         StringBuilder       sb = new StringBuilder();
         int                 i;
@@ -411,7 +447,7 @@ public class XML {
 
 // Emit content in body
 
-                if ("content".equals(key)) {
+                if (textKey.equals(key)) {
                     if (value instanceof JSONArray) {
                         ja = (JSONArray)value;
                         length = ja.length();
@@ -436,12 +472,12 @@ public class XML {
                             sb.append('<');
                             sb.append(key);
                             sb.append('>');
-                            sb.append(toString(value));
+                            sb.append(toString(value, null, textKey));
                             sb.append("</");
                             sb.append(key);
                             sb.append('>');
                         } else {
-                            sb.append(toString(value, key));
+                            sb.append(toString(value, key, textKey));
                         }
                     }
                 } else if ("".equals(value)) {
@@ -452,7 +488,7 @@ public class XML {
 // Emit a new tag <k>
 
                 } else {
-                    sb.append(toString(value, key));
+                    sb.append(toString(value, key, textKey));
                 }
             }
             if (tagName != null) {
@@ -476,7 +512,7 @@ public class XML {
                 ja = (JSONArray)object;
                 length = ja.length();
                 for (i = 0; i < length; i += 1) {
-                    sb.append(toString(ja.opt(i), tagName == null ? "array" : tagName));
+                    sb.append(toString(ja.opt(i), tagName == null ? "array" : tagName, textKey));
                 }
                 return sb.toString();
             } else {
