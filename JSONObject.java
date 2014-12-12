@@ -298,7 +298,7 @@ public class JSONObject {
      */
     public JSONObject(Object object, String names[]) {
         this();
-        Class c = object.getClass();
+        Class<?> c = object.getClass();
         for (int i = 0; i < names.length; i += 1) {
             String name = names[i];
             try {
@@ -631,7 +631,7 @@ public class JSONObject {
         if (object == null) {
             return null;
         }
-        Class klass = object.getClass();
+        Class<?> klass = object.getClass();
         Field[] fields = klass.getFields();
         int length = fields.length;
         if (length == 0) {
@@ -981,7 +981,7 @@ public class JSONObject {
     }
 
     private void populateMap(Object bean) {
-        Class klass = bean.getClass();
+        Class<?> klass = bean.getClass();
 
 // If klass is a System class then set includeSuperClass to false.
 
@@ -1488,6 +1488,7 @@ public class JSONObject {
      * @throws JSONException
      *             If the value is or contains an invalid number.
      */
+    @SuppressWarnings("unchecked")
     public static String valueToString(Object value) throws JSONException {
         if (value == null || value.equals(null)) {
             return "null";
@@ -1512,7 +1513,7 @@ public class JSONObject {
             return value.toString();
         }
         if (value instanceof Map) {
-            return new JSONObject((Map<String, Object>)value).toString();
+            return new JSONObject((Map<String, Object>) value).toString();
         }
         if (value instanceof Collection) {
             return new JSONArray((Collection<Object>) value).toString();
@@ -1535,6 +1536,7 @@ public class JSONObject {
      *            The object to wrap
      * @return The wrapped value
      */
+    @SuppressWarnings("unchecked")
     public static Object wrap(Object object) {
         try {
             if (object == null) {
@@ -1586,6 +1588,7 @@ public class JSONObject {
         return this.write(writer, 0, 0);
     }
 
+    @SuppressWarnings("unchecked")
     static final Writer writeValue(Writer writer, Object value,
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {

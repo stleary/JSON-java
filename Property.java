@@ -43,7 +43,7 @@ public class Property {
     public static JSONObject toJSONObject(java.util.Properties properties) throws JSONException {
         JSONObject jo = new JSONObject();
         if (properties != null && !properties.isEmpty()) {
-            Enumeration enumProperties = properties.propertyNames();
+            Enumeration<?> enumProperties = properties.propertyNames();
             while(enumProperties.hasMoreElements()) {
                 String name = (String)enumProperties.nextElement();
                 jo.put(name, properties.getProperty(name));

@@ -268,6 +268,7 @@ public class Zipper extends JSONzip {
      *            or String, or Boolean, or JSONObject.NULL, or null.
      * @throws JSONException
      */
+    @SuppressWarnings("unchecked")
     private void writeJSON(Object value) throws JSONException {
         if (JSONObject.NULL.equals(value)) {
             write(zipNull, 3);
@@ -277,9 +278,9 @@ public class Zipper extends JSONzip {
             write(zipTrue, 3);
         } else {
             if (value instanceof Map) {
-                value = new JSONObject((Map) value);
+                value = new JSONObject((Map<String,Object>) value);
             } else if (value instanceof Collection) {
-                value = new JSONArray((Collection) value);
+                value = new JSONArray((Collection<Object>) value);
             } else if (value.getClass().isArray()) {
                 value = new JSONArray(value);
             }
