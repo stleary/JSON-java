@@ -239,7 +239,9 @@ public class JSONObject {
      *
      * @param map
      *            A map object that can be used to initialize the contents of
-     *            the JSONObject.
+     *            the JSONObject. The keys of the map are usually strings;
+	 *            if not, then the keys toString() implementation will be
+     *            used to derive a proper JSON key.
      * @throws JSONException
      */
     public JSONObject(Map<?,?> map) {
@@ -1111,7 +1113,9 @@ public class JSONObject {
      * @param key
      *            A key string.
      * @param value
-     *            A Map value.
+	 *           A Map value. The keys of the parameter are usually strings;
+	 * 			 if not, then the keys toString() implementation will be
+     *			 used to derive a proper JSON key.
      * @return this.
      * @throws JSONException
      */
@@ -1549,7 +1553,7 @@ public class JSONObject {
             }
 
             if (object instanceof Collection) {
-                return new JSONArray((Collection<Object>) object);
+                return new JSONArray((Collection<?>) object);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);

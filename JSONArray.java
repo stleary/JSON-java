@@ -643,7 +643,9 @@ public class JSONArray {
      * is produced from a Map.
      *
      * @param value
-     *            A Map value.
+     *           A Map value. The keys of the parameter are usually strings;
+     * 			 if not, then the keys toString() implementation will be
+     *			 used to derive a proper JSON key.
      * @return this.
      */
     public JSONArray put(Map<?, ?> value) {
@@ -761,7 +763,9 @@ public class JSONArray {
      * @param index
      *            The subscript.
      * @param value
-     *            The Map value.
+     *           A Map value. The keys of the parameter are usually strings;
+     * 			 if not, then the keys toString() implementation will be
+     *			 used to derive a proper JSON key.
      * @return this.
      * @throws JSONException
      *             If the index is negative or if the the value is an invalid
