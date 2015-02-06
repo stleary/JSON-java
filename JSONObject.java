@@ -239,18 +239,18 @@ public class JSONObject {
      *
      * @param map
      *            A map object that can be used to initialize the contents of
-     *            the JSONObject.
+     *            the JSONObject. The keys of the map are usually strings;
+	 *            if not, then the keys toString() implementation will be
+     *            used to derive a proper JSON key.
      * @throws JSONException
      */
-    public JSONObject(Map<String, Object> map) {
+    public JSONObject(Map<?,?> map) {
         this.map = new HashMap<String, Object>();
         if (map != null) {
-            Iterator<Entry<String, Object>> i = map.entrySet().iterator();
-            while (i.hasNext()) {
-                Entry<String, Object> entry = i.next();
+			for (Entry<?,?> entry : map.entrySet()) {
                 Object value = entry.getValue();
                 if (value != null) {
-                    this.map.put(entry.getKey(), wrap(value));
+                    this.map.put(entry.getKey().toString(), wrap(value));
                 }
             }
         }
@@ -1053,7 +1053,7 @@ public class JSONObject {
      * @return this.
      * @throws JSONException
      */
-    public JSONObject put(String key, Collection<Object> value) throws JSONException {
+    public JSONObject put(String key, Collection<?> value) throws JSONException {
         this.put(key, new JSONArray(value));
         return this;
     }
@@ -1113,11 +1113,13 @@ public class JSONObject {
      * @param key
      *            A key string.
      * @param value
-     *            A Map value.
+	 *           A Map value. The keys of the parameter are usually strings;
+	 * 			 if not, then the keys toString() implementation will be
+     *			 used to derive a proper JSON key.
      * @return this.
      * @throws JSONException
      */
-    public JSONObject put(String key, Map<String, Object> value) throws JSONException {
+    public JSONObject put(String key, Map<?,?> value) throws JSONException {
         this.put(key, new JSONObject(value));
         return this;
     }
@@ -1512,10 +1514,10 @@ public class JSONObject {
             return value.toString();
         }
         if (value instanceof Map) {
-            return new JSONObject((Map<String, Object>)value).toString();
+            return new JSONObject((Map<?,?>)value).toString();
         }
         if (value instanceof Collection) {
-            return new JSONArray((Collection<Object>) value).toString();
+            return new JSONArray((Collection<?>) value).toString();
         }
         if (value.getClass().isArray()) {
             return new JSONArray(value).toString();
@@ -1551,13 +1553,13 @@ public class JSONObject {
             }
 
             if (object instanceof Collection) {
-                return new JSONArray((Collection<Object>) object);
+                return new JSONArray((Collection<?>) object);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);
             }
             if (object instanceof Map) {
-                return new JSONObject((Map<String, Object>) object);
+                return new JSONObject((Map<?,?>) object);
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage
@@ -1595,9 +1597,9 @@ public class JSONObject {
         } else if (value instanceof JSONArray) {
             ((JSONArray) value).write(writer, indentFactor, indent);
         } else if (value instanceof Map) {
-            new JSONObject((Map<String, Object>) value).write(writer, indentFactor, indent);
+            new JSONObject((Map<?,?>) value).write(writer, indentFactor, indent);
         } else if (value instanceof Collection) {
-            new JSONArray((Collection<Object>) value).write(writer, indentFactor,
+            new JSONArray((Collection<?>) value).write(writer, indentFactor,
                     indent);
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
