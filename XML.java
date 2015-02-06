@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 /**
  * This provides static methods to convert an XML text into a JSONObject,
@@ -60,6 +61,10 @@ public class XML {
 
     /** The Character '/'. */
     public static final Character SLASH = '/';
+
+    /** XML tag name validator **/
+    private static final Pattern TAGNAME_PATTERN = Pattern.compile("^(?!XML)[a-z][\\w0-9-]*$",
+            Pattern.CASE_INSENSITIVE);
 
     /**
      * Replace special characters with XML escapes:
@@ -392,6 +397,7 @@ public class XML {
 // Emit <tagName>
 
             if (tagName != null) {
+                validateTagName(tagName);
                 sb.append('<');
                 sb.append(tagName);
                 sb.append('>');
@@ -433,6 +439,7 @@ public class XML {
                     for (i = 0; i < length; i += 1) {
                         value = ja.get(i);
                         if (value instanceof JSONArray) {
+                            validateTagName(key);
                             sb.append('<');
                             sb.append(key);
                             sb.append('>');
@@ -445,6 +452,7 @@ public class XML {
                         }
                     }
                 } else if ("".equals(value)) {
+                    validateTagName(key);
                     sb.append('<');
                     sb.append(key);
                     sb.append("/>");
@@ -485,6 +493,16 @@ public class XML {
                     (string.length() == 0) ? "<" + tagName + "/>" :
                     "<" + tagName + ">" + string + "</" + tagName + ">";
             }
+        }
+    }
+
+    /**
+     * @param String name
+     * @throws JSONException if name is not a valid XML tag name
+     */
+    private static void validateTagName(String name) throws JSONException {
+        if (!TAGNAME_PATTERN.matcher(name).matches()) {
+            throw new JSONException("JSON contains key that would produce invalid XML: " + name);
         }
     }
 }
