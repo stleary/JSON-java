@@ -64,6 +64,24 @@ public class JSONWriter {
      * value.
      */
     private boolean comma;
+    
+    /**
+     * The pretty flag determines if the writer adds whitespace to make the
+     * JSON output more readable to a human
+     */
+    private boolean pretty;
+    
+    /**
+     * The nspaces field tells how many spaces to place before new characters
+     * on a line to make the output indented correctly.  Used when pretty==true
+     */
+    private int nspaces;
+    
+    /**
+     * the space field defines how many spaces to add/subtract per indent
+     * Used when pretty==true
+     */
+    private final int space = 2;
 
     /**
      * The current mode. Values:
@@ -95,12 +113,42 @@ public class JSONWriter {
      */
     public JSONWriter(Writer w) {
         this.comma = false;
+        this.nspaces = 0;
+        this.pretty = false;
         this.mode = 'i';
         this.stack = new JSONObject[maxdepth];
         this.top = 0;
         this.writer = w;
     }
 
+    /**
+     * constructor used to enable pretty output
+     * @param w - Writer
+     * @param pretty - boolean
+     */
+    public JSONWriter(Writer w, boolean pretty) {
+        this.comma = false;
+        this.nspaces = 0;
+        this.pretty = pretty;
+        this.mode = 'i';
+        this.stack = new JSONObject[maxdepth];
+        this.top = 0;
+        this.writer = w;
+    }
+    
+    /**
+     * create the correct indent, only used for pretty output
+     */
+    private String makeIndent() {    	
+    	StringBuilder indent = new StringBuilder();
+    	indent.append('\n');
+
+    	for (int ndx=0; ndx < nspaces; ndx++) {
+    		indent.append(' ');
+    	}
+    	return indent.toString();
+    }
+    
     /**
      * Append a value.
      * @param string A string value.
@@ -115,6 +163,8 @@ public class JSONWriter {
             try {
                 if (this.comma && this.mode == 'a') {
                     this.writer.write(',');
+                    if (this.pretty == true)
+                        this.writer.write(makeIndent());
                 }
                 this.writer.write(string);
             } catch (IOException e) {
@@ -138,10 +188,14 @@ public class JSONWriter {
      * started in the wrong place (for example as a key or after the end of the
      * outermost array or object).
      */
-    public JSONWriter array() throws JSONException {
+    public JSONWriter array() throws JSONException, IOException {
         if (this.mode == 'i' || this.mode == 'o' || this.mode == 'a') {
             this.push(null);
             this.append("[");
+            if (this.pretty == true) {
+                this.nspaces += this.space;
+            	this.writer.write(makeIndent());
+            }
             this.comma = false;
             return this;
         }
@@ -177,7 +231,11 @@ public class JSONWriter {
      * @return this
      * @throws JSONException If incorrectly nested.
      */
-    public JSONWriter endArray() throws JSONException {
+    public JSONWriter endArray() throws JSONException, IOException {
+        if (this.pretty == true) {
+        	this.nspaces -= space;
+    		this.writer.write(makeIndent());
+    	}
         return this.end('a', ']');
     }
 
@@ -187,7 +245,11 @@ public class JSONWriter {
      * @return this
      * @throws JSONException If incorrectly nested.
      */
-    public JSONWriter endObject() throws JSONException {
+    public JSONWriter endObject() throws JSONException, IOException {
+        if (this.pretty == true) {
+        	this.nspaces -= space;
+    		this.writer.write(makeIndent());
+    	}
         return this.end('k', '}');
     }
 
@@ -208,6 +270,8 @@ public class JSONWriter {
                 this.stack[this.top - 1].putOnce(string, Boolean.TRUE);
                 if (this.comma) {
                     this.writer.write(',');
+                    if (this.pretty == true)
+                        this.writer.write(makeIndent());
                 }
                 this.writer.write(JSONObject.quote(string));
                 this.writer.write(':');
@@ -231,12 +295,16 @@ public class JSONWriter {
      * started in the wrong place (for example as a key or after the end of the
      * outermost array or object).
      */
-    public JSONWriter object() throws JSONException {
+    public JSONWriter object() throws JSONException, IOException {
         if (this.mode == 'i') {
             this.mode = 'o';
         }
         if (this.mode == 'o' || this.mode == 'a') {
             this.append("{");
+            if (this.pretty == true) {
+                this.nspaces += this.space;
+            	this.writer.write(makeIndent());
+            }
             this.push(new JSONObject());
             this.comma = false;
             return this;
