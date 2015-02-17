@@ -236,6 +236,9 @@ public class JSONObject {
 
     /**
      * Construct a JSONObject from a Map.
+     * 
+     * A key/value pair will not be created in the JSONObject for any null
+     * values in the map.
      *
      * @param map
      *            A map object that can be used to initialize the contents of
@@ -243,18 +246,34 @@ public class JSONObject {
      * @throws JSONException
      */
     public JSONObject(Map<String, Object> map) {
+       this(map, false);
+    }
+
+    /**
+     * Construct a JSONObject from a Map.
+     * 
+     * If <code>includeNullValues</code> is false, then a key/value pair will not
+     * be created in the JSONObject for any null values in the map.
+     *
+     * @param map
+     *            A map object that can be used to initialize the contents of
+     *            the JSONObject.
+     * @throws JSONException
+     */
+    public JSONObject(Map map<String, Object>, boolean includeNullValues) {
         this.map = new HashMap<String, Object>();
         if (map != null) {
             Iterator<Entry<String, Object>> i = map.entrySet().iterator();
             while (i.hasNext()) {
                 Entry<String, Object> entry = i.next();
                 Object value = entry.getValue();
-                if (value != null) {
+                if (value != null || includeNullValues) {
                     this.map.put(entry.getKey(), wrap(value));
                 }
             }
         }
     }
+
 
     /**
      * Construct a JSONObject from an Object using bean getters. It reflects on
@@ -273,13 +292,44 @@ public class JSONObject {
      * <code>"Larry Fine"</code>, then the JSONObject will contain
      * <code>"name": "Larry Fine"</code>.
      *
+     * A key/value pair will not be created in the JSONObject for any getter
+     * that returns null.
+     * 
      * @param bean
      *            An object that has getter methods that should be used to make
      *            a JSONObject.
      */
     public JSONObject(Object bean) {
+        this(bean, false);
+    }
+
+    /**
+     * Construct a JSONObject from an Object using bean getters. It reflects on
+     * all of the public methods of the object. For each of the methods with no
+     * parameters and a name starting with <code>"get"</code> or
+     * <code>"is"</code> followed by an uppercase letter, the method is invoked,
+     * and a key and the value returned from the getter method are put into the
+     * new JSONObject.
+     *
+     * The key is formed by removing the <code>"get"</code> or <code>"is"</code>
+     * prefix. If the second remaining character is not upper case, then the
+     * first character is converted to lower case.
+     *
+     * For example, if an object has a method named <code>"getName"</code>, and
+     * if the result of calling <code>object.getName()</code> is
+     * <code>"Larry Fine"</code>, then the JSONObject will contain
+     * <code>"name": "Larry Fine"</code>.
+     * 
+     * If <code>includeNullValues</code> is false, then a key/value pair will not
+     * be created in the JSONObject for any getter that returns null.
+     *
+     * @param bean
+     *            An object that has getter methods that should be used to make
+     *            a JSONObject.
+     */
+    public JSONObject(Object bean, boolean includeNullValues) {
         this();
-        this.populateMap(bean);
+        this.populateMap(bean, includeNullValues);
     }
 
     /**
@@ -980,7 +1030,7 @@ public class JSONObject {
         return NULL.equals(object) ? defaultValue : object.toString();
     }
 
-    private void populateMap(Object bean) {
+    private void populateMap(Object bean, boolean includeNullValues) {
         Class klass = bean.getClass();
 
 // If klass is a System class then set includeSuperClass to false.
@@ -1016,7 +1066,7 @@ public class JSONObject {
                         }
 
                         Object result = method.invoke(bean, (Object[]) null);
-                        if (result != null) {
+                        if (result != null || includeNullValues) {
                             this.map.put(key, wrap(result));
                         }
                     }
