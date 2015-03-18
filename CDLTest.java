@@ -35,7 +35,7 @@ public class CDLTest {
 
     /**
      * String of lines where the column names are in the first row,
-     * and all subsequent rows are values
+     * and all subsequent rows are values. All keys and values should be legal.
      */
     String lines = new String(
             "Col 1, Col 2, Col 3, Col 4, Col 5, Col 6, Col 7\n" +
@@ -45,6 +45,98 @@ public class CDLTest {
             "0.23, 57.42, 5e27, -234.879, 2.34e5, 0.0, 9e-3\n" +
             "\"va\tl1\", \"val2\", \"val\\b3\", \"val4\\n\", \"va\\rl5\", val6, val7\n"
     );
+
+    @Test(expected=NullPointerException.class)
+    public void shouldThrowExceptionOnNullString() {
+        String nullStr = null;
+        CDL.toJSONArray(nullStr);
+    }
+
+    @Test
+    /**
+     * Note: This test reveals a bug in the method JavaDoc. It should
+     * mention it might return null, or it should return an empty JSONArray.
+     */
+    public void shouldHandleOnlyColumnNames() {
+        String columnNameStr = "col1, col2, col3";
+        JSONArray jsonArray = CDL.toJSONArray(columnNameStr);
+        assertTrue("CDL should return null when only 1 row is given",
+                jsonArray == null);
+    }
+
+    @Test
+    /**
+     * Note: This test reveals a bug in the method JavaDoc. It should
+     * mention it might return null, or it should return an empty JSONArray.
+     */
+    public void shouldHandleEmptyString() {
+        String emptyStr = "";
+        JSONArray jsonArray = CDL.toJSONArray(emptyStr);
+        assertTrue("CDL should return null when the input string is empty",
+                jsonArray == null);
+    }
+
+    @Test
+    public void toStringShouldCheckSpecialChars() {
+        /**
+         * This is pretty clumsy, there should be a better way
+         * to perform this test. Needs more debugging. The problem
+         * may be that these chars are sanitized out by CDL when constructing
+         * a JSONArray from a string.
+         */
+        String singleStr = "\"Col 1\"\n1";
+        JSONArray jsonArray = CDL.toJSONArray(singleStr);
+        JSONObject jsonObject = (JSONObject)(jsonArray.get(0));
+        jsonObject.put("Col \r4", "V4");
+        jsonObject.put("Col \0 a", "V5");
+        boolean doNotNormalize = false;
+        List<List<String>> expectedLines = 
+                sortColumnsInLines("Col ,2\",Col 1,\"Col 4\",\"Col  a\"\nV2,1,V4,V5,V3",
+                        doNotNormalize);
+        List<List<String>> jsonArrayLines = 
+                sortColumnsInLines(CDL.toString(jsonArray), doNotNormalize);
+        System.out.println("expected: " +expectedLines);
+        System.out.println("jsonArray: " +jsonArrayLines);
+    }
+
+    @Test
+    public void shouldConvertJSONArrayToCDLString() {
+        /**
+         * This is the first test of normal functionality.
+         * The string contains a typical variety of values
+         * that might be found in a real CDL.
+         */
+        final boolean normalize = true;
+        final boolean doNotNormalize = false;
+        JSONArray jsonArray = CDL.toJSONArray(lines);
+        String jsonStr = CDL.toString(jsonArray);
+        // normal sorted
+        List<List<String>> sortedLines = sortColumnsInLines(lines, normalize);
+        // sorted, should already be normalized
+        List<List<String>> sortedJsonStr = sortColumnsInLines(jsonStr, doNotNormalize);
+        boolean result = sortedLines.equals(sortedJsonStr);
+        if (!result) {
+            System.out.println("lines: " +sortedLines);
+            System.out.println("jsonStr: " +sortedJsonStr);
+            assertTrue("CDL should convert JSONArray back to original string: " +
+                lines.equals(jsonStr), false);
+        }
+    }
+
+    @Test
+    public void shouldConvertCDLToJSONArray() {
+        JSONArray jsonArray = CDL.toJSONArray(lines);
+        String resultStr = compareJSONArrayToString(jsonArray, lines);
+        if (resultStr != null) {
+            assertTrue("CDL should convert string to JSONArray: " +
+                resultStr, false);
+        }
+    }
+
+
+    /******************************************************************\
+    * SUPPORT AND UTILITY
+    \******************************************************************/
 
     /**
      * Compares a JSON array to the original string. The top row of the
@@ -56,7 +148,7 @@ public class CDLTest {
      * @param str the string which was used to create the JSONArray
      * @return null if equal, otherwise error description
      */
-    public String compareJSONArrayToString(JSONArray jsonArray, String str) {
+    private String compareJSONArrayToString(JSONArray jsonArray, String str) {
         int rows = jsonArray.length();
         StringReader sr = new StringReader(str);
         BufferedReader reader = new BufferedReader(sr);
@@ -107,35 +199,6 @@ public class CDLTest {
         } catch (IOException ignore) {
         } catch (JSONException ignore) {}
         return null;
-    }
-
-    @Test
-    public void shouldConvertCDLToJSONArray() {
-        JSONArray jsonArray = CDL.toJSONArray(lines);
-        String resultStr = compareJSONArrayToString(jsonArray, lines);
-        if (resultStr != null) {
-            assertTrue("CDL should convert string to JSONArray: " +
-                resultStr, false);
-        }
-    }
-
-    @Test
-    public void shouldConvertJSONArrayToCDLString() {
-        final boolean normalize = true;
-        final boolean doNotNormalize = false;
-        JSONArray jsonArray = CDL.toJSONArray(lines);
-        String jsonStr = CDL.toString(jsonArray);
-        // normal sorted
-        List<List<String>> sortedLines = sortColumnsInLines(lines, normalize);
-        // sorted, should already be normalized
-        List<List<String>> sortedJsonStr = sortColumnsInLines(jsonStr, doNotNormalize);
-        boolean result = sortedLines.equals(sortedJsonStr);
-        if (!result) {
-            System.out.println("lines: " +sortedLines);
-            System.out.println("jsonStr: " +sortedJsonStr);
-            assertTrue("CDL should convert JSONArray back to original string: " +
-                lines.equals(jsonStr), false);
-        }
     }
 
     /**
