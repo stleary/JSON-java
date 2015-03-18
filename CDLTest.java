@@ -59,20 +59,27 @@ public class CDLTest {
                 String[] values = row.split(",");
                 // need a value for every key to proceed
                 if (keys.length != values.length) {
+                    System.out.println("keys: " + Arrays.toString(keys));
+                    System.out.println("values: " + Arrays.toString(values));
                     return("row: " +i+ " key and value counts do not match");
                 }
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 // need a key for every JSONObject entry to proceed
                 if (keys.length != jsonObject.length()) {
+                    System.out.println("keys: " + Arrays.toString(keys));
+                    System.out.println("jsonObject: " + jsonObject.toString());
                     return("row: " +i+ " key and jsonObject counts do not match");
                 }
                 /**
                  * convert string entries into a natural order map. Trim the
-                 * keys and values for tokener compatibility
+                 * keys and values for tokener compatibility.
                  */
                 Map<String, String> strMap = new TreeMap<String, String>();
                 for (int j = 0; j < keys.length; ++j) {
-                    strMap.put(keys[j].trim(), values[j].trim());
+                    values[j] = values[j].trim();
+                    // strip optional surrounding quotes
+                    values[j] = values[j].replaceAll("^\"|\"$", "");
+                    strMap.put(keys[j].trim(), values[j]);
                 }
                 // put the JSONObjet key/value pairs in natural key order
                 Iterator<String> keyIt = jsonObject.keys();
@@ -82,6 +89,8 @@ public class CDLTest {
                     jsonObjectMap.put(key, jsonObject.get(key).toString());
                 }
                 if (!strMap.equals(jsonObjectMap)) {
+                    System.out.println("strMap: " +strMap.toString());
+                    System.out.println("jsonObjectMap: " +jsonObjectMap.toString());
                     return("row: " +i+ "string does not match jsonObject");
                 }
             }
@@ -99,7 +108,11 @@ public class CDLTest {
         String lines = new String(
                 "Col 1, Col 2, Col 3, Col 4, Col 5, Col 6, Col 7\n" +
                 "val1, val2, val3, val4, val5, val6, val7\n" +
-                "1, 2, 3, 4, 5, 6, 7\n");
+                "1, 2, 3, 4, 5, 6, 7\n" +
+                "true, false, true, true, false, false, false\n" +
+                "0.23, 57.42, 5e27, -234.879, 2.34e5, 0.0, 9e-3\n" +
+                "\"va\tl1\", \"val2\", \"val\\b3\", \"val4\\n\", \"va\\rl5\", val6, val7\n"
+        );
         JSONArray jsonArray = CDL.toJSONArray(lines);
         String resultStr = compareJSONArrayToString(jsonArray, lines);
         if (resultStr != null) {
