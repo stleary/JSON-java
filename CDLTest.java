@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,19 @@ import org.json.CDL;
 public class CDLTest {
 
     /**
+     * String of lines where the column names are in the first row,
+     * and all subsequent rows are values
+     */
+    String lines = new String(
+            "Col 1, Col 2, Col 3, Col 4, Col 5, Col 6, Col 7\n" +
+            "val1, val2, val3, val4, val5, val6, val7\n" +
+            "1, 2, 3, 4, 5, 6, 7\n" +
+            "true, false, true, true, false, false, false\n" +
+            "0.23, 57.42, 5e27, -234.879, 2.34e5, 0.0, 9e-3\n" +
+            "\"va\tl1\", \"val2\", \"val\\b3\", \"val4\\n\", \"va\\rl5\", val6, val7\n"
+    );
+
+    /**
      * Compares a JSON array to the original string. The top row of the
      * string contains the JSONObject keys and the remaining rows contain
      * the values. The JSONObject in each JSONArray row is expected to have
@@ -49,14 +63,16 @@ public class CDLTest {
         try {
             // first line contains the keys to the JSONObject array entries
             String columnNames = reader.readLine();
+            columnNames = normalizeString(columnNames);
             String[] keys = columnNames.split(",");
             /**
              * Each line contains the values for the corresponding
              * JSONObject array entry
              */
             for (int i = 0; i < rows; ++i) {
-                String row = reader.readLine();
-                String[] values = row.split(",");
+                String line = reader.readLine();
+                line = normalizeString(line);
+                String[] values = line.split(",");
                 // need a value for every key to proceed
                 if (keys.length != values.length) {
                     System.out.println("keys: " + Arrays.toString(keys));
@@ -70,16 +86,10 @@ public class CDLTest {
                     System.out.println("jsonObject: " + jsonObject.toString());
                     return("row: " +i+ " key and jsonObject counts do not match");
                 }
-                /**
-                 * convert string entries into a natural order map. Trim the
-                 * keys and values for tokener compatibility.
-                 */
+                // convert string entries into a natural order map.
                 Map<String, String> strMap = new TreeMap<String, String>();
                 for (int j = 0; j < keys.length; ++j) {
-                    values[j] = values[j].trim();
-                    // strip optional surrounding quotes
-                    values[j] = values[j].replaceAll("^\"|\"$", "");
-                    strMap.put(keys[j].trim(), values[j]);
+                    strMap.put(keys[j], values[j]);
                 }
                 // put the JSONObjet key/value pairs in natural key order
                 Iterator<String> keyIt = jsonObject.keys();
@@ -98,27 +108,91 @@ public class CDLTest {
         } catch (JSONException ignore) {}
         return null;
     }
-    
+
     @Test
     public void shouldConvertCDLToJSONArray() {
-        /**
-         * simple array where the first row of the string consists of the
-         * column names and there are 2 value rows
-         */
-        String lines = new String(
-                "Col 1, Col 2, Col 3, Col 4, Col 5, Col 6, Col 7\n" +
-                "val1, val2, val3, val4, val5, val6, val7\n" +
-                "1, 2, 3, 4, 5, 6, 7\n" +
-                "true, false, true, true, false, false, false\n" +
-                "0.23, 57.42, 5e27, -234.879, 2.34e5, 0.0, 9e-3\n" +
-                "\"va\tl1\", \"val2\", \"val\\b3\", \"val4\\n\", \"va\\rl5\", val6, val7\n"
-        );
         JSONArray jsonArray = CDL.toJSONArray(lines);
         String resultStr = compareJSONArrayToString(jsonArray, lines);
         if (resultStr != null) {
-            assertTrue("CDL should convert string to JSONArray correctly: " +
+            assertTrue("CDL should convert string to JSONArray: " +
                 resultStr, false);
         }
     }
 
+    @Test
+    public void shouldConvertJSONArrayToCDLString() {
+        final boolean normalize = true;
+        final boolean doNotNormalize = false;
+        JSONArray jsonArray = CDL.toJSONArray(lines);
+        String jsonStr = CDL.toString(jsonArray);
+        // normal sorted
+        List<List<String>> sortedLines = sortColumnsInLines(lines, normalize);
+        // sorted, should already be normalized
+        List<List<String>> sortedJsonStr = sortColumnsInLines(jsonStr, doNotNormalize);
+        boolean result = sortedLines.equals(sortedJsonStr);
+        if (!result) {
+            System.out.println("lines: " +sortedLines);
+            System.out.println("jsonStr: " +sortedJsonStr);
+            assertTrue("CDL should convert JSONArray back to original string: " +
+                lines.equals(jsonStr), false);
+        }
+    }
+
+    /**
+     * Utility to trim and remove internal quotes from comma delimited strings.
+     * Need to do this because JSONObject does the same thing
+     * @param line the line to be normalized
+     * @return the normalized line
+     */
+    private String normalizeString(String line) {
+        StringBuilder builder = new StringBuilder();
+        boolean comma = false;
+        String[] values = line.split(",");
+        for (int i = 0; i < values.length; ++i) {
+            if (comma) {
+                builder.append(",");
+            }
+            comma = true;
+            values[i] = values[i].trim();
+            // strip optional surrounding quotes
+            values[i] = values[i].replaceAll("^\"|\"$", "");
+            builder.append(values[i]);
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Utility to sort the columns in a (possibly) multi-lined string.
+     * The columns are column separated. Need to do this because 
+     * JSONObects are not ordered
+     * @param string the string to be sorted
+     * @param normalize flag, true if line should be normalized
+     * @return a list of sorted lines, where each line is a list sorted 
+     * in natural key order
+     */
+    private List<List<String>> sortColumnsInLines(String string,
+            boolean normalizeFlag) {
+        List<List<String>> lineList = new ArrayList<List<String>>();
+        StringReader sr = new StringReader(string);
+        BufferedReader reader = new BufferedReader(sr);
+        try {
+            while (true) {
+                String line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                if (normalizeFlag) {
+                    line = normalizeString(line);
+                }
+                List<String> columnList = new ArrayList<String>();
+                String[] values = line.split(",");
+                for (int i = 0; i < values.length; ++i) {
+                    columnList.add(values[i]);
+                }
+                Collections.sort(columnList);
+                lineList.add(columnList);
+            }
+        } catch (IOException ignore) {}
+        return lineList;
+    }
 }
