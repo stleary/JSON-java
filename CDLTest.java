@@ -1,5 +1,4 @@
 package org.json.junit;
-
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -9,12 +8,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -23,12 +19,12 @@ import org.json.CDL;
 
 /**
  * Tests for {@link CDL}.
- * CDL provides an application level API, it is not actually used by the
+ * CDL provides an application level API, but it is not used by the
  * reference app. To test it, strings will be converted to JSON-Java classes
- * and then converted back. But each row will be an unordered JSONObject,
- * so can't use a simple string compare.
+ * and then converted back. Since each row is an unordered JSONObject,
+ * can't use a simple string compare to check for equality.
  * @author JSON.org
- * @version 2015-03-16
+ * @version 2015-03-18
  * 
  */
 public class CDLTest {
@@ -43,7 +39,7 @@ public class CDLTest {
             "1, 2, 3, 4, 5, 6, 7\n" +
             "true, false, true, true, false, false, false\n" +
             "0.23, 57.42, 5e27, -234.879, 2.34e5, 0.0, 9e-3\n" +
-            "\"va\tl1\", \"val2\", \"val\\b3\", \"val4\\n\", \"va\\rl5\", val6, val7\n"
+            "\"va\tl1\", \"v\bal2\", \"val3\", \"val\f4\", \"val5\", va\'l6, val7\n"
     );
 
     @Test(expected=NullPointerException.class)
@@ -79,28 +75,74 @@ public class CDLTest {
     @Test
     public void toStringShouldCheckSpecialChars() {
         /**
-         * This is pretty clumsy, there should be a better way
-         * to perform this test. Needs more debugging. The problem
-         * may be that these chars are sanitized out by CDL when constructing
-         * a JSONArray from a string.
+         * Given a JSONArray that was not built by CDL, some chars may be
+         * found that would otherwise be filtered out by CDL.
          */
-        String singleStr = "\"Col 1\"\n1";
-        JSONArray jsonArray = CDL.toJSONArray(singleStr);
-        JSONObject jsonObject = (JSONObject)(jsonArray.get(0));
-        jsonObject.put("Col \r4", "V4");
-        jsonObject.put("Col \0 a", "V5");
-        boolean doNotNormalize = false;
+        JSONArray jsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        jsonArray.put(jsonObject);
+        // \r will be filtered from name
+        jsonObject.put("Col \r1", "V1");
+        // \r will be filtered from value
+        jsonObject.put("Col 2", "V2\r");
+        boolean normalize = true;
         List<List<String>> expectedLines = 
-                sortColumnsInLines("Col ,2\",Col 1,\"Col 4\",\"Col  a\"\nV2,1,V4,V5,V3",
-                        doNotNormalize);
+                sortColumnsInLines("Col 1, Col 2,\nV1, V2", normalize);
         List<List<String>> jsonArrayLines = 
-                sortColumnsInLines(CDL.toString(jsonArray), doNotNormalize);
-        System.out.println("expected: " +expectedLines);
-        System.out.println("jsonArray: " +jsonArrayLines);
+                sortColumnsInLines(CDL.toString(jsonArray), normalize);
+        if (!expectedLines.equals(jsonArrayLines)) {
+            System.out.println("expected: " +expectedLines);
+            System.out.println("jsonArray: " +jsonArrayLines);
+            assertTrue("Should filter out certain chars",
+                    false);
+        }
+    }
+
+    @Test(expected=JSONException.class)
+    public void shouldHandleUnbalancedQuoteInName() {
+        String badLine = "Col1, \"Col2\nVal1, Val2";
+        CDL.toJSONArray(badLine);
+    }
+
+    @Test(expected=JSONException.class)
+    public void shouldHandleUnbalancedQuoteInValue() {
+        String badLine = "Col1, Col2\n\"Val1, Val2";
+        CDL.toJSONArray(badLine);
+    }
+
+    @Test(expected=JSONException.class)
+    public void shouldHandleNullInName() {
+        String badLine = "C\0ol1, Col2\nVal1, Val2";
+        CDL.toJSONArray(badLine);
     }
 
     @Test
-    public void shouldConvertJSONArrayToCDLString() {
+    public void shouldConvertCDLToJSONArray() {
+        JSONArray jsonArray = CDL.toJSONArray(lines);
+        String resultStr = compareJSONArrayToString(jsonArray, lines);
+        if (resultStr != null) {
+            assertTrue("CDL should convert string to JSONArray: " +
+                resultStr, false);
+        }
+    }
+
+    @Test
+    public void shouldCreateJSONArrayUsingJSONArray() {
+        String names = "Col1, Col2";
+        String nameArrayStr = "[" +names+ "]";
+        String values = "V1, V2";
+        JSONArray nameJSONArray = new JSONArray(nameArrayStr);
+        JSONArray jsonArray = CDL.toJSONArray(nameJSONArray, values);
+        String combinedStr = names+ "\n" +values;
+        String resultStr = compareJSONArrayToString(jsonArray, combinedStr);
+        if (resultStr != null) {
+            assertTrue("CDL should convert JSONArray and string to JSONArray: " +
+                resultStr, false);
+        }
+    }
+
+    @Test
+    public void shouldConvertCDLToJSONArrayAndBackToString() {
         /**
          * This is the first test of normal functionality.
          * The string contains a typical variety of values
@@ -123,15 +165,6 @@ public class CDLTest {
         }
     }
 
-    @Test
-    public void shouldConvertCDLToJSONArray() {
-        JSONArray jsonArray = CDL.toJSONArray(lines);
-        String resultStr = compareJSONArrayToString(jsonArray, lines);
-        if (resultStr != null) {
-            assertTrue("CDL should convert string to JSONArray: " +
-                resultStr, false);
-        }
-    }
 
 
     /******************************************************************\
