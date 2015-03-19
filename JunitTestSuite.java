@@ -5,7 +5,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    CDLTest.class,
-   CookieTest.class
+   CookieTest.class,
+   PropertyTest.class
 })
 public class JunitTestSuite {   
 }  
