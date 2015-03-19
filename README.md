@@ -5,12 +5,17 @@ Test harness: http://junit.org
 
 Coverage: http://www.eclemma.org/
 
+Run individual tests using eclemma or the entire test suite using TestRunner
+
 Completed tests:
 
 CDLTest.java
 
+CookieTest.java
+
 In progress:
 
-CookieTest.java
+PropertyTest.java
+
 
 
