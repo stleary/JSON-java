@@ -41,11 +41,35 @@ public class CDLTest {
             "0.23, 57.42, 5e27, -234.879, 2.34e5, 0.0, 9e-3\n" +
             "\"va\tl1\", \"v\bal2\", \"val3\", \"val\f4\", \"val5\", va\'l6, val7\n"
     );
+    String jsonArrayLines = new String(
+            "[{Col 1:val1, Col 2:val2, Col 3:val3, Col 4:val4, Col 5:val5, Col 6:val6, Col 7:val7}, "+
+            "{Col 1:1, Col 2:2, Col 3:3, Col 4:4, Col 5:5, Col 6:6, Col 7:7}, "+
+            "{Col 1:true, Col 2:false, Col 3:true, Col 4:true, Col 5:false, Col 6:false, Col 7:false}, "+
+            "{Col 1:0.23, Col 2:57.42, Col 3:-234.879, Col 4:2.34e5, Col 5:2.34e5, Col 6:0.0, Col 7:9e-3}, "+
+            "{Col 1:\"val1\", Col 2:\"val2\", Col 3:val3, Col 4\"val4\", Col 5:val5, Col 6:val6, Col 7:val7}]");
 
     @Test(expected=NullPointerException.class)
     public void shouldThrowExceptionOnNullString() {
         String nullStr = null;
         CDL.toJSONArray(nullStr);
+    }
+
+    @Test(expected=JSONException.class)
+    public void shouldHandleUnbalancedQuoteInName() {
+        String badLine = "Col1, \"Col2\nVal1, Val2";
+        CDL.toJSONArray(badLine);
+    }
+
+    @Test(expected=JSONException.class)
+    public void shouldHandleUnbalancedQuoteInValue() {
+        String badLine = "Col1, Col2\n\"Val1, Val2";
+        CDL.toJSONArray(badLine);
+    }
+
+    @Test(expected=JSONException.class)
+    public void shouldHandleNullInName() {
+        String badLine = "C\0ol1, Col2\nVal1, Val2";
+        CDL.toJSONArray(badLine);
     }
 
     @Test
@@ -74,6 +98,7 @@ public class CDLTest {
 
     @Test
     public void toStringShouldCheckSpecialChars() {
+        String method = "toStringShouldCheckSpecialChars():";
         /**
          * Given a JSONArray that was not built by CDL, some chars may be
          * found that would otherwise be filtered out by CDL.
@@ -81,49 +106,24 @@ public class CDLTest {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
         jsonArray.put(jsonObject);
-        // \r will be filtered from name
+        // \r should be filtered from name
         jsonObject.put("Col \r1", "V1");
-        // \r will be filtered from value
+        // \r should be filtered from value
         jsonObject.put("Col 2", "V2\r");
-        boolean normalize = true;
-        List<List<String>> expectedLines = 
-                sortColumnsInLines("Col 1, Col 2,\nV1, V2", normalize);
-        List<List<String>> jsonArrayLines = 
-                sortColumnsInLines(CDL.toString(jsonArray), normalize);
-        if (!expectedLines.equals(jsonArrayLines)) {
-            System.out.println("expected: " +expectedLines);
-            System.out.println("jsonArray: " +jsonArrayLines);
-            assertTrue("Should filter out certain chars",
-                    false);
-        }
-    }
+        String jsonStr = CDL.toString(jsonArray);
 
-    @Test(expected=JSONException.class)
-    public void shouldHandleUnbalancedQuoteInName() {
-        String badLine = "Col1, \"Col2\nVal1, Val2";
-        CDL.toJSONArray(badLine);
-    }
-
-    @Test(expected=JSONException.class)
-    public void shouldHandleUnbalancedQuoteInValue() {
-        String badLine = "Col1, Col2\n\"Val1, Val2";
-        CDL.toJSONArray(badLine);
-    }
-
-    @Test(expected=JSONException.class)
-    public void shouldHandleNullInName() {
-        String badLine = "C\0ol1, Col2\nVal1, Val2";
-        CDL.toJSONArray(badLine);
+        String[] expectedStr = {"\"Col 1\"","Col 2","V1","\"V2\""};
+        Util.checkAndRemoveStrings(jsonStr, expectedStr, "[,\n\"]", method);
     }
 
     @Test
     public void shouldConvertCDLToJSONArray() {
+        String method = "shouldConvertCDLToJSONArray(): ";
         JSONArray jsonArray = CDL.toJSONArray(lines);
-        String resultStr = compareJSONArrayToString(jsonArray, lines);
-        if (resultStr != null) {
-            assertTrue("CDL should convert string to JSONArray: " +
-                resultStr, false);
-        }
+        String jsonStr = CDL.toString(jsonArray);
+        JSONArray expectedJsonArray = new JSONArray(jsonArrayLines);
+        assertTrue("CDL should convert string to JSONArray",
+                jsonArray.equals(expectedJsonArray));
     }
 
     @Test
