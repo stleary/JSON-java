@@ -41,6 +41,11 @@ public class CDLTest {
             "0.23, 57.42, 5e27, -234.879, 2.34e5, 0.0, 9e-3\n" +
             "\"va\tl1\", \"v\bal2\", \"val3\", \"val\f4\", \"val5\", va\'l6, val7\n"
     );
+
+    /**
+     * If lines were to be converted to a JSONArray without the benefit of CDL,
+     * this would be the input string
+     */
     String jsonArrayLines = new String(
             "[{Col 1:val1, Col 2:val2, Col 3:val3, Col 4:val4, Col 5:val5, Col 6:val6, Col 7:val7}, "+
             "{Col 1:1, Col 2:2, Col 3:3, Col 4:4, Col 5:5, Col 6:6, Col 7:7}, "+
@@ -55,19 +60,19 @@ public class CDLTest {
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleUnbalancedQuoteInName() {
+    public void shouldThrowExceptionOnUnbalancedQuoteInName() {
         String badLine = "Col1, \"Col2\nVal1, Val2";
         CDL.toJSONArray(badLine);
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleUnbalancedQuoteInValue() {
+    public void shouldThrowExceptionOnUnbalancedQuoteInValue() {
         String badLine = "Col1, Col2\n\"Val1, Val2";
         CDL.toJSONArray(badLine);
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleNullInName() {
+    public void shouldThrowExceptionOnNullInName() {
         String badLine = "C\0ol1, Col2\nVal1, Val2";
         CDL.toJSONArray(badLine);
     }
@@ -77,7 +82,7 @@ public class CDLTest {
      * Note: This test reveals a bug in the method JavaDoc. It should
      * mention it might return null, or it should return an empty JSONArray.
      */
-    public void shouldHandleOnlyColumnNames() {
+    public void shouldReturnNullOnOnlyColumnNames() {
         String columnNameStr = "col1, col2, col3";
         JSONArray jsonArray = CDL.toJSONArray(columnNameStr);
         assertTrue("CDL should return null when only 1 row is given",
@@ -89,11 +94,31 @@ public class CDLTest {
      * Note: This test reveals a bug in the method JavaDoc. It should
      * mention it might return null, or it should return an empty JSONArray.
      */
-    public void shouldHandleEmptyString() {
+    public void shouldReturnNullOnEmptyString() {
         String emptyStr = "";
         JSONArray jsonArray = CDL.toJSONArray(emptyStr);
         assertTrue("CDL should return null when the input string is empty",
                 jsonArray == null);
+    }
+
+    @Test
+    public void shouldConvertCDLToJSONArray() {
+        JSONArray jsonArray = CDL.toJSONArray(lines);
+        JSONArray expectedJsonArray = new JSONArray(jsonArrayLines);
+        assertTrue("CDL should convert string to JSONArray",
+                jsonArray.equals(expectedJsonArray));
+    }
+
+    @Test
+    public void shouldCreateJSONArrayUsingJSONArray() {
+        String names = "[Col1, Col2]";
+        String values = "V1, V2";
+        JSONArray nameJSONArray = new JSONArray(names);
+        JSONArray jsonArray = CDL.toJSONArray(nameJSONArray, values);
+        
+        JSONArray expectedJsonArray = new JSONArray("[{Col1:V1},{Col2:V2}]");
+        assertTrue("CDL should create JSONArray from a names JSONArray and a "+
+                "string of values", jsonArray.equals(expectedJsonArray));
     }
 
     @Test
@@ -112,33 +137,8 @@ public class CDLTest {
         jsonObject.put("Col 2", "V2\r");
         String jsonStr = CDL.toString(jsonArray);
 
-        String[] expectedStr = {"\"Col 1\"","Col 2","V1","\"V2\""};
-        Util.checkAndRemoveStrings(jsonStr, expectedStr, "[,\n\"]", method);
-    }
-
-    @Test
-    public void shouldConvertCDLToJSONArray() {
-        String method = "shouldConvertCDLToJSONArray(): ";
-        JSONArray jsonArray = CDL.toJSONArray(lines);
-        String jsonStr = CDL.toString(jsonArray);
-        JSONArray expectedJsonArray = new JSONArray(jsonArrayLines);
-        assertTrue("CDL should convert string to JSONArray",
-                jsonArray.equals(expectedJsonArray));
-    }
-
-    @Test
-    public void shouldCreateJSONArrayUsingJSONArray() {
-        String names = "Col1, Col2";
-        String nameArrayStr = "[" +names+ "]";
-        String values = "V1, V2";
-        JSONArray nameJSONArray = new JSONArray(nameArrayStr);
-        JSONArray jsonArray = CDL.toJSONArray(nameJSONArray, values);
-        String combinedStr = names+ "\n" +values;
-        String resultStr = compareJSONArrayToString(jsonArray, combinedStr);
-        if (resultStr != null) {
-            assertTrue("CDL should convert JSONArray and string to JSONArray: " +
-                resultStr, false);
-        }
+        String expectedStr = {"Col 1, Col 2","V1","\"V2\""};
+        // Util.checkAndRemoveStrings(jsonStr, expectedStr, "[,\n\"]", method);
     }
 
     @Test
@@ -152,16 +152,7 @@ public class CDLTest {
         final boolean doNotNormalize = false;
         JSONArray jsonArray = CDL.toJSONArray(lines);
         String jsonStr = CDL.toString(jsonArray);
-        // normal sorted
-        List<List<String>> sortedLines = sortColumnsInLines(lines, normalize);
-        // sorted, should already be normalized
-        List<List<String>> sortedJsonStr = sortColumnsInLines(jsonStr, doNotNormalize);
-        boolean result = sortedLines.equals(sortedJsonStr);
-        if (!result) {
-            System.out.println("lines: " +sortedLines);
-            System.out.println("jsonStr: " +sortedJsonStr);
-            assertTrue("CDL should convert JSONArray back to original string: " +
-                lines.equals(jsonStr), false);
+        assertTrue("CDL should convert string to JSONArray to string",
         }
     }
 
