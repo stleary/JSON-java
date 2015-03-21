@@ -17,18 +17,14 @@ The fundamental issues with JSON-Java testing are:
 * Access to the <b>JSONArray</b> and <b>JSONObject</b> internal containers for comparison is not currently available.
 * <b>JSONObject</b> sometimes wraps entries in quotes, other times does not, complicating comparisons.
 
-When you start working on a test, add the empty file to the repository, so that others will know that test is taken.
+When you start working on a test, add the empty file to the repository and update the readme, so that others will know that test is taken.
 
 A unit test is considered complete when the coverage is >= 90% as measured by EclEmma.
 
-| Test file name  | Coverage | Comments |
-
-| ------------- | ------------- |
-
+| Test-file-name  | Coverage | Comments |
+| ------------- | ------------- | ---- |
 | CookieTest.java  | 97.5%   | Completed |
-
 | PropertyTest.java  | 94.8%  | Completed |
-
 | CDLTest.java | 94.8% | Relies too much on string tests, needs to be reworked  |
 
 
