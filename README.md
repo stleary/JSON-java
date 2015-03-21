@@ -38,7 +38,6 @@ A unit test is considered complete when the coverage is >= 90% as measured by Ec
 | JSONML.java | 0%| | 
 | JSONObject.java | 27.6% | | 
 | JSONObject.Null | 18.8% | | | 
-| JSONString.java | | | 
 | JSONStringer.java | 0%| | 
 | JSONTokener.java |65.4% | | 
 | JSONWriter.java | 0% | | 
