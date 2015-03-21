@@ -23,22 +23,25 @@ A unit test is considered complete when the coverage is >= 90% as measured by Ec
 
 | Test file name  | Coverage | Comments |
 | ------------- | ------------- | ---- |
+| Total coverage | 26.5% | | | 
+| | | | 
 | CookieTest.java  | 97.5%   | Completed |
 | PropertyTest.java  | 94.8%  | Completed |
 | CDLTest.java | 94.8% | Relies too much on string tests, needs to be reworked  |
 | XMLTest.java | 0% | Just started - stleary |
 |  |  | |
-| CookieList.java | | |
-| HTTP.java | | | 
-| HTTPTokener.java | | | 
-| JSONArray.java | | | 
-|JSONException.java |  | |
-| JSONML.java | | | 
-| JSONObject.java | | | 
+| CookieList.java |0% | |
+| HTTP.java | 0%| | 
+| HTTPTokener.java |0% | | 
+| JSONArray.java |25.3% | | 
+|JSONException.java | 26.7% | |
+| JSONML.java | 0%| | 
+| JSONObject.java | 27.6% | | 
+| JSONObject.Null | 18.8% | | | 
 | JSONString.java | | | 
-| JSONStringer.java | | | 
-| JSONTokener.java | | | 
-| JSONWriter.java | | | 
-| XMLTokener.java| | | 
+| JSONStringer.java | 0%| | 
+| JSONTokener.java |65.4% | | 
+| JSONWriter.java | 0% | | 
+| XMLTokener.java| 0%| | 
 
 
