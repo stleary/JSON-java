@@ -22,10 +22,15 @@ When you start working on a test, add the empty file to the repository, so that 
 A unit test is considered complete when the coverage is >= 90% as measured by EclEmma.
 
 | Test file name  | Coverage | Comments |
+
 | ------------- | ------------- |
+
 | CookieTest.java  | 97.5%   | Completed |
+
 | PropertyTest.java  | 94.8%  | Completed |
-| CDLTest.java | 94.8% | Relies too much on string tests, needs to be reworked 
+
+| CDLTest.java | 94.8% | Relies too much on string tests, needs to be reworked  |
+
 
 <b>Completed tests:</b><br>
 CDLTest.java<br>
