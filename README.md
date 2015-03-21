@@ -5,7 +5,7 @@ Test harness: http://junit.org<br>
 Coverage: http://www.eclemma.org/<br>
 
 Eclipse is the recommended development environment.
-Run individual tests or *JunitTestSuite* using *EclEmma Coverage*, or execute the _TestRunner_ application directly.<br>
+Run individual tests or <b>JunitTestSuite</b> using *EclEmma Coverage*, or execute the <b>TestRunner<b> application directly.<br>
 
 Test filenames should consist of the name of the module being tested, with the suffix "Test". 
 For example, *Cookie.java* is tested by *CookieTest.java*.
