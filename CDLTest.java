@@ -1,8 +1,5 @@
 package org.json.junit;
 
-
-import java.util.Iterator;
-
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -127,7 +124,7 @@ public class CDLTest {
         JSONArray jsonArray = CDL.toJSONArray(lines);
         // This array is built from JSON parsing 
         JSONArray expectedJsonArray = new JSONArray(expectedLines);
-        compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
+        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 
     @Test
@@ -137,7 +134,7 @@ public class CDLTest {
         JSONArray nameJSONArray = new JSONArray(nameArrayStr);
         JSONArray jsonArray = CDL.toJSONArray(nameJSONArray, values);
         JSONArray expectedJsonArray = new JSONArray("[{Col1:V1,Col2:V2}]");
-        compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
+        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 
     @Test
@@ -151,39 +148,8 @@ public class CDLTest {
         String jsonStr = CDL.toString(jsonArray);
         JSONArray finalJsonArray = CDL.toJSONArray(jsonStr);
         JSONArray expectedJsonArray = new JSONArray(expectedLines);
-        compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
+        Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
     }
     
-    
-    ///////////////////////////  UTILITY METHODS /////////////////////////
-    
-    /**
-     * Compares two json arrays for equality
-     * @param jsonArray created by the code to be tested
-     * @param expectedJsonArray created specifically for compar
-     */
-    private void compareActualVsExpectedJsonArrays(JSONArray jsonArray,
-            JSONArray expectedJsonArray) {
-        assertTrue("jsonArray lengths should be equal",
-                jsonArray.length() == expectedJsonArray.length());
-        for (int i = 0; i < jsonArray.length(); ++i) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            JSONObject expectedJsonObject = expectedJsonArray.getJSONObject(i);
-            assertTrue("jsonObjects should have the same length",
-                    jsonObject.length() == expectedJsonObject.length());
-            Iterator<String> keys = jsonObject.keys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                Object value = jsonObject.get(key);
-                String testStr = "row: "+i+" key: "+key+" val: "+value.toString();
-                String actualStr = expectedJsonObject .get(key).toString();
-                assertTrue("values should be equal for actual: "+testStr+
-                        " expected: "+actualStr,
-                        value.equals(expectedJsonArray.getJSONObject(i).
-                                get(key).toString()));
-            }
-        }
-    }
-
 
 }
