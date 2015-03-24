@@ -22,6 +22,24 @@ public class XMLTest {
     }
 
     @Test
+    public void shouldHandleCommentsInXML() {
+
+        String xmlStr = 
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<!-- this is a comment -->\n"+
+                "<addresses>\n"+
+                "   <address>\n"+
+                "       <!-- this is another comment -->\n"+
+                "       <name>Joe Tester</name>\n"+
+                "       <!-- this is a multi line \n"+
+                "            comment -->\n"+
+                "       <street>Baker street 5</street>\n"+
+                "   </address>\n"+
+                "</addresses>";
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
+    }
+
+    @Test
     public void shouldHandleEmptyXML() {
 
         String xmlStr = "";
@@ -69,17 +87,17 @@ public class XMLTest {
     public void shouldHandleToString() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-            "<addr&esses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
+            "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
             "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
             "   <address>\n"+
-            "       <name>[CDATA[Joe Tester]]</name>\n"+
+            "       <name>[CDATA[Joe &amp; T &gt; e &lt; s &quot; t &apos; er]]</name>\n"+
             "       <street>Baker street 5</street>\n"+
             "   </address>\n"+
-            "</addr&esses>";
+            "</addresses>";
 
         String expectedStr = 
-                "{\"addr&esses\":{\"address\":{\"street\":\"Baker street 5\","+
-                "\"name\":\"[CDATA[Joe Tester]]\"},\"xsi:noNamespaceSchemaLocation\":"+
+                "{\"addresses\":{\"address\":{\"street\":\"Baker street 5\","+
+                "\"name\":\"[CDATA[Joe & T > e < s \\\" t \\\' er]]\"},\"xsi:noNamespaceSchemaLocation\":"+
                 "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
                 "XMLSchema-instance\"}}";
         
