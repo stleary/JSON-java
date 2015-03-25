@@ -28,15 +28,30 @@ public class XMLTest {
         String xmlStr = XML.toString(jsonObject);
     }
 
-    @Test
-    public void shouldHandleInvalidCDATA() {
+    @Test(expected=JSONException.class)
+    public void shouldHandleInvalidBangInTag() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
             "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
             "    <address>\n"+
             "       <name>Joe Tester</name>\n"+
-            "       <street>![Baker street 5</street>\n"+
+            "       <!street>abc street</street>\n"+
+            "   </address>\n"+
+            "</addresses>";
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
+        assertTrue(jsonObject == null);
+    }
+
+    @Test(expected=JSONException.class)
+    public void shouldHandleInvalidSlashInTag() {
+        String xmlStr = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
+            "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
+            "    <address>\n"+
+            "       <name/x>\n"+
+            "       <street>abc street</street>\n"+
             "   </address>\n"+
             "</addresses>";
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
@@ -66,12 +81,13 @@ public class XMLTest {
             "   <address>\n"+
             "       <name>Joe Tester</name>\n"+
             "       <street>[CDATA[Baker street 5]</street>\n"+
+            "       <NothingHere/>\n"+
             "   </address>\n"+
             "</addresses>";
 
         String expectedStr = 
             "{\"addresses\":{\"address\":{\"street\":\"[CDATA[Baker street 5]\","+
-            "\"name\":\"Joe Tester\"},\"xsi:noNamespaceSchemaLocation\":"+
+            "\"name\":\"Joe Tester\",\"NothingHere\":\"\"},\"xsi:noNamespaceSchemaLocation\":"+
             "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
             "XMLSchema-instance\"}}";
         
