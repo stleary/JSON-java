@@ -10,6 +10,7 @@ import org.junit.Test;
 
 /**
  * Tests for JSON-Java XML.java
+ * Note: noSpace() will be tested by JSONMLTest
  */
 public class XMLTest {
 
@@ -21,22 +22,25 @@ public class XMLTest {
         assertTrue("jsonObject should be empty", jsonObject.length() == 0);
     }
 
-    @Test
-    public void shouldHandleCommentsInXML() {
+    @Test(expected=NullPointerException.class)
+    public void shouldHandleNullJSONXML() {
+        JSONObject jsonObject= null;
+        String xmlStr = XML.toString(jsonObject);
+    }
 
+    @Test
+    public void shouldHandleInvalidCDATA() {
         String xmlStr = 
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-                "<!-- this is a comment -->\n"+
-                "<addresses>\n"+
-                "   <address>\n"+
-                "       <!-- this is another comment -->\n"+
-                "       <name>Joe Tester</name>\n"+
-                "       <!-- this is a multi line \n"+
-                "            comment -->\n"+
-                "       <street>Baker street 5</street>\n"+
-                "   </address>\n"+
-                "</addresses>";
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
+            "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
+            "    <address>\n"+
+            "       <name>Joe Tester</name>\n"+
+            "       <street>![Baker street 5</street>\n"+
+            "   </address>\n"+
+            "</addresses>";
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
+        assertTrue(jsonObject == null);
     }
 
     @Test
@@ -45,12 +49,6 @@ public class XMLTest {
         String xmlStr = "";
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("jsonObject should be empty", jsonObject.length() == 0);
-    }
-
-    @Test(expected=NullPointerException.class)
-    public void shouldHandleNullJSONXML() {
-        JSONObject jsonObject= null;
-        String xmlStr = XML.toString(jsonObject);
     }
 
     @Test
@@ -67,20 +65,38 @@ public class XMLTest {
             "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
             "   <address>\n"+
             "       <name>Joe Tester</name>\n"+
-            "       <street>Baker street 5</street>\n"+
+            "       <street>[CDATA[Baker street 5]</street>\n"+
             "   </address>\n"+
             "</addresses>";
 
         String expectedStr = 
-                "{\"addresses\":{\"address\":{\"street\":\"Baker street 5\","+
-                "\"name\":\"Joe Tester\"},\"xsi:noNamespaceSchemaLocation\":"+
-                "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
-                "XMLSchema-instance\"}}";
+            "{\"addresses\":{\"address\":{\"street\":\"[CDATA[Baker street 5]\","+
+            "\"name\":\"Joe Tester\"},\"xsi:noNamespaceSchemaLocation\":"+
+            "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
+            "XMLSchema-instance\"}}";
         
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+    @Test
+    public void shouldHandleCommentsInXML() {
+
+        String xmlStr = 
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<!-- this is a comment -->\n"+
+                "<addresses>\n"+
+                "   <address>\n"+
+                "       <![CDATA[ this is -- <another> comment ]]>\n"+
+                "       <name>Joe Tester</name>\n"+
+                "       <!-- this is a - multi line \n"+
+                "            comment -->\n"+
+                "       <street>Baker street 5</street>\n"+
+                "   </address>\n"+
+                "</addresses>";
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
     }
 
     @Test
