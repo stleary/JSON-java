@@ -7,7 +7,8 @@ import org.junit.runners.Suite;
    CDLTest.class,
    CookieTest.class,
    PropertyTest.class,
-   XMLTest.class
+   XMLTest.class,
+   JSONMLTest.class
 })
 public class JunitTestSuite {   
 }  
