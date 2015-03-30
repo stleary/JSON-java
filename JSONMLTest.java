@@ -12,30 +12,27 @@ import org.junit.Test;
 public class JSONMLTest {
 
     @Test(expected=NullPointerException.class)
-    public void shouldHandleNullXML() {
+    public void nullXMLException() {
 
         String xmlStr = null;
-        JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        JSONML.toJSONObject(xmlStr);
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleEmptyXML() {
+    public void emptyXMLException() {
 
         String xmlStr = "";
-        JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
-    }
-
-    @Test
-    public void shouldHandleNonXML() {
-        String xmlStr = "{ \"this is\": \"not xml\"}";
-        JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
-        assertTrue("xml string should be empty", jsonObject.length() == 0);
+        JSONML.toJSONObject(xmlStr);
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleInvalidSlashInTag() {
+    public void nonXMLException() {
+        String xmlStr = "{ \"this is\": \"not xml\"}";
+        JSONML.toJSONObject(xmlStr);
+    }
+
+    @Test(expected=JSONException.class)
+    public void unvalidSlashInTagException() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -49,7 +46,7 @@ public class JSONMLTest {
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleInvalidBangInTag() {
+    public void invalidBangInTagException() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -63,7 +60,7 @@ public class JSONMLTest {
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleInvalidBangNoCloseInTag() {
+    public void invalidBangNoCloseInTagException() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -77,7 +74,7 @@ public class JSONMLTest {
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleNoCloseStartTag() {
+    public void noCloseStartTagException() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -91,7 +88,7 @@ public class JSONMLTest {
     }
 
     @Test(expected=JSONException.class)
-    public void shouldHandleInvalidCDATABangInTag() {
+    public void invalidCDATABangInTagException() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -105,99 +102,129 @@ public class JSONMLTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void shouldHandleNullJSONXML() {
+    public void nullJSONXMLException() {
         JSONObject jsonObject= null;
         JSONML.toString(jsonObject);
     }
 
-    @Test
-    public void shouldHandleEmptyJSONXML() {
+    @Test(expected=JSONException.class)
+    public void emptyJSONXMLException() {
         JSONObject jsonObject= new JSONObject();
-        String xmlStr = JSONML.toString(jsonObject);
-        assertTrue("xml string should be empty", xmlStr.length() == 0);
+        JSONML.toString(jsonObject);
     }
 
     @Test
-    public void shouldHandleNoStartTag() {
+    public void noStartTag() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
-            "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
-            "    <address>\n"+
-            "       <name/>\n"+
-            "       <nocontent/>>\n"+
-            "   </address>\n"+
+                 "xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
+                 "<address>\n"+
+                     "<name/>\n"+
+                     "<nocontent/>>\n"+
+                 "</address>\n"+
             "</addresses>";
         String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\",\""+
-            "content\":\">\"},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
+            "{\"xsi:noNamespaceSchemaLocation\":\"test.xsd\","+
+                "\"childNodes\":[{"+
+                    "\"childNodes\":"+
+                        "[{\"tagName\":\"name\"},"+
+                        "{\"tagName\":\"nocontent\"},"+
+                        "\">\"],"+
+                        "\"tagName\":\"address\"}],"+
+                "\"xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\","+
+                "\"tagName\":\"addresses\"}";
         JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
     @Test
-    public void shouldHandleSimpleXML() {
+    public void simpleXML() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
-            "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
-            "   <address>\n"+
-            "       <name>Joe Tester</name>\n"+
-            "       <street>[CDATA[Baker street 5]</street>\n"+
-            "       <NothingHere/>\n"+
-            "       <TrueValue>true</TrueValue>\n"+
-            "       <FalseValue>false</FalseValue>\n"+
-            "       <NullValue>null</NullValue>\n"+
-            "       <PositiveValue>42</PositiveValue>\n"+
-            "       <NegativeValue>-23</NegativeValue>\n"+
-            "       <DoubleValue>-23.45</DoubleValue>\n"+
-            "       <Nan>-23x.45</Nan>\n"+
-            "       <ArrayOfNum>1, 2, 3, 4.1, 5.2</ArrayOfNum>\n"+
-            "   </address>\n"+
+                "xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
+                "<address>\n"+
+                    "<name>Joe Tester</name>\n"+
+                    "<street>[CDATA[Baker street 5]</street>\n"+
+                    "<NothingHere/>\n"+
+                    "<TrueValue>true</TrueValue>\n"+
+                    "<FalseValue>false</FalseValue>\n"+
+                    "<NullValue>null</NullValue>\n"+
+                    "<PositiveValue>42</PositiveValue>\n"+
+                    "<NegativeValue>-23</NegativeValue>\n"+
+                    "<DoubleValue>-23.45</DoubleValue>\n"+
+                    "<Nan>-23x.45</Nan>\n"+
+                    "<ArrayOfNum>1, 2, 3, 4.1, 5.2</ArrayOfNum>\n"+
+                "</address>\n"+
             "</addresses>";
 
         String expectedStr = 
-            "{\"addresses\":{\"address\":{\"street\":\"[CDATA[Baker street 5]\","+
-            "\"name\":\"Joe Tester\",\"NothingHere\":\"\",TrueValue:true,\n"+
-            "\"FalseValue\":false,\"NullValue\":null,\"PositiveValue\":42,\n"+
-            "\"NegativeValue\":-23,\"DoubleValue\":-23.45,\"Nan\":-23x.45,\n"+
-            "\"ArrayOfNum\":\"1, 2, 3, 4.1, 5.2\"\n"+
-            "},\"xsi:noNamespaceSchemaLocation\":"+
-            "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
-            "XMLSchema-instance\"}}";
-        
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+            "{\"xsi:noNamespaceSchemaLocation\":\"test.xsd\","+
+            "\"childNodes\":[{"+
+                "\"childNodes\":["+
+                    "{\"childNodes\":[\"Joe Tester\"],"+
+                        "\"tagName\":\"name\"},"+
+                    "{\"childNodes\":[\"[CDATA[Baker street 5]\"],"+
+                         "\"tagName\":\"street\"},"+
+                    "{\"tagName\":\"NothingHere\"},"+
+                    "{\"childNodes\":[true],"+
+                        "\"tagName\":\"TrueValue\"},"+
+                    "{\"childNodes\":[false],"+
+                        "\"tagName\":\"FalseValue\"},"+
+                    "{\"childNodes\":[null],"+
+                        "\"tagName\":\"NullValue\"},"+
+                    "{\"childNodes\":[42],"+
+                        "\"tagName\":\"PositiveValue\"},"+
+                    "{\"childNodes\":[-23],"+
+                        "\"tagName\":\"NegativeValue\"},"+
+                    "{\"childNodes\":[-23.45],"+
+                        "\"tagName\":\"DoubleValue\"},"+
+                    "{\"childNodes\":[\"-23x.45\"],"+
+                        "\"tagName\":\"Nan\"},"+
+                    "{\"childNodes\":[\"1, 2, 3, 4.1, 5.2\"],"+
+                        "\"tagName\":\"ArrayOfNum\"}],"+
+                "\"tagName\":\"address\"}],"+
+            "\"xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\","+
+            "\"tagName\":\"addresses\"}";
         JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
     @Test
-    public void shouldHandleCommentsInXML() {
+    public void commentsInXML() {
 
         String xmlStr = 
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-                "<!-- this is a comment -->\n"+
-                "<addresses>\n"+
-                "   <address>\n"+
-                "       <![CDATA[ this is -- <another> comment ]]>\n"+
-                "       <name>Joe Tester</name>\n"+
-                "       <!-- this is a - multi line \n"+
-                "            comment -->\n"+
-                "       <street>Baker street 5</street>\n"+
-                "   </address>\n"+
-                "</addresses>";
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<!-- this is a comment -->\n"+
+            "<addresses>\n"+
+                "<address>\n"+
+                    "<![CDATA[ this is -- <another> comment ]]>\n"+
+                    "<name>Joe Tester</name>\n"+
+                    "<!-- this is a - multi line \n"+
+                    "comment -->\n"+
+                    "<street>Baker street 5</street>\n"+
+                "</address>\n"+
+            "</addresses>";
+        String expectedStr = 
+            "{\"childNodes\":["+
+                "{\"childNodes\":["+
+                    "\" this is -- <another> comment \","+
+                    "{\"childNodes\":[\"Joe Tester\"],"+
+                        "\"tagName\":\"name\"},"+
+                    "{\"childNodes\":[\"Baker street 5\"],"+
+                        "\"tagName\":\"street\"}],"+
+                    "\"tagName\":\"address\"}],"+
+                "\"tagName\":\"addresses\"}";
         JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
-        String expectedStr = "{\"addresses\":{\"address\":{\"street\":\"Baker "+
-                "street 5\",\"name\":\"Joe Tester\",\"content\":\" this is -- "+
-                "<another> comment \"}}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
     @Test
-    public void shouldHandleToString() {
+    public void jsonObjectToString() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -210,12 +237,18 @@ public class JSONMLTest {
             "</addresses>";
 
         String expectedStr = 
-                "{\"addresses\":{\"address\":{\"street\":\"Baker street 5\","+
-                "\"name\":\"[CDATA[Joe & T > e < s \\\" t \\\' er]]\","+
-                "\"ArrayOfNum\":\"1, 2, 3, 4.1, 5.2\"\n"+
-                "},\"xsi:noNamespaceSchemaLocation\":"+
-                "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
-                "XMLSchema-instance\"}}";
+            "{\"xsi:noNamespaceSchemaLocation\":\"test.xsd\","+
+                "\"childNodes\":["+
+                    "{\"childNodes\":["+
+                        "{\"childNodes\":[\"[CDATA[Joe & T > e < s \\\" t ' er]]\"],"+
+                            "\"tagName\":\"name\"},"+
+                        "{\"childNodes\":[\"Baker street 5\"],"+
+                            "\"tagName\":\"street\"},"+
+                        "{\"childNodes\":[\"1, 2, 3, 4.1, 5.2\"],"+
+                            "\"tagName\":\"ArrayOfNum\"}],"+
+                        "\"tagName\":\"address\"}],"+
+                        "\"xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\","+
+                        "\"tagName\":\"addresses\"}";
         
         JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
         String xmlToStr = JSONML.toString(jsonObject);
@@ -226,72 +259,57 @@ public class JSONMLTest {
     }
 
     @Test
-    public void shouldHandleContentNoArraytoString() {
-        String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\",\""+
-            "content\":\">\"},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        String finalStr = JSONML.toString(expectedJsonObject);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>&gt;"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
-    }
-
-    @Test
-    public void shouldHandleContentArraytoString() {
-        String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\",\""+
-            "content\":[1, 2, 3]},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        String finalStr = JSONML.toString(expectedJsonObject);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>"+
-                "1\n2\n3"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
-    }
-
-    @Test
-    public void shouldHandleArraytoString() {
-        String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\","+
-            "\"something\":[1, 2, 3]},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        String finalStr = JSONML.toString(expectedJsonObject);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>"+
-                "<something>1</something><something>2</something><something>3</something>"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
-    }
-
-    @Test
-    public void shouldHandleNestedArraytoString() {
-        String xmlStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\","+
-            "\"outer\":[[1], [2], [3]]},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
-        JSONObject jsonObject = new JSONObject(xmlStr);
-        String finalStr = JSONML.toString(jsonObject);
-        JSONObject finalJsonObject = JSONML.toJSONObject(finalStr);
-        String expectedStr = "<addresses><address><name/><nocontent/>"+
-                "<outer><array>1</array></outer><outer><array>2</array>"+
-                "</outer><outer><array>3</array></outer>"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
-        JSONObject expectedJsonObject = JSONML.toJSONObject(expectedStr);
-        Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
+    public void jsonArrayToString() {
+        String xmlStr =
+            "<tag0>"+
+                "<tag1>"+
+                    "<tag2>5</tag2>"+
+                    "<tag2>10</tag2>"+
+                    "<tag2>15</tag2>"+
+                "</tag1>"+
+                "<tag2>val2</tag2>"+
+                "<tag3>val3</tag3>"+
+                "<tag4>"+
+                    "<tag5>-6</tag5>"+
+                    "<tag5>true</tag5>"+
+                "</tag4>"+
+                "<tag6>false</tag6>"+
+                "<tag7>null</tag7>"+
+                "<tag1>"+
+                    "<tag8>10</tag8>"+
+                    "<tag8>20</tag8>"+
+                    "<tag8>33.33</tag8>"+
+                    "<tag8>5220</tag8>"+
+                "</tag1>"+
+            "</tag0>";
+        String expectedStr =
+            "[\"tag0\","+
+                "[\"tag1\","+
+                    "[\"tag2\",5],"+
+                    "[\"tag2\",10],"+
+                    "[\"tag2\",15]"+
+                "],"+
+                "[\"tag2\",\"val2\"],"+
+                "[\"tag3\",\"val3\"],"+
+                "[\"tag4\","+
+                    "[\"tag5\",-6],"+
+                    "[\"tag5\",true]"+
+                "],"+
+                "[\"tag6\",false],"+
+                "[\"tag7\",null],"+
+                "[\"tag1\","+
+                    "[\"tag8\",10],"+
+                    "[\"tag8\",20],"+
+                    "[\"tag8\",33.33],"+
+                    "[\"tag8\",5220]"+
+                "]"+
+            "]";
+        JSONArray jsonArray = JSONML.toJSONArray(xmlStr);
+        String xmlToStr = JSONML.toString(jsonArray);
+        JSONArray finalJsonArray = JSONML.toJSONArray(xmlToStr);
+        JSONArray expectedJsonArray= new JSONArray(expectedStr);
+        Util.compareActualVsExpectedJsonArrays(jsonArray,expectedJsonArray);
+        Util.compareActualVsExpectedJsonArrays(finalJsonArray,expectedJsonArray);
     }
 
 }

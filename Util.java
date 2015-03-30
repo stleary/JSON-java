@@ -20,15 +20,9 @@ public class Util {
         assertTrue("jsonArray lengths should be equal",
                 jsonArray.length() == expectedJsonArray.length());
         for (int i = 0; i < jsonArray.length(); ++i) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            JSONObject expectedJsonObject = expectedJsonArray.getJSONObject(i);
-            assertTrue("jsonObjects should have the same length",
-                    jsonObject.length() == expectedJsonObject.length());
-            Iterator<String> keys = jsonObject.keys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                compareJsonObjectEntries(jsonObject, expectedJsonObject, key);
-            }
+            Object value = jsonArray.get(i);
+            Object expectedValue = expectedJsonArray.get(i);
+            compareActualVsExpectedObjects(value, expectedValue);
         }
     }
 
@@ -44,42 +38,36 @@ public class Util {
         Iterator<String> keys = jsonObject.keys();
         while (keys.hasNext()) {
             String key = keys.next();
-            compareJsonObjectEntries(jsonObject, expectedJsonObject, key);
+            Object value = jsonObject.get(key);
+            Object expectedValue = expectedJsonObject.get(key);
+            compareActualVsExpectedObjects(value, expectedValue);
         }
     }
 
     /**
-     * Compare two jsonObject entries
-     * @param jsonObject created by the code to be tested
-     * @param expectedJsonObject created specifically for comparing
+     * Compare two objects for equality. Might be JSONArray, JSONObject,
+     * or something else.
+     * @param value created by the code to be tested
+     * @param expectedValue created specifically for comparing
      * @param key key to the jsonObject entry to be compared
      */
-    private static void compareJsonObjectEntries(JSONObject jsonObject,
-            JSONObject expectedJsonObject, String key) {
-        Object value = jsonObject.get(key);
-        Object expectedValue = expectedJsonObject.get(key);
-        if (value instanceof JSONObject) {
-            JSONObject childJsonObject = jsonObject.getJSONObject(key);
-            JSONObject expectedChildJsonObject =
-                    expectedJsonObject.getJSONObject(key);
+    private static void compareActualVsExpectedObjects(Object value,
+            Object expectedValue) {
+        if (value instanceof JSONObject && expectedValue instanceof JSONObject) {
+            JSONObject jsonObject = (JSONObject)value;
+            JSONObject expectedJsonObject = (JSONObject)expectedValue;
             compareActualVsExpectedJsonObjects(
-                    childJsonObject, expectedChildJsonObject);
-        } else if (value instanceof JSONArray) {
-            JSONArray childJsonArray = jsonObject.getJSONArray(key);
-            JSONArray expectedChildJsonArray =
-                    expectedJsonObject.getJSONArray(key);
+                    jsonObject, expectedJsonObject);
+        } else if (value instanceof JSONArray && expectedValue instanceof JSONArray) {
+            JSONArray jsonArray = (JSONArray)value;
+            JSONArray expectedJsonArray = (JSONArray)expectedValue;
             compareActualVsExpectedJsonArrays(
-                    childJsonArray, expectedChildJsonArray);
-        } else if (!(value instanceof String) && !(expectedValue instanceof String)) {
-            assertTrue("string values should be equal for actual: "+
-                    value.toString()+" expected: "+expectedValue.toString(),
-                    value.toString().equals(expectedValue.toString()));
+                    jsonArray, expectedJsonArray);
         } else {
-            String testStr = "key: "+key+" val: "+value.toString();
-            String actualStr = expectedValue.toString();
             assertTrue("string values should be equal for actual: "+
-                testStr+" expected: "+actualStr,
-                value.equals(expectedValue.toString()));
+                value.toString()+" expected: "+expectedValue.toString(),
+                value.toString().equals(expectedValue.toString()));
         }
     }
+
 }
