@@ -15,20 +15,20 @@ public class JSONMLTest {
     public void nullXMLException() {
 
         String xmlStr = null;
-        JSONML.toJSONObject(xmlStr);
+        JSONML.toJSONArray(xmlStr);
     }
 
     @Test(expected=JSONException.class)
     public void emptyXMLException() {
 
         String xmlStr = "";
-        JSONML.toJSONObject(xmlStr);
+        JSONML.toJSONArray(xmlStr);
     }
 
     @Test(expected=JSONException.class)
     public void nonXMLException() {
         String xmlStr = "{ \"this is\": \"not xml\"}";
-        JSONML.toJSONObject(xmlStr);
+        JSONML.toJSONArray(xmlStr);
     }
 
     @Test(expected=JSONException.class)
@@ -42,7 +42,7 @@ public class JSONMLTest {
             "       <street>abc street</street>\n"+
             "   </address>\n"+
             "</addresses>";
-        JSONML.toJSONObject(xmlStr);
+        JSONML.toJSONArray(xmlStr);
     }
 
     @Test(expected=JSONException.class)
@@ -56,7 +56,7 @@ public class JSONMLTest {
             "       <!>\n"+
             "   </address>\n"+
             "</addresses>";
-        JSONML.toJSONObject(xmlStr);
+        JSONML.toJSONArray(xmlStr);
     }
 
     @Test(expected=JSONException.class)
@@ -70,7 +70,7 @@ public class JSONMLTest {
             "       <!\n"+
             "   </address>\n"+
             "</addresses>";
-        JSONML.toJSONObject(xmlStr);
+        JSONML.toJSONArray(xmlStr);
     }
 
     @Test(expected=JSONException.class)
@@ -84,7 +84,7 @@ public class JSONMLTest {
             "       <abc\n"+
             "   </address>\n"+
             "</addresses>";
-        JSONML.toJSONObject(xmlStr);
+        JSONML.toJSONArray(xmlStr);
     }
 
     @Test(expected=JSONException.class)
@@ -98,23 +98,23 @@ public class JSONMLTest {
             "       <![[]>\n"+
             "   </address>\n"+
             "</addresses>";
-        JSONML.toJSONObject(xmlStr);
+        JSONML.toJSONArray(xmlStr);
     }
 
     @Test(expected=NullPointerException.class)
     public void nullJSONXMLException() {
-        JSONObject jsonObject= null;
-        JSONML.toString(jsonObject);
+        JSONArray jsonArray= null;
+        JSONML.toString(jsonArray);
     }
 
     @Test(expected=JSONException.class)
     public void emptyJSONXMLException() {
-        JSONObject jsonObject= new JSONObject();
-        JSONML.toString(jsonObject);
+        JSONArray jsonArray = new JSONArray();
+        JSONML.toString(jsonArray);
     }
 
     @Test
-    public void noStartTag() {
+    public void complexTypeXML() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -125,22 +125,22 @@ public class JSONMLTest {
                  "</address>\n"+
             "</addresses>";
         String expectedStr = 
-            "{\"xsi:noNamespaceSchemaLocation\":\"test.xsd\","+
-                "\"childNodes\":[{"+
-                    "\"childNodes\":"+
-                        "[{\"tagName\":\"name\"},"+
-                        "{\"tagName\":\"nocontent\"},"+
-                        "\">\"],"+
-                        "\"tagName\":\"address\"}],"+
-                "\"xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\","+
-                "\"tagName\":\"addresses\"}";
-        JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+            "[\"addresses\","+
+                "{\"xsi:noNamespaceSchemaLocation\":\"test.xsd\","+
+                    "\"xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"},"+
+                "[\"address\","+
+                    "[\"name\"],"+
+                    "[\"nocontent\"],"+
+                    "\">\""+
+                "]"+
+            "]";
+        JSONArray jsonArray = JSONML.toJSONArray(xmlStr);
+        JSONArray expectedJsonArray = new JSONArray(expectedStr);
+        Util.compareActualVsExpectedJsonArrays(jsonArray,expectedJsonArray);
     }
 
     @Test
-    public void simpleXML() {
+    public void basicXMLAsObject() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -156,7 +156,13 @@ public class JSONMLTest {
                     "<NegativeValue>-23</NegativeValue>\n"+
                     "<DoubleValue>-23.45</DoubleValue>\n"+
                     "<Nan>-23x.45</Nan>\n"+
-                    "<ArrayOfNum>1, 2, 3, 4.1, 5.2</ArrayOfNum>\n"+
+                    "<ArrayOfNum>\n"+
+                        "<value>1</value>\n"+
+                        "<value>2</value>\n"+
+                        "<value>3</value>\n"+
+                        "<value>4.1</value>\n"+
+                        "<value>5.2</value>\n"+
+                    "</ArrayOfNum>\n"+
                 "</address>\n"+
             "</addresses>";
 
@@ -183,11 +189,69 @@ public class JSONMLTest {
                         "\"tagName\":\"DoubleValue\"},"+
                     "{\"childNodes\":[\"-23x.45\"],"+
                         "\"tagName\":\"Nan\"},"+
-                    "{\"childNodes\":[\"1, 2, 3, 4.1, 5.2\"],"+
-                        "\"tagName\":\"ArrayOfNum\"}],"+
+                    "{\"childNodes\":["+
+                        "{\"childNodes\":[1],"+
+                            "\"tagName\":\"value\"},"+
+                        "{\"childNodes\":[1],"+
+                            "\"tagName\":\"value\"},"+
+                        "{\"childNodes\":[1],"+
+                            "\"tagName\":\"value\"},"+
+                        "{\"childNodes\":[1],"+
+                            "\"tagName\":\"value\"},"+
+                        "{\"childNodes\":[1],"+
+                            "\"tagName\":\"value\"},"+
+                    "],"
+                    
                 "\"tagName\":\"address\"}],"+
             "\"xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\","+
             "\"tagName\":\"addresses\"}";
+        JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+    public void basicXMLAsArray() {
+        String xmlStr = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
+                "xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
+                "<address>\n"+
+                    "<name>Joe Tester</name>\n"+
+                    "<street>[CDATA[Baker street 5]</street>\n"+
+                    "<NothingHere/>\n"+
+                    "<TrueValue>true</TrueValue>\n"+
+                    "<FalseValue>false</FalseValue>\n"+
+                    "<NullValue>null</NullValue>\n"+
+                    "<PositiveValue>42</PositiveValue>\n"+
+                    "<NegativeValue>-23</NegativeValue>\n"+
+                    "<DoubleValue>-23.45</DoubleValue>\n"+
+                    "<Nan>-23x.45</Nan>\n"+
+                    "<ArrayOfNum>\n"+
+                        "<value>1</value>\n"+
+                        "<value>2</value>\n"+
+                        "<value>3</value>\n"+
+                        "<value>4.1</value>\n"+
+                        "<value>5.2</value>\n"+
+                    "</ArrayOfNum>\n"+
+                "</address>\n"+
+            "</addresses>";
+
+        String expectedStr =
+            "[\"addresses\","+
+                "{\"xsi:noNamespaceSchemaLocation\":\"test.xsd\","+
+                    "\"xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"},"+
+                "[\"address\","+
+                    "[\"name\", \"Joe Tester\"]"+
+                    "[\"street\", \"[CDATA[Baker street 5]\"]"+
+                    "[\"NothingHere\"]"+
+                    "[\"TrueValue\", true]"+
+                    "[\"FalseValue\", false]"+
+                    "[\"NullValue\", null]"+
+                    "[\"PositiveValue\", 42]"+
+                    "[\"NegativeValue\", -23]"+
+                    "[\"DoubleValue\", -23.45]"+
+                    "[\"Nan\", \"-23x.45\"]"+
+                    "[\"ArrayOfNum\", ]"+
         JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
