@@ -150,10 +150,10 @@ public class JSONArray {
      * @param collection
      *            A Collection.
      */
-    public JSONArray(Collection<Object> collection) {
+    public JSONArray(Collection<?> collection) {
         this.myArrayList = new ArrayList<Object>();
         if (collection != null) {
-            Iterator<Object> iter = collection.iterator();
+            Iterator<?> iter = collection.iterator();
             while (iter.hasNext()) {
                 this.myArrayList.add(JSONObject.wrap(iter.next()));
             }
