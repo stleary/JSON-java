@@ -6,6 +6,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
    CDLTest.class,
    CookieTest.class,
+   CookieListTest.class,
    PropertyTest.class,
    XMLTest.class,
    JSONMLTest.class
