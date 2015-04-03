@@ -60,8 +60,7 @@ public class CookieListTest {
             "{\"path\":\"/\","+
             "\"expires\":\"Wed, 19-Mar-2014 17:53:53 GMT\","+
             "\"domain\":\".yahoo.com\","+
-            "\"name\":\"PH\","+
-            "\"value\":\"deleted\"}";
+            "\"PH\":\"deleted\"}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
         JSONObject expectedJsonObject = new JSONObject(expectedCookieStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
