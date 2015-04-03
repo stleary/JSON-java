@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import org.json.*;
 import org.junit.Test;
 
-
 /**
  * Tests for JSON-Java JSONML.java
  */
