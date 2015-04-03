@@ -319,7 +319,7 @@ public class JSONMLTest {
             "<!-- this is a comment -->\n"+
             "<addresses>\n"+
                 "<address>\n"+
-                    "<![CDATA[ this is -- <another> comment ]]>\n"+
+                    "<!-- <!--[CDATA[ this is -- <another> comment ]] -->\n"+
                     "<name>Joe Tester</name>\n"+
                     "<!-- this is a - multi line \n"+
                     "comment -->\n"+
@@ -329,7 +329,6 @@ public class JSONMLTest {
         String expectedStr =
             "[\"addresses\","+
                 "[\"address\","+
-                    "\" this is -- <another> comment \","+
                     "[\"name\",\"Joe Tester\"],"+
                     "[\"street\",\"Baker street 5\"]"+
                 "]"+
@@ -339,9 +338,7 @@ public class JSONMLTest {
         String xmlToStr = JSONML.toString(jsonArray);
         JSONArray finalJsonArray = JSONML.toJSONArray(xmlToStr);
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
-        // TODO this test fails because JSONML.toString() escapes the
-        // <> chars in the comment.
-        // Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
+        Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
     }
 
 }
