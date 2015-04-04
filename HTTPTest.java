@@ -1,9 +1,5 @@
 package org.json.junit;
 
-import java.util.*;
-
-import static org.junit.Assert.*;
-
 import org.json.*;
 import org.junit.Test;
 
