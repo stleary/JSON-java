@@ -9,7 +9,8 @@ import org.junit.runners.Suite;
    CookieListTest.class,
    PropertyTest.class,
    XMLTest.class,
-   JSONMLTest.class
+   JSONMLTest.class,
+   HTTPTest.class
 })
 public class JunitTestSuite {   
 }  
