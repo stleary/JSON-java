@@ -10,7 +10,8 @@ import org.junit.runners.Suite;
    PropertyTest.class,
    XMLTest.class,
    JSONMLTest.class,
-   HTTPTest.class
+   HTTPTest.class,
+   JSONStringerTest.class
 })
 public class JunitTestSuite {   
 }  
