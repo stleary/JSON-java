@@ -1,5 +1,7 @@
 package org.json.junit;
 
+import static org.junit.Assert.*;
+
 import java.util.*;
 
 import org.json.*;
@@ -157,5 +159,18 @@ public class JSONObjectTest {
         jsonObject.append("myArray", -23.45e7);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
+    }
+
+    @Test
+    public void jsonObjectValuesToString() {
+        String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68", null };
+        Double [] doubles = { 1.0, 00001.00000, -23.4, -23.45e67, 
+                new Double(1/0) }; 
+        for (int i = 0; i < expectedStrs.length; ++i) {
+            String actualStr = JSONObject.doubleToString(doubles[i]);
+            assertTrue("double value expected ["+expectedStrs[i]+
+                    "] found ["+actualStr+ "]",
+                    expectedStrs[i].equals(actualStr));
+        }
     }
 }
