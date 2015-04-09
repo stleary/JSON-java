@@ -70,4 +70,17 @@ public class Util {
         }
     }
 
+    public static void compareActualVsExpectedStringArrays(String[] names,
+            String [] expectedNames) {
+        assertTrue("Array lengths should be equal",
+                names.length == expectedNames.length);
+        List<String> lNames = new ArrayList<String>(Arrays.asList(names));
+        for (int i = 0; i < expectedNames.length; ++i) {
+            String expectedName = expectedNames[i];
+            assertTrue("expected to find "+expectedName, 
+                    lNames.contains(expectedName));
+            lNames.remove(expectedName);
+        }
+    }
+
 }

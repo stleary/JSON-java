@@ -162,15 +162,75 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void jsonObjectValuesToString() {
-        String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68", null };
-        Double [] doubles = { 1.0, 00001.00000, -23.4, -23.45e67, 
-                new Double(1/0) }; 
+    public void jsonObjectDoubleToString() {
+        String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68" };
+        Double [] doubles = { 1.0, 00001.00000, -23.4, -23.45e67 }; 
         for (int i = 0; i < expectedStrs.length; ++i) {
             String actualStr = JSONObject.doubleToString(doubles[i]);
-            assertTrue("double value expected ["+expectedStrs[i]+
+            assertTrue("value expected ["+expectedStrs[i]+
                     "] found ["+actualStr+ "]",
                     expectedStrs[i].equals(actualStr));
         }
     }
+
+    @Test
+    public void jsonObjectValues() {
+        String str = 
+            "{"+
+                "\"trueKey\":true,"+
+                "\"falseKey\":false,"+
+                "\"trueStrKey\":\"true\","+
+                "\"falseStrKey\":\"false\","+
+                "\"stringKey\":\"hello world!\","+
+                "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
+                "\"intKey\":42,"+
+                "\"intStrKey\":\"43\","+
+                "\"longKey\":1234567890123456789,"+
+                "\"longStrKey\":\"987654321098765432\","+
+                "\"doubleKey\":-23.45e7,"+
+                "\"doubleStrKey\":\"00001.000\","+
+                "\"arrayKey\":[0,1,2],"+
+                "\"objectKey\":{\"myKey\":\"myVal\"}"+
+            "}";
+        JSONObject jsonObject = new JSONObject(str);
+        assertTrue("trueKey should be true", jsonObject.getBoolean("trueKey"));
+        assertTrue("falseKey should be false", !jsonObject.getBoolean("falseKey"));
+        assertTrue("trueStrKey should be true", jsonObject.getBoolean("trueStrKey"));
+        assertTrue("falseStrKey should be false", !jsonObject.getBoolean("falseStrKey"));
+        assertTrue("doubleKey should be double", 
+                jsonObject.getDouble("doubleKey") == -23.45e7);
+        assertTrue("doubleStrKey should be double", 
+                jsonObject.getDouble("doubleStrKey") == 1);
+        assertTrue("intKey should be int", 
+                jsonObject.getInt("intKey") == 42);
+        assertTrue("intStrKey should be int", 
+                jsonObject.getInt("intStrKey") == 43);
+        assertTrue("longKey should be long", 
+                jsonObject.getLong("longKey") == 1234567890123456789L);
+        assertTrue("longStrKey should be long", 
+                jsonObject.getLong("longStrKey") == 987654321098765432L);
+        JSONArray jsonArray = jsonObject.getJSONArray("arrayKey");
+        assertTrue("arrayKey should be JSONArray", 
+                jsonArray.getInt(0) == 0 &&
+                jsonArray.getInt(1) == 1 &&
+                jsonArray.getInt(2) == 2);
+        JSONObject jsonObjectInner = jsonObject.getJSONObject("objectKey");
+        assertTrue("objectKey should be JSONObject", 
+                jsonObjectInner.get("myKey").equals("myVal"));
+    }
+
+    @Test
+    public void jsonObjectNames() {
+        String str = 
+            "{"+
+                "\"trueKey\":true,"+
+                "\"falseKey\":false,"+
+                "\"stringKey\":\"hello world!\","+
+            "}";
+        String [] expectedNames = {"trueKey", "falseKey", "stringKey"};
+        JSONObject jsonObject = new JSONObject(str);
+        String [] names = JSONObject.getNames(jsonObject);
+        Util.compareActualVsExpectedStringArrays(names, expectedNames);
+    }
+
 }
