@@ -182,7 +182,6 @@ public class JSONObjectTest {
                 "\"trueStrKey\":\"true\","+
                 "\"falseStrKey\":\"false\","+
                 "\"stringKey\":\"hello world!\","+
-                "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
                 "\"intKey\":42,"+
                 "\"intStrKey\":\"43\","+
                 "\"longKey\":1234567890123456789,"+
@@ -231,6 +230,44 @@ public class JSONObjectTest {
         JSONObject jsonObject = new JSONObject(str);
         String [] names = JSONObject.getNames(jsonObject);
         Util.compareActualVsExpectedStringArrays(names, expectedNames);
+    }
+
+    @Test
+    public void objectNames() {
+        MyBean myBean = new MyBean();
+        String [] expectedNames = {"intKey", "doubleKey", "stringKey", 
+                "complexStringKey", "trueKey", "falseKey"};
+        String [] names = JSONObject.getNames(myBean);
+        Util.compareActualVsExpectedStringArrays(names, expectedNames);
+    }
+
+    @Test
+    public void jsonObjectIncrement() {
+        String str = 
+            "{"+
+                "\"keyLong\":1L,"+
+                "\"keyDouble\":1.1,"+
+                "\"keyFloat\":1.1F,"+
+             "}";
+        String expectedStr = 
+        "{"+
+            "\"keyInt\":3,"+
+            "\"keyLong\":3,"+
+            "\"keyDouble\":3.1,"+
+            "\"keyFloat\":3.1"+
+        "}";
+        JSONObject jsonObject = new JSONObject(str);
+        jsonObject.increment("keyInt");
+        jsonObject.increment("keyInt");
+        jsonObject.increment("keyLong");
+        jsonObject.increment("keyDouble");
+        jsonObject.increment("keyFloat");
+        jsonObject.increment("keyInt");
+        jsonObject.increment("keyLong");
+        jsonObject.increment("keyDouble");
+        jsonObject.increment("keyFloat");
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
 }
