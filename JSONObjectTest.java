@@ -193,8 +193,10 @@ public class JSONObjectTest {
             "}";
         JSONObject jsonObject = new JSONObject(str);
         assertTrue("trueKey should be true", jsonObject.getBoolean("trueKey"));
+        assertTrue("opt trueKey should be true", jsonObject.optBoolean("trueKey"));
         assertTrue("falseKey should be false", !jsonObject.getBoolean("falseKey"));
         assertTrue("trueStrKey should be true", jsonObject.getBoolean("trueStrKey"));
+        assertTrue("trueStrKey should be true", jsonObject.optBoolean("trueStrKey"));
         assertTrue("falseStrKey should be false", !jsonObject.getBoolean("falseStrKey"));
         assertTrue("doubleKey should be double", 
                 jsonObject.getDouble("doubleKey") == -23.45e7);
@@ -208,6 +210,12 @@ public class JSONObjectTest {
                 jsonObject.getLong("longKey") == 1234567890123456789L);
         assertTrue("longStrKey should be long", 
                 jsonObject.getLong("longStrKey") == 987654321098765432L);
+        assertTrue("xKey should not exist",
+                jsonObject.isNull("xKey"));
+        assertTrue("stringKey should exist",
+                jsonObject.has("stringKey"));
+        assertTrue("stringKey should string",
+                jsonObject.getString("stringKey").equals("hello world!"));
         JSONArray jsonArray = jsonObject.getJSONArray("arrayKey");
         assertTrue("arrayKey should be JSONArray", 
                 jsonArray.getInt(0) == 0 &&
@@ -233,6 +241,32 @@ public class JSONObjectTest {
     }
 
     @Test
+    public void jsonObjectNamesToJsonAray() {
+        String str = 
+            "{"+
+                "\"trueKey\":true,"+
+                "\"falseKey\":false,"+
+                "\"stringKey\":\"hello world!\","+
+            "}";
+        String [] expectedNames = {"trueKey", "falseKey", "stringKey" };
+
+        JSONObject jsonObject = new JSONObject(str);
+        JSONArray jsonArray = jsonObject.names();
+        /**
+         * Cannot really compare to an expected JSONArray because the ordering
+         * of the JSONObject keys is not fixed, and JSONArray comparisons
+         * presume fixed. Since this test is limited to key strings, a 
+         * string comparison will have to suffice.
+         */
+        String namesStr = jsonArray.toString();
+        // remove square brackets, commas, and spaces
+        namesStr = namesStr.replaceAll("[\\]|\\[|\"]", "");
+        String [] names = namesStr.split(",");
+
+        Util.compareActualVsExpectedStringArrays(names, expectedNames);
+    }
+
+    @Test
     public void objectNames() {
         MyBean myBean = new MyBean();
         String [] expectedNames = {"intKey", "doubleKey", "stringKey", 
@@ -245,29 +279,53 @@ public class JSONObjectTest {
     public void jsonObjectIncrement() {
         String str = 
             "{"+
-                "\"keyLong\":1L,"+
+                "\"keyLong\":9999999991,"+
                 "\"keyDouble\":1.1,"+
-                "\"keyFloat\":1.1F,"+
              "}";
         String expectedStr = 
         "{"+
             "\"keyInt\":3,"+
-            "\"keyLong\":3,"+
+            "\"keyLong\":9999999993,"+
             "\"keyDouble\":3.1,"+
-            "\"keyFloat\":3.1"+
         "}";
         JSONObject jsonObject = new JSONObject(str);
         jsonObject.increment("keyInt");
         jsonObject.increment("keyInt");
         jsonObject.increment("keyLong");
         jsonObject.increment("keyDouble");
-        jsonObject.increment("keyFloat");
         jsonObject.increment("keyInt");
         jsonObject.increment("keyLong");
         jsonObject.increment("keyDouble");
-        jsonObject.increment("keyFloat");
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    @Test
+    public void jsonObjectNamesToArray() {
+        String str = 
+            "{"+
+                "\"trueKey\":true,"+
+                "\"falseKey\":false,"+
+                "\"stringKey\":\"hello world!\","+
+            "}";
+        String [] expectedNames = {"trueKey", "falseKey", "stringKey"};
+        JSONObject jsonObject = new JSONObject(str);
+        String [] names = JSONObject.getNames(jsonObject);
+        Util.compareActualVsExpectedStringArrays(names, expectedNames);
+    }
+
+    @Test
+    public void jsonObjectNumberToString() {
+        String str;
+        Double dVal;
+        Integer iVal = 1;
+        str = JSONObject.numberToString(iVal);
+        assertTrue("expected "+iVal+" actual "+str, iVal.toString().equals(str));
+        dVal = 12.34;
+        str = JSONObject.numberToString(dVal);
+        assertTrue("expected "+dVal+" actual "+str, dVal.toString().equals(str));
+        dVal = 12.34e27;
+        str = JSONObject.numberToString(dVal);
+        assertTrue("expected "+dVal+" actual "+str, dVal.toString().equals(str));
+    }
 }
