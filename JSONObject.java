@@ -442,20 +442,8 @@ public class JSONObject {
         if (Double.isInfinite(d) || Double.isNaN(d)) {
             return "null";
         }
-
-// Shave off trailing zeros and decimal point, if possible.
-
-        String string = Double.toString(d);
-        if (string.indexOf('.') > 0 && string.indexOf('e') < 0
-                && string.indexOf('E') < 0) {
-            while (string.endsWith("0")) {
-                string = string.substring(0, string.length() - 1);
-            }
-            if (string.endsWith(".")) {
-                string = string.substring(0, string.length() - 1);
-            }
-        }
-        return string;
+        // Shave off trailing zeros and decimal point, if possible.
+        return trimNumericString(Double.toString(d));
     }
 
     /**
@@ -757,6 +745,22 @@ public class JSONObject {
         }
         return ja.length() == 0 ? null : ja;
     }
+    
+    private static String trimNumericString(String num) {
+        final int idx_point = num.indexOf('.');
+        int idx_last = num.length() - 1;
+        if (idx_point > 0 && num.indexOf('e') < 0 &&
+        		num.indexOf('E') < 0) {
+        	while (num.charAt(idx_last) == '0') {
+        		idx_last --;
+        	}
+        	if (idx_last != idx_point) {
+        		idx_last ++;
+        	}
+        	num = num.substring(0, idx_last);
+        }
+    	return num;
+    }
 
     /**
      * Produce a string from a Number.
@@ -769,23 +773,11 @@ public class JSONObject {
      */
     public static String numberToString(Number number) throws JSONException {
         if (number == null) {
-            throw new JSONException("Null pointer");
+            throw new NullPointerException("Number must not be null.");
         }
         testValidity(number);
-
-// Shave off trailing zeros and decimal point, if possible.
-
-        String string = number.toString();
-        if (string.indexOf('.') > 0 && string.indexOf('e') < 0
-                && string.indexOf('E') < 0) {
-            while (string.endsWith("0")) {
-                string = string.substring(0, string.length() - 1);
-            }
-            if (string.endsWith(".")) {
-                string = string.substring(0, string.length() - 1);
-            }
-        }
-        return string;
+        // Shave off trailing zeros and decimal point, if possible.
+        return trimNumericString(number.toString());
     }
 
     /**
