@@ -470,7 +470,7 @@ public class XML {
 
         } else {
             if (object.getClass().isArray()) {
-                object = new JSONArray(object);
+                object = new JSONArray((Object[]) object);
             }
             if (object instanceof JSONArray) {
                 ja = (JSONArray)object;
