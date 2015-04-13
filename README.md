@@ -24,7 +24,7 @@ A unit test is considered complete when the coverage is >= 90% as measured by Ec
 
 | Test file name  | Coverage | Comments |
 | ------------- | ------------- | ---- |
-| Total coverage | 58.4% | | | 
+| Total coverage | 81.6% | | | 
 | | | | 
 | CDL.java | 94.8% | Completed  |
 | Cookie.java  | 97.5%   | Completed |
