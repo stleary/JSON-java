@@ -651,39 +651,6 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void jsonObjectEquals() {
-        String str = 
-            "{"+
-                "\"trueKey\":true,"+
-                "\"falseKey\":false,"+
-                "\"arrayKey\":[0,1,2],"+
-                "\"objectKey\":{"+
-                    "\"myKey1\":\"myVal1\","+
-                    "\"myKey2\":\"myVal2\","+
-                    "\"myKey3\":\"myVal3\","+
-                    "\"myKey4\":\"myVal4\""+
-                "}"+
-            "}";
-        String diffStr = 
-                "{"+
-                    "\"arrayKey\":[0]"+
-                "}";
-        JSONObject jsonObject = new JSONObject(str);
-        JSONObject otherJsonObject = new JSONObject(str);
-        JSONObject unequalJsonObject = new JSONObject(diffStr);
-        assertTrue("equal JSONObjects should be equal",
-                jsonObject.equals(otherJsonObject));
-        assertTrue("unequal JSONObjects should not be equal",
-                !jsonObject.equals(unequalJsonObject));
-
-        // make sure hashcode returns some interesting value
-        assertTrue("equal JSONObjects should have equal hashCode",
-                jsonObject.hashCode() == otherJsonObject.hashCode());
-        assertTrue("unequal JSONObjects should have unequal hashCode",
-                jsonObject.hashCode() != unequalJsonObject.hashCode());
-    }
-
-    @Test
     public void jsonObjectParsingErrors() {
         int tryCount = 0;
         int exceptionCount = 0;
@@ -869,13 +836,8 @@ public class JSONObjectTest {
     public void equals() {
         String str = "{\"key\":\"value\"}";
         JSONObject aJsonObject = new JSONObject(str);
-        JSONObject bJsonObject = new JSONObject(str);
         assertTrue("Same JSONObject should be equal to itself",
                 aJsonObject.equals(aJsonObject));
-        assertTrue("JSONObjects with equal content should be equal",
-                aJsonObject.equals(bJsonObject));
-        assertTrue("JSONObjects should not be equal to non J",
-                !aJsonObject.equals(new String()));
     }
 }
 
