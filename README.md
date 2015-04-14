@@ -4,7 +4,7 @@ Unit tests to validate the JSON-Java GitHub project code<br>
 https://github.com/douglascrockford/JSON-java<br>
 
 *These tests are a work in progress. Help from interested developers is welcome.*<br>
-More coverage is needed, but more important is to improve the quality of the tests.<br>
+More coverage is needed, but more importantly, improvements to test quality is needed.<br>
 
 Test harness: http://junit.org<br>
 Coverage: http://www.eclemma.org/<br>
