@@ -26,21 +26,29 @@ A unit test is considered complete when the coverage is >= 90% as measured by Ec
 | ------------- | ------------- | ---- |
 | Total coverage | 88.7% | | | 
 | | | | 
-| CDL.java | 94.8% | Completed  |
-| Cookie.java  | 97.5%   | Completed |
-| CookieList.java |96.5% | Completed |
-| HTTP.java | 98.7%| Completed | 
-| HTTPTokener.java |93.2% |Completed  | 
-| JSONArray.java |95.9% | In progress | 
-| JSONException.java | 26.7% | |
-| JSONML.java | 83.2%| Completed | 
-| JSONObject | 90.9% | Completed | 
-| JSONObject.Null | 87.5% | | | 
-| JSONStringer.java | 93.8%| Completed | 
-| JSONTokener.java | 72.1% | | 
-| JSONWriter.java | 88.9% | Completed | 
-| Property.java  | 94.8%  | Completed |
-| XML.java | 85.1% | Completed |
-| XMLTokener.java| 82.7%| Completed | 
+| CDLTest.java | 94.8% | Completed  |
+| CookieTest.java  | 97.5%   | Completed |
+| CookieListTest.java |96.5% | Completed |
+| HTTPTest.java | 98.7%| Completed | 
+| HTTPTokene.java |93.2% |(no test file)  | 
+| JSONArrayTest.java |95.9% | In progress | 
+| JSONException.java | 26.7% | (no test file) |
+| JSONMLTest.java | 83.2%| Completed | 
+| JSONObjectTest | 90.9% | Completed | 
+| JSONObject.Null | 87.5% | (no test file) | 
+| JSONString.java | | (no lines to test)  | 
+| JSONStringerTest.java | 93.8%| Completed | 
+| JSONTokener.java | 72.1% | (no test file) | 
+| JSONWriter.java | 88.9% | (no test file) | 
+| PropertyTest.java  | 94.8%  | Completed |
+| XMLTest.java | 85.1% | Completed |
+| XMLTokener.java| 82.7%| (no test file) | 
+
+|| Files used in test ||
+| JunitTestSuite.java |
+| MyBean.java |
+| StringsResourceBundle.java |
+|TestRUnner.java |
+| Util.java |
 
 
