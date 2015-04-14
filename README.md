@@ -1,6 +1,10 @@
 # JSON-Java-unit-test
 
-Unit tests to validate the JSON-Java GitHub project code (https://github.com/douglascrockford/JSON-java).<br>
+Unit tests to validate the JSON-Java GitHub project code<br>
+https://github.com/douglascrockford/JSON-java<br>
+
+*These tests are a work in progress. Help improving the tests is welcome*
+More coverage is needed, but more important is to improve the quality of the tests.
 
 Test harness: http://junit.org<br>
 Coverage: http://www.eclemma.org/<br>
