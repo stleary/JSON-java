@@ -450,6 +450,18 @@ public class JSONArrayTest {
         JSONArray jsonArray = new JSONArray();
         assertTrue("toJSONObject should return null",
                 null == jsonArray.toJSONObject(names));
-        
+    }
+
+    @Test
+    public void objectArrayVsIsArray() {
+        String expectedStr = 
+            "["+
+                "1,2,3,4,5,6,7"+
+            "]";
+        int[] myInts = { 1, 2, 3, 4, 5, 6, 7 };
+        Object myObject = myInts;
+        JSONArray jsonArray = new JSONArray(myObject);
+        JSONArray expectedJsonArray = new JSONArray(expectedStr);
+        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 }
