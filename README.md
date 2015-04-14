@@ -44,11 +44,12 @@ A unit test is considered complete when the coverage is >= 90% as measured by Ec
 | XMLTest.java | 85.1% | Completed |
 | XMLTokener.java| 82.7%| (no test file) | 
 
-|| Files used in test ||
-| JunitTestSuite.java |
-| MyBean.java |
-| StringsResourceBundle.java |
-|TestRUnner.java |
-| Util.java |
+|| Files used in test || ||
+| ------------- |  |
+| JunitTestSuite.java | |
+| MyBean.java | |
+| StringsResourceBundle.java | |
+|TestRUnner.java | |
+| Util.java | |
 
 
