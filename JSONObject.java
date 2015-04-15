@@ -773,7 +773,7 @@ public class JSONObject {
      */
     public static String numberToString(Number number) throws JSONException {
         if (number == null) {
-            throw new NullPointerException("Number must not be null.");
+            throw new JSONException("Null pointer");
         }
         testValidity(number);
         // Shave off trailing zeros and decimal point, if possible.
