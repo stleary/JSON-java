@@ -1510,7 +1510,7 @@ public class JSONObject {
             return new JSONArray((Collection<Object>) value).toString();
         }
         if (value.getClass().isArray()) {
-            return new JSONArray((Object[]) value).toString();
+            return new JSONArray(value).toString();
         }
         return quote(value.toString());
     }
@@ -1546,7 +1546,7 @@ public class JSONObject {
                 return new JSONArray((Collection<Object>) object);
             }
             if (object.getClass().isArray()) {
-                return new JSONArray((Object[]) object);
+                return new JSONArray(object);
             }
             if (object instanceof Map) {
                 return new JSONObject((Map<String, Object>) object);
@@ -1586,19 +1586,14 @@ public class JSONObject {
             ((JSONObject) value).write(writer, indentFactor, indent);
         } else if (value instanceof JSONArray) {
             ((JSONArray) value).write(writer, indentFactor, indent);
-        }
-        else if (value instanceof Map) {
-            new JSONObject((Map<String, Object>) value).write(writer,
-            		indentFactor, indent);
-        }
-        else if (value instanceof Collection) {
-            new JSONArray((Collection<Object>) value).write(writer,
-            		indentFactor, indent);
-        }
-        else if (value.getClass().isArray()) {
-            new JSONArray((Object[]) value).write(writer, indentFactor, indent);
-        }
-        else if (value instanceof Number) {
+        } else if (value instanceof Map) {
+            new JSONObject((Map<String, Object>) value).write(writer, indentFactor, indent);
+        } else if (value instanceof Collection) {
+            new JSONArray((Collection<Object>) value).write(writer, indentFactor,
+                    indent);
+        } else if (value.getClass().isArray()) {
+            new JSONArray(value).write(writer, indentFactor, indent);
+        } else if (value instanceof Number) {
             writer.write(numberToString((Number) value));
         } else if (value instanceof Boolean) {
             writer.write(value.toString());

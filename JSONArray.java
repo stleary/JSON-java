@@ -27,6 +27,7 @@ package org.json;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -165,10 +166,16 @@ public class JSONArray {
      * @throws JSONException
      *             If not an array.
      */
-    public JSONArray(Object[] array) throws JSONException {
+    public JSONArray(Object array) throws JSONException {
         this();
-        for (int i = 0; i < array.length; i ++) {
-            put(JSONObject.wrap(array[i]));
+        if (array.getClass().isArray()) {
+            int length = Array.getLength(array);
+            for (int i = 0; i < length; i += 1) {
+                this.put(JSONObject.wrap(Array.get(array, i)));
+            }
+        } else {
+            throw new JSONException(
+                    "JSONArray initial value should be a string or collection or array.");
         }
     }
 
@@ -182,10 +189,11 @@ public class JSONArray {
      *             If there is no value for the index.
      */
     public Object get(int index) throws JSONException {
-    	if (index < 0 || index >= this.length()) {
-            throw new JSONException("Index out of bounds.");
-    	}
-    	return myArrayList.get(index);
+        Object object = this.opt(index);
+        if (object == null) {
+            throw new JSONException("JSONArray[" + index + "] not found.");
+        }
+        return object;
     }
 
     /**
