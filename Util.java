@@ -83,4 +83,13 @@ public class Util {
         }
     }
 
+    public static void compareXML(String aXmlStr, String bXmlStr) {
+        // TODO For simple tests this may be adequate, but it won't work for
+        // elements with multiple attributes and possibly other cases as well.
+        // Should use XMLUnit or similar.
+        assertTrue("expected equal XML strings \naXmlStr: "+
+                aXmlStr+ "\nbXmlStr: " +bXmlStr, aXmlStr.equals(bXmlStr));
+        
+    }
+
 }
