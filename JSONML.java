@@ -373,6 +373,8 @@ public class JSONML {
                         sb.append(toString((JSONObject)object));
                     } else if (object instanceof JSONArray) {
                         sb.append(toString((JSONArray)object));
+                    } else {
+                        sb.append(object.toString());
                     }
                 }
             } while (i < length);
