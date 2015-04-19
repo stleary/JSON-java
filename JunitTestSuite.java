@@ -12,7 +12,8 @@ import org.junit.runners.Suite;
    JSONMLTest.class,
    HTTPTest.class,
    JSONStringerTest.class,
-   JSONObjectTest.class
+   JSONObjectTest.class,
+   JSONArrayTest.class
 })
 public class JunitTestSuite {   
 }  
