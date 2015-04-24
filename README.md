@@ -33,6 +33,8 @@ A unit test has the following stages:
 | Coverage > 90% |
 | Reasonable test cases |
 | Checked against previous unit tests |
+| Completed |
+
 
 | Test file name  | Coverage | Comments |
 | ------------- | ------------- | ---- |
