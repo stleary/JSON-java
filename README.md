@@ -30,22 +30,22 @@ A unit test is considered complete when the coverage is >= 90% as measured by Ec
 | ------------- | ------------- | ---- |
 | Total coverage | 88.6% | | | 
 | | | | 
-| CDLTest.java | 98% | Completed  |
-| CookieTest.java  | 97.5%   | Completed |
-| CookieListTest.java |96.5% | Completed |
-| HTTPTest.java | 98.7%| Completed | 
-| HTTPTokene.java |93.2% |(no test file)  | 
-| JSONArrayTest.java |95.9% | Completed | 
+| CDLTest.java | 98% | basic coverage completed. Reasonable testing completed.  |
+| CookieTest.java  | 97.5%   | basic coverage completed |
+| CookieListTest.java |96.5% | basic coverage completed |
+| HTTPTest.java | 98.7%| basic coverage completed | 
+| HTTPTokener.java |93.2% |(no test file)  | 
+| JSONArrayTest.java |95.9% | basic coverage completed | 
 | JSONException.java | 26.7% | (no test file) |
-| JSONMLTest.java | 83.2%| Completed | 
-| JSONObjectTest | 90.9% | Completed | 
+| JSONMLTest.java | 83.2%| working on basic coverage | 
+| JSONObjectTest | 90.9% | basic coverage completed | 
 | JSONObject.Null | 87.5% | (no test file) | 
 | JSONString.java | | (no lines to test)  | 
-| JSONStringerTest.java | 93.8%| Completed | 
+| JSONStringerTest.java | 93.8%| basic coverage completed | 
 | JSONTokenerTest.java | 72.1% | In progress | 
 | JSONWriter.java | 88.9% | (no test file) | 
-| PropertyTest.java  | 94.8%  | Completed |
-| XMLTest.java | 85.1% | Completed |
+| PropertyTest.java  | 94.8%  | basic coverage completed |
+| XMLTest.java | 85.1% | working on basic coverage |
 | XMLTokener.java| 82.7%| (no test file) | 
 
 | Files used in test |
@@ -53,7 +53,7 @@ A unit test is considered complete when the coverage is >= 90% as measured by Ec
 | JunitTestSuite.java | 
 | MyBean.java | 
 | StringsResourceBundle.java | 
-|TestRUnner.java | 
+|TestRunner.java | 
 | Util.java | 
 
 
