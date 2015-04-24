@@ -26,11 +26,13 @@ When you start working on a test, add the empty file to the repository and updat
 
 A unit test has the following stages:
 
-|No test|
-|In progress|
-|Coverage > 90%|
-|Reasonable test cases|
-|Checked against previous unit tests|
+| Test phase |
+|----|
+| No test |
+| In progress |
+| Coverage > 90% |
+| Reasonable test cases |
+| Checked against previous unit tests |
 
 | Test file name  | Coverage | Comments |
 | ------------- | ------------- | ---- |
