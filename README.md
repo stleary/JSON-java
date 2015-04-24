@@ -24,29 +24,34 @@ The fundamental issues with JSON-Java testing are:
 
 When you start working on a test, add the empty file to the repository and update the readme, so that others will know that test is taken.
 
-A unit test is considered complete when the coverage is >= 90% as measured by EclEmma.
+A unit test has the following stages:
+|No test|
+|In progress|
+|Coverage > 90%|
+|Reasonable test cases|
+|Checked against previous unit tests|
 
 | Test file name  | Coverage | Comments |
 | ------------- | ------------- | ---- |
 | Total coverage | 88.6% | | | 
 | | | | 
-| CDLTest.java | 98% | basic coverage completed. Reasonable testing completed.  |
-| CookieTest.java  | 97.5%   | basic coverage completed |
-| CookieListTest.java |96.5% | basic coverage completed |
-| HTTPTest.java | 98.7%| basic coverage completed | 
-| HTTPTokener.java |93.2% |(no test file)  | 
-| JSONArrayTest.java |95.9% | basic coverage completed | 
-| JSONException.java | 26.7% | (no test file) |
-| JSONMLTest.java | 83.2%| working on basic coverage | 
-| JSONObjectTest | 90.9% | basic coverage completed | 
-| JSONObject.Null | 87.5% | (no test file) | 
-| JSONString.java | | (no lines to test)  | 
-| JSONStringerTest.java | 93.8%| basic coverage completed | 
+| CDLTest.java | 98% | Reasonable test cases.  |
+| CookieTest.java  | 97.5%   | Coverage > 90% |
+| CookieListTest.java |96.5% | Coverage > 90% |
+| HTTPTest.java | 98.7%| Coverage > 90% | 
+| HTTPTokener.java |93.2% | No test   | 
+| JSONArrayTest.java |95.9% | Coverage > 90% | 
+| JSONException.java | 26.7% | No test |
+| JSONMLTest.java | 83.2%| In progress | 
+| JSONObjectTest | 90.9% | Coverage > 90% | 
+| JSONObject.Null | 87.5% | No test  | 
+| JSONString.java | | No test  | 
+| JSONStringerTest.java | 93.8%| Coverage > 90% | 
 | JSONTokenerTest.java | 72.1% | In progress | 
-| JSONWriter.java | 88.9% | (no test file) | 
-| PropertyTest.java  | 94.8%  | basic coverage completed |
-| XMLTest.java | 85.1% | working on basic coverage |
-| XMLTokener.java| 82.7%| (no test file) | 
+| JSONWriter.java | 88.9% | No test | 
+| PropertyTest.java  | 94.8%  | Coverage > 90% |
+| XMLTest.java | 85.1% | In progress |
+| XMLTokener.java| 82.7%| No test  | 
 
 | Files used in test |
 | ------------- |  
