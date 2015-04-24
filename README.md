@@ -25,6 +25,7 @@ The fundamental issues with JSON-Java testing are:
 When you start working on a test, add the empty file to the repository and update the readme, so that others will know that test is taken.
 
 A unit test has the following stages:
+
 |No test|
 |In progress|
 |Coverage > 90%|
