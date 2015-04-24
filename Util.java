@@ -64,6 +64,20 @@ public class Util {
             compareActualVsExpectedJsonArrays(
                     jsonArray, expectedJsonArray);
         } else {
+            /**
+             * Certain helper classes (e.g. XML) may create Long instead of
+             * Integer for small int values. As long as both are Numbers,
+             * just compare the toString() values.
+             */
+            if (!(value instanceof Number && expectedValue instanceof Number)) {
+                assertTrue("object types should be equal for actual: "+
+                    value.toString()+" ("+
+                    value.getClass().toString()+") expected: "+
+                    expectedValue.toString()+" ("+
+                    expectedValue.getClass().toString()+")",
+                    value.getClass().toString().equals(
+                            expectedValue.getClass().toString()));
+            }
             assertTrue("string values should be equal for actual: "+
                 value.toString()+" expected: "+expectedValue.toString(),
                 value.toString().equals(expectedValue.toString()));
@@ -81,6 +95,15 @@ public class Util {
                     lNames.contains(expectedName));
             lNames.remove(expectedName);
         }
+    }
+
+    public static void compareXML(String aXmlStr, String bXmlStr) {
+        // TODO For simple tests this may be adequate, but it won't work for
+        // elements with multiple attributes and possibly other cases as well.
+        // Should use XMLUnit or similar.
+        assertTrue("expected equal XML strings \naXmlStr: "+
+                aXmlStr+ "\nbXmlStr: " +bXmlStr, aXmlStr.equals(bXmlStr));
+        
     }
 
 }
