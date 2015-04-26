@@ -40,22 +40,22 @@ A unit test has the following stages:
 | ------------- | ------------- | ---- |
 | Total coverage | 88.6% | | | 
 | | | | 
-| CDLTest.java | 98% | Reasonable test cases.  |
-| CookieTest.java  | 97.5%   | Coverage > 90% |
-| CookieListTest.java |96.5% | Coverage > 90% |
-| HTTPTest.java | 98.7%| Coverage > 90% | 
+| CDL.java | 98% | Reasonable test cases.  |
+| Cookie.java  | 98.9%   | Reasonable test cases. |
+| CookieList.java |96.5% | Coverage > 90% |
+| HTTP.java | 98.7%| Coverage > 90% | 
 | HTTPTokener.java |93.2% | No test   | 
-| JSONArrayTest.java |95.9% | Coverage > 90% | 
+| JSONArray.java |95.9% | Coverage > 90% | 
 | JSONException.java | 26.7% | No test |
-| JSONMLTest.java | 83.2%| In progress | 
-| JSONObjectTest | 90.9% | Coverage > 90% | 
+| JSONML.java | 83.2%| In progress | 
+| JSONObject | 90.9% | Coverage > 90% | 
 | JSONObject.Null | 87.5% | No test  | 
 | JSONString.java | | No test  | 
-| JSONStringerTest.java | 93.8%| Coverage > 90% | 
-| JSONTokenerTest.java | 72.1% | In progress | 
+| JSONStringer.java | 93.8%| Coverage > 90% | 
+| JSONTokener.java | 72.1% | In progress | 
 | JSONWriter.java | 88.9% | No test | 
-| PropertyTest.java  | 94.8%  | Coverage > 90% |
-| XMLTest.java | 85.1% | In progress |
+| Property.java  | 94.8%  | Coverage > 90% |
+| XML.java | 85.1% | In progress |
 | XMLTokener.java| 82.7%| No test  | 
 
 | Files used in test |
