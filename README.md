@@ -26,14 +26,14 @@ When you start working on a test, add the empty file to the repository and updat
 
 A unit test has the following stages:
 
-| Test phase |
-|----|
-| No test |
-| In progress |
-| Coverage > 90% |
-| Reasonable test cases |
-| Checked against previous unit tests |
-| Completed |
+| Test phase |Description |
+|----|----|
+| No test | No test specifically for this class has been written, or the class contains no executable code. |
+| In progress | Unit tests have been started for this class. |
+| Coverage > 90% | Initial goal of 90% coverage has been reached. Test quality may be questionable |
+| Reasonable test cases | 90% coverage. Functionality and behavior has been confirmed |
+| Checked against previous unit tests | Historical unit tests have been checked in case something important was missed |
+| Completed | The unit test is completed |
 
 
 | Test file name  | Coverage | Comments |
