@@ -7,23 +7,37 @@ import static org.junit.Assert.*;
 import org.json.*;
 import org.junit.Test;
 
-
 /**
- * Tests for JSON-Java CookieList.java
- * The main differences between Cookie and CookieList appears to be that 
- * CookieList does not treat the initial name/value pair different than
- * the other segments, and does not handle "secure".
- * Therefore the tests will be similar, but not identical.
+ * HTTP cookie specification: RFC6265
+ * 
+ * A cookie list is a JSONObject whose members are cookie name/value pairs.
+ * Entries are unescaped while being added, and escaped in the toString()
+ * method. Unescaping means to convert %hh hex strings to the ascii equivalent
+ * and converting '+' to ' '. Escaping converts '+', '%', '=', ';',
+ * and ascii control chars to %hh hex strings.
+ *
+ * CookieList should not be considered as just a list of Cookie objects:
+ * - CookieList stores a cookie name/value pair as a single entry; Cookie stores 
+ *      it as 2 entries.
+ * - CookieList expects multiple name/value pairs as input; Cookie allows the
+ *      'secure' name with no associated value
  */
 public class CookieListTest {
+
     @Test(expected=NullPointerException.class)
     public void nullCookieListException() {
+        /**
+         * Attempts to create a CookieList from a null string
+         */
         String cookieStr = null;
         CookieList.toJSONObject(cookieStr);
     }
 
     @Test(expected=JSONException.class)
     public void malFormedCookieListException() {
+        /**
+         * Attempts to create a CookieList from a malformed string
+         */
         String cookieStr = "thisCookieHasNoEqualsChar";
         CookieList.toJSONObject(cookieStr);
     }
@@ -31,6 +45,7 @@ public class CookieListTest {
     @Test(expected=JSONException.class)
     public void emptyStringCookieList() {
         /**
+         * Creates a CookieList from an empty string.
          * Cookie throws an exception, but CookieList does not
          */
         String cookieStr = "";
@@ -42,6 +57,9 @@ public class CookieListTest {
 
     @Test
     public void simpleCookieList() {
+        /**
+         * The simplest cookie is a name/value pair with no delimiter
+         */
         String cookieStr = "SID=31d4d96e407aad42";
         String expectedCookieStr = "{\"SID\":\"31d4d96e407aad42\"}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
