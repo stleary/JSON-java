@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JSON-Java" default="jar" basedir=".">
+	<description>
+		Build script for the JSON library for Java
+	</description>
+
+	<property name="sources" value="src" />
+	<property name="classes" value="classes"/>
+	<property name="jar.file" value="json.jar"/>
+
+	<target name="compile">
+		<mkdir dir="${classes}"/>
+
+		<javac
+            includeantruntime="false"
+            srcdir="${sources}"
+            destdir="${classes}"
+            verbose="no"
+            encoding="utf-8"
+			source="1.7"
+			target="1.7"
+		/>		
+	</target>
+	
+	<target name="jar" depends="compile">
+		<delete file="${jar.file}"/>
+		<jar jarfile="${jar.file}">
+			<fileset dir="${classes}"/>
+		</jar>
+	</target>
+
+
+	<target name="clean">
+		<delete dir="${classes}"/>
+		<delete file="${jar.file}"/>
+	</target>
+</project>
