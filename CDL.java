@@ -26,7 +26,7 @@ SOFTWARE.
 
 /**
  * This provides static methods to convert comma delimited text into a
- * JSONArray, and to covert a JSONArray into comma delimited text. Comma
+ * JSONArray, and to convert a JSONArray into comma delimited text. Comma
  * delimited text is a very popular format for data interchange. It is
  * understood by most database, spreadsheet, and organizer programs.
  * <p>
@@ -41,7 +41,7 @@ SOFTWARE.
  * The names for the elements in the JSONObjects can be taken from the names
  * in the first row.
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2015-05-01
  */
 public class CDL {
 
