@@ -1512,13 +1512,13 @@ public class JSONObject {
             return value.toString();
         }
         if (value instanceof Map) {
-        	@SuppressWarnings("unchecked")
-        	Map<String, Object> map = (Map<String, Object>) value;
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) value;
             return new JSONObject(map).toString();
         }
         if (value instanceof Collection) {
-        	@SuppressWarnings("unchecked")
-        	Collection<Object> coll = (Collection<Object>) value;
+            @SuppressWarnings("unchecked")
+            Collection<Object> coll = (Collection<Object>) value;
             return new JSONArray(coll).toString();
         }
         if (value.getClass().isArray()) {
@@ -1555,16 +1555,16 @@ public class JSONObject {
             }
 
             if (object instanceof Collection) {
-            	@SuppressWarnings("unchecked")
-            	Collection<Object> coll = (Collection<Object>) object;
+                @SuppressWarnings("unchecked")
+                Collection<Object> coll = (Collection<Object>) object;
                 return new JSONArray(coll);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);
             }
             if (object instanceof Map) {
-            	@SuppressWarnings("unchecked")
-            	Map<String, Object> map = (Map<String, Object>) object;
+                @SuppressWarnings("unchecked")
+                Map<String, Object> map = (Map<String, Object>) object;
                 return new JSONObject(map);
             }
             Package objectPackage = object.getClass().getPackage();
@@ -1603,12 +1603,12 @@ public class JSONObject {
         } else if (value instanceof JSONArray) {
             ((JSONArray) value).write(writer, indentFactor, indent);
         } else if (value instanceof Map) {
-        	@SuppressWarnings("unchecked")
-        	Map<String, Object> map = (Map<String, Object>) value;
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) value;
             new JSONObject(map).write(writer, indentFactor, indent);
         } else if (value instanceof Collection) {
-        	@SuppressWarnings("unchecked")
-        	Collection<Object> coll = (Collection<Object>) value;
+            @SuppressWarnings("unchecked")
+            Collection<Object> coll = (Collection<Object>) value;
             new JSONArray(coll).write(writer, indentFactor,
                     indent);
         } else if (value.getClass().isArray()) {
