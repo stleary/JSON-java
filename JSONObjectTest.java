@@ -553,6 +553,62 @@ public class JSONObjectTest {
     }
 
     @Test
+    public void jsonObjectToStringSuppressWarningOnCastToMap() {
+        JSONObject jsonObject = new JSONObject();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("abc", "def");
+        jsonObject.put("key", map);
+        String toStr = jsonObject.toString();
+        JSONObject expectedJsonObject = new JSONObject(toStr);
+        assertTrue("keys should be equal",
+                jsonObject.keySet().iterator().next().equals(
+                expectedJsonObject.keySet().iterator().next()));
+        /**
+         * Can't do a Util compare because although they look the same
+         * in the debugger, one is a map and the other is a JSONObject.  
+         */
+        // TODO: fix warnings
+        map = (Map)jsonObject.get("key");
+        JSONObject mapJsonObject = expectedJsonObject.getJSONObject("key");
+        assertTrue("value size should be equal",
+                map.size() == mapJsonObject.length() && map.size() == 1);
+        assertTrue("keys should be equal for key: "+map.keySet().iterator().next(),
+                mapJsonObject.keys().next().equals(map.keySet().iterator().next()));
+        assertTrue("values should be equal for key: "+map.keySet().iterator().next(),
+                mapJsonObject.get(mapJsonObject.keys().next()).toString().equals(
+                        map.get(map.keySet().iterator().next())));
+    }
+
+    @Test
+    public void jsonObjectToStringSuppressWarningOnCastToCollection() {
+        JSONObject jsonObject = new JSONObject();
+        Collection<String> collection = new ArrayList<String>();
+        collection.add("abc");
+        // ArrayList will be added as an object
+        jsonObject.put("key", collection);
+        String toStr = jsonObject.toString();
+        // [abc] will be added as a JSONArray
+        JSONObject expectedJsonObject = new JSONObject(toStr);
+        /**
+         * Can't do a Util compare because although they look the same
+         * in the debugger, one is a collection and the other is a JSONArray.  
+         */
+        assertTrue("keys should be equal",
+                jsonObject.keySet().iterator().next().equals(
+                expectedJsonObject.keySet().iterator().next()));
+        // TODO: fix warnings
+        collection = (Collection)jsonObject.get("key");
+        JSONArray jsonArray = expectedJsonObject.getJSONArray("key");
+        assertTrue("value size should be equal",
+                collection.size() == jsonArray.length());
+        Iterator it = collection.iterator();
+        for (int i = 0; i < collection.size(); ++i) {
+            assertTrue("items should be equal for index: "+i,
+                    jsonArray.get(i).toString().equals(it.next().toString()));
+        }
+    }
+
+    @Test
     public void valueToString() {
         
         assertTrue("null valueToString() incorrect",
