@@ -16,11 +16,29 @@ class MyJsonString implements JSONString {
     }
 }
 
+/**
+ * JSONObject, along with JSONArray, are the central classes of the reference app.
+ * All of the other classes interact with it and JSON functionality would be
+ * impossible without it.
+ */
 public class JSONObjectTest {
 
+    @Test
+    public void emptyJsonObject() {
+        /**
+         * A JSONObject can be created with no content
+         */
+        JSONObject jsonObject = new JSONObject();
+        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+    }
 
     @Test
     public void jsonObjectByNames() {
+        /**
+         * A JSONObject can be created from another JSONObject plus a list of names.
+         * In this test, some of the starting JSONObject keys are not in the 
+         * names list.
+         */
         String str = 
             "{"+
                 "\"trueKey\":true,"+
@@ -45,8 +63,30 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(copyJsonObject, expectedJsonObject);
     }
 
+    /**
+     * the JSONObject(JsonTokener) ctor is not tested directly since it already
+     * has full coverage from other tests.
+     */
+
+    @Test
+    public void jsonObjectByNullMap() {
+        /**
+         * JSONObjects can be built from a Map<String, Object>. 
+         * In this test the map is null.
+         */
+        Map<String, Object> map = null;
+        JSONObject jsonObject = new JSONObject(map);
+        JSONObject expectedJsonObject = new JSONObject();
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
+    }
+
     @Test
     public void jsonObjectByMap() {
+        /**
+         * JSONObjects can be built from a Map<String, Object>. 
+         * In this test all of the map entries are valid JSON types.
+         * TODO: test with map values that are not valid JSON types 
+         */
         String expectedStr = 
             "{"+
                 "\"trueKey\":true,"+
@@ -70,7 +110,51 @@ public class JSONObjectTest {
     }
 
     @Test
+    public void jsonObjectByMapWithNullValue() {
+        /**
+         * JSONObjects can be built from a Map<String, Object>. 
+         * In this test one of the map values is null 
+         */
+        String expectedStr = 
+            "{"+
+                "\"trueKey\":true,"+
+                "\"falseKey\":false,"+
+                "\"stringKey\":\"hello world!\","+
+                "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
+                "\"intKey\":42,"+
+                "\"doubleKey\":-23.45e67"+
+            "}";
+        Map<String, Object> jsonMap = new HashMap<String, Object>();
+        jsonMap.put("trueKey", new Boolean(true));
+        jsonMap.put("falseKey", new Boolean(false));
+        jsonMap.put("stringKey", "hello world!");
+        jsonMap.put("nullKey",  null);
+        jsonMap.put("complexStringKey", "h\be\tllo w\u1234orld!");
+        jsonMap.put("intKey", new Long(42));
+        jsonMap.put("doubleKey", new Double(-23.45e67));
+
+        JSONObject jsonObject = new JSONObject(jsonMap);
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void jsonObjectByNullBean() {
+        /**
+         * JSONObject built from a bean, but only using a null value.
+         * Nothing good is expected to happen.
+         */
+        MyBean myBean = null;
+        new JSONObject(myBean);
+    }
+
+    @Test
     public void jsonObjectByBean() {
+        /**
+         * JSONObject built from a bean. In this case all of the 
+         * bean properties are valid JSON types
+         * TODO: test with bean fields that are not valid JSON types 
+         */
         String expectedStr = 
             "{"+
                 "\"trueKey\":true,"+
@@ -87,19 +171,27 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void jsonObjectByBeanAndNames() {
+    public void jsonObjectByObjectAndNames() {
+        /**
+         * A bean is also an object. But in order to test the JSONObject
+         * ctor that takes an object and a list of names, 
+         * this particular bean needs some public
+         * data members, which have been added to the class.
+         */
         String expectedStr = 
             "{"+
-                "\"trueKey\":true,"+
-                "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
-                "\"doubleKey\":-23.45e7"+
+                "\"publicStr\":\"abc\","+
+                "\"publicInt\":42"+
             "}";
-        String[] keys = {"trueKey", "complexStringKey", "doubleKey"};
+        String[] keys = {"publicStr", "publicInt"};
+
         MyBean myBean = new MyBean();
         JSONObject jsonObject = new JSONObject(myBean, keys);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
+
+    // this is where I left off
 
     @Test
     public void jsonObjectByResourceBundle() {
@@ -394,9 +486,13 @@ public class JSONObjectTest {
 
     @Test
     public void objectNames() {
+        /**
+         * A bean is also an object. But in order to test the static
+         * method getNames(), this particular bean needs some public
+         * data members, which have been added to the class.
+         */
         MyBean myBean = new MyBean();
-        String [] expectedNames = {"intKey", "doubleKey", "stringKey", 
-                "complexStringKey", "trueKey", "falseKey"};
+        String [] expectedNames = {"publicStr", "publicInt"};
         String [] names = JSONObject.getNames(myBean);
         Util.compareActualVsExpectedStringArrays(names, expectedNames);
     }
