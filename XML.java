@@ -376,7 +376,7 @@ public class XML {
      * @return A string.
      * @throws JSONException
      */
-    public static String toString(Object object, String tagName)
+    public static String toString(Object object, String originalTagName)
             throws JSONException {
         StringBuilder       sb = new StringBuilder();
         int                 i;
@@ -387,11 +387,20 @@ public class XML {
         int                 length;
         String              string;
         Object              value;
+        String              tagName;
+                
+        tagName = originalTagName;
+        if (tagName != null)
+        {
+            //replace leading digits with n_
+           tagName = tagName.replaceFirst("^(\\d)", "n_$1"); 
+        }
+        
         if (object instanceof JSONObject) {
 
 // Emit <tagName>
 
-            if (tagName != null) {
+            if (tagName != null) {                
                 sb.append('<');
                 sb.append(tagName);
                 sb.append('>');
