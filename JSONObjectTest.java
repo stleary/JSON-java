@@ -85,7 +85,6 @@ public class JSONObjectTest {
         /**
          * JSONObjects can be built from a Map<String, Object>. 
          * In this test all of the map entries are valid JSON types.
-         * TODO: test with map values that are not valid JSON types 
          */
         String expectedStr = 
             "{"+
@@ -103,6 +102,28 @@ public class JSONObjectTest {
         jsonMap.put("complexStringKey", "h\be\tllo w\u1234orld!");
         jsonMap.put("intKey", new Long(42));
         jsonMap.put("doubleKey", new Double(-23.45e67));
+
+        JSONObject jsonObject = new JSONObject(jsonMap);
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
+    }
+
+    @Test
+    public void jsonObjectByMapWithUnsupportedValues() {
+        /**
+         * JSONObjects can be built from a Map<String, Object>. 
+         * In this test the map entries are not valid JSON types.
+         * The actual conversion is kind of interesting.
+         */
+        String expectedStr = 
+            "{"+
+                "\"key1\":{},"+
+                "\"key2\":\"java.lang.Exception\""+
+            "}";
+        Map<String, Object> jsonMap = new HashMap<String, Object>();
+        // Just insert some random objects
+        jsonMap.put("key1", new CDL());
+        jsonMap.put("key2", new Exception());
 
         JSONObject jsonObject = new JSONObject(jsonMap);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
@@ -151,9 +172,8 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectByBean() {
         /**
-         * JSONObject built from a bean. In this case all of the 
-         * bean properties are valid JSON types
-         * TODO: test with bean fields that are not valid JSON types 
+         * JSONObject built from a bean. In this case all but one of the 
+         * bean getters return valid JSON types
          */
         String expectedStr = 
             "{"+
@@ -162,7 +182,8 @@ public class JSONObjectTest {
                 "\"stringKey\":\"hello world!\","+
                 "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
                 "\"intKey\":42,"+
-                "\"doubleKey\":-23.45e7"+
+                "\"doubleKey\":-23.45e7,"+
+                "\"stringReaderKey\":{}"+
             "}";
         MyBean myBean = new MyBean();
         JSONObject jsonObject = new JSONObject(myBean);
