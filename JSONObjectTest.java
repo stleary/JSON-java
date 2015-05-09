@@ -1,6 +1,7 @@
 package org.json.junit;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.*;
 import java.util.*;
@@ -8,13 +9,26 @@ import java.util.*;
 import org.json.*;
 import org.junit.*;
 
+/**
+ * These classes will be used for testing
+ */
 class MyJsonString implements JSONString {
 
     @Override
     public String toJSONString() {
         return "my string";
     }
-}
+};
+
+interface MyBean {
+    public Integer getIntKey();
+    public Double getDoubleKey();
+    public String getStringKey();
+    public String getEscapeStringKey();
+    public Boolean isTrueKey();
+    public Boolean isFalseKey();
+    public StringReader getStringReaderKey();
+};
 
 /**
  * JSONObject, along with JSONArray, are the central classes of the reference app.
@@ -22,6 +36,13 @@ class MyJsonString implements JSONString {
  * impossible without it.
  */
 public class JSONObjectTest {
+    /**
+     * Need a class with some public data members for testing, so
+     * JSONObjectTest is chosen.
+     */
+    public Integer publicInt = 42;
+    public String publicString = "abc";
+
 
     @Test
     public void emptyJsonObject() {
@@ -45,7 +66,7 @@ public class JSONObjectTest {
                 "\"falseKey\":false,"+
                 "\"nullKey\":null,"+
                 "\"stringKey\":\"hello world!\","+
-                "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
+                "\"escapeStringKey\":\"h\be\tllo w\u1234orld!\","+
                 "\"intKey\":42,"+
                 "\"doubleKey\":-23.45e67"+
             "}";
@@ -91,7 +112,7 @@ public class JSONObjectTest {
                 "\"trueKey\":true,"+
                 "\"falseKey\":false,"+
                 "\"stringKey\":\"hello world!\","+
-                "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
+                "\"escapeStringKey\":\"h\be\tllo w\u1234orld!\","+
                 "\"intKey\":42,"+
                 "\"doubleKey\":-23.45e67"+
             "}";
@@ -99,7 +120,7 @@ public class JSONObjectTest {
         jsonMap.put("trueKey", new Boolean(true));
         jsonMap.put("falseKey", new Boolean(false));
         jsonMap.put("stringKey", "hello world!");
-        jsonMap.put("complexStringKey", "h\be\tllo w\u1234orld!");
+        jsonMap.put("escapeStringKey", "h\be\tllo w\u1234orld!");
         jsonMap.put("intKey", new Long(42));
         jsonMap.put("doubleKey", new Double(-23.45e67));
 
@@ -141,7 +162,7 @@ public class JSONObjectTest {
                 "\"trueKey\":true,"+
                 "\"falseKey\":false,"+
                 "\"stringKey\":\"hello world!\","+
-                "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
+                "\"escapeStringKey\":\"h\be\tllo w\u1234orld!\","+
                 "\"intKey\":42,"+
                 "\"doubleKey\":-23.45e67"+
             "}";
@@ -150,7 +171,7 @@ public class JSONObjectTest {
         jsonMap.put("falseKey", new Boolean(false));
         jsonMap.put("stringKey", "hello world!");
         jsonMap.put("nullKey",  null);
-        jsonMap.put("complexStringKey", "h\be\tllo w\u1234orld!");
+        jsonMap.put("escapeStringKey", "h\be\tllo w\u1234orld!");
         jsonMap.put("intKey", new Long(42));
         jsonMap.put("doubleKey", new Double(-23.45e67));
 
@@ -180,12 +201,37 @@ public class JSONObjectTest {
                 "\"trueKey\":true,"+
                 "\"falseKey\":false,"+
                 "\"stringKey\":\"hello world!\","+
-                "\"complexStringKey\":\"h\be\tllo w\u1234orld!\","+
+                "\"escapeStringKey\":\"h\be\tllo w\u1234orld!\","+
                 "\"intKey\":42,"+
                 "\"doubleKey\":-23.45e7,"+
-                "\"stringReaderKey\":{}"+
+                "\"stringReaderKey\":{},"+
+                "\"callbacks\":[{\"handler\":{}},{}]"+ // sorry, mockito artifact
             "}";
-        MyBean myBean = new MyBean();
+
+        /**
+         * Default access classes have to be mocked since JSONObject, which is
+         * not in the same package, cannot call MyBean methods by reflection.
+         */
+        MyBean myBean = mock(MyBean.class);
+        when(myBean.getDoubleKey()).thenReturn(-23.45e7);
+        when(myBean.getIntKey()).thenReturn(42);
+        when(myBean.getStringKey()).thenReturn("hello world!");
+        when(myBean.getEscapeStringKey()).thenReturn("h\be\tllo w\u1234orld!");
+        when(myBean.isTrueKey()).thenReturn(true);
+        when(myBean.isFalseKey()).thenReturn(false);
+        when(myBean.getStringReaderKey()).thenReturn(
+            new StringReader("") {
+                /**
+                 * TODO: Need to understand why returning a string
+                 * turns "this" into an empty JSONObject,
+                 * but not overriding turns "this" into a string.
+                 */
+                @Override
+                public String toString(){
+                    return "Whatever";
+                }
+            });
+
         JSONObject jsonObject = new JSONObject(myBean);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
@@ -201,21 +247,20 @@ public class JSONObjectTest {
          */
         String expectedStr = 
             "{"+
-                "\"publicStr\":\"abc\","+
+                "\"publicString\":\"abc\","+
                 "\"publicInt\":42"+
             "}";
-        String[] keys = {"publicStr", "publicInt"};
-
-        MyBean myBean = new MyBean();
-        JSONObject jsonObject = new JSONObject(myBean, keys);
+        String[] keys = {"publicString", "publicInt"};
+        // just need a class that has public data members
+        JSONObjectTest jsonObjectTest = new JSONObjectTest();
+        JSONObject jsonObject = new JSONObject(jsonObjectTest, keys);
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
-    // this is where I left off
-
     @Test
     public void jsonObjectByResourceBundle() {
+        // TODO: how to improve resource bundle testing?
         String expectedStr = 
             "{"+
                 "\"greetings\": {"+
@@ -236,6 +281,7 @@ public class JSONObjectTest {
 
     @Test
     public void jsonObjectAccumulate() {
+        // TODO: should include an unsupported object
         String expectedStr = 
             "{"+
                 "\"myArray\": ["+
@@ -260,6 +306,7 @@ public class JSONObjectTest {
 
     @Test
     public void jsonObjectAppend() {
+        // TODO: should include an unsupported object
         String expectedStr = 
             "{"+
                 "\"myArray\": ["+
@@ -284,8 +331,9 @@ public class JSONObjectTest {
 
     @Test
     public void jsonObjectDoubleToString() {
-        String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68" };
-        Double [] doubles = { 1.0, 00001.00000, -23.4, -23.45e67 }; 
+        String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68", "null", "null" };
+        Double [] doubles = { 1.0, 00001.00000, -23.4, -23.45e67, 
+                Double.NaN, Double.NEGATIVE_INFINITY }; 
         for (int i = 0; i < expectedStrs.length; ++i) {
             String actualStr = JSONObject.doubleToString(doubles[i]);
             assertTrue("value expected ["+expectedStrs[i]+
@@ -367,6 +415,8 @@ public class JSONObjectTest {
         assertTrue("objectKey should be JSONObject", 
                 jsonObjectInner.get("myKey").equals("myVal"));
     }
+
+    // improving unit tests left off here
 
     @Test
     public void jsonObjectNonAndWrongValues() {
@@ -480,6 +530,13 @@ public class JSONObjectTest {
     }
 
     @Test
+    public void emptyJsonObjectNamesToJsonAray() {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = jsonObject.names();
+        assertTrue("jsonArray should be null", jsonArray == null);
+    }
+
+    @Test
     public void jsonObjectNamesToJsonAray() {
         String str = 
             "{"+
@@ -512,9 +569,9 @@ public class JSONObjectTest {
          * method getNames(), this particular bean needs some public
          * data members, which have been added to the class.
          */
-        MyBean myBean = new MyBean();
-        String [] expectedNames = {"publicStr", "publicInt"};
-        String [] names = JSONObject.getNames(myBean);
+        JSONObjectTest jsonObjectTest = new JSONObjectTest();
+        String [] expectedNames = {"publicString", "publicInt"};
+        String [] names = JSONObject.getNames(jsonObjectTest);
         Util.compareActualVsExpectedStringArrays(names, expectedNames);
     }
 
@@ -530,6 +587,8 @@ public class JSONObjectTest {
             "\"keyInt\":3,"+
             "\"keyLong\":9999999993,"+
             "\"keyDouble\":3.1,"+
+            // TODO: not sure if this will work on other platforms
+            "\"keyFloat\":3.0999999046325684,"+
         "}";
         JSONObject jsonObject = new JSONObject(str);
         jsonObject.increment("keyInt");
@@ -539,8 +598,18 @@ public class JSONObjectTest {
         jsonObject.increment("keyInt");
         jsonObject.increment("keyLong");
         jsonObject.increment("keyDouble");
+        jsonObject.put("keyFloat", new Float(1.1));
+        jsonObject.increment("keyFloat");
+        jsonObject.increment("keyFloat");
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
+    }
+
+    @Test
+    public void emptyJsonObjectNamesToArray() {
+        JSONObject jsonObject = new JSONObject();
+        String [] names = JSONObject.getNames(jsonObject);
+        assertTrue("names should be null", names == null);
     }
 
     @Test
@@ -906,6 +975,13 @@ public class JSONObjectTest {
     }
 
     @Test
+    public void jsonObjectPutOnceNull() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.putOnce(null, null);
+        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+    }
+
+    @Test
     public void jsonObjectOptDefault() {
 
         String str = "{\"myKey\": \"myval\"}";
@@ -1013,4 +1089,5 @@ public class JSONObjectTest {
                 aJsonObject.equals(aJsonObject));
     }
 }
+
 
