@@ -6,8 +6,10 @@ https://github.com/douglascrockford/JSON-java<br>
 *These tests are a work in progress. Help from interested developers is welcome.*<br>
 More coverage is needed, but more importantly, improvements to test quality is needed.<br>
 
+You will need the following libraries for testing:
 Test harness: http://junit.org<br>
 Coverage: http://www.eclemma.org/<br>
+Mockery: https://github.com/mockito/mockito 
 
 Eclipse is the recommended development environment.
 Run individual tests or <b>JunitTestSuite</b> using *EclEmma Coverage*, or execute the <b>TestRunner<b> application directly.<br>
