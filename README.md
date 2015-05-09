@@ -69,7 +69,6 @@ A unit test has the following stages:
 | Files used in test |
 | ------------- |  
 | JunitTestSuite.java | 
-| MyBean.java | 
 | StringsResourceBundle.java | 
 |TestRunner.java | 
 | Util.java | 
