@@ -2,10 +2,10 @@ package org.json.junit;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
-
 import org.json.*;
 import org.junit.*;
 
@@ -417,6 +417,91 @@ public class JSONObjectTest {
     }
 
     // improving unit tests left off here
+
+    @Test
+    public void stringToValueNumbersTest() {
+        // Check if library handles large or high precision numbers correctly
+        assertTrue( "0.2 should be a Double!",
+                JSONObject.stringToValue( "0.2" ) instanceof Double );
+        assertTrue( "Doubles should be Doubles, even when incorrectly converting floats!",
+                JSONObject.stringToValue( new Double( "0.2f" ).toString() ) instanceof Double );
+        assertTrue( "299792.457999999984 should be a BigDecimal!",
+                JSONObject.stringToValue( "299792.457999999984" ) instanceof BigDecimal );
+        assertTrue( "1 should be an Integer!",
+                JSONObject.stringToValue( "1" ) instanceof Integer );
+        assertTrue( "Integer.MAX_VALUE should still be an Integer!",
+                JSONObject.stringToValue( new Integer( Integer.MAX_VALUE ).toString() ) instanceof Integer );
+        assertTrue( "Large integers should be a Long!",
+                JSONObject.stringToValue( new Long( Long.sum( Integer.MAX_VALUE, 1 ) ).toString() ) instanceof Long );
+        assertTrue( "Long.MAX_VALUE should still be an Integer!",
+                JSONObject.stringToValue( new Long( Long.MAX_VALUE ).toString() ) instanceof Long );
+        assertTrue( "Really large integers should be a BigInteger!",
+                JSONObject.stringToValue(
+                        new BigInteger( new Long( Long.MAX_VALUE ).toString() )
+                        .add( BigInteger.ONE ).toString() ) instanceof BigInteger );
+    }
+
+    @Test
+    public void jsonValidNumberValuesNeitherLongNorIEE754Compatible() {
+        // Valid JSON Numbers, probably should return BigDecimal or BigInteger objects
+        String str = 
+            "{"+
+                "\"someNumber\":299792.457999999984,"+
+                "\"largeNumber\":12345678901234567890,"+
+                "\"preciseNumber\":0.2000000000000000111,"+
+                "\"largeExponent\":-23.45e2327"+
+            "}";
+        JSONObject jsonObject = new JSONObject(str);
+        assertFalse( "someNumber certainly was not 299792.458!",
+                jsonObject.get( "someNumber" ).equals( new Double( "299792.458" ) ) );
+        assertTrue( "someNumber must be a number",
+                jsonObject.get( "someNumber" ) instanceof Number );
+        assertTrue( "largeNumber must be a number",
+                jsonObject.get( "largeNumber" ) instanceof Number );
+        assertTrue( "preciseNumber must be a number",
+                jsonObject.get( "preciseNumber" ) instanceof Number );
+        assertTrue( "largeExponent must be a number",
+                jsonObject.get( "largeExponent" ) instanceof Number );
+    }
+
+    @Test
+    public void jsonInvalidNumberValues() {
+    	// Number-notations supported by Java and invalid as JSON
+        String str = 
+            "{"+
+                "\"hexNumber\":-0x123,"+
+                "\"tooManyZeros\":00,"+
+                "\"negativeInfinite\":-Infinity,"+
+                "\"negativeNaN\":-NaN,"+
+                "\"negativeFraction\":-.01,"+
+                "\"tooManyZerosFraction\":00.001,"+
+                "\"negativeHexFloat\":-0x1.fffp1,"+
+                "\"hexFloat\":0x1.0P-1074,"+
+                "\"floatIdentifier\":0.1f,"+
+                "\"doubleIdentifier\":0.1d,"+
+            "}";
+        JSONObject jsonObject = new JSONObject(str);
+        assertFalse( "hexNumber must not be a number (should throw exception!?)",
+                jsonObject.get( "hexNumber" ) instanceof Number );
+        assertFalse( "tooManyZeros must not be a number (should throw exception!?)",
+                jsonObject.get( "tooManyZeros" ) instanceof Number );
+        assertFalse( "negativeInfinite must not be a number (should throw exception!?)",
+                jsonObject.get( "negativeInfinite" ) instanceof Number );
+        assertFalse( "negativeNaN must not be a number (should throw exception!?)",
+                jsonObject.get( "negativeNaN" ) instanceof Number );
+        assertFalse( "tooManyZerosFraction must not be a number (should throw exception!?)",
+                jsonObject.get( "tooManyZerosFraction" ) instanceof Number );
+        assertFalse( "negativeFraction must not be a number (should throw exception!?)",
+                jsonObject.get( "negativeFraction" ) instanceof Number );
+        assertFalse( "negativeHexFloat must not be a number (should throw exception!?)",
+                jsonObject.get( "negativeHexFloat" ) instanceof Number );
+        assertFalse( "hexFloat must not be a number (should throw exception!?)",
+                jsonObject.get( "hexFloat" ) instanceof Number );
+        assertFalse( "floatIdentifier must not be a number (should throw exception!?)",
+                jsonObject.get( "floatIdentifier" ) instanceof Number );
+        assertFalse( "doubleIdentifier must not be a number (should throw exception!?)",
+                jsonObject.get( "doubleIdentifier" ) instanceof Number );
+    }
 
     @Test
     public void jsonObjectNonAndWrongValues() {
@@ -849,6 +934,11 @@ public class JSONObjectTest {
         Integer in = new Integer(1);
         assertTrue("Integer wrap() incorrect",
                 in == JSONObject.wrap(in));
+
+        // wrap(BigDecimal) returns BigDecimal
+        BigDecimal bd = BigDecimal.ONE;
+        assertTrue("BigDecimal wrap() incorrect",
+        		bd == JSONObject.wrap(bd));
 
         // wrap JSONObject returns JSONObject
         String jsonObjectStr = 
