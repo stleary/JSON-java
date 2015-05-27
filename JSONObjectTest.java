@@ -695,16 +695,19 @@ public class JSONObjectTest {
             "\"keyDouble\":3.1,"+
             // TODO: not sure if this will work on other platforms
 
-            // Should work the same way on any platform, this the effect of a float to double conversion and happens because
-            // java type-casts float to double. A 32 bit float is type-casted to 64 bit double by simply appending zero-bits to the
-            // mantissa (and extended the signed exponent by 3 bits.)
+            // Should work the same way on any platform! @see https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.2.3
+            // This is the effect of a float to double conversion and is inherent to the shortcomings of the IEEE 754 format, when
+            // converting 32-bit into double-precision 64-bit.
+            // Java type-casts float to double. A 32 bit float is type-casted to 64 bit double by simply appending zero-bits to the
+            // mantissa (and extended the signed exponent by 3 bits.) and there is no way to obtain more information than it is
+            // stored in the 32-bits float.
 
-            // Like 1/3 cannot be represented as base10 number because it is periodically, 1/5 cannot be represented as base2 number
-            // since it is periodically in base2 (take a look at http://www.h-schmidt.net/FloatConverter/)
+            // Like 1/3 cannot be represented as base10 number because it is periodically, 1/5 (for example) cannot be represented
+            // as base2 number since it is periodically in base2 (take a look at http://www.h-schmidt.net/FloatConverter/)
             // The same happens to 3.1, that decimal number (base10 representation) is periodic in base2 representation, therefore
-            // appending zero-bits is inaccurate only repeating the periodically repeating bits (0110) would be a proper conversion.
+            // appending zero-bits is inaccurate. Only repeating the periodically occuring bits (0110) would be a proper conversion.
             // However one cannot detect from a 32 bit IEE754 representation which bits would "repeat infinitely", since the missing
-            // bits would not fit into the 32 bit float, i.e. the information needed is not there! ;)
+            // bits would not fit into the 32 bit float, i.e. the information needed simply is not there!
             "\"keyFloat\":3.0999999046325684,"+
         "}";
         JSONObject jsonObject = new JSONObject(str);
@@ -738,12 +741,19 @@ public class JSONObjectTest {
 		 100000000001000110011001100110011000000000000000000000000000000
 		 100000000001000110011001100110011001100110011001100110011001101
 		*/
+        // Examples of well documented but probably unexpected behavior in java / with 32-bit float to 64-bit float conversion.
+        assertFalse("Document unexpected behaviour with explicit type-casting float as double!", (double)0.2f == 0.2d );
+        assertFalse("Document unexpected behaviour with implicit type-cast!", 0.2f == 0.2d );
+        Double d1 = new Double( 1.1f );
+        Double d2 = new Double( "1.1f" );
+        assertFalse( "Document implicit type cast from float to double before calling Double(double d) constructor", d1.equals( d2 ) );
+
         assertTrue( "Correctly converting float to double via base10 (string) representation!", new Double( 3.1d ).equals(  new Double( new Float( 3.1f ).toString() ) ) );
 
         // Pinpointing the not so obvious "buggy" conversion from float to double in JSONObject
         JSONObject jo = new JSONObject();
         jo.put( "bug", 3.1f ); // will call put( String key, double value ) with implicit and "buggy" type-cast from float to double
-        assertFalse( "The java-compiler did add some zero bits for you (probably unexpected, but well documented)", jo.get( "bug" ).equals(  new Double( 3.1d ) ) );
+        assertFalse( "The java-compiler did add some zero bits for you to the mantissa (unexpected, but well documented)", jo.get( "bug" ).equals(  new Double( 3.1d ) ) );
 
         JSONObject inc = new JSONObject();
         inc.put( "bug", new Float( 3.1f ) ); // This will put in instance of Float into JSONObject, i.e. call put( String key, Object value ) 
@@ -755,18 +765,12 @@ public class JSONObjectTest {
         // 3.	A float+float operation will be performed and results into a float primitive.
         // 4.	There is no method that matches the signature put( String key, float value), java-compiler will choose the method
         //		put( String key, double value) and does an implicit type-cast(!) by appending zero-bits to the mantissa
-        assertTrue( "JSONObject increment unexpected behaviour, Float will not stay Float!", jo.get( "bug" ) instanceof Float );
-        // correct implementation (with change of behaviour) would be:
+        assertTrue( "JSONObject increment unexpected behavior, Float will not stay Float!", jo.get( "bug" ) instanceof Float );
+        // correct implementation (with change of behavior) would be:
         // this.put(key, new Float((Float) value + 1)); 
         // Probably it would be better to deprecate the method and remove some day, while convenient processing the "payload" is not
         // really in the the scope of a JSON-library (IMHO.)
 
-        // Some more examples of well documented unexpeced "numbercrunching" ;)
-        assertTrue("Stumbled over explicitly type-casting float as double!", (double)0.2f == 0.2d );
-        assertTrue("Stumbled over comparing float with double any implicit type-cast!", 0.2f == 0.2d );
-        Double d1 = new Double( 1.1f );
-        Double d2 = new Double( "1.1f" );
-        assertTrue( "Stumbled again over implicit type cast from float to double before calling Double(double d) constructor", d1.equals( d2 ) );
     }
 
     @Test
