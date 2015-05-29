@@ -765,7 +765,7 @@ public class JSONObjectTest {
         // 3.	A float+float operation will be performed and results into a float primitive.
         // 4.	There is no method that matches the signature put( String key, float value), java-compiler will choose the method
         //		put( String key, double value) and does an implicit type-cast(!) by appending zero-bits to the mantissa
-        assertTrue( "JSONObject increment unexpected behavior, Float will not stay Float!", jo.get( "bug" ) instanceof Float );
+        assertTrue( "JSONObject increment converts Float to Double", jo.get( "bug" ) instanceof Double );
         // correct implementation (with change of behavior) would be:
         // this.put(key, new Float((Float) value + 1)); 
         // Probably it would be better to deprecate the method and remove some day, while convenient processing the "payload" is not
