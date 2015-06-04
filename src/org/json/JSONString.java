@@ -2,7 +2,6 @@ package org.json;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.logging.Logger;
 
 /**
  * The <code>JSONString</code> interface allows a <code>toJSONString()</code>
@@ -24,8 +23,9 @@ public interface JSONString {
      *
      * @return A strictly syntactically correct JSON text or null if an exception
      * occurred
+     * @throws JSONException if a field's type or value could not be retrieved 
      */
-    public default String toJSONString(){
+    public default String toJSONString() throws JSONException {
     	String ret = "{\n";
 		for(Field f: this.getClass().getFields()){
 			Object o = null;
@@ -36,11 +36,8 @@ public interface JSONString {
 					o = f.get(this);
 				}
 			} catch( IllegalAccessException | IllegalArgumentException e){
-				Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).throwing(
-						this.getClass().getName(), "toJSONString",
-						new JSONException("could not create a JSON representation"
-								+ "for " + this.getClass().getName(), e));
-				return null;
+				throw new JSONException("could not create a JSON representation"
+								+ "for " + this.getClass().getName(), e);
 			}
 			ret += "\"" + f.getName().replace("\"", "\\\"") + "\":";
 			if(f.getType().isAssignableFrom(JSONString.class)){
