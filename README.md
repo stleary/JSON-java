@@ -51,6 +51,7 @@ A unit test has the following stages:
 | CDL.java | 98% | Reasonable test cases.  |
 | Cookie.java  | 98.9%   | Reasonable test cases. |
 | CookieList.java |96.5% | Reasonable test cases. |
+| EnumTest.java | n/a | Just documenting how enums are handled. |
 | HTTP.java | 98.7%| Coverage > 90% | 
 | HTTPTokener.java |93.2% | No test   | 
 | JSONArray.java |95.9% | Coverage > 90% | 
