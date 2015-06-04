@@ -13,7 +13,8 @@ import org.junit.runners.Suite;
    HTTPTest.class,
    JSONStringerTest.class,
    JSONObjectTest.class,
-   JSONArrayTest.class
+   JSONArrayTest.class,
+   EnumTest.class
 })
 public class JunitTestSuite {   
 }  
