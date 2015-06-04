@@ -69,9 +69,12 @@ A unit test has the following stages:
 
 | Files used in test |
 | ------------- |  
+| MyEnum.java |
+| MyEnumClass.java |
+| MyEnumField.java |
 | JunitTestSuite.java | 
 | StringsResourceBundle.java | 
-|TestRunner.java | 
+| TestRunner.java | 
 | Util.java | 
 
 
