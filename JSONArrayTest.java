@@ -2,10 +2,7 @@ package org.json.junit;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.json.*;
 import org.junit.Test;
@@ -463,5 +460,43 @@ public class JSONArrayTest {
         JSONArray jsonArray = new JSONArray(myObject);
         JSONArray expectedJsonArray = new JSONArray(expectedStr);
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
+    }
+
+    @Test
+    public void iterator() {
+        JSONArray jsonArray = new JSONArray(arrayStr);
+        Iterator<Object> it = jsonArray.iterator();
+        assertTrue("Array true",
+                Boolean.TRUE.equals(it.next()));
+        assertTrue("Array false",
+                Boolean.FALSE.equals(it.next()));
+        assertTrue("Array string true",
+                "true".equals(it.next()));
+        assertTrue("Array string false",
+                "false".equals(it.next()));
+        assertTrue("Array string",
+                "hello".equals(it.next()));
+
+        assertTrue("Array double",
+                new Double(23.45e-4).equals(it.next()));
+        assertTrue("Array string double",
+                new Double(23.45).equals(Double.parseDouble((String)it.next())));
+
+        assertTrue("Array value int",
+                new Integer(42).equals(it.next()));
+        assertTrue("Array value string int",
+                new Integer(43).equals(Integer.parseInt((String)it.next())));
+
+        JSONArray nestedJsonArray = (JSONArray)it.next();
+        assertTrue("Array value JSONArray", nestedJsonArray != null);
+
+        JSONObject nestedJsonObject = (JSONObject)it.next();
+        assertTrue("Array value JSONObject", nestedJsonObject != null);
+
+        assertTrue("Array value long",
+                new Long(0).equals(((Number) it.next()).longValue()));
+        assertTrue("Array value string long",
+                new Long(-1).equals(Long.parseLong((String) it.next())));
+        assertTrue("should be at end of array", !it.hasNext());
     }
 }
