@@ -75,9 +75,9 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2015-06-04
  */
-public class JSONArray {
+public class JSONArray implements Iterable<Object> {
 
     /**
      * The arrayList where the JSONArray's properties are kept.
@@ -177,6 +177,11 @@ public class JSONArray {
             throw new JSONException(
                     "JSONArray initial value should be a string or collection or array.");
         }
+    }
+
+    @Override
+    public Iterator<Object> iterator() {
+        return myArrayList.iterator();
     }
 
     /**
