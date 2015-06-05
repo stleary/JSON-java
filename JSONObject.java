@@ -566,6 +566,27 @@ public class JSONObject {
     }
 
     /**
+     * Get the enum value associated with a key.
+     * 
+     * @param clazz
+     *           The type of enum to retrieve.
+     * @param key
+     *           A key string.
+     * @return The enum value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to an integer.
+     */
+    public <E extends Enum<E>> E getEnum(Class<E> clazz, String key)  throws JSONException {
+        try {
+            return Enum.valueOf(clazz, this.optString(key));
+        } catch (IllegalArgumentException |  NullPointerException e) {
+            // JSONException should really take a throwable argument
+            throw new JSONException("Unable to process enum value for "+key);
+        }
+    }
+
+    /**
      * Get the int value associated with a key.
      *
      * @param key
@@ -943,6 +964,44 @@ public class JSONObject {
         } catch (Exception e) {
             return defaultValue;
         }
+    }
+
+    /**
+     * Get the enum value associated with a key.
+     * 
+     * @param clazz
+     *           The type of enum to retrieve.
+     * @param key
+     *           A key string.
+     * @return The enum value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to an integer.
+     */
+    public <E extends Enum<E>> E optEnum(Class<E> clazz, String key)  throws JSONException {
+        return this.optEnum(clazz, key, null);
+    }
+
+    /**
+     * Get the enum value associated with a key.
+     * 
+     * @param clazz
+     *            The type of enum to retrieve.
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return The enum value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to an integer.
+     */
+    public <E extends Enum<E>> E optEnum(Class<E> clazz, String key, E defaultValue)  throws JSONException {
+        try {
+            return Enum.valueOf(clazz, this.optString(key));
+        } catch (IllegalArgumentException |  NullPointerException e) {
+        }
+	return defaultValue;
     }
 
     /**
