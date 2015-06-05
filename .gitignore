@@ -1,0 +1,21 @@
+# don't push the local git settings
+.git/*
+
+# don't push local gradle files
+.gradle/*
+
+
+# ignore the binaries and other build artifacts
+build/*
+
+# don't push IDE specific files
+.classpath
+.project
+json.iml
+json.ipr
+json.iws
+.settings/*
+
+# ignore files with a trailing ~ as they are just backups
+*~
+
