@@ -577,13 +577,18 @@ public class JSONObject {
      *             if the key is not found or if the value cannot be converted
      *             to an integer.
      */
-    public <E extends Enum<E>> E getEnum(Class<E> clazz, String key)  throws JSONException {
-        try {
-            return Enum.valueOf(clazz, this.optString(key));
-        } catch (IllegalArgumentException |  NullPointerException e) {
-            // JSONException should really take a throwable argument
-            throw new JSONException("Unable to process enum value for "+key);
+    public <E extends Enum<E>> E getEnum(Class<E> clazz, String key) throws JSONException {
+        E val = optEnum(clazz, key);
+        if(val==null) {
+            // JSONException should really take a throwable argument.
+            // If it did, I would re-implement this with the Enum.valueOf
+            // method and place any thrown exception in the JSONException
+            throw new JSONException("JSONObject[" + quote(key)
+                    + "] is not an enum of type " + quote(clazz.getSimpleName())
+                    + ".");
         }
+        return val;
+
     }
 
     /**
@@ -998,10 +1003,20 @@ public class JSONObject {
      */
     public <E extends Enum<E>> E optEnum(Class<E> clazz, String key, E defaultValue)  throws JSONException {
         try {
-            return Enum.valueOf(clazz, this.optString(key));
+            Object val = this.opt(key);
+            if(NULL.equals(val)) {
+                return defaultValue;
+            }
+            if(clazz.isAssignableFrom(val.getClass())) {
+                // we just checked it!
+                @SuppressWarnings("unchecked")
+                E myE = (E)val;
+                return myE;
+            }
+            return Enum.valueOf(clazz, val.toString());
         } catch (IllegalArgumentException |  NullPointerException e) {
+            return defaultValue;
         }
-	return defaultValue;
     }
 
     /**
