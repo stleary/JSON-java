@@ -2,10 +2,12 @@ package org.json.junit;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+
 import org.json.*;
 import org.junit.*;
 
@@ -416,10 +418,7 @@ public class JSONObjectTest {
                 jsonObjectInner.get("myKey").equals("myVal"));
     }
 
-    // improving unit tests left off here
-
     @Test
-
     public void stringToValueNumbersTest() {
         // Check if library handles large or high precision numbers correctly
         assertTrue( "0.2 should be a Double!",
@@ -446,12 +445,12 @@ public class JSONObjectTest {
                 JSONObject.stringToValue(str).equals("9223372036854775808"));
     }
 
-    @Test
     /**
      * This test documents numeric values which could be numerically
      * handled as BigDecimal or BigInteger. It helps determine what outputs
      * will change if those types are supported.
      */
+    @Test
     public void jsonValidNumberValuesNeitherLongNorIEEE754Compatible() {
         // Valid JSON Numbers, probably should return BigDecimal or BigInteger objects
         String str = 
@@ -605,8 +604,16 @@ public class JSONObjectTest {
                 exceptionCount == tryCount);
     }
 
+    /**
+     * The purpose for the static method getNames() methods are not clear.
+     * This method is not called from within JSON-Java. Most likely
+     * uses are to prep names arrays for:  
+     * JSONObject(JSONObject jo, String[] names)
+     * JSONObject(Object object, String names[]),
+     */
     @Test
     public void jsonObjectNames() {
+        JSONObject jsonObject;
 
         // getNames() from null JSONObject
         assertTrue("null names from null Object", 
@@ -616,11 +623,17 @@ public class JSONObjectTest {
         assertTrue("null names from Object with no fields", 
                 null == JSONObject.getNames(new MyJsonString()));
 
+        // getNames from new JSONOjbect
+        jsonObject = new JSONObject();
+        String [] names = JSONObject.getNames(jsonObject);
+        assertTrue("names should be null", names == null);
+
+        
         // getNames() from empty JSONObject
         String emptyStr = "{}";
-        JSONObject emptyJsonObject = new JSONObject(emptyStr);
+        jsonObject = new JSONObject(emptyStr);
         assertTrue("empty JSONObject should have null names",
-                null == JSONObject.getNames(emptyJsonObject));
+                null == JSONObject.getNames(jsonObject));
 
         // getNames() from JSONObject
         String str = 
@@ -630,9 +643,28 @@ public class JSONObjectTest {
                 "\"stringKey\":\"hello world!\","+
             "}";
         String [] expectedNames = {"trueKey", "falseKey", "stringKey"};
-        JSONObject jsonObject = new JSONObject(str);
-        String [] names = JSONObject.getNames(jsonObject);
+        jsonObject = new JSONObject(str);
+        names = JSONObject.getNames(jsonObject);
         Util.compareActualVsExpectedStringArrays(names, expectedNames);
+
+        /**
+         * getNames() from an enum with properties has an interesting result.
+         * It returns the enum values, not the selected enum properties
+         */
+        MyEnumField myEnumField = MyEnumField.VAL1; 
+        String[] enumExpectedNames = {"VAL1", "VAL2", "VAL3"};
+        names = JSONObject.getNames(myEnumField);
+        Util.compareActualVsExpectedStringArrays(names, enumExpectedNames);
+
+        /**
+         * A bean is also an object. But in order to test the static
+         * method getNames(), this particular bean needs some public
+         * data members, which have been added to the class.
+         */
+        JSONObjectTest jsonObjectTest = new JSONObjectTest();
+        String [] jsonObjectTestExpectedNames = {"publicString", "publicInt"};
+        names = JSONObject.getNames(jsonObjectTest);
+        Util.compareActualVsExpectedStringArrays(names, jsonObjectTestExpectedNames);
     }
 
     @Test
@@ -669,19 +701,6 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void objectNames() {
-        /**
-         * A bean is also an object. But in order to test the static
-         * method getNames(), this particular bean needs some public
-         * data members, which have been added to the class.
-         */
-        JSONObjectTest jsonObjectTest = new JSONObjectTest();
-        String [] expectedNames = {"publicString", "publicInt"};
-        String [] names = JSONObject.getNames(jsonObjectTest);
-        Util.compareActualVsExpectedStringArrays(names, expectedNames);
-    }
-
-    @Test
     public void jsonObjectIncrement() {
         String str = 
             "{"+
@@ -693,8 +712,6 @@ public class JSONObjectTest {
             "\"keyInt\":3,"+
             "\"keyLong\":9999999993,"+
             "\"keyDouble\":3.1,"+
-            // TODO: not sure if this will work on other platforms
-
             // Should work the same way on any platform! @see https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.2.3
             // This is the effect of a float to double conversion and is inherent to the shortcomings of the IEEE 754 format, when
             // converting 32-bit into double-precision 64-bit.
@@ -773,26 +790,6 @@ public class JSONObjectTest {
 
     }
 
-    @Test
-    public void emptyJsonObjectNamesToArray() {
-        JSONObject jsonObject = new JSONObject();
-        String [] names = JSONObject.getNames(jsonObject);
-        assertTrue("names should be null", names == null);
-    }
-
-    @Test
-    public void jsonObjectNamesToArray() {
-        String str = 
-            "{"+
-                "\"trueKey\":true,"+
-                "\"falseKey\":false,"+
-                "\"stringKey\":\"hello world!\","+
-            "}";
-        String [] expectedNames = {"trueKey", "falseKey", "stringKey"};
-        JSONObject jsonObject = new JSONObject(str);
-        String [] names = JSONObject.getNames(jsonObject);
-        Util.compareActualVsExpectedStringArrays(names, expectedNames);
-    }
 
     @Test
     public void jsonObjectNumberToString() {
@@ -907,6 +904,7 @@ public class JSONObjectTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked") 
     public void jsonObjectToStringSuppressWarningOnCastToMap() {
         JSONObject jsonObject = new JSONObject();
         Map<String, String> map = new HashMap<String, String>();
@@ -921,8 +919,7 @@ public class JSONObjectTest {
          * Can't do a Util compare because although they look the same
          * in the debugger, one is a map and the other is a JSONObject.  
          */
-        // TODO: fix warnings
-        map = (Map)jsonObject.get("key");
+        map = (Map<String, String>)jsonObject.get("key");
         JSONObject mapJsonObject = expectedJsonObject.getJSONObject("key");
         assertTrue("value size should be equal",
                 map.size() == mapJsonObject.length() && map.size() == 1);
@@ -934,6 +931,7 @@ public class JSONObjectTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void jsonObjectToStringSuppressWarningOnCastToCollection() {
         JSONObject jsonObject = new JSONObject();
         Collection<String> collection = new ArrayList<String>();
@@ -950,12 +948,11 @@ public class JSONObjectTest {
         assertTrue("keys should be equal",
                 jsonObject.keySet().iterator().next().equals(
                 expectedJsonObject.keySet().iterator().next()));
-        // TODO: fix warnings
-        collection = (Collection)jsonObject.get("key");
+        collection = (Collection<String>)jsonObject.get("key");
         JSONArray jsonArray = expectedJsonObject.getJSONArray("key");
         assertTrue("value size should be equal",
                 collection.size() == jsonArray.length());
-        Iterator it = collection.iterator();
+        Iterator<String> it = collection.iterator();
         for (int i = 0; i < collection.size(); ++i) {
             assertTrue("items should be equal for index: "+i,
                     jsonArray.get(i).toString().equals(it.next().toString()));
