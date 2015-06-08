@@ -30,6 +30,8 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -114,7 +116,7 @@ public class JSONObject {
 
         /**
          * A Null object is equal to the null value and to itself.
-         *
+         * 
          * @param object
          *            An object to test for nullness.
          * @return true if the object parameter is the JSONObject.NULL object or
@@ -122,7 +124,7 @@ public class JSONObject {
          */
         @Override
         public boolean equals(Object object) {
-            return object == null || object == this;
+            return object == null || object == this; 
         }
 
         /**
@@ -1357,19 +1359,29 @@ public class JSONObject {
             try {
                 if (string.indexOf('.') > -1 || string.indexOf('e') > -1
                         || string.indexOf('E') > -1) {
-                    d = Double.valueOf(string);
-                    if (!d.isInfinite() && !d.isNaN()) {
-                        return d;
-                    }
+                	BigDecimal bd = new BigDecimal( string );
+                	d = Double.valueOf( bd.doubleValue() );
+                	if( new BigDecimal( d.toString() ).equals( bd ) ) {
+	                    if (!d.isInfinite() && !d.isNaN()) {
+	                        return d;
+	                    }
+                	} else {
+                		return bd;
+                	}
                 } else {
-                    Long myLong = new Long(string);
-                    if (string.equals(myLong.toString())) {
-                        if (myLong == myLong.intValue()) {
-                            return myLong.intValue();
-                        } else {
-                            return myLong;
-                        }
-                    }
+                	BigInteger bi = new BigInteger( string );
+                	Long myLong = Long.valueOf( bi.longValue() );
+                	if( new BigInteger( myLong.toString() ).equals( bi ) ) { 
+	                    if (string.equals(myLong.toString())) {
+	                        if (myLong == myLong.intValue()) {
+	                            return myLong.intValue();
+	                        } else {
+	                            return myLong;
+	                        }
+	                    }
+                	} else {
+                		return bi;
+                	}
                 }
             } catch (Exception ignore) {
             }
