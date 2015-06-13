@@ -9,7 +9,15 @@ More coverage is needed, but more importantly, improvements to test quality is n
 You will need the following libraries for testing:
 Test harness: http://junit.org<br>
 Coverage: http://www.eclemma.org/<br>
+JsonPath: https://github.com/jayway/JsonPath
 Mockery: https://github.com/mockito/mockito 
+
+Include these libraries in your project:
+JSON-Java.jar (make this jar of the files to be tested yourself)
+hamcrest-core-1.3.jar (for Junit)
+junit-4.12.jar
+mockito-all-1.9.5.jar
+
 
 Eclipse is the recommended development environment.
 Run individual tests or <b>JunitTestSuite</b> using *EclEmma Coverage*, or execute the <b>TestRunner<b> application directly.<br>
