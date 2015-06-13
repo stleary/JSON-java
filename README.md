@@ -9,7 +9,6 @@ More coverage is needed, but more importantly, improvements to test quality is n
 You will need the following libraries for testing:
 Test harness: http://junit.org<br>
 Coverage: http://www.eclemma.org/<br>
-JsonPath: https://github.com/jayway/JsonPath
 Mockery: https://github.com/mockito/mockito 
 
 Include these libraries in your project:
