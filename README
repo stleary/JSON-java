@@ -71,3 +71,9 @@ XML.java: XML provides support for converting between JSON and XML.
 JSONML.java: JSONML provides support for converting between JSONML and XML.
 
 XMLTokener.java: XMLTokener extends JSONTokener for parsing XML text.
+
+
+Build Instructions
+===================
+This project can be built with latest version of maven. http://maven.apache.org/
+

@@ -77,7 +77,8 @@ import java.util.Map;
  * @author JSON.org
  * @version 2015-06-04
  */
-public class JSONArray implements Iterable<Object> {
+public class JSONArray implements Iterable {
+
 
     /**
      * The arrayList where the JSONArray's properties are kept.
@@ -177,11 +178,6 @@ public class JSONArray implements Iterable<Object> {
             throw new JSONException(
                     "JSONArray initial value should be a string or collection or array.");
         }
-    }
-
-    @Override
-    public Iterator<Object> iterator() {
-        return myArrayList.iterator();
     }
 
     /**
@@ -978,5 +974,14 @@ public class JSONArray implements Iterable<Object> {
         } catch (IOException e) {
             throw new JSONException(e);
         }
+    }
+
+    /**
+     * Gets iterator for the elements in the array
+     * @return
+     */
+    @Override
+    public Iterator iterator() {
+        return myArrayList.iterator();
     }
 }
