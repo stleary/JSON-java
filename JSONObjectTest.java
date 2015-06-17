@@ -604,6 +604,33 @@ public class JSONObjectTest {
                 exceptionCount == tryCount);
     }
 
+    @Test
+    public void unexpectedDoubleToIntConversion() {
+        /**
+         * This test documents an unexpected numeric behavior.
+         * A double that ends with .0 is parsed, serialized, then
+         * parsed again. On the second parse, it has become an int.
+         */
+        String key30 = "key30";
+        String key31 = "key31";
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(key30, new Double(3.0));
+        jsonObject.put(key31, new Double(3.1));
+
+        assertTrue("3.0 should remain a double",
+                jsonObject.getDouble(key30) == 3); 
+        assertTrue("3.1 should remain a double",
+                jsonObject.getDouble(key31) == 3.1); 
+ 
+        // turns 3.0 into 3.
+        String serializedString = jsonObject.toString();
+        JSONObject deserialized = new JSONObject(serializedString);
+        assertTrue("3.0 is now an int", deserialized.get(key30) instanceof Integer);
+        assertTrue("3.0 can still be interpreted as a double",
+                deserialized.getDouble(key30) == 3.0);
+        assertTrue("3.1 remains a double", deserialized.getDouble(key31) == 3.1);
+    }
+
     /**
      * The purpose for the static method getNames() methods are not clear.
      * This method is not called from within JSON-Java. Most likely
