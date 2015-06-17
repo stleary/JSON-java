@@ -91,7 +91,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2015-05-05
  */
 public class JSONObject implements Iterable<Entry<String, Object>>{
 
@@ -299,7 +299,7 @@ public class JSONObject implements Iterable<Entry<String, Object>>{
      */
     public JSONObject(Object object, String names[]) {
         this();
-        Class c = object.getClass();
+        Class<?> c = object.getClass();
         for (int i = 0; i < names.length; i += 1) {
             String name = names[i];
             try {
@@ -632,7 +632,7 @@ public class JSONObject implements Iterable<Entry<String, Object>>{
         if (object == null) {
             return null;
         }
-        Class klass = object.getClass();
+        Class<?> klass = object.getClass();
         Field[] fields = klass.getFields();
         int length = fields.length;
         if (length == 0) {
@@ -982,7 +982,7 @@ public class JSONObject implements Iterable<Entry<String, Object>>{
     }
 
     private void populateMap(Object bean) {
-        Class klass = bean.getClass();
+        Class<?> klass = bean.getClass();
 
 // If klass is a System class then set includeSuperClass to false.
 
@@ -1513,10 +1513,14 @@ public class JSONObject implements Iterable<Entry<String, Object>>{
             return value.toString();
         }
         if (value instanceof Map) {
-            return new JSONObject((Map<String, Object>)value).toString();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) value;
+            return new JSONObject(map).toString();
         }
         if (value instanceof Collection) {
-            return new JSONArray((Collection<Object>) value).toString();
+            @SuppressWarnings("unchecked")
+            Collection<Object> coll = (Collection<Object>) value;
+            return new JSONArray(coll).toString();
         }
         if (value.getClass().isArray()) {
             return new JSONArray(value).toString();
@@ -1552,13 +1556,17 @@ public class JSONObject implements Iterable<Entry<String, Object>>{
             }
 
             if (object instanceof Collection) {
-                return new JSONArray((Collection<Object>) object);
+                @SuppressWarnings("unchecked")
+                Collection<Object> coll = (Collection<Object>) object;
+                return new JSONArray(coll);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);
             }
             if (object instanceof Map) {
-                return new JSONObject((Map<String, Object>) object);
+                @SuppressWarnings("unchecked")
+                Map<String, Object> map = (Map<String, Object>) object;
+                return new JSONObject(map);
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage
@@ -1596,9 +1604,13 @@ public class JSONObject implements Iterable<Entry<String, Object>>{
         } else if (value instanceof JSONArray) {
             ((JSONArray) value).write(writer, indentFactor, indent);
         } else if (value instanceof Map) {
-            new JSONObject((Map<String, Object>) value).write(writer, indentFactor, indent);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) value;
+            new JSONObject(map).write(writer, indentFactor, indent);
         } else if (value instanceof Collection) {
-            new JSONArray((Collection<Object>) value).write(writer, indentFactor,
+            @SuppressWarnings("unchecked")
+            Collection<Object> coll = (Collection<Object>) value;
+            new JSONArray(coll).write(writer, indentFactor,
                     indent);
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);

@@ -75,9 +75,10 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2015-06-04
  */
 public class JSONArray implements Iterable {
+
 
     /**
      * The arrayList where the JSONArray's properties are kept.

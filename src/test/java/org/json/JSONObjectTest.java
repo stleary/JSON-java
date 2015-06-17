@@ -45,6 +45,5 @@ public class JSONObjectTest {
             assertNotNull(entry.getValue());
         }
 
-
     }
 }
