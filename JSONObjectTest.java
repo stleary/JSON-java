@@ -631,6 +631,90 @@ public class JSONObjectTest {
         assertTrue("3.1 remains a double", deserialized.getDouble(key31) == 3.1);
     }
 
+    @Test
+    public void bigNumberOperations() {
+        /**
+         * JSONObject tries to parse BigInteger as a bean, but it only has
+         * one getter, getLowestBitSet(). The value is lost and an unhelpful
+         * value is stored. This should be fixed.
+         */
+        BigInteger bigInteger = new BigInteger("123456789012345678901234567890");
+        JSONObject jsonObject = new JSONObject(bigInteger);
+        Object obj = jsonObject.get("lowestSetBit");
+        assertTrue("JSONObject only has 1 value", jsonObject.length() == 1);
+        assertTrue("JSONObject parses BigInteger as the Integer lowestBitSet",
+                obj instanceof Integer);
+        assertTrue("this bigInteger lowestBitSet happens to be 1",
+                obj.equals(1));
+
+        /**
+         * JSONObject put(String, Object) method stores and serializesbigInt and bigDec
+         * correctly. Nothing needs to change.
+         */
+        BigDecimal bigDecimal = new BigDecimal(
+                "123456789012345678901234567890.12345678901234567890123456789");
+        jsonObject = new JSONObject(bigDecimal);
+        assertTrue("large bigDecimal is not stored", jsonObject.length() == 0);
+
+        /**
+         * JSONObject put(String, Object) method stores and serializes
+         * bigInt and bigDec correctly. Nothing needs to change.
+         */
+        jsonObject = new JSONObject();
+        jsonObject.put("bigInt", bigInteger);
+        assertTrue("jsonObject.put() handles bigInt correctly",
+                jsonObject.get("bigInt").equals(bigInteger));
+        assertTrue("jsonObject serializes bigInt correctly",
+                jsonObject.toString().equals("{\"bigInt\":123456789012345678901234567890}"));
+        jsonObject = new JSONObject();
+        jsonObject.put("bigDec", bigDecimal);
+        assertTrue("jsonObject.put() handles bigDec correctly",
+                jsonObject.get("bigDec").equals(bigDecimal));
+        assertTrue("jsonObject serializes bigDec correctly",
+                jsonObject.toString().equals(
+                        "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
+
+        /**
+         * There is no way to get bigInt or bigDec by type.
+         * This should be fixed. E.G. jsonObject.getBigInteger(key);
+         */
+
+        /**
+         * JSONObject.numberToString() works correctly, nothing to change.
+         */
+        String str = JSONObject.numberToString(bigInteger);
+        assertTrue("numberToString() handles bigInteger correctly",
+                str.equals("123456789012345678901234567890"));
+        str = JSONObject.numberToString(bigDecimal);
+        assertTrue("numberToString() handles bigDecimal correctly",
+                str.equals("123456789012345678901234567890.12345678901234567890123456789"));
+
+        /**
+         * JSONObject.stringToValue() turns bigInt into an accurate string,
+         * and rounds bigDec. This incorrect, but users may have come to 
+         * expect this behavior. Change would be marginally better, but 
+         * might inconvenience users.
+         */
+        obj = JSONObject.stringToValue(bigInteger.toString());
+        assertTrue("stringToValue() turns bigInteger string into string",
+                obj instanceof String);
+        obj = JSONObject.stringToValue(bigDecimal.toString());
+        assertTrue("stringToValue() changes bigDecimal string",
+                !obj.toString().equals(bigDecimal.toString()));
+
+        /**
+         * JSONObject.wrap() performs the advertised behavior,
+         * which is to turn Java classes into strings. 
+         * Probably not a bug
+         */
+        obj = JSONObject.wrap(bigInteger);
+        assertTrue("wrap() turns bigInt into a string",
+                obj.equals(bigInteger.toString()));
+        obj = JSONObject.wrap(bigDecimal);
+        assertTrue("wrap() turns bigDec into a string",
+                obj.equals(bigDecimal.toString()));
+    }
+
     /**
      * The purpose for the static method getNames() methods are not clear.
      * This method is not called from within JSON-Java. Most likely
