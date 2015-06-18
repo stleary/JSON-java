@@ -648,8 +648,9 @@ public class JSONObjectTest {
                 obj.equals(1));
 
         /**
-         * JSONObject put(String, Object) method stores and serializesbigInt and bigDec
-         * correctly. Nothing needs to change.
+         * JSONObject tries to parse BigDecimal as a bean, but it has
+         * no getters, The value is lost and no value is stored.
+         * This should be fixed.
          */
         BigDecimal bigDecimal = new BigDecimal(
                 "123456789012345678901234567890.12345678901234567890123456789");
