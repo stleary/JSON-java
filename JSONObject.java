@@ -30,6 +30,7 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.*;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -504,6 +505,46 @@ public class JSONObject {
     }
 
     /**
+     * Get the BigInteger value associated with a key.
+     *
+     * @param key
+     *            A key string.
+     * @return The numeric value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot 
+     *             be converted to BigInteger.
+     */
+    public BigInteger getBigInteger(String key) throws JSONException {
+        Object object = this.get(key);
+        try {
+            return new BigInteger(object.toString());
+        } catch (Exception e) {
+            throw new JSONException("JSONObject[" + quote(key)
+                    + "] could not be converted to BigInteger.");
+        }
+    }
+
+    /**
+     * Get the BigDecimal value associated with a key.
+     *
+     * @param key
+     *            A key string.
+     * @return The numeric value.
+     * @throws JSONException
+     *             if the key is not found or if the value
+     *             cannot be converted to BigDecimal.
+     */
+    public BigDecimal getBigDecimal(String key) throws JSONException {
+        Object object = this.get(key);
+        try {
+            return new BigDecimal(object.toString());
+        } catch (Exception e) {
+            throw new JSONException("JSONObject[" + quote(key)
+                    + "] could not be converted to BigDecimal.");
+        }
+    }
+
+    /**
      * Get the double value associated with a key.
      *
      * @param key
@@ -688,6 +729,10 @@ public class JSONObject {
         Object value = this.opt(key);
         if (value == null) {
             this.put(key, 1);
+        } else if (value instanceof BigInteger) {
+            this.put(key, ((BigInteger)value).add(BigInteger.ONE));
+        } else if (value instanceof BigDecimal) {
+            this.put(key, ((BigDecimal)value).add(BigDecimal.ONE));
         } else if (value instanceof Integer) {
             this.put(key, (Integer) value + 1);
         } else if (value instanceof Long) {
@@ -841,6 +886,44 @@ public class JSONObject {
      */
     public double optDouble(String key) {
         return this.optDouble(key, Double.NaN);
+    }
+
+    /**
+     * Get an optional BigInteger associated with a key, or the defaultValue if
+     * there is no such key or if its value is not a number. If the value is a
+     * string, an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public BigInteger optBigInteger(String key, BigInteger defaultValue) {
+        try {
+            return this.getBigInteger(key);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get an optional BigDecimal associated with a key, or the defaultValue if
+     * there is no such key or if its value is not a number. If the value is a
+     * string, an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public BigDecimal optBigDecimal(String key, BigDecimal defaultValue) {
+        try {
+            return this.getBigDecimal(key);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     /**
