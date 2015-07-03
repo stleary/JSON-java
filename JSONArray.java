@@ -885,7 +885,9 @@ public class JSONArray implements Iterable<Object> {
      * @return a copy of the JSONArray as an ArrayList.
      */
     public ArrayList<Object> toArrayList() {
-        return new ArrayList<Object>(this.myArrayList);
+        ArrayList<Object> copy = new ArrayList<Object>(this.myArrayList.size());
+        for (Object o : this.myArrayList) copy.add((Object) o.clone());
+        return copy;
     }
 
     /**
