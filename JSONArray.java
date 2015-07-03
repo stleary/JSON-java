@@ -878,6 +878,15 @@ public class JSONArray implements Iterable<Object> {
         }
         return jo;
     }
+    
+    /**
+     * Returns the JSONArray as an ArrayList.
+     * 
+     * @return a copy of the JSONArray as an ArrayList.
+     */
+    public ArrayList<Object> toArrayList() {
+        return this.myArrayList;
+    }
 
     /**
      * Make a JSON text of this JSONArray. For compactness, no unnecessary
