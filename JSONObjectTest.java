@@ -637,6 +637,10 @@ public class JSONObjectTest {
     }
 
     @Test
+    /**
+     * Important behaviors of big numbers. Includes both JSONObject
+     * and JSONArray tests
+     */
     public void bigNumberOperations() {
         /**
          * JSONObject tries to parse BigInteger as a bean, but it only has
@@ -691,6 +695,9 @@ public class JSONObjectTest {
                 jsonObject.toString().equals(
                 "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
 
+        JSONArray jsonArray = new JSONArray();
+        
+
         /**
          * JSONObject.numberToString() works correctly, nothing to change.
          */
@@ -715,9 +722,7 @@ public class JSONObjectTest {
                 !obj.toString().equals(bigDecimal.toString()));
 
         /**
-         * wrap() vs put() big number behavior changes serialization
-         * This is a bug. 
-         * TODO: Updated expected wrap() test results after JSONObject is updated.
+         * wrap() vs put() big number behavior is now the same.
          */
         // bigInt map ctor 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -726,7 +731,7 @@ public class JSONObjectTest {
         String actualFromMapStr = jsonObject.toString();
         assertTrue("bigInt in map (or array or bean) is a string",
                 actualFromMapStr.equals(
-                "{\"bigInt\":\"123456789012345678901234567890\"}"));
+                "{\"bigInt\":123456789012345678901234567890}"));
         // bigInt put
         jsonObject = new JSONObject();
         jsonObject.put("bigInt", bigInteger);
@@ -739,9 +744,9 @@ public class JSONObjectTest {
         map.put("bigDec", bigDecimal);
         jsonObject = new JSONObject(map);
         actualFromMapStr = jsonObject.toString();
-        assertTrue("bigDec in map (or array or bean) is a string",
+        assertTrue("bigDec in map (or array or bean) is a bigDec",
                 actualFromMapStr.equals(
-                "{\"bigDec\":\"123456789012345678901234567890.12345678901234567890123456789\"}"));
+                "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
         // bigDec put
         jsonObject = new JSONObject();
         jsonObject.put("bigDec", bigDecimal);
@@ -750,43 +755,59 @@ public class JSONObjectTest {
                 actualFromPutStr.equals(
                 "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
         // bigInt,bigDec put 
-        JSONArray jsonArray = new JSONArray();
+        jsonArray = new JSONArray();
         jsonArray.put(bigInteger);
         jsonArray.put(bigDecimal);
         actualFromPutStr = jsonArray.toString();
         assertTrue("bigInt, bigDec from put is a number",
                 actualFromPutStr.equals(
                 "[123456789012345678901234567890,123456789012345678901234567890.12345678901234567890123456789]"));
+        assertTrue("getBigInt is bigInt", jsonArray.getBigInteger(0).equals(bigInteger));
+        assertTrue("getBigDec is bigDec", jsonArray.getBigDecimal(1).equals(bigDecimal));
+        assertTrue("optBigInt is bigInt", jsonArray.optBigInteger(0, BigInteger.ONE).equals(bigInteger));
+        assertTrue("optBigDec is bigDec", jsonArray.optBigDecimal(1, BigDecimal.ONE).equals(bigDecimal));
+        jsonArray.put(Boolean.TRUE);
+        try {
+            jsonArray.getBigInteger(2);
+            assertTrue("should not be able to get big int", false);
+        } catch (Exception ignored) {}
+        try {
+            jsonArray.getBigDecimal(2);
+            assertTrue("should not be able to get big dec", false);
+        } catch (Exception ignored) {}
+        assertTrue("optBigInt is default", jsonArray.optBigInteger(2, BigInteger.ONE).equals(BigInteger.ONE));
+        assertTrue("optBigDec is default", jsonArray.optBigDecimal(2, BigDecimal.ONE).equals(BigDecimal.ONE));
+
         // bigInt,bigDec list ctor
         List<Object> list = new ArrayList<Object>();
         list.add(bigInteger);
         list.add(bigDecimal);
         jsonArray = new JSONArray(list);
         String actualFromListStr = jsonArray.toString();
-        assertTrue("bigInt, bigDec in list is a string",
+        assertTrue("bigInt, bigDec in list is a bigInt, bigDec",
                 actualFromListStr.equals(
-                "[\"123456789012345678901234567890\",\"123456789012345678901234567890.12345678901234567890123456789\"]"));
+                "[123456789012345678901234567890,123456789012345678901234567890.12345678901234567890123456789]"));
         // bigInt bean ctor
         MyBigNumberBean myBigNumberBean = mock(MyBigNumberBean.class);
         when(myBigNumberBean.getBigInteger()).thenReturn(new BigInteger("123456789012345678901234567890"));
         jsonObject = new JSONObject(myBigNumberBean);
         String actualFromBeanStr = jsonObject.toString();
         // can't do a full string compare because mockery adds an extra key/value
-        assertTrue("bigInt from bean ctor is a string",
-                actualFromBeanStr.contains("\"123456789012345678901234567890\""));
+        assertTrue("bigInt from bean ctor is a bigInt",
+                actualFromBeanStr.contains("123456789012345678901234567890"));
         // bigDec bean ctor
         myBigNumberBean = mock(MyBigNumberBean.class);
         when(myBigNumberBean.getBigDecimal()).thenReturn(new BigDecimal("123456789012345678901234567890.12345678901234567890123456789"));
         jsonObject = new JSONObject(myBigNumberBean);
         actualFromBeanStr = jsonObject.toString();
         // can't do a full string compare because mockery adds an extra key/value
-        assertTrue("bigDec from bean ctor is a string",
-                actualFromBeanStr.contains("\"123456789012345678901234567890.12345678901234567890123456789\""));
+        assertTrue("bigDec from bean ctor is a bigDec",
+                actualFromBeanStr.contains("123456789012345678901234567890.12345678901234567890123456789"));
         // bigInt,bigDec wrap()
         obj = JSONObject.wrap(bigInteger);
-        assertTrue("wrap() returns string",obj.equals(bigInteger.toString()));
+        assertTrue("wrap() returns big num",obj.equals(bigInteger));
         obj = JSONObject.wrap(bigDecimal);
-        assertTrue("wrap() returns string",obj.equals(bigDecimal.toString()));
+        assertTrue("wrap() returns string",obj.equals(bigDecimal));
 
     }
 
@@ -1207,8 +1228,8 @@ public class JSONObjectTest {
          * is recognized as being a Java package class. 
          */
         Object bdWrap = JSONObject.wrap(BigDecimal.ONE);
-        assertTrue("BigDecimal.ONE evaluates to string",
-                bdWrap.equals(BigDecimal.ONE.toString()));
+        assertTrue("BigDecimal.ONE evaluates to ONE",
+                bdWrap.equals(BigDecimal.ONE));
 
         // wrap JSONObject returns JSONObject
         String jsonObjectStr = 
