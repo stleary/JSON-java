@@ -532,6 +532,44 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
+     * Get the optional BigInteger value associated with an index. The 
+     * defaultValue is returned if there is no value for the index, or if the 
+     * value is not a number and cannot be converted to a number.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param defaultValue
+     *            The default value.
+     * @return The value.
+     */
+    public BigInteger optBigInteger(int index, BigInteger defaultValue) {
+        try {
+            return this.getBigInteger(index);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get the optional BigDecimal value associated with an index. The 
+     * defaultValue is returned if there is no value for the index, or if the 
+     * value is not a number and cannot be converted to a number.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param defaultValue
+     *            The default value.
+     * @return The value.
+     */
+    public BigDecimal optBigDecimal(int index, BigDecimal defaultValue) {
+        try {
+            return this.getBigDecimal(index);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
      * Get the optional JSONArray associated with an index.
      *
      * @param index
