@@ -1,5 +1,7 @@
 # JSON-Java-unit-test
 
+*Tests are broken until bigint/bigdec changes are committed in JsonJava*<br>
+
 Unit tests to validate the JSON-Java GitHub project code<br>
 https://github.com/douglascrockford/JSON-java<br>
 
