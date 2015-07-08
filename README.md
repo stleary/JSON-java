@@ -9,7 +9,7 @@ https://github.com/douglascrockford/JSON-java<br>
 More coverage is needed, but more importantly, improvements to test quality is needed.<br>
 
 Eclipse is the recommended development environment.<br>
-Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or execute the <b>TestRunner<b> application directly.<br>
+Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or execute the **TestRunner** application directly.<br>
 
 **You will need the following libraries for testing:**<br>
 Test harness: http://junit.org<br> 
