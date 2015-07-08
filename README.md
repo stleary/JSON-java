@@ -20,17 +20,17 @@ Mockery: https://github.com/mockito/mockito <br>
 Coverage: http://www.eclemma.org/ (just install the latest in Eclipse)<br>
 JSON-Java.jar (make this jar of the files to be tested yourself)<br>
 
-*Conventions*<br>
+<b>Conventions</b><br>
 Test filenames should consist of the name of the module being tested, with the suffix "Test". 
 For example, <b>Cookie.java</b> is tested by <b>CookieTest.java</b>.
 When adding a new unit test, don't forget to update <b>JunitTestSuite.java</b>.
 
-*The fundamental issues with JSON-Java testing are:*
+<b>The fundamental issues with JSON-Java testing are:</b><br>
 * <b>JSONObjects</b> are unordered, making simple string comparison ineffective. 
 * Comparisons via **equals()** is not currently supported. Neither <b>JSONArray</b> nor <b>JSONObject</b> overrride <b>hashCode()</b> or <b>equals()</b>, so comparison defaults to the <b>Object</b> equals(), which is not useful.
 * Access to the <b>JSONArray</b> and <b>JSONObject</b> internal containers for comparison is not currently available.
 
-General issues with unit testing are:
+<b>General issues with unit testing are:</b><br>
 * Just writing tests to make coverage goals tends to result in poor tests. 
 * Unit tests are a form of documentation - how a given method actually works is demonstrated by the test. So for a code reviewer or future developer looking at code a good test helps explain how a function is supposed to work according to the original author. This can be difficult if you are not the original developer.
 *	It is difficult to evaluate unit tests in a vacuum. You also need to see the code being tested to understand if a test is good. 
