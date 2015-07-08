@@ -9,15 +9,18 @@ https://github.com/douglascrockford/JSON-java<br>
 More coverage is needed, but more importantly, improvements to test quality is needed.<br>
 
 Eclipse is the recommended development environment.<br>
-Run individual tests or <b>JunitTestSuite</b> using *EclEmma Coverage*, or execute the <b>TestRunner<b> application directly.<br>
+Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or execute the <b>TestRunner<b> application directly.<br>
 
-You will need the following libraries for testing:<br>
+**You will need the following libraries for testing:**<br>
 Test harness: http://junit.org<br> 
-* hamcrest-core-1.3.jar (for Junit)
-* junit-4.12.jar
+* hamcrest-core-1.3.jar (for Junit)<br>
+* junit-4.12.jar<br>
+
 Mockery: https://github.com/mockito/mockito <br>
-* mockito-all-1.9.5.jar
+* mockito-all-1.9.5.jar<br>
+
 Coverage: http://www.eclemma.org/ (just install the latest in Eclipse)<br>
+
 JSON-Java.jar (make this jar of the files to be tested yourself)<br>
 
 <b>Conventions</b><br>
