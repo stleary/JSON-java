@@ -8,26 +8,24 @@ https://github.com/douglascrockford/JSON-java<br>
 *These tests are a work in progress. Help from interested developers is welcome.*<br>
 More coverage is needed, but more importantly, improvements to test quality is needed.<br>
 
-You will need the following libraries for testing:
-Test harness: http://junit.org<br>
-Coverage: http://www.eclemma.org/<br>
-Mockery: https://github.com/mockito/mockito 
-
-Include these libraries in your project:
-JSON-Java.jar (make this jar of the files to be tested yourself)
-hamcrest-core-1.3.jar (for Junit)
-junit-4.12.jar
-mockito-all-1.9.5.jar
-
-
 Eclipse is the recommended development environment.
 Run individual tests or <b>JunitTestSuite</b> using *EclEmma Coverage*, or execute the <b>TestRunner<b> application directly.<br>
 
+You will need the following libraries for testing:
+Test harness: http://junit.org<br> 
+* hamcrest-core-1.3.jar (for Junit)
+* junit-4.12.jar
+Mockery: https://github.com/mockito/mockito 
+* mockito-all-1.9.5.jar
+Coverage: http://www.eclemma.org/ (just install the latest in Eclipse)<br>
+JSON-Java.jar (make this jar of the files to be tested yourself)
+
+*Conventions*
 Test filenames should consist of the name of the module being tested, with the suffix "Test". 
 For example, <b>Cookie.java</b> is tested by <b>CookieTest.java</b>.
 When adding a new unit test, don't forget to update <b>JunitTestSuite.java</b>.
 
-The fundamental issues with JSON-Java testing are:
+*The fundamental issues with JSON-Java testing are:*
 * <b>JSONObjects</b> are unordered, making simple string comparison ineffective. 
 * Comparisons via **equals()** is not currently supported. Neither <b>JSONArray</b> nor <b>JSONObject</b> overrride <b>hashCode()</b> or <b>equals()</b>, so comparison defaults to the <b>Object</b> equals(), which is not useful.
 * Access to the <b>JSONArray</b> and <b>JSONObject</b> internal containers for comparison is not currently available.
