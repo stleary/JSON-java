@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
+import java.math.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -75,7 +76,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2015-06-04
+ * @version 2015-07-06
  */
 public class JSONArray implements Iterable<Object> {
 
@@ -243,6 +244,46 @@ public class JSONArray implements Iterable<Object> {
                     : Double.parseDouble((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONArray[" + index + "] is not a number.");
+        }
+    }
+
+    /**
+     * Get the BigDecimal value associated with an index.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value cannot be converted
+     *             to a BigDecimal.
+     */
+    public BigDecimal getBigDecimal (int index) throws JSONException {
+        Object object = this.get(index);
+        try {
+            return new BigDecimal(object.toString());
+        } catch (Exception e) {
+            throw new JSONException("JSONArray[" + index +
+                    "] could not convert to BigDecimal.");
+        }
+    }
+
+    /**
+     * Get the BigInteger value associated with an index.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value cannot be converted
+     *             to a BigInteger.
+     */
+    public BigInteger getBigInteger (int index) throws JSONException {
+        Object object = this.get(index);
+        try {
+            return new BigInteger(object.toString());
+        } catch (Exception e) {
+            throw new JSONException("JSONArray[" + index +
+                    "] could not convert to BigInteger.");
         }
     }
 
@@ -485,6 +526,44 @@ public class JSONArray implements Iterable<Object> {
     public int optInt(int index, int defaultValue) {
         try {
             return this.getInt(index);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get the optional BigInteger value associated with an index. The 
+     * defaultValue is returned if there is no value for the index, or if the 
+     * value is not a number and cannot be converted to a number.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param defaultValue
+     *            The default value.
+     * @return The value.
+     */
+    public BigInteger optBigInteger(int index, BigInteger defaultValue) {
+        try {
+            return this.getBigInteger(index);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get the optional BigDecimal value associated with an index. The 
+     * defaultValue is returned if there is no value for the index, or if the 
+     * value is not a number and cannot be converted to a number.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param defaultValue
+     *            The default value.
+     * @return The value.
+     */
+    public BigDecimal optBigDecimal(int index, BigDecimal defaultValue) {
+        try {
+            return this.getBigDecimal(index);
         } catch (Exception e) {
             return defaultValue;
         }
