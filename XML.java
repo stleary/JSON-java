@@ -404,7 +404,7 @@ public class XML {
             while (keys.hasNext()) {
                 key = keys.next();
                 value = jo.opt(key);
-                if (value == null) {
+                if (value == null || value == JSONObject.NULL) {
                     value = "";
                 }
                 string = value instanceof String ? (String)value : null;
