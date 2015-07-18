@@ -1469,6 +1469,89 @@ public class JSONObjectTest {
         assertTrue("Same JSONObject should be equal to itself",
                 aJsonObject.equals(aJsonObject));
     }
+
+    @Test
+    public void jsonObjectNullOperations() {
+        /**
+         * The Javadoc for JSONObject.NULL states:
+         *      "JSONObject.NULL is equivalent to the value that JavaScript calls null,
+         *      whilst Java's null is equivalent to the value that JavaScript calls
+         *      undefined."
+         * 
+         * Standard ECMA-262 6th Edition / June 2015 (included to help explain the javadoc):
+         *      undefined value: primitive value used when a variable has not been assigned a value
+         *      Undefined type:  type whose sole value is the undefined value
+         *      null value:      primitive value that represents the intentional absence of any object value
+         *      Null type:       type whose sole value is the null value
+         * Java SE8 language spec (included to help explain the javadoc):
+         *      The Kinds of Types and Values ...
+         *      There is also a special null type, the type of the expression null, which has no name.
+         *      Because the null type has no name, it is impossible to declare a variable of the null 
+         *      type or to cast to the null type. The null reference is the only possible value of an 
+         *      expression of null type. The null reference can always be assigned or cast to any reference type.
+         *      In practice, the programmer can ignore the null type and just pretend that null is merely 
+         *      a special literal that can be of any reference type.
+         * Extensible Markup Language (XML) 1.0 Fifth Edition / 26 November 2008
+         *      No mention of null
+         * ECMA-404 1st Edition / October 2013:
+         *      JSON Text  ...
+         *      These are three literal name tokens: ...
+         *      null 
+         * 
+         * There seems to be no best practice, it's all about what we want the code to do.
+         * In the code we see that JSONObject.NULL is tranformed into null
+         */
+
+        // add JSONObject.NULL then convert to string in the manner of XML.toString() 
+        JSONObject jsonObjectJONull = new JSONObject();
+        Object obj = JSONObject.NULL;
+        jsonObjectJONull.put("key", obj);
+        Object value = jsonObjectJONull.opt("key");
+        assertTrue("opt() JSONObject.NULL should find JSONObject.NULL", obj.equals(value));
+        value = jsonObjectJONull.get("key");
+        assertTrue("get() JSONObject.NULL should find JSONObject.NULL", obj.equals(value));
+        if (value == null) {
+            value = "";
+        }
+        String string = value instanceof String ? (String)value : null;
+        assertTrue("XML toString() should convert JSONObject.NULL to null", string == null);
+
+        // now try it with null
+        JSONObject jsonObjectNull = new JSONObject();
+        obj = null;
+        jsonObjectNull.put("key", obj);
+        value = jsonObjectNull.opt("key");
+        assertTrue("opt() null should find null", value == null);;
+        if (value == null) {
+            value = "";
+        }
+        string = value instanceof String ? (String)value : null;
+        assertTrue("should convert null to empty string", "".equals(string));
+        try {
+            value = jsonObjectNull.get("key");
+            assertTrue("get() null should throw exception", false);
+        } catch (Exception ignored) {}
+
+        /**
+         * XML.toString() then goes on to do something with the value
+         * if the key val is "content", then value.toString() will be 
+         * called. This will evaluate to "null" for JSONObject.NULL,
+         * and the empty string for null.
+         * But if the key is anything else, then JSONObject.NULL will be emitted as <key>null</key> 
+         * and null will be emitted as ""
+         */
+        String sJONull = XML.toString(jsonObjectJONull);
+        assertTrue("JSONObject.NULL should emit a null value", "<key>null</key>".equals(sJONull));
+        String sNull = XML.toString(jsonObjectNull);
+        assertTrue("null should emit an empty string", "".equals(sNull));
+    }
+
+    /**
+     * 
+     */
+    private void nullOperations(Object value) {
+    }
+
 }
 
 
