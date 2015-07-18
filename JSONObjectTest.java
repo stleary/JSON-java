@@ -1498,7 +1498,8 @@ public class JSONObjectTest {
          *      These are three literal name tokens: ...
          *      null 
          * 
-         * There seems to be no best practice to follow, it's all about what we want the code to do.
+         * There seems to be no best practice to follow, it's all about what we
+         * want the code to do.
          */
 
         // add JSONObject.NULL then convert to string in the manner of XML.toString() 
@@ -1506,14 +1507,17 @@ public class JSONObjectTest {
         Object obj = JSONObject.NULL;
         jsonObjectJONull.put("key", obj);
         Object value = jsonObjectJONull.opt("key");
-        assertTrue("opt() JSONObject.NULL should find JSONObject.NULL", obj.equals(value));
+        assertTrue("opt() JSONObject.NULL should find JSONObject.NULL",
+                obj.equals(value));
         value = jsonObjectJONull.get("key");
-        assertTrue("get() JSONObject.NULL should find JSONObject.NULL", obj.equals(value));
+        assertTrue("get() JSONObject.NULL should find JSONObject.NULL",
+                obj.equals(value));
         if (value == null) {
             value = "";
         }
         String string = value instanceof String ? (String)value : null;
-        assertTrue("XML toString() should convert JSONObject.NULL to null", string == null);
+        assertTrue("XML toString() should convert JSONObject.NULL to null",
+                string == null);
 
         // now try it with null
         JSONObject jsonObjectNull = new JSONObject();
@@ -1536,11 +1540,12 @@ public class JSONObjectTest {
          * if the key val is "content", then value.toString() will be 
          * called. This will evaluate to "null" for JSONObject.NULL,
          * and the empty string for null.
-         * But if the key is anything else, then JSONObject.NULL will be emitted as <key>null</key> 
-         * and null will be emitted as ""
+         * But if the key is anything else, then JSONObject.NULL will be emitted
+         * as <key>null</key> and null will be emitted as ""
          */
         String sJONull = XML.toString(jsonObjectJONull);
-        assertTrue("JSONObject.NULL should emit a null value", "<key>null</key>".equals(sJONull));
+        assertTrue("JSONObject.NULL should emit a null value", 
+                "<key>null</key>".equals(sJONull));
         String sNull = XML.toString(jsonObjectNull);
         assertTrue("null should emit an empty string", "".equals(sNull));
     }
