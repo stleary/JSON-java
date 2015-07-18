@@ -1498,8 +1498,7 @@ public class JSONObjectTest {
          *      These are three literal name tokens: ...
          *      null 
          * 
-         * There seems to be no best practice, it's all about what we want the code to do.
-         * In the code we see that JSONObject.NULL is tranformed into null
+         * There seems to be no best practice to follow, it's all about what we want the code to do.
          */
 
         // add JSONObject.NULL then convert to string in the manner of XML.toString() 
