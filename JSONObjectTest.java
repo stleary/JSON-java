@@ -1545,13 +1545,6 @@ public class JSONObjectTest {
         String sNull = XML.toString(jsonObjectNull);
         assertTrue("null should emit an empty string", "".equals(sNull));
     }
-
-    /**
-     * 
-     */
-    private void nullOperations(Object value) {
-    }
-
 }
 
 
