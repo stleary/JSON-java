@@ -329,11 +329,11 @@ public class XMLTest {
         inputJSON.put("nullValue", JSONObject.NULL);
         // This is a possible preferred result
         String expectedXML = "<nullValue/>";
-        String actualXML = "<nullValue>null</nullValue>";
         /**
          * This is the current behavior. JSONObject.NULL is emitted as 
          * the string, "null".
          */
+        String actualXML = "<nullValue>null</nullValue>";
         String resultXML = XML.toString(inputJSON);
         assertEquals(actualXML, resultXML);
     }
