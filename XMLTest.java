@@ -294,4 +294,25 @@ public class XMLTest {
         JSONObject expectedJsonObject = XML.toJSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
     }
+
+
+    /**
+     * Illegal node-names must be converted to legal XML-node-names.
+     * The given example shows 2 nodes which are valid for JSON, but not for XML.
+     * Therefore illegal arguments should be converted to e.g. an underscore (_).
+     * 
+     */
+    @Test
+    public void shouldHandleIllegalJSONNodeNames()
+    {
+        JSONObject inputJSON = new JSONObject();
+        inputJSON.append("123IllegalNode", "someValue1");
+        inputJSON.append("Illegal@node", "someValue2");
+
+        String result = XML.toString(inputJSON);
+
+        String expected = "<___IllegalNode>someValue1</___IllegalNode><Illegal_node>someValue3</Illegal_node>";
+
+        assertEquals(expected, result);
+    }
 }
