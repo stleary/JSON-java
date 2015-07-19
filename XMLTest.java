@@ -311,7 +311,13 @@ public class XMLTest {
 
         String result = XML.toString(inputJSON);
 
-        String expected = "<___IllegalNode>someValue1</___IllegalNode><Illegal_node>someValue3</Illegal_node>";
+        /**
+         * This is invalid XML. Names should not begin with digits or contain
+         * certain values, including '@'. One possible solution is to replace
+         * illegal chars with '_', in which case the expected output would be:
+         * <___IllegalNode>someValue1</___IllegalNode><Illegal_node>someValue2</Illegal_node>
+         */
+        String expected = "<123IllegalNode>someValue1</123IllegalNode><Illegal@node>someValue2</Illegal@node>";
 
         assertEquals(expected, result);
     }
