@@ -71,3 +71,5 @@ XML.java: XML provides support for converting between JSON and XML.
 JSONML.java: JSONML provides support for converting between JSONML and XML.
 
 XMLTokener.java: XMLTokener extends JSONTokener for parsing XML text.
+
+Unit tests are maintained in a separate project. Contributing developers can test JSON-java pull requests with the code in this project: https://github.com/stleary/JSON-Java-unit-test
