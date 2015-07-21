@@ -364,8 +364,8 @@ public class XMLTest {
         assertTrue("2. content array found", jsonObject.get("content") instanceof JSONArray);
         JSONArray jsonArray = jsonObject.getJSONArray("content");
         assertTrue("2. array size", jsonArray.length() == 2);
-        assertTrue("2. content array entry 1", "if (a < b && a > 0) then return".equals(jsonArray.get(0)));
-        assertTrue("2. content array entry 2", "here is another cdata".equals(jsonArray.get(1)));
+        assertTrue("2. content array entry 0", "if (a < b && a > 0) then return".equals(jsonArray.get(0)));
+        assertTrue("2. content array entry 1", "here is another cdata".equals(jsonArray.get(1)));
 
         /**
          * text content is accumulated in a "content" inside a local JSONObject.
@@ -388,8 +388,8 @@ public class XMLTest {
         assertTrue("4. content array found", jsonObject.get("tag1") instanceof JSONArray);
         jsonArray = jsonObject.getJSONArray("tag1");
         assertTrue("4. array size", jsonArray.length() == 3);
-        assertTrue("4. content array entry 1", "value 1".equals(jsonArray.get(0)));
-        assertTrue("4. content array entry 2", jsonArray.getInt(1) == 2);
+        assertTrue("4. content array entry 0", "value 1".equals(jsonArray.get(0)));
+        assertTrue("4. content array entry 1", jsonArray.getInt(1) == 2);
         assertTrue("4. content array entry 2", jsonArray.getBoolean(2) == true);
 
         /**
@@ -407,8 +407,8 @@ public class XMLTest {
         assertTrue("5. contained content jsonArray found", jsonObject.get("content") instanceof JSONArray);
         jsonArray = jsonObject.getJSONArray("content");
         assertTrue("5. array size", jsonArray.length() == 2);
-        assertTrue("5. content array entry 1", "val1".equals(jsonArray.get(0)));
-        assertTrue("5. content array entry 2", "val2".equals(jsonArray.get(1)));
+        assertTrue("5. content array entry 0", "val1".equals(jsonArray.get(0)));
+        assertTrue("5. content array entry 1", "val2".equals(jsonArray.get(1)));
 
         /**
          * If there is only 1 complex text content, then it is accumulated in a 
@@ -421,5 +421,22 @@ public class XMLTest {
         jsonObject = jsonObject.getJSONObject("tag1");
         assertTrue("6. contained content found", "val1".equals(jsonObject.get("content")));
         assertTrue("6. contained tag2", "".equals(jsonObject.get("tag2")));
-    }
+
+        /**
+         * In this corner case, the content sibling happens to have key=content
+         * We end up with an array within an array, and no content element.
+         * This is probably a bug. 
+         */
+        xmlStr =  "<tag1>val1<content/></tag1>";
+        jsonObject = XML.toJSONObject(xmlStr);
+        assertTrue("7. 1 item", 1 == jsonObject.length());
+        assertTrue("7. jsonArray found", jsonObject.get("tag1") instanceof JSONArray);
+        jsonArray = jsonObject.getJSONArray("tag1");
+        assertTrue("array size 1", jsonArray.length() == 1);
+        assertTrue("7. contained array found", jsonArray.get(0) instanceof JSONArray);
+        jsonArray = jsonArray.getJSONArray(0);
+        assertTrue("7. inner array size 2", jsonArray.length() == 2);
+        assertTrue("7. inner array item 0", "val1".equals(jsonArray.get(0)));
+        assertTrue("7. inner array item 1", "".equals(jsonArray.get(1)));
+}
 }
