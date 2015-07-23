@@ -222,13 +222,13 @@ public class EnumTest {
 
     @Test
     public void enumAPI() {
-        /**
-         * Exercise the proposed enum API methods
-         */
         MyEnumClass myEnumClass = new MyEnumClass();
         myEnumClass.setMyEnum(MyEnum.VAL1);
         MyEnumField myEnumField = MyEnumField.VAL2;
 
+        /**
+         * Exercise the proposed enum API methods on JSONObject
+         */
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("strKey", "value");
         jsonObject.put("enumKey", myEnumField);
@@ -268,5 +268,46 @@ public class EnumTest {
         actualEnum = jsonObject.optEnum(MyEnumField.class, "strKey", null);
         assertTrue("opt null", actualEnum == null);
 
+        /**
+         * Exercise the proposed enum API methods on JSONArray
+         */
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put("value");
+        jsonArray.put(myEnumField);
+        jsonArray.put(myEnumClass);
+
+        // get a plain old enum
+        actualEnum = jsonArray.getEnum(MyEnumField.class, 1);
+        assertTrue("get myEnumField", actualEnum == MyEnumField.VAL2);
+
+        // try to get the wrong value
+        try {
+            actualEnum = jsonArray.getEnum(MyEnumField.class, 0);
+            assertTrue("should throw an exception for wrong index", false);
+        } catch (Exception ignored) {}
+
+        // get a class that contains an enum
+        actualEnumClass = (MyEnumClass)jsonArray.get(2);
+        assertTrue("get enum", actualEnumClass.getMyEnum() == MyEnum.VAL1);
+
+        // opt a plain old enum
+        actualEnum = jsonArray.optEnum(MyEnumField.class, 1);
+        assertTrue("opt myEnumField", actualEnum == MyEnumField.VAL2);
+
+        // opt the wrong value
+        actualEnum = jsonArray.optEnum(MyEnumField.class, 0);
+        assertTrue("opt null", actualEnum == null);
+
+        // opt a class that contains an enum
+        actualEnumClass = (MyEnumClass)jsonArray.opt(2);
+        assertTrue("get enum", actualEnumClass.getMyEnum() == MyEnum.VAL1);
+
+        // opt with default a plain old enum
+        actualEnum = jsonArray.optEnum(MyEnumField.class, 1, null);
+        assertTrue("opt myEnumField", actualEnum == MyEnumField.VAL2);
+
+        // opt with default the wrong value
+        actualEnum = jsonArray.optEnum(MyEnumField.class, 0, null);
+        assertTrue("opt null", actualEnum == null);
     }
 }
