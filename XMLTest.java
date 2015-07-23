@@ -438,5 +438,47 @@ public class XMLTest {
         assertTrue("7. inner array size 2", jsonArray.length() == 2);
         assertTrue("7. inner array item 0", "val1".equals(jsonArray.get(0)));
         assertTrue("7. inner array item 1", "".equals(jsonArray.get(1)));
-}
+
+        /**
+         * Confirm behavior of original issue
+         */
+        String jsonStr = 
+                "{"+
+                    "\"Profile\": {"+
+                        "\"list\": {"+
+                            "\"history\": {"+
+                                "\"entries\": ["+
+                                    "{"+
+                                        "\"deviceId\": \"id\","+
+                                        "\"content\": {"+
+                                            "\"material\": ["+
+                                                "{"+
+                                                    "\"stuff\": false"+
+                                                "}"+
+                                            "]"+
+                                        "}"+
+                                    "}"+
+                                "]"+
+                            "}"+
+                        "}"+
+                    "}"+
+                "}";
+        jsonObject = new JSONObject(jsonStr);
+        xmlStr = XML.toString(jsonObject);
+        /**
+         * This is the created XML. Looks like content was mistaken for
+         * complex (child node + text) XML. 
+         *  <Profile>
+         *      <list>
+         *          <history>
+         *              <entries>
+         *                  <deviceId>id</deviceId>
+         *                  {&quot;material&quot;:[{&quot;stuff&quot;:false}]}
+         *              </entries>
+         *          </history>
+         *      </list>
+         *  </Profile>
+         */
+        assertTrue("nothing to test here, see comment on created XML, above", true);
+    }
 }
