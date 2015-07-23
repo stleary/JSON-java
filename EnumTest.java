@@ -268,6 +268,10 @@ public class EnumTest {
         actualEnum = jsonObject.optEnum(MyEnumField.class, "strKey", null);
         assertTrue("opt null", actualEnum == null);
 
+        // opt with default an index that does not exist
+        actualEnum = jsonObject.optEnum(MyEnumField.class, "noKey", null);
+        assertTrue("opt null", actualEnum == null);
+
         /**
          * Exercise the proposed enum API methods on JSONArray
          */
@@ -309,5 +313,10 @@ public class EnumTest {
         // opt with default the wrong value
         actualEnum = jsonArray.optEnum(MyEnumField.class, 0, null);
         assertTrue("opt null", actualEnum == null);
+
+        // opt with default an index that does not exist
+        actualEnum = jsonArray.optEnum(MyEnumField.class, 3, null);
+        assertTrue("opt null", actualEnum == null);
+
     }
 }
