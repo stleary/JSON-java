@@ -254,7 +254,7 @@ public class JSONArray implements Iterable<Object> {
     *            The type of enum to retrieve.
     * @param index
     *            The index must be between 0 and length() - 1.
-    * @return The enum value.
+    * @return The enum value at the index location
     * @throws JSONException
     *            if the key is not found or if the value cannot be converted
     *            to an enum.
@@ -563,7 +563,7 @@ public class JSONArray implements Iterable<Object> {
      *            The type of enum to retrieve.
      * @param index
      *            The index must be between 0 and length() - 1.
-     * @return The enum value or null if not found
+     * @return The enum value at the index location or null if not found
      */
     public <E extends Enum<E>> E optEnum(Class<E> clazz, int index) {
         return this.optEnum(clazz, index, null);
@@ -578,8 +578,8 @@ public class JSONArray implements Iterable<Object> {
      *            The index must be between 0 and length() - 1.
      * @param defaultValue
      *            The default in case the value is not found
-     * @return The enum value or defaultValue if the value is not found or
-     *            cannot be assigned to clazz
+     * @return The enum value at the index location or defaultValue if
+     *            the value is not found or cannot be assigned to clazz
      */
     public <E extends Enum<E>> E optEnum(Class<E> clazz, int index, E defaultValue) {
         try {

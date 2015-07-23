@@ -486,7 +486,7 @@ public class JSONObject {
     *           The type of enum to retrieve.
     * @param key
     *           A key string.
-    * @return The enum value.
+    * @return The enum value associated with the key
     * @throws JSONException
     *             if the key is not found or if the value cannot be converted
     *             to an enum.
@@ -876,7 +876,7 @@ public class JSONObject {
      *            The type of enum to retrieve.
      * @param key
      *            A key string.
-     * @return The enum value or null if not found
+     * @return The enum value associated with the key or null if not found
      */
     public <E extends Enum<E>> E optEnum(Class<E> clazz, String key) {
         return this.optEnum(clazz, key, null);
@@ -891,8 +891,8 @@ public class JSONObject {
      *            A key string.
      * @param defaultValue
      *            The default in case the value is not found
-     * @return The enum value or defaultValue if the value is not found or
-     *            cannot be assigned to clazz
+     * @return The enum value associated with the key or defaultValue
+     *            if the value is not found or cannot be assigned to clazz
      */
     public <E extends Enum<E>> E optEnum(Class<E> clazz, String key, E defaultValue) {
         try {
