@@ -480,6 +480,31 @@ public class JSONObject {
     }
 
     /**
+    * Get the enum value associated with a key.
+    * 
+    * @param clazz
+    *           The type of enum to retrieve.
+    * @param key
+    *           A key string.
+    * @return The enum value.
+    * @throws JSONException
+    *             if the key is not found or if the value cannot be converted
+    *             to an enum.
+    */
+    public <E extends Enum<E>> E getEnum(Class<E> clazz, String key) throws JSONException {
+        E val = optEnum(clazz, key);
+        if(val==null) {
+            // JSONException should really take a throwable argument.
+            // If it did, I would re-implement this with the Enum.valueOf
+            // method and place any thrown exception in the JSONException
+            throw new JSONException("JSONObject[" + quote(key)
+                    + "] is not an enum of type " + quote(clazz.getSimpleName())
+                    + ".");
+        }
+        return val;
+    }
+
+    /**
      * Get the boolean value associated with a key.
      *
      * @param key
@@ -842,6 +867,49 @@ public class JSONObject {
      */
     public Object opt(String key) {
         return key == null ? null : this.map.get(key);
+    }
+
+    /**
+     * Get the enum value associated with a key.
+     * 
+     * @param clazz
+     *            The type of enum to retrieve.
+     * @param key
+     *            A key string.
+     * @return The enum value or null if not found
+     */
+    public <E extends Enum<E>> E optEnum(Class<E> clazz, String key) {
+        return this.optEnum(clazz, key, null);
+    }
+
+    /**
+     * Get the enum value associated with a key.
+     * 
+     * @param clazz
+     *            The type of enum to retrieve.
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default in case the value is not found
+     * @return The enum value or defaultValue if the value is not found or
+     *            cannot be assigned to clazz
+     */
+    public <E extends Enum<E>> E optEnum(Class<E> clazz, String key, E defaultValue) {
+        try {
+            Object val = this.opt(key);
+            if (NULL.equals(val)) {
+                return defaultValue;
+            }
+            if (clazz.isAssignableFrom(val.getClass())) {
+                // we just checked it!
+                @SuppressWarnings("unchecked")
+                E myE = (E) val;
+                return myE;
+            }
+            return Enum.valueOf(clazz, val.toString());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return defaultValue;
+        }
     }
 
     /**
