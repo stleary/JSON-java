@@ -195,6 +195,7 @@ public class EnumTest {
         Util.compareActualVsExpectedJsonArrays(actualJsonArray, expectedJsonArray);
     }
 
+    @Test
     public void wrap() {
         /**
          * Wrap should handle enums exactly the same way as the JSONObject(Object)
@@ -217,5 +218,55 @@ public class EnumTest {
         jsonObject = (JSONObject)JSONObject.wrap(myEnumClass);
         expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
+    }
+
+    @Test
+    public void enumAPI() {
+        /**
+         * Exercise the proposed enum API methods
+         */
+        MyEnumClass myEnumClass = new MyEnumClass();
+        myEnumClass.setMyEnum(MyEnum.VAL1);
+        MyEnumField myEnumField = MyEnumField.VAL2;
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("strKey", "value");
+        jsonObject.put("enumKey", myEnumField);
+        jsonObject.put("enumClassKey", myEnumClass);
+
+        // get a plain old enum
+        MyEnumField actualEnum = jsonObject.getEnum(MyEnumField.class, "enumKey");
+        assertTrue("get myEnumField", actualEnum == MyEnumField.VAL2);
+
+        // try to get the wrong value
+        try {
+            actualEnum = jsonObject.getEnum(MyEnumField.class, "strKey");
+            assertTrue("should throw an exception for wrong key", false);
+        } catch (Exception ignored) {}
+
+        // get a class that contains an enum
+        MyEnumClass actualEnumClass = (MyEnumClass)jsonObject.get("enumClassKey");
+        assertTrue("get enum", actualEnumClass.getMyEnum() == MyEnum.VAL1);
+
+        // opt a plain old enum
+        actualEnum = jsonObject.optEnum(MyEnumField.class, "enumKey");
+        assertTrue("opt myEnumField", actualEnum == MyEnumField.VAL2);
+
+        // opt the wrong value
+        actualEnum = jsonObject.optEnum(MyEnumField.class, "strKey");
+        assertTrue("opt null", actualEnum == null);
+
+        // opt a class that contains an enum
+        actualEnumClass = (MyEnumClass)jsonObject.opt("enumClassKey");
+        assertTrue("get enum", actualEnumClass.getMyEnum() == MyEnum.VAL1);
+
+        // opt with default a plain old enum
+        actualEnum = jsonObject.optEnum(MyEnumField.class, "enumKey", null);
+        assertTrue("opt myEnumField", actualEnum == MyEnumField.VAL2);
+
+        // opt with default the wrong value
+        actualEnum = jsonObject.optEnum(MyEnumField.class, "strKey", null);
+        assertTrue("opt null", actualEnum == null);
+
     }
 }
