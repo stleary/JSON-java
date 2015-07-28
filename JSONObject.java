@@ -1099,7 +1099,7 @@ public class JSONObject {
                         }
 
                         Object result = method.invoke(bean, (Object[]) null);
-                        if (result != null) {
+                        if (result != null && result != bean) {
                             this.map.put(key, wrap(result));
                         }
                     }
