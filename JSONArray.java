@@ -76,7 +76,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2015-07-06
+ * @version 2015-07-22
  */
 public class JSONArray implements Iterable<Object> {
 
@@ -245,6 +245,31 @@ public class JSONArray implements Iterable<Object> {
         } catch (Exception e) {
             throw new JSONException("JSONArray[" + index + "] is not a number.");
         }
+    }
+
+    /**
+    * Get the enum value associated with an index.
+    * 
+    * @param clazz
+    *            The type of enum to retrieve.
+    * @param index
+    *            The index must be between 0 and length() - 1.
+    * @return The enum value at the index location
+    * @throws JSONException
+    *            if the key is not found or if the value cannot be converted
+    *            to an enum.
+    */
+    public <E extends Enum<E>> E getEnum(Class<E> clazz, int index) throws JSONException {
+        E val = optEnum(clazz, index);
+        if(val==null) {
+            // JSONException should really take a throwable argument.
+            // If it did, I would re-implement this with the Enum.valueOf
+            // method and place any thrown exception in the JSONException
+            throw new JSONException("JSONObject[" + JSONObject.quote(Integer.toString(index))
+                    + "] is not an enum of type " + JSONObject.quote(clazz.getSimpleName())
+                    + ".");
+        }
+        return val;
     }
 
     /**
@@ -530,6 +555,50 @@ public class JSONArray implements Iterable<Object> {
             return defaultValue;
         }
     }
+
+    /**
+     * Get the enum value associated with a key.
+     * 
+     * @param clazz
+     *            The type of enum to retrieve.
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The enum value at the index location or null if not found
+     */
+    public <E extends Enum<E>> E optEnum(Class<E> clazz, int index) {
+        return this.optEnum(clazz, index, null);
+    }
+
+    /**
+     * Get the enum value associated with a key.
+     * 
+     * @param clazz
+     *            The type of enum to retrieve.
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param defaultValue
+     *            The default in case the value is not found
+     * @return The enum value at the index location or defaultValue if
+     *            the value is not found or cannot be assigned to clazz
+     */
+    public <E extends Enum<E>> E optEnum(Class<E> clazz, int index, E defaultValue) {
+        try {
+            Object val = this.opt(index);
+            if (JSONObject.NULL.equals(val)) {
+                return defaultValue;
+            }
+            if (clazz.isAssignableFrom(val.getClass())) {
+                // we just checked it!
+                @SuppressWarnings("unchecked")
+                E myE = (E) val;
+                return myE;
+            }
+            return Enum.valueOf(clazz, val.toString());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return defaultValue;
+        }
+    }
+
 
     /**
      * Get the optional BigInteger value associated with an index. The 
