@@ -1,6 +1,6 @@
 JSON in Java [package org.json]
 
-This package needs a new owner. I have not used it in over a decade, and I do 
+This package needs a new owner. I have not used it in over a decade, and I do
 not have time to maintain programs that I do not use.
 
 If you think you can give this package a good home, please contact me.
@@ -73,3 +73,8 @@ JSONML.java: JSONML provides support for converting between JSONML and XML.
 XMLTokener.java: XMLTokener extends JSONTokener for parsing XML text.
 
 Unit tests are maintained in a separate project. Contributing developers can test JSON-java pull requests with the code in this project: https://github.com/stleary/JSON-Java-unit-test
+
+##### To include using gradle :-
+
+* compile 'org.json:json:20141113' (Java 1.8 compatible release)
+* compile 'org.json:json:20140107' (Java 1.7 compatible release)
