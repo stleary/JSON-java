@@ -1,16 +1,5 @@
 JSON in Java [package org.json]
 
-This package needs a new owner. I have not used it in over a decade, and I do 
-not have time to maintain programs that I do not use.
-
-If you think you can give this package a good home, please contact me.
-
-Douglas Crockford
-douglas@crockford.com
-
-2015-02-06
-
-
 JSON is a light-weight, language independent, data interchange format.
 See http://www.JSON.org/
 
