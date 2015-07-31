@@ -393,7 +393,7 @@ public class XML {
 
             if (tagName != null) {
                 sb.append('<');
-                sb.append(tagName);
+                sb.append(getEscapedNodeKey(tagName));
                 sb.append('>');
             }
 
@@ -404,7 +404,7 @@ public class XML {
             while (keys.hasNext()) {
                 key = keys.next();
                 value = jo.opt(key);
-                if (value == null) {
+                if (value == null || value == JSONObject.NULL) {
                     value = "";
                 }
                 string = value instanceof String ? (String)value : null;
@@ -434,11 +434,11 @@ public class XML {
                         value = ja.get(i);
                         if (value instanceof JSONArray) {
                             sb.append('<');
-                            sb.append(key);
+                            sb.append(getEscapedNodeKey(key));
                             sb.append('>');
                             sb.append(toString(value));
                             sb.append("</");
-                            sb.append(key);
+                            sb.append(getEscapedNodeKey(key));
                             sb.append('>');
                         } else {
                             sb.append(toString(value, key));
@@ -446,7 +446,7 @@ public class XML {
                     }
                 } else if ("".equals(value)) {
                     sb.append('<');
-                    sb.append(key);
+                    sb.append(getEscapedNodeKey(key));
                     sb.append("/>");
 
 // Emit a new tag <k>
@@ -460,7 +460,7 @@ public class XML {
 // Emit the </tagname> close tag
 
                 sb.append("</");
-                sb.append(tagName);
+                sb.append(getEscapedNodeKey(tagName));
                 sb.append('>');
             }
             return sb.toString();
@@ -482,9 +482,26 @@ public class XML {
             } else {
                 string = (object == null) ? "null" : escape(object.toString());
                 return (tagName == null) ? "\"" + string + "\"" :
-                    (string.length() == 0) ? "<" + tagName + "/>" :
-                    "<" + tagName + ">" + string + "</" + tagName + ">";
+                    (string.length() == 0) ? "<" + getEscapedNodeKey(tagName) + "/>" :
+                    "<" + getEscapedNodeKey(tagName) + ">" + string + "</" + getEscapedNodeKey(tagName) + ">";
             }
         }
+    }
+
+
+    /**
+     * Strip disallowed node-name chars.
+     * This is a two way replacement:
+     *      1. Replace first char if it's not an Alnum-Unicode-value.
+     *      2. Replace all special chars which are neither Alnum-Unicode nor Digit-values.
+     * 
+     * Hint: (?U) Is available since JDK7.
+     * For more informations on Regex-usage look at this JavaDoc: {@link java.util.regex.Pattern}
+     * @param key
+     * @return
+     */
+    private static String getEscapedNodeKey(String key)
+    {
+        return key.replaceFirst("(?U)^[^\\p{Alpha}]", "_$0").replaceAll("(?U)[\\W]", "_");
     }
 }
