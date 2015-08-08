@@ -10,61 +10,88 @@ import org.junit.Test;
 
 /**
  * HTTP cookie specification: RFC6265
- * 
+ * <p>
  * At its most basic, a cookie is a name=value pair. The value may be subdivided
  * into other cookies, but that is not tested here. The cookie may also include
  * certain named attributes, delimited by semicolons. 
- * 
+ * <p>
  * The Cookie.toString() method emits certain attributes if present: expires,
  * domain, path, secure. All but secure are name-value pairs. Other attributes
  * are not included in the toString() output.
- *   
+ * <p>
  * A JSON-Java encoded cookie escapes '+', '%', '=', ';' with %hh values.
  */
 public class CookieTest {
 
+    /**
+     * Attempts to create a JSONObject from a null string.
+     * Expects a NullPointerException.
+     */
     @Test(expected=NullPointerException.class)
     public void nullCookieException() {
-        /**
-         * Attempts to create a JSONObject from a null string
-         */
         String cookieStr = null;
         Cookie.toJSONObject(cookieStr);
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to create a JSONObject from a cookie string with
+     * no '=' char.
+     * Expects a JSONException.
+     */
+    @Test
     public void malFormedNameValueException() {
-        /**
-         * Attempts to create a JSONObject from a malformed cookie string
-         */
         String cookieStr = "thisCookieHasNoEqualsChar";
-        Cookie.toJSONObject(cookieStr);
+        try {
+            Cookie.toJSONObject(cookieStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    e.getMessage().startsWith("Expected '=' and instead saw '")
+                    && e.getMessage().endsWith("' at 27 [character 28 line 1]"));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to create a JSONObject from a cookie string
+     * with embedded ';' char.
+     * Expects a JSONException.
+     */
+    @Test
     public void malFormedAttributeException() {
-        /**
-         * Attempts to create a JSONObject from a malformed cookie string
-         */
         String cookieStr = "this=Cookie;myAttribute";
-        Cookie.toJSONObject(cookieStr);
+        try {
+            Cookie.toJSONObject(cookieStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    "Missing '=' in cookie parameter. at 25 [character 26 line 1]".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to create a JSONObject from an empty cookie string.<br>
+     * Note: Cookie throws an exception, but CookieList does not.<br>
+     * Expects a JSONException
+     */
+    @Test
     public void emptyStringCookieException() {
-        /**
-         * Attempts to create a JSONObject from an empty cookie string
-         * Note: Cookie throws an exception, but CookieList does not
-         */
         String cookieStr = "";
-        Cookie.toJSONObject(cookieStr);
+        try {
+            Cookie.toJSONObject(cookieStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    e.getMessage().startsWith("Expected '=' and instead saw '") &&
+                    e.getMessage().endsWith("' at 2 [character 3 line 1]"));
+        }
     }
 
+    /**
+     * Cookie from a simple name/value pair with no delimiter
+     */
     @Test
     public void simpleCookie() {
-        /**
-         * The simplest cookie is a name/value pair with no delimiter
-         */
         String cookieStr = "SID=31d4d96e407aad42";
         String expectedCookieStr = "{\"name\":\"SID\",\"value\":\"31d4d96e407aad42\"}";
         JSONObject jsonObject = Cookie.toJSONObject(cookieStr);
@@ -72,13 +99,13 @@ public class CookieTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
+    /**
+     * Store a cookie with all of the supported attributes in a 
+     * JSONObject. The secure attribute, which has no value, is treated
+     * as a boolean.
+     */
     @Test
     public void multiPartCookie() {
-        /**
-         * Store a cookie with all of the supported attributes in a 
-         * JSONObject. The secure attribute, which has no value, is treated
-         * as a boolean.
-         */
         String cookieStr = 
             "PH=deleted;  "+
             " expires=Wed, 19-Mar-2014 17:53:53 GMT;"+
@@ -99,13 +126,13 @@ public class CookieTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
+    /**
+     * Cookie.toString() will omit the non-standard "thiswont=beIncluded"
+     * attribute, but the attribute is still stored in the JSONObject.
+     * This test confirms both behaviors.
+     */
     @Test
     public void convertCookieToString() {
-        /**
-         * ToString() will omit the non-standard "thiswont=beIncluded"
-         * attribute, but the attribute is still stored in the JSONObject.
-         * This test confirms both behaviors.
-         */
         String cookieStr = 
             "PH=deleted;  "+
             " expires=Wed, 19-Mar-2014 17:53:53 GMT;"+
@@ -138,14 +165,14 @@ public class CookieTest {
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
     }
 
+    /**
+     * A string may be URL-encoded when converting to JSONObject.
+     * If found, '+' is converted to ' ', and %hh hex strings are converted
+     * to their ascii char equivalents. This test confirms the decoding
+     * behavior. 
+     */
     @Test
     public void convertEncodedCookieToString() {
-        /**
-         * A string may be URL-encoded when converting to JSONObject.
-         * If found, '+' is converted to ' ', and %hh hex strings are converted
-         * to their ascii char equivalents. This test confirms the decoding
-         * behavior. 
-         */
         String cookieStr = 
             "PH=deleted;  "+
             " expires=Wed,+19-Mar-2014+17:53:53+GMT;"+
@@ -167,14 +194,14 @@ public class CookieTest {
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
     }
     
+    /**
+     * A public API method performs a URL encoding for selected chars
+     * in a string. Control chars, '+', '%', '=', ';' are all encoded 
+     * as %hh hex strings. The string is also trimmed.
+     * This test confirms that behavior. 
+     */
     @Test
     public void escapeString() {
-        /**
-         * A public API method performs a URL encoding for selected chars
-         * in a string. Control chars, '+', '%', '=', ';' are all encoded 
-         * as %hh hex strings. The string is also trimmed.
-         * This test confirms that behavior. 
-         */
         String str = "   +%\r\n\t\b%=;;;   ";
         String expectedStr = "%2b%25%0d%0a%09%08%25%3d%3b%3b%3b";
         String actualStr = Cookie.escape(str);
@@ -182,14 +209,14 @@ public class CookieTest {
                 " expected: " +expectedStr, expectedStr.equals(actualStr));
     }
 
+    /**
+     * A public API method performs URL decoding for strings.
+     * '+' is converted to space and %hh hex strings are converted to
+     * their ascii equivalent values. The string is not trimmed.
+     * This test confirms that behavior. 
+     */
     @Test
     public void unescapeString() {
-        /**
-         * A public API method performs URL decoding for strings.
-         * '+' is converted to space and %hh hex strings are converted to
-         * their ascii equivalent values. The string is not trimmed.
-         * This test confirms that behavior. 
-         */
         String str = " +%2b%25%0d%0a%09%08%25%3d%3b%3b%3b+ ";
         String expectedStr = "  +%\r\n\t\b%=;;;  ";
         String actualStr = Cookie.unescape(str);
