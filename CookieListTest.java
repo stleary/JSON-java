@@ -6,60 +6,70 @@ import org.json.*;
 import org.junit.Test;
 
 /**
- * HTTP cookie specification: RFC6265
- * 
+ * HTTP cookie specification RFC6265: http://tools.ietf.org/html/rfc6265
+ * <p>
  * A cookie list is a JSONObject whose members are presumed to be cookie
  * name/value pairs. Entries are unescaped while being added, and escaped in 
  * the toString() output.
  * Unescaping means to convert %hh hex strings to the ascii equivalent
  * and converting '+' to ' '.
  * Escaping converts '+', '%', '=', ';' and ascii control chars to %hh hex strings.
- *
- * CookieList should not be considered as just a list of Cookie objects:
+ * <p>
+ * CookieList should not be considered as just a list of Cookie objects:<br>
  * - CookieList stores a cookie name/value pair as a single entry; Cookie stores 
- *      it as 2 entries (key="name" and key="value").
+ *      it as 2 entries (key="name" and key="value").<br>
  * - CookieList requires multiple name/value pairs as input; Cookie allows the
- *      'secure' name with no associated value
- * - CookieList has no special handling for attribute name/value pairs.
+ *      'secure' name with no associated value<br>
+ * - CookieList has no special handling for attribute name/value pairs.<br>
  */
 public class CookieListTest {
 
+    /**
+     * Attempts to create a CookieList from a null string.
+     * Expects a NullPointerException.
+     */
     @Test(expected=NullPointerException.class)
     public void nullCookieListException() {
-        /**
-         * Attempts to create a CookieList from a null string
-         */
         String cookieStr = null;
         CookieList.toJSONObject(cookieStr);
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to create a CookieList from a malformed string.
+     * Expects a JSONException.
+     */
+    @Test
     public void malFormedCookieListException() {
-        /**
-         * Attempts to create a CookieList from a malformed string
-         */
         String cookieStr = "thisCookieHasNoEqualsChar";
-        CookieList.toJSONObject(cookieStr);
+        try {
+            CookieList.toJSONObject(cookieStr);
+            assertTrue("should throw an exception", false);
+        } catch (JSONException e) {
+            /**
+             * Not sure of the missing char, but full string compare fails 
+             */
+            assertTrue("Expecting an exception message",
+                    e.getMessage().startsWith("Expected '=' and instead saw '") &&
+                            e.getMessage().endsWith("' at 27 [character 28 line 1]"));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Creates a CookieList from an empty string.
+     */
+    @Test
     public void emptyStringCookieList() {
-        /**
-         * Creates a CookieList from an empty string.
-         * Cookie throws an exception, but CookieList does not
-         */
         String cookieStr = "";
         String expectedCookieStr = "";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
-        JSONObject expectedJsonObject = new JSONObject(expectedCookieStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+        assertTrue(jsonObject.length() == 0);
     }
 
+    /**
+     * CookieList with the simplest cookie - a name/value pair with no delimiter.
+     */
     @Test
     public void simpleCookieList() {
-        /**
-         * The simplest cookie is a name/value pair with no delimiter
-         */
         String cookieStr = "SID=31d4d96e407aad42";
         String expectedCookieStr = "{\"SID\":\"31d4d96e407aad42\"}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
@@ -67,11 +77,11 @@ public class CookieListTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
+    /**
+     * CookieList with a single a cookie which has a name/value pair and delimiter.
+     */
     @Test
     public void simpleCookieListWithDelimiter() {
-        /**
-         * The simplest cookie is a name/value pair with a delimiter
-         */
         String cookieStr = "SID=31d4d96e407aad42;";
         String expectedCookieStr = "{\"SID\":\"31d4d96e407aad42\"}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
@@ -79,6 +89,10 @@ public class CookieListTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
+    /**
+     * CookieList with multiple cookies consisting of name/value pairs
+     * with delimiters.
+     */
     @Test
     public void multiPartCookieList() {
         String cookieStr = 
@@ -102,6 +116,9 @@ public class CookieListTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
+    /**
+     * CookieList from a JSONObject with valid key and null value
+     */
     @Test
     public void convertCookieListWithNullValueToString() {
         JSONObject jsonObject = new JSONObject();
@@ -110,6 +127,9 @@ public class CookieListTest {
         assertTrue("toString() should be empty", "".equals(cookieToStr));
     }
 
+    /**
+     * CookieList with multiple entries converted to a JSON document. 
+     */
     @Test
     public void convertCookieListToString() {
         String cookieStr = 
@@ -136,6 +156,10 @@ public class CookieListTest {
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
     }
 
+    /**
+     * CookieList with multiple entries and some '+' chars and URL-encoded
+     * values converted to a JSON document. 
+     */
     @Test   
     public void convertEncodedCookieListToString() {
         String cookieStr = 
