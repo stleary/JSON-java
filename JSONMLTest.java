@@ -23,34 +23,93 @@ import org.junit.Test;
  */
 public class JSONMLTest {
 
+    /**
+     * Attempts to transform a null XML string to JSON.
+     * Expects a NullPointerException
+     */
     @Test(expected=NullPointerException.class)
     public void nullXMLException() {
-        /**
-         * Attempts to transform a null XML string to JSON
-         */
         String xmlStr = null;
         JSONML.toJSONArray(xmlStr);
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to transform an empty string to JSON.
+     * Expects a JSONException
+     */
+    @Test
     public void emptyXMLException() {
-        /**
-         * Attempts to transform an empty XML string to JSON
-         */
         String xmlStr = "";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Bad XML at 1 [character 2 line 1]".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to call JSONML.toString() with a null JSONArray.
+     * Expects a NullPointerException. 
+     */
+    @Test(expected=NullPointerException.class)
+    public void nullJSONXMLException() {
+        /**
+         * Tries to convert a null JSONArray to XML.
+         */
+        JSONArray jsonArray= null;
+        JSONML.toString(jsonArray);
+    }
+
+    /**
+     * Attempts to call JSONML.toString() with a null JSONArray.
+     * Expects a JSONException. 
+     */
+    @Test
+    public void emptyJSONXMLException() {
+        /**
+         * Tries to convert an empty JSONArray to XML.
+         */
+        JSONArray jsonArray = new JSONArray();
+        try {
+            JSONML.toString(jsonArray);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "JSONArray[0] not found.".
+                equals(e.getMessage()));
+        }
+    }
+
+    /**
+     * Attempts to transform an non-XML string to JSON.
+     * Expects a JSONException
+     */
+    @Test
     public void nonXMLException() {
         /**
          * Attempts to transform a nonXML string to JSON
          */
         String xmlStr = "{ \"this is\": \"not xml\"}";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Bad XML at 25 [character 26 line 1]".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to transform a JSON document with XML content that
+     * does not follow JSONML conventions (element name is not first value
+     * in a nested JSONArray) to a JSONArray then back to string.
+     * Expects a JSONException
+     */
+    @Test
     public void emptyTagException() {
         /**
          * jsonArrayStr is used to build a JSONArray which is then
@@ -70,10 +129,22 @@ public class JSONMLTest {
                 "]"+
             "]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
-        JSONML.toString(jsonArray);
+        try {
+            JSONML.toString(jsonArray);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "JSONArray[0] not a string.".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to transform a JSON document with XML content that
+     * does not follow JSONML conventions (element tag has an embedded space)
+     * to a JSONArray then back to string. Expects a JSONException
+     */
+    @Test
     public void spaceInTagException() {
         /**
          * jsonArrayStr is used to build a JSONArray which is then
@@ -94,10 +165,22 @@ public class JSONMLTest {
                 "]"+
             "]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
-        JSONML.toString(jsonArray);
+        try {
+            JSONML.toString(jsonArray);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "'addr esses' contains a space character.".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempts to transform a malformed XML document 
+     * (element tag has a frontslash) to a JSONArray.\
+     * Expects a JSONException
+     */
+    @Test
     public void invalidSlashInTagException() {
         /**
          * xmlStr contains XML text which is transformed into a JSONArray.
@@ -113,16 +196,22 @@ public class JSONMLTest {
             "       <street>abc street</street>\n"+
             "    </address>\n"+
             "</addresses>";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Misshaped tag at 176 [character 14 line 7]".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Malformed XML text (invalid tagname) is transformed into a JSONArray.
+     * Expects a JSONException.
+     */
+    @Test
     public void invalidBangInTagException() {
-        /**
-         * xmlStr contains XML text which is transformed into a JSONArray.
-         * In this case, the XML is invalid because an element
-         * has the invalid name '!'.
-         */
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
             "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
@@ -132,10 +221,21 @@ public class JSONMLTest {
             "       <!>\n"+
             "    </address>\n"+
             "</addresses>";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Misshaped meta tag at 216 [character 13 line 11]".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Malformed XML text (invalid tagname, no close bracket) is transformed\
+     * into a JSONArray. Expects a JSONException.
+     */
+    @Test
     public void invalidBangNoCloseInTagException() {
         /**
          * xmlStr contains XML text which is transformed into a JSONArray.
@@ -151,10 +251,21 @@ public class JSONMLTest {
             "       <!\n"+
             "    </address>\n"+
             "</addresses>";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Misshaped meta tag at 215 [character 13 line 11]".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Malformed XML text (tagname with no close bracket) is transformed\
+     * into a JSONArray. Expects a JSONException.
+     */
+    @Test
     public void noCloseStartTagException() {
         /**
          * xmlStr contains XML text which is transformed into a JSONArray.
@@ -170,10 +281,21 @@ public class JSONMLTest {
             "       <abc\n"+
             "    </address>\n"+
             "</addresses>";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Misplaced '<' at 194 [character 5 line 10]".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Malformed XML text (endtag with no name) is transformed\
+     * into a JSONArray. Expects a JSONException.
+     */
+    @Test
     public void noCloseEndTagException() {
         /**
          * xmlStr contains XML text which is transformed into a JSONArray.
@@ -189,10 +311,21 @@ public class JSONMLTest {
             "       <abc/>\n"+
             "   </>\n"+
             "</addresses>";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Expected a closing name instead of '>'.".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Malformed XML text (endtag with no close bracket) is transformed\
+     * into a JSONArray. Expects a JSONException.
+     */
+    @Test
     public void noCloseEndBraceException() {
         /**
          * xmlStr contains XML text which is transformed into a JSONArray.
@@ -208,10 +341,21 @@ public class JSONMLTest {
             "       <abc/>\n"+
             "    </address\n"+
             "</addresses>";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Misplaced '<' at 206 [character 1 line 12]".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Malformed XML text (incomplete CDATA string) is transformed\
+     * into a JSONArray. Expects a JSONException.
+     */
+    @Test
     public void invalidCDATABangInTagException() {
         /**
          * xmlStr contains XML text which is transformed into a JSONArray.
@@ -227,27 +371,22 @@ public class JSONMLTest {
             "       <![[]>\n"+
             "   </address>\n"+
             "</addresses>";
-        JSONML.toJSONArray(xmlStr);
+        try {
+            JSONML.toJSONArray(xmlStr);
+            assertTrue("Expecting an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                "Expected 'CDATA[' at 204 [character 11 line 9]".
+                equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=NullPointerException.class)
-    public void nullJSONXMLException() {
-        /**
-         * Tries to convert a null JSONArray to XML.
-         */
-        JSONArray jsonArray= null;
-        JSONML.toString(jsonArray);
-    }
-
-    @Test(expected=JSONException.class)
-    public void emptyJSONXMLException() {
-        /**
-         * Tries to convert an empty JSONArray to XML.
-         */
-        JSONArray jsonArray = new JSONArray();
-        JSONML.toString(jsonArray);
-    }
-
+    /**
+     * Convert an XML document into a JSONArray, then use JSONML.toString()
+     * to convert it into a string. This string is then converted back into
+     * a JSONArray. Both JSONArrays are compared against a control to 
+     * confirm the contents.
+     */
     @Test
     public void toJSONArray() {
         /**
@@ -290,6 +429,20 @@ public class JSONMLTest {
         Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
     }
 
+    /**
+     * Convert an XML document into a JSONObject. Use JSONML.toString() to 
+     * convert it back into a string, and then re-convert it into a JSONObject.
+     * Both JSONObjects are compared against a control JSONObject to confirm
+     * the contents.
+     * <p>
+     * Next convert the XML document into a JSONArray. Use JSONML.toString() to 
+     * convert it back into a string, and then re-convert it into a JSONArray.
+     * Both JSONArrays are compared against a control JSONArray to confirm
+     * the contents.
+     * <p>
+     * This test gives a comprehensive example of how the JSONML
+     * transformations work.
+     */
     @Test
     public void toJSONObjectToJSONArray() {
         /**
@@ -505,7 +658,14 @@ public class JSONMLTest {
         Util.compareXML(jsonObjectXmlToStr, jsonArrayXmlToStr);
     }
 
-
+    /**
+     * Convert an XML document which contains embedded comments into
+     * a JSONArray. Use JSONML.toString() to turn it into a string, then
+     * reconvert it into a JSONArray. Compare both JSONArrays to a control
+     * JSONArray to confirm the contents. 
+     * <p>
+     * This test shows how XML comments are handled.
+     */
     @Test
     public void commentsInXML() {
 
