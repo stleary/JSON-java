@@ -7,7 +7,7 @@ import org.junit.Test;
 
 
 /**
- * Unit tests for JSON-Java HTTP.java. See RFC7230
+ * Unit tests for JSON-Java HTTP.java. See RFC7230.
  */
 public class HTTPTest {
 
