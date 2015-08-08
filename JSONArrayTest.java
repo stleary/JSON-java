@@ -36,27 +36,59 @@ public class JSONArrayTest {
                 "\"-1\""+
             "]";
 
+    /**
+     * Attempt to create a JSONArray with a null string.
+     * Expects a NullPointerException.
+     */
     @Test(expected=NullPointerException.class)
     public void nullException() {
         String str = null;
         new JSONArray(str);
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempt to create a JSONArray with an empty string.
+     * Expects a JSONException.
+     */
+    @Test
     public void emptStr() {
         String str = "";
-        new JSONArray(str);
+        try {
+            new JSONArray(str);
+            assertTrue("Should throw an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "A JSONArray text must start with '[' at 1 [character 2 line 1]".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Attempt to create a JSONArray with a string as object that is
+     * not a JSON array doc.
+     * Expects a JSONException.
+     */
+    @Test
     public void badObject() {
         String str = "abc";
-        new JSONArray((Object)str);
+        try {
+            new JSONArray((Object)str);
+            assertTrue("Should throw an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "JSONArray initial value should be a string or collection or array.".
+                    equals(e.getMessage()));
+        }
     }
 
+    /**
+     * Create a JSONArray doc with a variety of different elements.
+     * Confirm that the values can be accessed via the get[type]() API methods
+     */
     @Test
     public void getArrayValues() {
         JSONArray jsonArray = new JSONArray(arrayStr);
+        // booleans
         assertTrue("Array true",
                 true == jsonArray.getBoolean(0));
         assertTrue("Array false",
@@ -65,83 +97,105 @@ public class JSONArrayTest {
                 true == jsonArray.getBoolean(2));
         assertTrue("Array string false",
                 false == jsonArray.getBoolean(3));
-
+        // strings
+        assertTrue("Array value string",
+                "hello".equals(jsonArray.getString(4)));
+        // doubles
         assertTrue("Array double",
                 new Double(23.45e-4).equals(jsonArray.getDouble(5)));
         assertTrue("Array string double",
                 new Double(23.45).equals(jsonArray.getDouble(6)));
-
+        // ints
         assertTrue("Array value int",
                 new Integer(42).equals(jsonArray.getInt(7)));
         assertTrue("Array value string int",
                 new Integer(43).equals(jsonArray.getInt(8)));
-
+        // nested objects
         JSONArray nestedJsonArray = jsonArray.getJSONArray(9);
         assertTrue("Array value JSONArray", nestedJsonArray != null);
-
         JSONObject nestedJsonObject = jsonArray.getJSONObject(10);
         assertTrue("Array value JSONObject", nestedJsonObject != null);
-
+        // longs
         assertTrue("Array value long",
                 new Long(0).equals(jsonArray.getLong(11)));
         assertTrue("Array value string long",
                 new Long(-1).equals(jsonArray.getLong(12)));
 
-        assertTrue("Array value string",
-                "hello".equals(jsonArray.getString(4)));
-
         assertTrue("Array value null", jsonArray.isNull(-1));
     }
 
+    /**
+     * Create a JSONArray doc with a variety of different elements.
+     * Confirm that attempting to get the wrong types via the get[type]()
+     * API methods result in JSONExceptions
+     */
     @Test
     public void failedGetArrayValues() {
-        int tryCount = 0;
-        int exceptionCount = 0;
         JSONArray jsonArray = new JSONArray(arrayStr);
         try {
-            tryCount++;
             jsonArray.getBoolean(4);
             assertTrue("expected getBoolean to fail", false);
-        } catch (JSONException ignored) { exceptionCount++; }
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message",
+                    "JSONArray[4] is not a boolean.".equals(e.getMessage()));
+        }
         try {
-            tryCount++;
             jsonArray.get(-1);
             assertTrue("expected get to fail", false);
-        } catch (JSONException ignored) { exceptionCount++; }
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message",
+                    "JSONArray[-1] not found.".equals(e.getMessage()));
+        }
         try {
-            tryCount++;
             jsonArray.getDouble(4);
             assertTrue("expected getDouble to fail", false);
-        } catch (JSONException ignored) { exceptionCount++; }
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message",
+                    "JSONArray[4] is not a number.".equals(e.getMessage()));
+        }
         try {
-            tryCount++;
             jsonArray.getInt(4);
             assertTrue("expected getInt to fail", false);
-        } catch (JSONException ignored) { exceptionCount++; }
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message",
+                    "JSONArray[4] is not a number.".equals(e.getMessage()));
+        }
         try {
-            tryCount++;
             jsonArray.getJSONArray(4);
             assertTrue("expected getJSONArray to fail", false);
-        } catch (JSONException ignored) { exceptionCount++; }
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message",
+                    "JSONArray[4] is not a JSONArray.".equals(e.getMessage()));
+        }
         try {
-            tryCount++;
             jsonArray.getJSONObject(4);
             assertTrue("expected getJSONObject to fail", false);
-        } catch (JSONException ignored) { exceptionCount++; }
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message",
+                    "JSONArray[4] is not a JSONObject.".equals(e.getMessage()));
+        }
         try {
-            tryCount++;
             jsonArray.getLong(4);
             assertTrue("expected getLong to fail", false);
-        } catch (JSONException ignored) { exceptionCount++; }
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message",
+                    "JSONArray[4] is not a number.".equals(e.getMessage()));
+        }
         try {
-            tryCount++;
             jsonArray.getString(5);
             assertTrue("expected getString to fail", false);
-        } catch (JSONException ignored) { exceptionCount++; }
-        assertTrue("tryCount should match exceptionCount",
-                tryCount == exceptionCount);
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message",
+                    "JSONArray[5] not a string.".equals(e.getMessage()));
+        }
     }
 
+    /**
+     * Exercise JSONArray.join() by converting a JSONArray into a 
+     * comma-separated string. Since this is very nearly a JSON document,
+     * array braces are added to the beginning and end, and it is reconverted
+     * back to a JSONArray for comparison.
+     */
     @Test
     public void join() {
         String expectedStr =
@@ -176,6 +230,9 @@ public class JSONArrayTest {
         Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
     }
 
+    /**
+     * Confirm the JSONArray.length() method
+     */
     @Test 
     public void length() {
         assertTrue("expected empty JSONArray length 0",
@@ -186,6 +243,11 @@ public class JSONArrayTest {
         assertTrue("expected JSONArray length 1", nestedJsonArray.length() == 1);
     }
 
+    /**
+     * Create a JSONArray doc with a variety of different elements.
+     * Confirm that the values can be accessed via the opt[type](index)
+     * and opt[type](index, default) API methods.
+     */
     @Test 
     public void opt() {
         JSONArray jsonArray = new JSONArray(arrayStr);
@@ -238,6 +300,10 @@ public class JSONArrayTest {
                 "".equals(jsonArray.optString(-1)));
     }
 
+    /**
+     * Exercise the JSONArray.put(value) method with various parameters
+     * and confirm the resulting JSONArray.
+     */
     @Test
     public void put() {
         String expectedStr =
@@ -314,6 +380,10 @@ public class JSONArrayTest {
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 
+    /**
+     * Exercise the JSONArray.put(index, value) method with various parameters
+     * and confirm the resulting JSONArray.
+     */
     @Test
     public void putIndex() {
         String expectedStr =
@@ -393,6 +463,10 @@ public class JSONArrayTest {
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 
+    /**
+     * Exercise the JSONArray.remove(index) method 
+     * and confirm the resulting JSONArray.
+     */
     @Test
     public void remove() {
         String arrayStr = 
@@ -406,6 +480,10 @@ public class JSONArrayTest {
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 
+    /**
+     * Exercise the JSONArray.similar() method with various parameters
+     * and confirm the results when not similar.
+     */
     @Test
     public void notSimilar() {
         String arrayStr = 
@@ -441,6 +519,9 @@ public class JSONArrayTest {
                 !jsonArray.similar(otherJsonArray));
     }
 
+    /**
+     * Convert an empty JSONArray to JSONObject
+     */
     @Test
     public void toJSONObject() {
         JSONArray names = new JSONArray();
@@ -449,6 +530,9 @@ public class JSONArrayTest {
                 null == jsonArray.toJSONObject(names));
     }
 
+    /**
+     * Confirm the creation of a JSONArray from an array of ints
+     */
     @Test
     public void objectArrayVsIsArray() {
         String expectedStr = 
@@ -462,6 +546,9 @@ public class JSONArrayTest {
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 
+    /**
+     * Exercise the JSONArray iterator.
+     */
     @Test
     public void iterator() {
         JSONArray jsonArray = new JSONArray(arrayStr);
