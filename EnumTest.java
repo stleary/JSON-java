@@ -11,14 +11,14 @@ import org.junit.*;
  * These tests explore how enum serialization works with JSON-Java.
  */
 public class EnumTest {
+
+    /**
+     * To serialize an enum by its getters, use the JSONObject Object constructor.
+     * The JSONObject ctor handles enum like any other bean. A JSONobject 
+     * is created whose entries are the getter name/value pairs.
+     */
     @Test
     public void jsonObjectFromEnum() {
-        /**
-         * To serialize an enum by its getters, use the JSONObject Object constructor.
-         * The JSONObject ctor handles enum like any other bean. A JSONobject 
-         * is created whose entries are the getter name/value pairs.
-         */
-        
         // If there are no getters then the object is empty.
         MyEnum myEnum = MyEnum.VAL2;
         JSONObject jsonObject = new JSONObject(myEnum);
@@ -44,12 +44,12 @@ public class EnumTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * To serialize an enum by its set of allowed values, use getNames()
+     * and the the JSONObject Object with names constructor. 
+     */
     @Test
     public void jsonObjectFromEnumWithNames() {
-        /**
-         * To serialize an enum by its set of allowed values, use getNames()
-         * and the the JSONObject Object with names constructor. 
-         */
         String [] names;
         String expectedStr;
         JSONObject jsonObject;
@@ -74,12 +74,13 @@ public class EnumTest {
         expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(finalJsonObject, expectedJsonObject);
     }
+
+    /**
+     * To serialize by assigned value, use the put() methods. The value
+     * will be stored as a enum type. 
+     */
     @Test
     public void enumPut() {
-        /**
-         * To serialize by assigned value, use the put() methods. The value
-         * will be stored as a enum type. 
-         */
         String expectedFinalStr = "{\"myEnum\":\"VAL2\", \"myEnumField\":\"VAL1\"}";
         JSONObject jsonObject = new JSONObject();
         MyEnum myEnum = MyEnum.VAL2;
@@ -106,12 +107,12 @@ public class EnumTest {
         assertTrue("expecting myEnumField value", MyEnumField.VAL1.equals(jsonArray.remove(1)));
     }
 
+    /**
+     * The default action of valueToString() is to call object.toString().
+     * For enums, this means the assigned value will be returned as a string.
+     */
     @Test
     public void enumValueToString() {
-        /**
-         * The default action of valueToString() is to call object.toString().
-         * For enums, this means the assigned value will be returned as a string.
-         */
         String expectedStr1 = "\"VAL1\"";
         String expectedStr2 = "\"VAL1\"";
         MyEnum myEnum = MyEnum.VAL1;
@@ -137,12 +138,12 @@ public class EnumTest {
                 str3.startsWith(expectedStr3));
     }
 
+    /**
+     * In whatever form the enum was added to the JSONObject or JSONArray,
+     * json[Object|Array].toString should serialize it in a reasonable way.
+     */
     @Test
     public void enumToString() {
-        /**
-         * In whatever form the enum was added to the JSONObject or JSONArray,
-         * json[Object|Array].toString should serialize it in a reasonable way.
-         */
         MyEnum myEnum = MyEnum.VAL2;
         JSONObject jsonObject = new JSONObject(myEnum);
         String expectedStr = "{}";
@@ -195,12 +196,12 @@ public class EnumTest {
         Util.compareActualVsExpectedJsonArrays(actualJsonArray, expectedJsonArray);
     }
 
+    /**
+     * Wrap should handle enums exactly the same way as the JSONObject(Object)
+     * constructor. 
+     */
     @Test
     public void wrap() {
-        /**
-         * Wrap should handle enums exactly the same way as the JSONObject(Object)
-         * constructor. 
-         */
         MyEnum myEnum = MyEnum.VAL2;
         JSONObject jsonObject = (JSONObject)JSONObject.wrap(myEnum);
         assertTrue("simple enum has no getters", jsonObject.length() == 0);
@@ -220,15 +221,24 @@ public class EnumTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * It was determined that some API methods should be added to 
+     * support enums:<br>
+     * JSONObject.getEnum(class, key)<br>
+     * JSONObject.optEnum(class, key)<br>
+     * JSONObject.optEnum(class, key, default)<br>
+     * JSONArray.getEnum(class, index)<br>
+     * JSONArray.optEnum(class, index)<br>
+     * JSONArray.optEnum(class, index, default)<br>
+     * <p>
+     * Exercise these enum API methods on JSONObject and JSONArray
+     */
     @Test
     public void enumAPI() {
         MyEnumClass myEnumClass = new MyEnumClass();
         myEnumClass.setMyEnum(MyEnum.VAL1);
         MyEnumField myEnumField = MyEnumField.VAL2;
 
-        /**
-         * Exercise the proposed enum API methods on JSONObject
-         */
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("strKey", "value");
         jsonObject.put("enumKey", myEnumField);
