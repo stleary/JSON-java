@@ -1,5 +1,8 @@
 package org.json.junit;
 
+/**
+ * An enum that contains getters and some internal fields
+ */
 public enum MyEnumField {
     VAL1(1, "val 1"),
     VAL2(2, "val 2"),

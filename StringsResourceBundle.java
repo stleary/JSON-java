@@ -2,6 +2,9 @@ package org.json.junit;
 
 import java.util.*;
 
+/**
+ * A resource bundle class
+ */
 public class StringsResourceBundle extends ListResourceBundle {
     public Object[][] getContents() {
         return contents;

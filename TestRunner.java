@@ -4,6 +4,10 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+/**
+ * Invoke this class main method if you want to run unit tests from the
+ * command line. If successful, will print "true" to stdout.
+ */
 public class TestRunner {
    public static void main(String[] args) {
       Result result = JUnitCore.runClasses(JunitTestSuite.class);
