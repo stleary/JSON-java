@@ -1,100 +1,178 @@
 package org.json.junit;
 
+import static org.junit.Assert.*;
+
 import org.json.*;
 import org.junit.Test;
 
 
 /**
- * Tests for JSON-Java JSONStringer.java
+ * Tests for JSON-Java JSONStringer. 
+ * TODO: Could use a lot more testing. For example, cascade-style productions.
  */
 public class JSONStringerTest {
 
-    @Test(expected=JSONException.class)
+    /**
+     * Object with a null key.
+     * Expects a JSONException.
+     */
+    @Test
     public void nullKeyException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object();
-        jsonStringer.key(null);
+        try {
+            jsonStringer.key(null);
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "Null key.".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Add a key with no object.
+     * Expects a JSONException.
+     */
+    @Test
     public void outOfSequenceException() {
         JSONStringer jsonStringer = new JSONStringer();
-        jsonStringer.key("hi");
+        try {
+            jsonStringer.key("hi");
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "Misplaced key.".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Missplace an array.
+     * Expects a JSONException
+     */
+    @Test
     public void missplacedArrayException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object().endObject();
-        jsonStringer.array();
+        try {
+            jsonStringer.array();
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "Misplaced array.".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Missplace an endErray.
+     * Expects a JSONException
+     */
+    @Test
     public void missplacedEndArrayException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object();
-        jsonStringer.endArray();
+        try {
+            jsonStringer.endArray();
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "Misplaced endArray.".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Missplace an endObject.
+     * Expects a JSONException
+     */
+    @Test
     public void missplacedEndObjectException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.array();
-        jsonStringer.endObject();
+        try {
+            jsonStringer.endObject();
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "Misplaced endObject.".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Missplace an object.
+     * Expects a JSONException.
+     */
+    @Test
     public void missplacedObjectException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object().endObject();
-        jsonStringer.object();
+        try {
+            jsonStringer.object();
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "Misplaced object.".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Exceeds implementation max nesting depth.
+     * Expects a JSONException
+     */
+    @Test
     public void exceedNestDepthException() {
-        new JSONStringer().object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-        key("k").object().key("k").object().key("k").object().key("k").object().key("k").object();
+        try {
+            new JSONStringer().object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object();
+        } catch (JSONException e) {
+            assertTrue("Expected an exception message", 
+                    "".
+                    equals(e.getMessage()));
+        }
     }
 
+    /**
+     * Build a JSON doc using JSONString API calls,
+     * then convert to JSONObject
+     */
     @Test
     public void simpleObjectString() {
         String expectedStr = 
@@ -123,6 +201,10 @@ public class JSONStringerTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * Build a JSON doc using JSONString API calls,
+     * then convert to JSONArray
+     */
     @Test
     public void simpleArrayString() {
         String expectedStr = 
@@ -149,6 +231,10 @@ public class JSONStringerTest {
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 
+    /**
+     * Build a nested JSON doc using JSONString API calls,
+     * then convert to JSONObject
+     */
     @Test
     public void complexObjectString() {
         String expectedStr = 

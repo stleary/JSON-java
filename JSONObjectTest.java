@@ -12,7 +12,7 @@ import org.json.*;
 import org.junit.*;
 
 /**
- * These classes will be used for testing
+ * Used in testing when a JSONString is needed
  */
 class MyJsonString implements JSONString {
 
@@ -22,6 +22,9 @@ class MyJsonString implements JSONString {
     }
 }
 
+/**
+ * Used in testing when Bean behavior is needed
+ */
 interface MyBean {
     public Integer getIntKey();
     public Double getDoubleKey();
@@ -32,6 +35,9 @@ interface MyBean {
     public StringReader getStringReaderKey();
 };
 
+/**
+ * Used in testing when a Bean containing big numbers is needed
+ */
 interface MyBigNumberBean {
     public BigInteger getBigInteger();
     public BigDecimal getBigDecimal();
@@ -39,34 +45,45 @@ interface MyBigNumberBean {
 
 /**
  * JSONObject, along with JSONArray, are the central classes of the reference app.
- * All of the other classes interact with it and JSON functionality would be
- * impossible without it.
+ * All of the other classes interact with them, and JSON functionality would
+ * otherwise be impossible.
  */
 public class JSONObjectTest {
     /**
      * Need a class with some public data members for testing, so
-     * JSONObjectTest is chosen.
+     * JSONObjectTest itself will be used for this purpose.
+     * TODO: Why not use MyBigNumberBean or MyBean?
      */
     public Integer publicInt = 42;
     public String publicString = "abc";
 
+    /**
+     * JSONObject built from a bean, but only using a null value.
+     * Nothing good is expected to happen.
+     * Expects NullPointerException
+     */
+    @Test(expected=NullPointerException.class)
+    public void jsonObjectByNullBean() {
+        MyBean myBean = null;
+        new JSONObject(myBean);
+    }
 
+    /**
+     * A JSONObject can be created with no content
+     */
     @Test
     public void emptyJsonObject() {
-        /**
-         * A JSONObject can be created with no content
-         */
         JSONObject jsonObject = new JSONObject();
         assertTrue("jsonObject should be empty", jsonObject.length() == 0);
     }
 
+    /**
+     * A JSONObject can be created from another JSONObject plus a list of names.
+     * In this test, some of the starting JSONObject keys are not in the 
+     * names list.
+     */
     @Test
     public void jsonObjectByNames() {
-        /**
-         * A JSONObject can be created from another JSONObject plus a list of names.
-         * In this test, some of the starting JSONObject keys are not in the 
-         * names list.
-         */
         String str = 
             "{"+
                 "\"trueKey\":true,"+
@@ -92,28 +109,25 @@ public class JSONObjectTest {
     }
 
     /**
+     * JSONObjects can be built from a Map<String, Object>. 
+     * In this test the map is null.
      * the JSONObject(JsonTokener) ctor is not tested directly since it already
      * has full coverage from other tests.
      */
-
     @Test
     public void jsonObjectByNullMap() {
-        /**
-         * JSONObjects can be built from a Map<String, Object>. 
-         * In this test the map is null.
-         */
         Map<String, Object> map = null;
         JSONObject jsonObject = new JSONObject(map);
         JSONObject expectedJsonObject = new JSONObject();
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * JSONObjects can be built from a Map<String, Object>. 
+     * In this test all of the map entries are valid JSON types.
+     */
     @Test
     public void jsonObjectByMap() {
-        /**
-         * JSONObjects can be built from a Map<String, Object>. 
-         * In this test all of the map entries are valid JSON types.
-         */
         String expectedStr = 
             "{"+
                 "\"trueKey\":true,"+
@@ -136,13 +150,13 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * JSONObjects can be built from a Map<String, Object>. 
+     * In this test the map entries are not valid JSON types.
+     * The actual conversion is kind of interesting.
+     */
     @Test
     public void jsonObjectByMapWithUnsupportedValues() {
-        /**
-         * JSONObjects can be built from a Map<String, Object>. 
-         * In this test the map entries are not valid JSON types.
-         * The actual conversion is kind of interesting.
-         */
         String expectedStr = 
             "{"+
                 "\"key1\":{},"+
@@ -158,12 +172,12 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * JSONObjects can be built from a Map<String, Object>. 
+     * In this test one of the map values is null 
+     */
     @Test
     public void jsonObjectByMapWithNullValue() {
-        /**
-         * JSONObjects can be built from a Map<String, Object>. 
-         * In this test one of the map values is null 
-         */
         String expectedStr = 
             "{"+
                 "\"trueKey\":true,"+
@@ -187,22 +201,12 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
-    @Test(expected=NullPointerException.class)
-    public void jsonObjectByNullBean() {
-        /**
-         * JSONObject built from a bean, but only using a null value.
-         * Nothing good is expected to happen.
-         */
-        MyBean myBean = null;
-        new JSONObject(myBean);
-    }
-
+    /**
+     * JSONObject built from a bean. In this case all but one of the 
+     * bean getters return valid JSON types
+     */
     @Test
     public void jsonObjectByBean() {
-        /**
-         * JSONObject built from a bean. In this case all but one of the 
-         * bean getters return valid JSON types
-         */
         String expectedStr = 
             "{"+
                 "\"trueKey\":true,"+
@@ -244,14 +248,14 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * A bean is also an object. But in order to test the JSONObject
+     * ctor that takes an object and a list of names, 
+     * this particular bean needs some public
+     * data members, which have been added to the class.
+     */
     @Test
     public void jsonObjectByObjectAndNames() {
-        /**
-         * A bean is also an object. But in order to test the JSONObject
-         * ctor that takes an object and a list of names, 
-         * this particular bean needs some public
-         * data members, which have been added to the class.
-         */
         String expectedStr = 
             "{"+
                 "\"publicString\":\"abc\","+
@@ -265,6 +269,9 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * Exercise the JSONObject from resource bundle functionality
+     */
     @Test
     public void jsonObjectByResourceBundle() {
         // TODO: how to improve resource bundle testing?
@@ -286,6 +293,9 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * Exercise the JSONObject.accumulate() method
+     */
     @Test
     public void jsonObjectAccumulate() {
         // TODO: should include an unsupported object
@@ -311,6 +321,9 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * Exercise the JSONObject append() functionality
+     */
     @Test
     public void jsonObjectAppend() {
         // TODO: should include an unsupported object
@@ -336,6 +349,9 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * Exercise the JSONObject doubleToString() method
+     */
     @Test
     public void jsonObjectDoubleToString() {
         String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68", "null", "null" };
@@ -349,6 +365,9 @@ public class JSONObjectTest {
         }
     }
 
+    /**
+     * Exercise some JSONObject get[type] and opt[type] methods
+     */
     @Test
     public void jsonObjectValues() {
         String str = 
@@ -423,9 +442,12 @@ public class JSONObjectTest {
                 jsonObjectInner.get("myKey").equals("myVal"));
     }
 
+    /**
+     * Check whether JSONObject handles large or high precision numbers correctly
+     */
     @Test
     public void stringToValueNumbersTest() {
-        // Check if library handles large or high precision numbers correctly
+       
         assertTrue( "0.2 should be a Double!",
                 JSONObject.stringToValue( "0.2" ) instanceof Double );
         assertTrue( "Doubles should be Doubles, even when incorrectly converting floats!",
@@ -528,6 +550,9 @@ public class JSONObjectTest {
                 jsonObject.get("doubleIdentifier").equals(new Double(0.1)));
     }
 
+    /**
+     * Tests how JSONObject get[type] handles incorrect types
+     */
     @Test
     public void jsonObjectNonAndWrongValues() {
         String str = 
@@ -547,75 +572,126 @@ public class JSONObjectTest {
                 "\"objectKey\":{\"myKey\":\"myVal\"}"+
             "}";
         JSONObject jsonObject = new JSONObject(str);
-        int tryCount = 0;
-        int exceptionCount = 0;
         try {
-            ++tryCount;
             jsonObject.getBoolean("nonKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.".equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getBoolean("stringKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a Boolean.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getString("nonKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getString("trueKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"trueKey\"] not a string.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getDouble("nonKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    "JSONObject[\"nonKey\"] not found.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getDouble("stringKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message",
+                    "JSONObject[\"stringKey\"] is not a number.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getInt("nonKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message",
+                    "JSONObject[\"nonKey\"] not found.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getInt("stringKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not an int.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getLong("nonKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getLong("stringKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a long.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getJSONArray("nonKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getJSONArray("stringKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a JSONArray.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getJSONObject("nonKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.".
+                    equals(e.getMessage()));
+        }
         try {
-            ++tryCount;
             jsonObject.getJSONObject("stringKey");
-        } catch (JSONException ignore) { ++exceptionCount; }
-        assertTrue("all get calls should have failed",
-                exceptionCount == tryCount);
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a JSONObject.".
+                    equals(e.getMessage()));
+        }
     }
 
+    /**
+     * This test documents an unexpected numeric behavior.
+     * A double that ends with .0 is parsed, serialized, then
+     * parsed again. On the second parse, it has become an int.
+     */
     @Test
     public void unexpectedDoubleToIntConversion() {
-        /**
-         * This test documents an unexpected numeric behavior.
-         * A double that ends with .0 is parsed, serialized, then
-         * parsed again. On the second parse, it has become an int.
-         */
         String key30 = "key30";
         String key31 = "key31";
         JSONObject jsonObject = new JSONObject();
@@ -636,11 +712,11 @@ public class JSONObjectTest {
         assertTrue("3.1 remains a double", deserialized.getDouble(key31) == 3.1);
     }
 
-    @Test
     /**
-     * Important behaviors of big numbers. Includes both JSONObject
+     * Document behaviors of big numbers. Includes both JSONObject
      * and JSONArray tests
      */
+    @Test
     public void bigNumberOperations() {
         /**
          * JSONObject tries to parse BigInteger as a bean, but it only has
@@ -874,6 +950,10 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedStringArrays(names, jsonObjectTestExpectedNames);
     }
 
+    /**
+     * Populate a JSONArray from an empty JSONObject names() method.
+     * It should be empty.
+     */
     @Test
     public void emptyJsonObjectNamesToJsonAray() {
         JSONObject jsonObject = new JSONObject();
@@ -881,6 +961,10 @@ public class JSONObjectTest {
         assertTrue("jsonArray should be null", jsonArray == null);
     }
 
+    /**
+     * Populate a JSONArray from a JSONObject names() method.
+     * Confirm that it contains the expected names.
+     */
     @Test
     public void jsonObjectNamesToJsonAray() {
         String str = 
@@ -907,6 +991,9 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedStringArrays(names, expectedNames);
     }
 
+    /**
+     * Exercise the JSONObject increment() method.
+     */
     @Test
     public void jsonObjectIncrement() {
         String str = 
@@ -919,19 +1006,31 @@ public class JSONObjectTest {
             "\"keyInt\":3,"+
             "\"keyLong\":9999999993,"+
             "\"keyDouble\":3.1,"+
-            // Should work the same way on any platform! @see https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.2.3
-            // This is the effect of a float to double conversion and is inherent to the shortcomings of the IEEE 754 format, when
-            // converting 32-bit into double-precision 64-bit.
-            // Java type-casts float to double. A 32 bit float is type-casted to 64 bit double by simply appending zero-bits to the
-            // mantissa (and extended the signed exponent by 3 bits.) and there is no way to obtain more information than it is
-            // stored in the 32-bits float.
-
-            // Like 1/3 cannot be represented as base10 number because it is periodically, 1/5 (for example) cannot be represented
-            // as base2 number since it is periodically in base2 (take a look at http://www.h-schmidt.net/FloatConverter/)
-            // The same happens to 3.1, that decimal number (base10 representation) is periodic in base2 representation, therefore
-            // appending zero-bits is inaccurate. Only repeating the periodically occuring bits (0110) would be a proper conversion.
-            // However one cannot detect from a 32 bit IEE754 representation which bits would "repeat infinitely", since the missing
-            // bits would not fit into the 32 bit float, i.e. the information needed simply is not there!
+            /**
+             * Should work the same way on any platform! @see
+             * https://docs.oracle
+             * .com/javase/specs/jls/se7/html/jls-4.html#jls-4.2.3 This is
+             * the effect of a float to double conversion and is inherent to
+             * the shortcomings of the IEEE 754 format, when converting
+             * 32-bit into double-precision 64-bit. Java type-casts float to
+             * double. A 32 bit float is type-casted to 64 bit double by
+             * simply appending zero-bits to the mantissa (and extended the
+             * signed exponent by 3 bits.) and there is no way to obtain
+             * more information than it is stored in the 32-bits float.
+             * 
+             * Like 1/3 cannot be represented as base10 number because it is
+             * periodically, 1/5 (for example) cannot be represented as
+             * base2 number since it is periodically in base2 (take a look
+             * at http://www.h-schmidt.net/FloatConverter/) The same happens
+             * to 3.1, that decimal number (base10 representation) is
+             * periodic in base2 representation, therefore appending
+             * zero-bits is inaccurate. Only repeating the periodically
+             * occuring bits (0110) would be a proper conversion. However
+             * one cannot detect from a 32 bit IEE754 representation which
+             * bits would "repeat infinitely", since the missing bits would
+             * not fit into the 32 bit float, i.e. the information needed
+             * simply is not there!
+             */
             "\"keyFloat\":3.0999999046325684,"+
         "}";
         JSONObject jsonObject = new JSONObject(str);
@@ -948,24 +1047,28 @@ public class JSONObjectTest {
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
 
-		/*
-        float f = 3.1f;
-        double df = (double) f;
-        double d = 3.1d;
-        System.out.println(Integer.toBinaryString(Float.floatToRawIntBits(f)));
-        System.out.println(Long.toBinaryString(Double.doubleToRawLongBits(df)));
-        System.out.println(Long.toBinaryString(Double.doubleToRawLongBits(d)));
+		/**
+         * float f = 3.1f;
+         * double df = (double) f;
+         * double d = 3.1d;
+         * System.out.println(Integer.toBinaryString(Float.floatToRawIntBits(f)));
+         * System.out.println(Long.toBinaryString(Double.doubleToRawLongBits(df)));
+         * System.out.println(Long.toBinaryString(Double.doubleToRawLongBits(d)));
+         * 
+         * - Float:
+         * seeeeeeeemmmmmmmmmmmmmmmmmmmmmmm
+         * 1000000010001100110011001100110
+         * - Double
+         * seeeeeeeeeeemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+         * 10000000   10001100110011001100110
+         * 100000000001000110011001100110011000000000000000000000000000000
+         * 100000000001000110011001100110011001100110011001100110011001101
+         */
 
-		- Float:
-		seeeeeeeemmmmmmmmmmmmmmmmmmmmmmm
-		 1000000010001100110011001100110
-		- Double
-		seeeeeeeeeeemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
-		 10000000   10001100110011001100110
-		 100000000001000110011001100110011000000000000000000000000000000
-		 100000000001000110011001100110011001100110011001100110011001101
-		*/
-        // Examples of well documented but probably unexpected behavior in java / with 32-bit float to 64-bit float conversion.
+        /**
+        * Examples of well documented but probably unexpected behavior in 
+        * java / with 32-bit float to 64-bit float conversion.
+        */
         assertFalse("Document unexpected behaviour with explicit type-casting float as double!", (double)0.2f == 0.2d );
         assertFalse("Document unexpected behaviour with implicit type-cast!", 0.2f == 0.2d );
         Double d1 = new Double( 1.1f );
@@ -997,7 +1100,9 @@ public class JSONObjectTest {
 
     }
 
-
+    /**
+     * Exercise JSONObject numberToString() method
+     */
     @Test
     public void jsonObjectNumberToString() {
         String str;
@@ -1017,6 +1122,9 @@ public class JSONObjectTest {
         assertTrue("expected 5000000 actual "+str, str.equals("5000000"));
     }
 
+    /**
+     * Exercise JSONObject put() and similar() methods
+     */
     @Test
     public void jsonObjectPut() {
         String expectedStr = 
@@ -1090,6 +1198,9 @@ public class JSONObjectTest {
                 !aCompareArrayJsonObject.similar(bCompareArrayJsonObject));
     }
 
+    /**
+     * Exercise JSONObject toString() method
+     */
     @Test
     public void jsonObjectToString() {
         String str = 
@@ -1110,6 +1221,13 @@ public class JSONObjectTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 
+    /**
+     * Explores how JSONObject handles maps. Insert a string/string map
+     * as a value in a JSONObject. It will remain a map. Convert the 
+     * JSONObject to string, then create a new JSONObject from the string. 
+     * In the new JSONObject, the value will be stored as a nested JSONObject.
+     * Confirm that map and nested JSONObject have the same contents.
+     */
     @Test
     @SuppressWarnings("unchecked") 
     public void jsonObjectToStringSuppressWarningOnCastToMap() {
@@ -1124,7 +1242,8 @@ public class JSONObjectTest {
                 expectedJsonObject.keySet().iterator().next()));
         /**
          * Can't do a Util compare because although they look the same
-         * in the debugger, one is a map and the other is a JSONObject.  
+         * in the debugger, one is a map and the other is a JSONObject.
+         * TODO: write a util method for such comparisons  
          */
         map = (Map<String, String>)jsonObject.get("key");
         JSONObject mapJsonObject = expectedJsonObject.getJSONObject("key");
@@ -1137,6 +1256,13 @@ public class JSONObjectTest {
                         map.get(map.keySet().iterator().next())));
     }
 
+    /**
+     * Explores how JSONObject handles collections. Insert a string collection
+     * as a value in a JSONObject. It will remain a collection. Convert the 
+     * JSONObject to string, then create a new JSONObject from the string. 
+     * In the new JSONObject, the value will be stored as a nested JSONArray.
+     * Confirm that collection and nested JSONArray have the same contents.
+     */
     @Test
     @SuppressWarnings("unchecked")
     public void jsonObjectToStringSuppressWarningOnCastToCollection() {
@@ -1166,6 +1292,9 @@ public class JSONObjectTest {
         }
     }
 
+    /**
+     * Exercises the JSONObject.valueToString() method for various types
+     */
     @Test
     public void valueToString() {
         
@@ -1211,6 +1340,12 @@ public class JSONObjectTest {
                 jsonArray.toString().equals(JSONObject.valueToString(array))); 
     }
 
+    /**
+     * Exercise the JSONObject wrap() method. Sometimes wrap() will change
+     * the object being wrapped, other times not. The purpose of wrap() is
+     * to ensure the value is packaged in a way that is compatible with how
+     * a JSONObject value or JSONArray value is supposed to be stored.
+     */
     @Test
     public void wrapObject() {
         // wrap(null) returns NULL
@@ -1224,8 +1359,9 @@ public class JSONObjectTest {
 
         /**
          * This test is to document the preferred behavior if BigDecimal is
-         * supported. At the present time, bd returns as a string, since it
-         * is recognized as being a Java package class. 
+         * supported. Previously  bd returned as a string, since it
+         * is recognized as being a Java package class. Now with explicit
+         * support for big numbers, it remains a BigDecimal 
          */
         Object bdWrap = JSONObject.wrap(BigDecimal.ONE);
         assertTrue("BigDecimal.ONE evaluates to ONE",
@@ -1273,88 +1409,128 @@ public class JSONObjectTest {
         // TODO test wrap(package)
     }
 
+    /**
+     * Explore how JSONObject handles parsing errors.
+     */
     @Test
     public void jsonObjectParsingErrors() {
-        int tryCount = 0;
-        int exceptionCount = 0;
         try {
             // does not start with '{'
-            ++tryCount;
             String str = "abc";
             new JSONObject(str);
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "A JSONObject text must begin with '{' at 1 [character 2 line 1]".
+                    equals(e.getMessage()));
+        }
         try {
             // does not end with '}'
-            ++tryCount;
             String str = "{";
             new JSONObject(str);
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "A JSONObject text must end with '}' at 2 [character 3 line 1]".
+                    equals(e.getMessage()));
+        }
         try {
             // key with no ':'
-            ++tryCount;
             String str = "{\"myKey\" = true}";
             new JSONObject(str);
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "Expected a ':' after a key at 10 [character 11 line 1]".
+                    equals(e.getMessage()));
+        }
         try {
             // entries with no ',' separator
-            ++tryCount;
             String str = "{\"myKey\":true \"myOtherKey\":false}";
             new JSONObject(str);
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "Expected a ',' or '}' at 15 [character 16 line 1]".
+                    equals(e.getMessage()));
+        }
         try {
             // append to wrong key
-            ++tryCount;
             String str = "{\"myKey\":true, \"myOtherKey\":false}";
             JSONObject jsonObject = new JSONObject(str);
             jsonObject.append("myKey", "hello");
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message",
+                    "JSONObject[myKey] is not a JSONArray.".
+                    equals(e.getMessage()));
+        }
         try {
             // increment wrong key
-            ++tryCount;
             String str = "{\"myKey\":true, \"myOtherKey\":false}";
             JSONObject jsonObject = new JSONObject(str);
             jsonObject.increment("myKey");
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message",
+                    "Unable to increment [\"myKey\"].".
+                    equals(e.getMessage()));
+        }
         try {
             // invalid key
-            ++tryCount;
             String str = "{\"myKey\":true, \"myOtherKey\":false}";
             JSONObject jsonObject = new JSONObject(str);
             jsonObject.get(null);
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message",
+                    "Null key.".
+                    equals(e.getMessage()));
+        }
         try {
             // invalid numberToString()
-            ++tryCount;
             JSONObject.numberToString((Number)null);
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("Expecting an exception message", 
+                    "Null pointer".
+                    equals(e.getMessage()));
+        }
         try {
             // null put key 
-            ++tryCount;
             JSONObject jsonObject = new JSONObject("{}");
             jsonObject.put(null, 0);
-        } catch (NullPointerException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (NullPointerException ignored) { 
+        }
         try {
             // multiple putOnce key 
-            ++tryCount;
             JSONObject jsonObject = new JSONObject("{}");
             jsonObject.putOnce("hello", "world");
             jsonObject.putOnce("hello", "world!");
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("", true);
+        }
         try {
             // test validity of invalid double 
-            ++tryCount;
             JSONObject.testValidity(Double.NaN);
-        } catch (JSONException ignore) {++exceptionCount; }
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("", true);
+        }
         try {
             // test validity of invalid float 
-            ++tryCount;
             JSONObject.testValidity(Float.NEGATIVE_INFINITY);
-        } catch (JSONException ignore) {++exceptionCount; }
-
-        assertTrue("all tries should have failed",
-                exceptionCount == tryCount);
+            assertTrue("Expected an exception", false);
+        } catch (JSONException e) { 
+            assertTrue("", true);
+        }
     }
 
+    /**
+     * Confirm behavior when putOnce() is called with null parameters
+     */
     @Test
     public void jsonObjectPutOnceNull() {
         JSONObject jsonObject = new JSONObject();
@@ -1362,6 +1538,9 @@ public class JSONObjectTest {
         assertTrue("jsonObject should be empty", jsonObject.length() == 0);
     }
 
+    /**
+     * Exercise JSONObject opt(key, default) method
+     */
     @Test
     public void jsonObjectOptDefault() {
 
@@ -1382,6 +1561,9 @@ public class JSONObjectTest {
                 "hi".equals(jsonObject.optString("hiKey", "hi")));
     }
 
+    /**
+     * Confirm behavior when JSONObject put(key, null object) is called
+     */
     @Test
     public void jsonObjectputNull() {
 
@@ -1397,6 +1579,11 @@ public class JSONObjectTest {
                 jsonObjectPutNull.length() == 0);
     }
 
+    /**
+     * Exercise JSONObject quote() method
+     * This purpose of quote() is to ensure that for strings with embedded
+     * quotes, the quotes are properly escaped.
+     */
     @Test
     public void jsonObjectQuote() {
         String str;
@@ -1435,6 +1622,10 @@ public class JSONObjectTest {
                 "\"\u1234\\u0088\"".equals(quotedStr));
     }
 
+    /**
+     * Confirm behavior when JSONObject stringToValue() is called for an
+     * empty string
+     */
     @Test
     public void stringToValue() {
         String str = "";
@@ -1443,12 +1634,18 @@ public class JSONObjectTest {
                 "".equals(valueStr));
     }
 
+    /**
+     * Confirm behavior when toJSONArray is called with a null value
+     */
     @Test
     public void toJSONArray() {
         assertTrue("toJSONArray() with null names should be null",
                 null == new JSONObject().toJSONArray(null));
     }
 
+    /**
+     * Exercise the JSONObject write() method
+     */
     @Test
     public void write() {
         String str = "{\"key\":\"value\"}";
@@ -1462,6 +1659,9 @@ public class JSONObjectTest {
                 expectedStr.equals(actualStr));
     }
 
+    /**
+     * Exercise the JSONObject equals() method
+     */
     @Test
     public void equals() {
         String str = "{\"key\":\"value\"}";
@@ -1470,6 +1670,10 @@ public class JSONObjectTest {
                 aJsonObject.equals(aJsonObject));
     }
 
+    /**
+     * JSON null is not the same as Java null. This test examines the differences
+     * in how they are handled by JSON-java.
+     */
     @Test
     public void jsonObjectNullOperations() {
         /**
