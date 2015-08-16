@@ -367,23 +367,14 @@ public class XML {
      */
     public static JSONObject toJSONObject(Reader reader) throws JSONException {
     	
-    	String string = "";
-    	
-    	BufferedReader br = new BufferedReader(reader);
-    	
-    	String line = "";
-    	
-    	try {
-		while( (line = br.readLine()) != null) {
-			string += line;
- 		}
+        JSONObject jo = new JSONObject();
+        XMLTokener x = new XMLTokener(reader);
 
-	} catch (IOException e) {
-		throw new JSONException(e);
-	}
-    	
-    	return toJSONObject(string);
-    	
+        while (x.more() && x.skipPast("<")) {
+            parse(x, jo, null);
+        }
+
+        return jo;
     }
 
     /**
