@@ -358,8 +358,9 @@ public class XML {
     }
 
     /**
-     * Works like {@link XML#toJSONObject(String)}, but will read the XML 
-     * from a reader object.  
+     * Similar to {@link XML#toJSONObject(String)}, but will read the XML 
+     * from a reader object. This method can be used to convert a XML file
+     * to a JSONObject. 
      * 
      * @param reader The reader object that the XML will be read from.
      * @return A JSONObject containing the structured data from the XML read from reader.
