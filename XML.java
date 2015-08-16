@@ -357,6 +357,34 @@ public class XML {
         return jo;
     }
 
+    /**
+     * Works like {@link XML#toJSONObject(String)}, but will read the XML 
+     * from a reader object.  
+     * 
+     * @param reader The reader object that the XML will be read from.
+     * @return A JSONObject containing the structured data from the XML read from reader.
+     * @throws JSONException with an IOException as the cause if an I/O error occurs.
+     */
+    public static JSONObject toJSONObject(Reader reader) throws JSONException {
+    	
+    	String string = "";
+    	
+    	BufferedReader br = new BufferedReader(reader);
+    	
+    	String line = "";
+    	
+    	try {
+		while( (line = br.readLine()) != null) {
+			string += line;
+ 		}
+
+	} catch (IOException e) {
+		throw new JSONException(e);
+	}
+    	
+    	return toJSONObject(string);
+    	
+    }
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
