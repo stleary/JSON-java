@@ -56,6 +56,14 @@ public class XMLTokener extends JSONTokener {
     }
 
     /**
+     * Construct an XMLTokener from a reader
+     * @param reader A reader
+     */
+    public XMLTokenizer(Reader reader) {
+        super(reader);
+    }
+
+    /**
      * Get the text in the CDATA block.
      * @return The string up to the <code>]]&gt;</code>.
      * @throws JSONException If the <code>]]&gt;</code> is not found.

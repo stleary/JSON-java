@@ -357,6 +357,26 @@ public class XML {
         return jo;
     }
 
+    /**
+     * Similar to {@link XML#toJSONObject(String)}, but will read the XML 
+     * from a reader object. This method can be used to convert a XML file
+     * to a JSONObject. 
+     * 
+     * @param reader The reader object that the XML will be read from.
+     * @return A JSONObject containing the structured data from the XML read from reader.
+     * @throws JSONException with an IOException as the cause if an I/O error occurs.
+     */
+    public static JSONObject toJSONObject(Reader reader) throws JSONException {
+    	
+        JSONObject jo = new JSONObject();
+        XMLTokener x = new XMLTokener(reader);
+
+        while (x.more() && x.skipPast("<")) {
+            parse(x, jo, null);
+        }
+
+        return jo;
+    }
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
