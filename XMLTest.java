@@ -2,8 +2,11 @@ package org.json.junit;
 
 import static org.junit.Assert.*;
 
+import java.io.*;
+
 import org.json.*;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.*;
 
 
 /**
@@ -11,15 +14,27 @@ import org.junit.Test;
  * Note: noSpace() will be tested by JSONMLTest
  */
 public class XMLTest {
+    /**
+     * JUnit supports temporary files and folders that are cleaned up after the test.
+     * https://garygregory.wordpress.com/2010/01/20/junit-tip-use-rules-to-manage-temporary-files-and-folders/ 
+     */
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
+    /**
+     * JSONObject from a null XML string.
+     * Expects a NullPointerException
+     */
     @Test(expected=NullPointerException.class)
     public void shouldHandleNullXML() {
-
         String xmlStr = null;
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
         assertTrue("jsonObject should be empty", jsonObject.length() == 0);
     }
 
+    /**
+     * Empty JSONObject from an empty XML string.
+     */
     @Test
     public void shouldHandleEmptyXML() {
 
@@ -28,6 +43,9 @@ public class XMLTest {
         assertTrue("jsonObject should be empty", jsonObject.length() == 0);
     }
 
+    /**
+     * Empty JSONObject from a non-XML string.
+     */
     @Test
     public void shouldHandleNonXML() {
         String xmlStr = "{ \"this is\": \"not xml\"}";
@@ -35,7 +53,11 @@ public class XMLTest {
         assertTrue("xml string should be empty", jsonObject.length() == 0);
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Invalid XML string (tag contains a frontslash).
+     * Expects a JSONException
+     */
+    @Test
     public void shouldHandleInvalidSlashInTag() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
@@ -46,10 +68,21 @@ public class XMLTest {
             "       <street>abc street</street>\n"+
             "   </address>\n"+
             "</addresses>";
-        XML.toJSONObject(xmlStr);
+        try {
+            XML.toJSONObject(xmlStr);
+            assertTrue("Expecting a JSONException", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    "Misshaped tag at 176 [character 14 line 5]".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Invalid XML string ('!' char in tag)
+     * Expects a JSONException
+     */
+    @Test
     public void shouldHandleInvalidBangInTag() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
@@ -60,10 +93,21 @@ public class XMLTest {
             "       <!>\n"+
             "   </address>\n"+
             "</addresses>";
-        XML.toJSONObject(xmlStr);
+        try {
+            XML.toJSONObject(xmlStr);
+            assertTrue("Expecting a JSONException", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    "Misshaped meta tag at 215 [character 13 line 8]".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Invalid XML string ('!' char and no closing tag brace)
+     * Expects a JSONException
+     */
+    @Test
     public void shouldHandleInvalidBangNoCloseInTag() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
@@ -74,10 +118,21 @@ public class XMLTest {
             "       <!\n"+
             "   </address>\n"+
             "</addresses>";
-        XML.toJSONObject(xmlStr);
+        try {
+            XML.toJSONObject(xmlStr);
+            assertTrue("Expecting a JSONException", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    "Misshaped meta tag at 214 [character 13 line 8]".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Invalid XML string (no end brace for tag)
+     * Expects JSONException
+     */
+    @Test
     public void shouldHandleNoCloseStartTag() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
@@ -88,10 +143,21 @@ public class XMLTest {
             "       <abc\n"+
             "   </address>\n"+
             "</addresses>";
-        XML.toJSONObject(xmlStr);
+        try {
+            XML.toJSONObject(xmlStr);
+            assertTrue("Expecting a JSONException", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    "Misplaced '<' at 193 [character 4 line 7]".
+                    equals(e.getMessage()));
+        }
     }
 
-    @Test(expected=JSONException.class)
+    /**
+     * Invalid XML string (partial CDATA chars in tag name)
+     * Expects JSONException
+     */
+    @Test
     public void shouldHandleInvalidCDATABangInTag() {
         String xmlStr = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
@@ -102,15 +168,29 @@ public class XMLTest {
             "       <![[]>\n"+
             "   </address>\n"+
             "</addresses>";
-        XML.toJSONObject(xmlStr);
+        try {
+            XML.toJSONObject(xmlStr);
+            assertTrue("Expecting a JSONException", false);
+        } catch (JSONException e) {
+            assertTrue("Expecting an exception message",
+                    "Expected 'CDATA[' at 204 [character 11 line 6]".
+                    equals(e.getMessage()));
+        }
     }
 
+    /**
+     * Null JSONObject in XML.toString()
+     * Expects NullPointerException
+     */
     @Test(expected=NullPointerException.class)
     public void shouldHandleNullJSONXML() {
         JSONObject jsonObject= null;
         XML.toString(jsonObject);
     }
 
+    /**
+     * Empty JSONObject in XML.toString()
+     */
     @Test
     public void shouldHandleEmptyJSONXML() {
         JSONObject jsonObject= new JSONObject();
@@ -118,6 +198,9 @@ public class XMLTest {
         assertTrue("xml string should be empty", xmlStr.length() == 0);
     }
 
+    /**
+     * No SML start tag. The ending tag ends up being treated as content.
+     */
     @Test
     public void shouldHandleNoStartTag() {
         String xmlStr = 
@@ -138,6 +221,9 @@ public class XMLTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
+    /**
+     * Valid XML to JSONObject
+     */
     @Test
     public void shouldHandleSimpleXML() {
         String xmlStr = 
@@ -168,12 +254,15 @@ public class XMLTest {
             "},\"xsi:noNamespaceSchemaLocation\":"+
             "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
             "XMLSchema-instance\"}}";
-        
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        JSONObject jsonObject = XML.toJSONObject(xmlStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+
+        compareStringToJSONObject(xmlStr, expectedStr);
+        compareReaderToJSONObject(xmlStr, expectedStr);
+        compareFileToJSONObject(xmlStr, expectedStr);
     }
 
+    /**
+     * Valid XML with comments to JSONObject
+     */
     @Test
     public void shouldHandleCommentsInXML() {
 
@@ -197,6 +286,9 @@ public class XMLTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
+    /**
+     * Valid XML to XML.toString()
+     */
     @Test
     public void shouldHandleToString() {
         String xmlStr = 
@@ -226,6 +318,10 @@ public class XMLTest {
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
     }
 
+    /**
+     * Converting a JSON doc containing '>' content to JSONObject, then
+     * XML.toString() should result in valid XML.
+     */
     @Test
     public void shouldHandleContentNoArraytoString() {
         String expectedStr = 
@@ -242,6 +338,11 @@ public class XMLTest {
                 finalStr+"]", expectedFinalStr.equals(finalStr));
     }
 
+    /**
+     * Converting a JSON doc containing a 'content' array to JSONObject, then
+     * XML.toString() should result in valid XML.
+     * TODO: This is probably an error in how the 'content' keyword is used.
+     */
     @Test
     public void shouldHandleContentArraytoString() {
         String expectedStr = 
@@ -259,6 +360,10 @@ public class XMLTest {
                 finalStr+"]", expectedFinalStr.equals(finalStr));
     }
 
+    /**
+     * Converting a JSON doc containing a named array to JSONObject, then
+     * XML.toString() should result in valid XML.
+     */
     @Test
     public void shouldHandleArraytoString() {
         String expectedStr = 
@@ -276,6 +381,10 @@ public class XMLTest {
                 finalStr+"]", expectedFinalStr.equals(finalStr));
     }
 
+    /**
+     * Converting a JSON doc containing a named array of nested arrays to
+     * JSONObject, then XML.toString() should result in valid XML.
+     */
     @Test
     public void shouldHandleNestedArraytoString() {
         String xmlStr = 
@@ -297,10 +406,10 @@ public class XMLTest {
 
 
     /**
+     * Possible bug: 
      * Illegal node-names must be converted to legal XML-node-names.
      * The given example shows 2 nodes which are valid for JSON, but not for XML.
      * Therefore illegal arguments should be converted to e.g. an underscore (_).
-     * 
      */
     @Test
     public void shouldHandleIllegalJSONNodeNames()
@@ -322,6 +431,9 @@ public class XMLTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * JSONObject with NULL value, to XML.toString()
+     */
     @Test
     public void shouldHandleNullNodeValue()
     {
@@ -338,12 +450,11 @@ public class XMLTest {
         assertEquals(actualXML, resultXML);
     }
 
+    /**
+     * Investigate exactly how the "content" keyword works
+     */
     @Test
     public void contentOperations() {
-        /**
-         * Make sure we understand exactly how the "content" keyword works
-         */
-
         /**
          * When a standalone <!CDATA[...]] structure is found while parsing XML into a
          * JSONObject, the contents are placed in a string value with key="content".
@@ -480,5 +591,52 @@ public class XMLTest {
          *  </Profile>
          */
         assertTrue("nothing to test here, see comment on created XML, above", true);
+    }
+
+    /**
+     * Convenience method, given an input string and expected result,
+     * convert to JSONBObject and compare actual to expected result.
+     * @param xmlStr the string to parse
+     * @param expectedStr the expected JSON string
+     */
+    private void compareStringToJSONObject(String xmlStr, String expectedStr) {
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+    /**
+     * Convenience method, given an input string and expected result,
+     * convert to JSONBObject via reader and compare actual to expected result.
+     * @param xmlStr the string to parse
+     * @param expectedStr the expected JSON string
+     */
+    private void compareReaderToJSONObject(String xmlStr, String expectedStr) {
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Reader reader = new StringReader(xmlStr);
+        JSONObject jsonObject = XML.toJSONObject(reader);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+    /**
+     * Convenience method, given an input string and expected result,
+     * convert to JSONBObject via file and compare actual to expected result.
+     * @param xmlStr the string to parse
+     * @param expectedStr the expected JSON string
+     * @throws IOException 
+     */
+    private void compareFileToJSONObject(String xmlStr, String expectedStr) {
+        try {
+            JSONObject expectedJsonObject = new JSONObject(expectedStr);
+            File tempFile = testFolder.newFile("fileToJSONObject.xml");
+            FileWriter fileWriter = new FileWriter(tempFile);
+            fileWriter.write(xmlStr);
+            fileWriter.close();
+            Reader reader = new FileReader(tempFile);
+            JSONObject jsonObject = XML.toJSONObject(reader);
+            Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+        } catch (IOException e) {
+            assertTrue("file writer error: " +e.getMessage(), false);
+        }
     }
 }
