@@ -69,4 +69,4 @@ Release history:
 ----|----
  20150729 | This release was made to provide a checkpoint for a Maven central repository release. Contains the latest code as of 29 July, 2015. 
 
-Latest Maven release can be found here: https://search.maven.org/#artifactdetails%7Corg.json%7Cjson%7C20150729%7Cjar
+JSON-java Maven releases can be found here: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.json%22%20AND%20a%3A%22json%22
