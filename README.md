@@ -62,3 +62,11 @@ JSONML.java: JSONML provides support for converting between JSONML and XML.
 XMLTokener.java: XMLTokener extends JSONTokener for parsing XML text.
 
 Unit tests are maintained in a separate project. Contributing developers can test JSON-java pull requests with the code in this project: https://github.com/stleary/JSON-Java-unit-test
+
+Release history:
+
+|Version |Description|
+----|----
+ 20150729 | This release was made to provide a checkpoint for a Maven central repository release. Contains the latest code as of 29 July, 2015. 
+
+JSON-java Maven releases can be found here: https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.json%22%20AND%20a%3A%22json%22
