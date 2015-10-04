@@ -243,12 +243,14 @@ public class JSONObject {
      *            the JSONObject.
      * @throws JSONException
      */
-    public JSONObject(Map<String, Object> map) {
+    public JSONObject(Map<String, ?> map) {
         this.map = new HashMap<String, Object>();
         if (map != null) {
-            Iterator<Entry<String, Object>> i = map.entrySet().iterator();
+        	Set<?> eSet = map.entrySet();
+            @SuppressWarnings("unchecked")
+			Iterator<Entry<String, ?>> i = (Iterator<Entry<String, ?>>) eSet.iterator();
             while (i.hasNext()) {
-                Entry<String, Object> entry = i.next();
+                Entry<String, ?> entry = i.next();
                 Object value = entry.getValue();
                 if (value != null) {
                     this.map.put(entry.getKey(), wrap(value));
