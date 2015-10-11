@@ -243,17 +243,13 @@ public class JSONObject {
      *            the JSONObject.
      * @throws JSONException
      */
-    public JSONObject(Map<String, ?> map) {
+    public JSONObject(Map<?, ?> map) {
         this.map = new HashMap<String, Object>();
         if (map != null) {
-        	Set<?> eSet = map.entrySet();
-            @SuppressWarnings("unchecked")
-			Iterator<Entry<String, ?>> i = (Iterator<Entry<String, ?>>) eSet.iterator();
-            while (i.hasNext()) {
-                Entry<String, ?> entry = i.next();
-                Object value = entry.getValue();
+        	for (final Entry<?, ?> e : map.entrySet()) {
+                final Object value = e.getValue();
                 if (value != null) {
-                    this.map.put(entry.getKey(), wrap(value));
+                    this.map.put(String.valueOf(e.getKey()), wrap(value));
                 }
             }
         }
@@ -1270,7 +1266,7 @@ public class JSONObject {
      * @return this.
      * @throws JSONException
      */
-    public JSONObject put(String key, Map<String, ?> value) throws JSONException {
+    public JSONObject put(String key, Map<?, ?> value) throws JSONException {
         this.put(key, new JSONObject(value));
         return this;
     }
@@ -1666,7 +1662,7 @@ public class JSONObject {
         }
         if (value instanceof Map) {
             @SuppressWarnings("unchecked")
-            Map<String, ?> map = (Map<String, ?>) value;
+            Map<?, ?> map = (Map<?, ?>) value;
             return new JSONObject(map).toString();
         }
         if (value instanceof Collection) {
@@ -1718,7 +1714,7 @@ public class JSONObject {
             }
             if (object instanceof Map) {
                 @SuppressWarnings("unchecked")
-                Map<String, ?> map = (Map<String, ?>) object;
+                Map<?, ?> map = (Map<?, ?>) object;
                 return new JSONObject(map);
             }
             Package objectPackage = object.getClass().getPackage();
@@ -1758,7 +1754,7 @@ public class JSONObject {
             ((JSONArray) value).write(writer, indentFactor, indent);
         } else if (value instanceof Map) {
             @SuppressWarnings("unchecked")
-            Map<String, ?> map = (Map<String, ?>) value;
+            Map<?, ?> map = (Map<?, ?>) value;
             new JSONObject(map).write(writer, indentFactor, indent);
         } else if (value instanceof Collection) {
             @SuppressWarnings("unchecked")
