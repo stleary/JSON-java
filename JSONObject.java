@@ -1206,7 +1206,7 @@ public class JSONObject {
      * @return this.
      * @throws JSONException
      */
-    public JSONObject put(String key, Collection<Object> value) throws JSONException {
+    public JSONObject put(String key, Collection<?> value) throws JSONException {
         this.put(key, new JSONArray(value));
         return this;
     }
@@ -1270,7 +1270,7 @@ public class JSONObject {
      * @return this.
      * @throws JSONException
      */
-    public JSONObject put(String key, Map<String, Object> value) throws JSONException {
+    public JSONObject put(String key, Map<String, ?> value) throws JSONException {
         this.put(key, new JSONObject(value));
         return this;
     }
@@ -1666,12 +1666,12 @@ public class JSONObject {
         }
         if (value instanceof Map) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) value;
+            Map<String, ?> map = (Map<String, ?>) value;
             return new JSONObject(map).toString();
         }
         if (value instanceof Collection) {
             @SuppressWarnings("unchecked")
-            Collection<Object> coll = (Collection<Object>) value;
+            Collection<?> coll = (Collection<?>) value;
             return new JSONArray(coll).toString();
         }
         if (value.getClass().isArray()) {
@@ -1710,7 +1710,7 @@ public class JSONObject {
 
             if (object instanceof Collection) {
                 @SuppressWarnings("unchecked")
-                Collection<Object> coll = (Collection<Object>) object;
+                Collection<?> coll = (Collection<?>) object;
                 return new JSONArray(coll);
             }
             if (object.getClass().isArray()) {
@@ -1718,7 +1718,7 @@ public class JSONObject {
             }
             if (object instanceof Map) {
                 @SuppressWarnings("unchecked")
-                Map<String, Object> map = (Map<String, Object>) object;
+                Map<String, ?> map = (Map<String, ?>) object;
                 return new JSONObject(map);
             }
             Package objectPackage = object.getClass().getPackage();
@@ -1758,13 +1758,12 @@ public class JSONObject {
             ((JSONArray) value).write(writer, indentFactor, indent);
         } else if (value instanceof Map) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> map = (Map<String, Object>) value;
+            Map<String, ?> map = (Map<String, ?>) value;
             new JSONObject(map).write(writer, indentFactor, indent);
         } else if (value instanceof Collection) {
             @SuppressWarnings("unchecked")
-            Collection<Object> coll = (Collection<Object>) value;
-            new JSONArray(coll).write(writer, indentFactor,
-                    indent);
+            Collection<?> coll = (Collection<?>) value;
+            new JSONArray(coll).write(writer, indentFactor, indent);
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
         } else if (value instanceof Number) {
