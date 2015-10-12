@@ -30,7 +30,8 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1484,7 +1485,6 @@ public class JSONObject {
      * @return A simple JSON value.
      */
     public static Object stringToValue(String string) {
-        Double d;
         if (string.equals("")) {
             return string;
         }
@@ -1503,28 +1503,46 @@ public class JSONObject {
          * produced, then the value will just be a string.
          */
 
-        char b = string.charAt(0);
-        if ((b >= '0' && b <= '9') || b == '-') {
-            try {
-                if (string.indexOf('.') > -1 || string.indexOf('e') > -1
-                        || string.indexOf('E') > -1) {
-                    d = Double.valueOf(string);
-                    if (!d.isInfinite() && !d.isNaN()) {
-                        return d;
-                    }
-                } else {
-                    Long myLong = new Long(string);
-                    if (string.equals(myLong.toString())) {
-                        if (myLong == myLong.intValue()) {
-                            return myLong.intValue();
-                        } else {
-                            return myLong;
-                        }
-                    }
-                }
-            } catch (Exception ignore) {
-            }
-        }
+	final char b = string.charAt(0);
+	if (b >= '0' && b <= '9' || b == '-') {
+	    try {
+		if (string.indexOf('.') > -1 || string.indexOf('e') > -1
+			|| string.indexOf('E') > -1) {
+		    // try a BigDecimal first and downgrade to Double if able
+		    // this is known to lose precision for some values of double
+		    try {
+			final BigDecimal bd = new BigDecimal(string);
+			final Double d = Double.valueOf(bd.doubleValue());
+			if(!d.isInfinite() && !d.isNaN()) {
+			    return d;
+			}
+			return bd;
+		    } catch (final NumberFormatException ignore) {
+			// if BigDecimal couldn't read it, double can't either.
+		    }
+		} else {
+		    try {
+			BigInteger bi= new BigInteger(string);
+			// the equals comparison is to validate that the number is
+			// a valid JSON number, which can't have leading 00's
+			if(bi.toString().equals(string)){
+			    try{
+				return Integer.valueOf(bi.intValueExact());
+			    } catch (ArithmeticException ignore) {
+    			    	try{
+    			    	    return Long.valueOf(bi.longValueExact());
+    			    	} catch (ArithmeticException ignore1) {
+    			    	    return bi;
+    			    	}
+			    }
+			}
+		    } catch (final NumberFormatException ignore) {
+			// ignore / fall through
+		    }
+		}
+	    } catch (final Exception ignore) {
+	    }
+	}
         return string;
     }
 
