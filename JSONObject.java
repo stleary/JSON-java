@@ -1661,12 +1661,10 @@ public class JSONObject {
             return value.toString();
         }
         if (value instanceof Map) {
-            @SuppressWarnings("unchecked")
             Map<?, ?> map = (Map<?, ?>) value;
             return new JSONObject(map).toString();
         }
         if (value instanceof Collection) {
-            @SuppressWarnings("unchecked")
             Collection<?> coll = (Collection<?>) value;
             return new JSONArray(coll).toString();
         }
@@ -1705,7 +1703,6 @@ public class JSONObject {
             }
 
             if (object instanceof Collection) {
-                @SuppressWarnings("unchecked")
                 Collection<?> coll = (Collection<?>) object;
                 return new JSONArray(coll);
             }
@@ -1713,7 +1710,6 @@ public class JSONObject {
                 return new JSONArray(object);
             }
             if (object instanceof Map) {
-                @SuppressWarnings("unchecked")
                 Map<?, ?> map = (Map<?, ?>) object;
                 return new JSONObject(map);
             }
@@ -1753,11 +1749,9 @@ public class JSONObject {
         } else if (value instanceof JSONArray) {
             ((JSONArray) value).write(writer, indentFactor, indent);
         } else if (value instanceof Map) {
-            @SuppressWarnings("unchecked")
             Map<?, ?> map = (Map<?, ?>) value;
             new JSONObject(map).write(writer, indentFactor, indent);
         } else if (value instanceof Collection) {
-            @SuppressWarnings("unchecked")
             Collection<?> coll = (Collection<?>) value;
             new JSONArray(coll).write(writer, indentFactor, indent);
         } else if (value.getClass().isArray()) {
