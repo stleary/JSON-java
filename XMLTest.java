@@ -189,7 +189,8 @@ public class XMLTest {
     @Test
     public void shouldHandleNullJSONXML() {
         JSONObject jsonObject= null;
-        XML.toString(jsonObject);
+        String actualXml=XML.toString(jsonObject);
+        assertEquals("generated XML does not equal expected XML","\"null\"",actualXml);
     }
 
     /**
