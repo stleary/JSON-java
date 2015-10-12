@@ -7,6 +7,7 @@ package org.json;
  * @version 2014-05-03
  */
 public class JSONException extends RuntimeException {
+    /** Serialization ID */
     private static final long serialVersionUID = 0;
 
     /**
@@ -17,6 +18,16 @@ public class JSONException extends RuntimeException {
      */
     public JSONException(final String message) {
 	super(message);
+    }
+
+    /**
+     * @param message
+     *            Detail about the reason for the exception.
+     * @param cause
+     *            The cause.
+     */
+    public JSONException(String message, Throwable cause) {
+	super(message, cause);
     }
 
     /**
