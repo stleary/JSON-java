@@ -468,10 +468,12 @@ public class XML {
 // XML does not have good support for arrays. If an array appears in a place
 // where XML is lacking, synthesize an <array> element.
 
-        } else {
+        }
+        if(object!=null){
             if (object.getClass().isArray()) {
                 object = new JSONArray(object);
             }
+            
             if (object instanceof JSONArray) {
                 ja = (JSONArray)object;
                 length = ja.length();
@@ -479,12 +481,12 @@ public class XML {
                     sb.append(toString(ja.opt(i), tagName == null ? "array" : tagName));
                 }
                 return sb.toString();
-            } else {
-                string = (object == null) ? "null" : escape(object.toString());
-                return (tagName == null) ? "\"" + string + "\"" :
-                    (string.length() == 0) ? "<" + tagName + "/>" :
-                    "<" + tagName + ">" + string + "</" + tagName + ">";
             }
         }
+        string = (object == null) ? "null" : escape(object.toString());
+        return (tagName == null) ? "\"" + string + "\"" :
+            (string.length() == 0) ? "<" + tagName + "/>" :
+            "<" + tagName + ">" + string + "</" + tagName + ">";
+            
     }
 }
