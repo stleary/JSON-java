@@ -1518,15 +1518,12 @@ public class JSONObject {
 			}
 			return bd;
 		    } catch (final NumberFormatException ignore) {
-			final Double d = Double.valueOf(string);
-			if (!d.isInfinite() && !d.isNaN()) {
-			    return d;
-			}
+			// if BigDecimal couldn't read it, double can't either.
 		    }
 		} else {
 		    try {
 			BigInteger bi= new BigInteger(string);
-			// the equals comparison if to validate that the number is
+			// the equals comparison is to validate that the number is
 			// a valid JSON number, which can't have leading 00's
 			if(bi.toString().equals(string)){
 			    try{
