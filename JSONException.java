@@ -4,7 +4,7 @@ package org.json;
  * The JSONException is thrown by the JSON.org classes when things are amiss.
  *
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2015-10-14
  */
 public class JSONException extends RuntimeException {
     /** Serialization ID */
