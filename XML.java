@@ -1,7 +1,7 @@
 package org.json;
 
 /*
-Copyright (c) 2002 JSON.org
+Copyright (c) 2015 JSON.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import java.util.Iterator;
  * This provides static methods to convert an XML text into a JSONObject,
  * and to covert a JSONObject into an XML text.
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2015-10-14
  */
 public class XML {
 
