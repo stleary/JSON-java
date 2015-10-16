@@ -151,12 +151,11 @@ public class JSONArray implements Iterable<Object> {
      * @param collection
      *            A Collection.
      */
-    public JSONArray(Collection<Object> collection) {
+    public JSONArray(Collection<?> collection) {
         this.myArrayList = new ArrayList<Object>();
         if (collection != null) {
-            Iterator<Object> iter = collection.iterator();
-            while (iter.hasNext()) {
-                this.myArrayList.add(JSONObject.wrap(iter.next()));
+            for (Object o: collection){
+                this.myArrayList.add(JSONObject.wrap(o));
             }
         }
     }
