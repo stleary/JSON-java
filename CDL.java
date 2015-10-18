@@ -26,7 +26,7 @@ SOFTWARE.
 
 /**
  * This provides static methods to convert comma delimited text into a
- * JSONArray, and to covert a JSONArray into comma delimited text. Comma
+ * JSONArray, and to convert a JSONArray into comma delimited text. Comma
  * delimited text is a very popular format for data interchange. It is
  * understood by most database, spreadsheet, and organizer programs.
  * <p>
@@ -41,7 +41,7 @@ SOFTWARE.
  * The names for the elements in the JSONObjects can be taken from the names
  * in the first row.
  * @author JSON.org
- * @version 2012-11-13
+ * @version 2015-05-01
  */
 public class CDL {
 
@@ -142,7 +142,7 @@ public class CDL {
      * @return A string ending in NEWLINE.
      */
     public static String rowToString(JSONArray ja) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ja.length(); i += 1) {
             if (i > 0) {
                 sb.append(',');

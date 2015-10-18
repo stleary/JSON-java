@@ -33,7 +33,7 @@ import java.util.Iterator;
  * the JsonML transform.
  *
  * @author JSON.org
- * @version 2012-03-28
+ * @version 2014-05-03
  */
 public class JSONML {
 
@@ -53,12 +53,12 @@ public class JSONML {
     ) throws JSONException {
         String     attribute;
         char       c;
-        String       closeTag = null;
+        String     closeTag = null;
         int        i;
         JSONArray  newja = null;
         JSONObject newjo = null;
         Object     token;
-        String       tagName = null;
+        String     tagName = null;
 
 // Test for and skip past these forms:
 //      <!-- ... -->
@@ -312,15 +312,15 @@ public class JSONML {
      * @throws JSONException
      */
     public static String toString(JSONArray ja) throws JSONException {
-        int             i;
-        JSONObject   jo;
-        String       key;
-        Iterator     keys;
-        int             length;
-        Object         object;
-        StringBuffer sb = new StringBuffer();
-        String       tagName;
-        String       value;
+        int                 i;
+        JSONObject          jo;
+        String              key;
+        Iterator<String>    keys;
+        int                 length;
+        Object              object;
+        StringBuilder        sb = new StringBuilder();
+        String              tagName;
+        String               value;
 
 // Emit <tagName
 
@@ -339,7 +339,7 @@ public class JSONML {
 
             keys = jo.keys();
             while (keys.hasNext()) {
-                key = keys.next().toString();
+                key = keys.next();
                 XML.noSpace(key);
                 value = jo.optString(key);
                 if (value != null) {
@@ -355,7 +355,7 @@ public class JSONML {
             i = 1;
         }
 
-//Emit content in body
+// Emit content in body
 
         length = ja.length();
         if (i >= length) {
@@ -373,6 +373,8 @@ public class JSONML {
                         sb.append(toString((JSONObject)object));
                     } else if (object instanceof JSONArray) {
                         sb.append(toString((JSONArray)object));
+                    } else {
+                        sb.append(object.toString());
                     }
                 }
             } while (i < length);
@@ -394,15 +396,15 @@ public class JSONML {
      * @throws JSONException
      */
     public static String toString(JSONObject jo) throws JSONException {
-        StringBuffer sb = new StringBuffer();
-        int          i;
-        JSONArray    ja;
-        String       key;
-        Iterator     keys;
-        int          length;
-        Object         object;
-        String       tagName;
-        String       value;
+        StringBuilder sb = new StringBuilder();
+        int                 i;
+        JSONArray           ja;
+        String              key;
+        Iterator<String>    keys;
+        int                 length;
+        Object              object;
+        String              tagName;
+        String              value;
 
 //Emit <tagName
 
@@ -419,7 +421,7 @@ public class JSONML {
 
         keys = jo.keys();
         while (keys.hasNext()) {
-            key = keys.next().toString();
+            key = keys.next();
             if (!"tagName".equals(key) && !"childNodes".equals(key)) {
                 XML.noSpace(key);
                 value = jo.optString(key);

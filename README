@@ -1,11 +1,5 @@
 JSON in Java [package org.json]
 
-Douglas Crockford
-douglas@crockford.com
-
-2011-02-02
-
-
 JSON is a light-weight, language independent, data interchange format.
 See http://www.JSON.org/
 
@@ -21,7 +15,7 @@ The license includes this restriction: "The software shall be used for good,
 not evil." If your conscience cannot live with that, then choose a different
 package.
 
-The package compiles on Java 1.2 thru Java 1.4.
+The package compiles on Java 1.8.
 
 
 JSONObject.java: The JSONObject can parse text from a String or a JSONTokener
@@ -66,3 +60,5 @@ XML.java: XML provides support for converting between JSON and XML.
 JSONML.java: JSONML provides support for converting between JSONML and XML.
 
 XMLTokener.java: XMLTokener extends JSONTokener for parsing XML text.
+
+Unit tests are maintained in a separate project. Contributing developers can test JSON-java pull requests with the code in this project: https://github.com/stleary/JSON-Java-unit-test

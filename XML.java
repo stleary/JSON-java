@@ -26,41 +26,40 @@ SOFTWARE.
 
 import java.util.Iterator;
 
-
 /**
  * This provides static methods to convert an XML text into a JSONObject,
  * and to covert a JSONObject into an XML text.
  * @author JSON.org
- * @version 2013-11-12
+ * @version 2014-05-03
  */
 public class XML {
 
     /** The Character '&amp;'. */
-    public static final Character AMP   = new Character('&');
+    public static final Character AMP   = '&';
 
     /** The Character '''. */
-    public static final Character APOS  = new Character('\'');
+    public static final Character APOS  = '\'';
 
     /** The Character '!'. */
-    public static final Character BANG  = new Character('!');
+    public static final Character BANG  = '!';
 
     /** The Character '='. */
-    public static final Character EQ    = new Character('=');
+    public static final Character EQ    = '=';
 
     /** The Character '>'. */
-    public static final Character GT    = new Character('>');
+    public static final Character GT    = '>';
 
     /** The Character '&lt;'. */
-    public static final Character LT    = new Character('<');
+    public static final Character LT    = '<';
 
     /** The Character '?'. */
-    public static final Character QUEST = new Character('?');
+    public static final Character QUEST = '?';
 
     /** The Character '"'. */
-    public static final Character QUOT  = new Character('"');
+    public static final Character QUOT  = '"';
 
     /** The Character '/'. */
-    public static final Character SLASH = new Character('/');
+    public static final Character SLASH = '/';
 
     /**
      * Replace special characters with XML escapes:
@@ -74,7 +73,7 @@ public class XML {
      * @return The escaped string.
      */
     public static String escape(String string) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder(string.length());
         for (int i = 0, length = string.length(); i < length; i++) {
             char c = string.charAt(i);
             switch (c) {
@@ -103,7 +102,7 @@ public class XML {
     /**
      * Throw an exception if the string contains whitespace.
      * Whitespace is not allowed in tagNames and attributes.
-     * @param string
+     * @param string A string.
      * @throws JSONException
      */
     public static void noSpace(String string) throws JSONException {
@@ -379,15 +378,15 @@ public class XML {
      */
     public static String toString(Object object, String tagName)
             throws JSONException {
-        StringBuffer sb = new StringBuffer();
-        int          i;
-        JSONArray    ja;
-        JSONObject   jo;
-        String       key;
-        Iterator     keys;
-        int          length;
-        String       string;
-        Object       value;
+        StringBuilder       sb = new StringBuilder();
+        int                 i;
+        JSONArray           ja;
+        JSONObject          jo;
+        String              key;
+        Iterator<String>    keys;
+        int                 length;
+        String              string;
+        Object              value;
         if (object instanceof JSONObject) {
 
 // Emit <tagName>
@@ -403,16 +402,12 @@ public class XML {
             jo = (JSONObject)object;
             keys = jo.keys();
             while (keys.hasNext()) {
-                key = keys.next().toString();
+                key = keys.next();
                 value = jo.opt(key);
                 if (value == null) {
                     value = "";
                 }
-                if (value instanceof String) {
-                    string = (String)value;
-                } else {
-                    string = null;
-                }
+                string = value instanceof String ? (String)value : null;
 
 // Emit content in body
 

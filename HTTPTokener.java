@@ -28,7 +28,7 @@ SOFTWARE.
  * The HTTPTokener extends the JSONTokener to provide additional methods
  * for the parsing of HTTP headers.
  * @author JSON.org
- * @version 2012-11-13
+ * @version 2014-05-03
  */
 public class HTTPTokener extends JSONTokener {
 
@@ -49,7 +49,7 @@ public class HTTPTokener extends JSONTokener {
     public String nextToken() throws JSONException {
         char c;
         char q;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         do {
             c = next();
         } while (Character.isWhitespace(c));
