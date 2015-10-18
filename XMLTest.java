@@ -1,12 +1,17 @@
 package org.json.junit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.io.*;
+import java.io.IOException;
 
-import org.json.*;
-import org.junit.*;
-import org.junit.rules.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.XML;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 
 /**
@@ -180,12 +185,12 @@ public class XMLTest {
 
     /**
      * Null JSONObject in XML.toString()
-     * Expects NullPointerException
      */
-    @Test(expected=NullPointerException.class)
+    @Test
     public void shouldHandleNullJSONXML() {
         JSONObject jsonObject= null;
-        XML.toString(jsonObject);
+        String actualXml=XML.toString(jsonObject);
+        assertEquals("generated XML does not equal expected XML","\"null\"",actualXml);
     }
 
     /**
