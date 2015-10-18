@@ -745,7 +745,7 @@ public class JSONArray implements Iterable<Object> {
      *            A Collection value.
      * @return this.
      */
-    public JSONArray put(Collection<Object> value) {
+    public JSONArray put(Collection<?> value) {
         this.put(new JSONArray(value));
         return this;
     }
@@ -798,7 +798,7 @@ public class JSONArray implements Iterable<Object> {
      *            A Map value.
      * @return this.
      */
-    public JSONArray put(Map<String, Object> value) {
+    public JSONArray put(Map<String, ?> value) {
         this.put(new JSONObject(value));
         return this;
     }
@@ -847,7 +847,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException
      *             If the index is negative or if the value is not finite.
      */
-    public JSONArray put(int index, Collection<Object> value) throws JSONException {
+    public JSONArray put(int index, Collection<?> value) throws JSONException {
         this.put(index, new JSONArray(value));
         return this;
     }
@@ -919,7 +919,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the index is negative or if the the value is an invalid
      *             number.
      */
-    public JSONArray put(int index, Map<String, Object> value) throws JSONException {
+    public JSONArray put(int index, Map<String, ?> value) throws JSONException {
         this.put(index, new JSONObject(value));
         return this;
     }
