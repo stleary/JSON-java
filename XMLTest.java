@@ -385,6 +385,74 @@ public class XMLTest {
         assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
                 finalStr+"]", expectedFinalStr.equals(finalStr));
     }
+    
+    /**
+     * Tests that the XML output for empty arrays is consistent.
+     */
+    @Test
+    public void shouldHandleEmptyArray(){
+	final JSONObject jo1 = new JSONObject();
+	jo1.put("array",new Object[]{});
+	final JSONObject jo2 = new JSONObject();
+	jo2.put("array",new JSONArray());
+
+	final String expected = "<jo></jo>";
+	String output1 = XML.toString(jo1,"jo");
+	assertTrue("Expected an empty root tag", expected.equals(output1));
+	String output2 = XML.toString(jo2,"jo");
+	assertTrue("Expected an empty root tag", expected.equals(output2));
+    }
+    
+    /**
+     * Tests that the XML output for arrays is consistent when an internal array is empty.
+     */
+    @Test
+    public void shouldHandleEmptyMultiArray(){
+	final JSONObject jo1 = new JSONObject();
+	jo1.put("arr",new Object[]{"One", new String[]{}, "Four"});
+	final JSONObject jo2 = new JSONObject();
+	jo2.put("arr",new JSONArray(new Object[]{"One", new JSONArray(new String[]{}), "Four"}));
+
+	final String expected = "<jo><arr>One</arr><arr></arr><arr>Four</arr></jo>";
+	String output1 = XML.toString(jo1,"jo");
+	assertTrue("Expected a matching array", expected.equals(output1));
+	String output2 = XML.toString(jo2,"jo");
+	assertTrue("Expected a matching array", expected.equals(output2));
+    }
+   
+    /**
+     * Tests that the XML output for arrays is consistent when arrays are not empty.
+     */
+    @Test
+    public void shouldHandleNonEmptyArray(){
+	final JSONObject jo1 = new JSONObject();
+	jo1.put("arr",new String[]{"One", "Two", "Three"});
+	final JSONObject jo2 = new JSONObject();
+	jo2.put("arr",new JSONArray(new String[]{"One", "Two", "Three"}));
+
+	final String expected = "<jo><arr>One</arr><arr>Two</arr><arr>Three</arr></jo>";
+	String output1 = XML.toString(jo1,"jo");
+	assertTrue("Expected a non empty root tag", expected.equals(output1));
+	String output2 = XML.toString(jo2,"jo");
+	assertTrue("Expected a non empty root tag", expected.equals(output2));
+    }
+
+    /**
+     * Tests that the XML output for arrays is consistent when arrays are not empty and contain internal arrays.
+     */
+    @Test
+    public void shouldHandleMultiArray(){
+	final JSONObject jo1 = new JSONObject();
+	jo1.put("arr",new Object[]{"One", new String[]{"Two", "Three"}, "Four"});
+	final JSONObject jo2 = new JSONObject();
+	jo2.put("arr",new JSONArray(new Object[]{"One", new JSONArray(new String[]{"Two", "Three"}), "Four"}));
+
+	final String expected = "<jo><arr>One</arr><arr><array>Two</array><array>Three</array></arr><arr>Four</arr></jo>";
+	String output1 = XML.toString(jo1,"jo");
+	assertTrue("Expected a matching array", expected.equals(output1));
+	String output2 = XML.toString(jo2,"jo");
+	assertTrue("Expected a matching array", expected.equals(output2));
+    }
 
     /**
      * Converting a JSON doc containing a named array of nested arrays to
@@ -425,7 +493,7 @@ public class XMLTest {
 
         String result = XML.toString(inputJSON);
 
-        /**
+        /*
          * This is invalid XML. Names should not begin with digits or contain
          * certain values, including '@'. One possible solution is to replace
          * illegal chars with '_', in which case the expected output would be:
@@ -460,7 +528,7 @@ public class XMLTest {
      */
     @Test
     public void contentOperations() {
-        /**
+        /*
          * When a standalone <!CDATA[...]] structure is found while parsing XML into a
          * JSONObject, the contents are placed in a string value with key="content".
          */
@@ -483,7 +551,7 @@ public class XMLTest {
         assertTrue("2. content array entry 0", "if (a < b && a > 0) then return".equals(jsonArray.get(0)));
         assertTrue("2. content array entry 1", "here is another cdata".equals(jsonArray.get(1)));
 
-        /**
+        /*
          * text content is accumulated in a "content" inside a local JSONObject.
          * If there is only one instance, it is saved in the context (a different JSONObject 
          * from the calling code. and the content element is discarded. 
@@ -493,7 +561,7 @@ public class XMLTest {
         assertTrue("3. 2 items", 1 == jsonObject.length());
         assertTrue("3. value tag1", "value 1".equals(jsonObject.get("tag1")));
 
-        /**
+        /*
          * array-style text content (multiple tags with the same name) is 
          * accumulated in a local JSONObject with key="content" and value=JSONArray,
          * saved in the context, and then the local JSONObject is discarded.
@@ -508,7 +576,7 @@ public class XMLTest {
         assertTrue("4. content array entry 1", jsonArray.getInt(1) == 2);
         assertTrue("4. content array entry 2", jsonArray.getBoolean(2) == true);
 
-        /**
+        /*
          * Complex content is accumulated in a "content" field. For example, an element
          * may contain a mix of child elements and text. Each text segment is 
          * accumulated to content. 
@@ -526,7 +594,7 @@ public class XMLTest {
         assertTrue("5. content array entry 0", "val1".equals(jsonArray.get(0)));
         assertTrue("5. content array entry 1", "val2".equals(jsonArray.get(1)));
 
-        /**
+        /*
          * If there is only 1 complex text content, then it is accumulated in a 
          * "content" field as a string.
          */
@@ -538,7 +606,7 @@ public class XMLTest {
         assertTrue("6. contained content found", "val1".equals(jsonObject.get("content")));
         assertTrue("6. contained tag2", "".equals(jsonObject.get("tag2")));
 
-        /**
+        /*
          * In this corner case, the content sibling happens to have key=content
          * We end up with an array within an array, and no content element.
          * This is probably a bug. 
@@ -555,7 +623,7 @@ public class XMLTest {
         assertTrue("7. inner array item 0", "val1".equals(jsonArray.get(0)));
         assertTrue("7. inner array item 1", "".equals(jsonArray.get(1)));
 
-        /**
+        /*
          * Confirm behavior of original issue
          */
         String jsonStr = 
@@ -581,7 +649,7 @@ public class XMLTest {
                 "}";
         jsonObject = new JSONObject(jsonStr);
         xmlStr = XML.toString(jsonObject);
-        /**
+        /*
          * This is the created XML. Looks like content was mistaken for
          * complex (child node + text) XML. 
          *  <Profile>
@@ -600,7 +668,7 @@ public class XMLTest {
 
     /**
      * Convenience method, given an input string and expected result,
-     * convert to JSONBObject and compare actual to expected result.
+     * convert to JSONObject and compare actual to expected result.
      * @param xmlStr the string to parse
      * @param expectedStr the expected JSON string
      */
@@ -612,7 +680,7 @@ public class XMLTest {
 
     /**
      * Convenience method, given an input string and expected result,
-     * convert to JSONBObject via reader and compare actual to expected result.
+     * convert to JSONObject via reader and compare actual to expected result.
      * @param xmlStr the string to parse
      * @param expectedStr the expected JSON string
      */
@@ -628,11 +696,14 @@ public class XMLTest {
     }
 
     /**
-     * Convenience method, given an input string and expected result,
-     * convert to JSONBObject via file and compare actual to expected result.
-     * @param xmlStr the string to parse
-     * @param expectedStr the expected JSON string
-     * @throws IOException 
+     * Convenience method, given an input string and expected result, convert to
+     * JSONObject via file and compare actual to expected result.
+     * 
+     * @param xmlStr
+     *            the string to parse
+     * @param expectedStr
+     *            the expected JSON string
+     * @throws IOException
      */
     private void compareFileToJSONObject(String xmlStr, String expectedStr) {
         /*
