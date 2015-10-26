@@ -406,8 +406,11 @@ public class XML {
                 value = jo.opt(key);
                 if (value == null) {
                     value = "";
+                }else if(value.getClass().isArray()){
+                    value = new JSONArray(value);
                 }
                 string = value instanceof String ? (String)value : null;
+                
 
 // Emit content in body
 
