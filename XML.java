@@ -379,14 +379,13 @@ public class XML {
     public static String toString(Object object, String tagName)
             throws JSONException {
         StringBuilder       sb = new StringBuilder();
-        int                 i;
         JSONArray           ja;
         JSONObject          jo;
         String              key;
         Iterator<String>    keys;
-        int                 length;
         String              string;
         Object              value;
+        
         if (object instanceof JSONObject) {
 
 // Emit <tagName>
@@ -417,12 +416,13 @@ public class XML {
                 if ("content".equals(key)) {
                     if (value instanceof JSONArray) {
                         ja = (JSONArray)value;
-                        length = ja.length();
-                        for (i = 0; i < length; i += 1) {
+                        int i = 0;
+                        for (Object val : ja) {
                             if (i > 0) {
                                 sb.append('\n');
                             }
-                            sb.append(escape(ja.get(i).toString()));
+                            sb.append(escape(val.toString()));
+                            i++;
                         }
                     } else {
                         sb.append(escape(value.toString()));
@@ -432,19 +432,17 @@ public class XML {
 
                 } else if (value instanceof JSONArray) {
                     ja = (JSONArray)value;
-                    length = ja.length();
-                    for (i = 0; i < length; i += 1) {
-                        value = ja.get(i);
-                        if (value instanceof JSONArray) {
+                    for (Object val : ja) {
+                        if (val instanceof JSONArray) {
                             sb.append('<');
                             sb.append(key);
                             sb.append('>');
-                            sb.append(toString(value));
+                            sb.append(toString(val));
                             sb.append("</");
                             sb.append(key);
                             sb.append('>');
                         } else {
-                            sb.append(toString(value, key));
+                            sb.append(toString(val, key));
                         }
                     }
                 } else if ("".equals(value)) {
@@ -479,9 +477,8 @@ public class XML {
             
             if (object instanceof JSONArray) {
                 ja = (JSONArray)object;
-                length = ja.length();
-                for (i = 0; i < length; i += 1) {
-                    sb.append(toString(ja.opt(i), tagName == null ? "array" : tagName));
+                for (Object val : ja) {
+                    sb.append(toString(val, tagName == null ? "array" : tagName));
                 }
                 return sb.toString();
             }
