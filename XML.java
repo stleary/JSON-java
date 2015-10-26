@@ -430,6 +430,9 @@ public class XML {
                 } else if (value instanceof JSONArray) {
                     ja = (JSONArray)value;
                     length = ja.length();
+					if(length == 0) {
+                        sb.append(toString("", key));
+                    }
                     for (i = 0; i < length; i += 1) {
                         value = ja.get(i);
                         if (value instanceof JSONArray) {
