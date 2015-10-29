@@ -76,7 +76,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2015-07-22
+ * @version 2015-10-29
  */
 public class JSONArray implements Iterable<Object> {
 
