@@ -151,13 +151,12 @@ public class JSONArray implements Iterable<Object> {
      * @param collection
      *            A Collection.
      */
-    public JSONArray(Collection<Object> collection) {
+    public JSONArray(Collection<?> collection) {
         this.myArrayList = new ArrayList<Object>();
         if (collection != null) {
-            Iterator<Object> iter = collection.iterator();
-            while (iter.hasNext()) {
-                this.myArrayList.add(JSONObject.wrap(iter.next()));
-            }
+        	for (Object o: collection){
+        		this.myArrayList.add(JSONObject.wrap(o));
+        	}
         }
     }
 
@@ -746,7 +745,7 @@ public class JSONArray implements Iterable<Object> {
      *            A Collection value.
      * @return this.
      */
-    public JSONArray put(Collection<Object> value) {
+    public JSONArray put(Collection<?> value) {
         this.put(new JSONArray(value));
         return this;
     }
@@ -799,7 +798,7 @@ public class JSONArray implements Iterable<Object> {
      *            A Map value.
      * @return this.
      */
-    public JSONArray put(Map<String, Object> value) {
+    public JSONArray put(Map<?, ?> value) {
         this.put(new JSONObject(value));
         return this;
     }
@@ -848,7 +847,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException
      *             If the index is negative or if the value is not finite.
      */
-    public JSONArray put(int index, Collection<Object> value) throws JSONException {
+    public JSONArray put(int index, Collection<?> value) throws JSONException {
         this.put(index, new JSONArray(value));
         return this;
     }
@@ -920,7 +919,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the index is negative or if the the value is an invalid
      *             number.
      */
-    public JSONArray put(int index, Map<String, Object> value) throws JSONException {
+    public JSONArray put(int index, Map<?, ?> value) throws JSONException {
         this.put(index, new JSONObject(value));
         return this;
     }
