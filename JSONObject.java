@@ -92,7 +92,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2015-07-22
+ * @version 2015-10-29
  */
 public class JSONObject {
     /**
