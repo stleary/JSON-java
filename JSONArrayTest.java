@@ -93,29 +93,29 @@ public class JSONArrayTest {
      */
     @Test
     public void verifyConstructor() {
-	
-	final JSONArray expected = new JSONArray("[10]");
-	
-	@SuppressWarnings("rawtypes")
-	Collection myRawC = Collections.singleton(Integer.valueOf(10));
-	JSONArray jaRaw = new JSONArray(myRawC);
+        
+        final JSONArray expected = new JSONArray("[10]");
+        
+        @SuppressWarnings("rawtypes")
+        Collection myRawC = Collections.singleton(Integer.valueOf(10));
+        JSONArray jaRaw = new JSONArray(myRawC);
 
-	Collection<Integer> myCInt = Collections.singleton(Integer.valueOf(10));
-	JSONArray jaInt = new JSONArray(myCInt);
+        Collection<Integer> myCInt = Collections.singleton(Integer.valueOf(10));
+        JSONArray jaInt = new JSONArray(myCInt);
 
-	Collection<Object> myCObj = Collections.singleton((Object) Integer
-		.valueOf(10));
-	JSONArray jaObj = new JSONArray(myCObj);
+        Collection<Object> myCObj = Collections.singleton((Object) Integer
+                .valueOf(10));
+        JSONArray jaObj = new JSONArray(myCObj);
 
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaRaw));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaInt));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaRaw));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaInt));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaObj));
     }
 
     /**
@@ -123,32 +123,32 @@ public class JSONArrayTest {
      */
     @Test
     public void verifyPutCollection() {
-	
-	final JSONArray expected = new JSONArray("[[10]]");
+        
+        final JSONArray expected = new JSONArray("[[10]]");
 
-	@SuppressWarnings("rawtypes")
-	Collection myRawC = Collections.singleton(Integer.valueOf(10));
-	JSONArray jaRaw = new JSONArray();
-	jaRaw.put(myRawC);
+        @SuppressWarnings("rawtypes")
+        Collection myRawC = Collections.singleton(Integer.valueOf(10));
+        JSONArray jaRaw = new JSONArray();
+        jaRaw.put(myRawC);
 
-	Collection<Object> myCObj = Collections.singleton((Object) Integer
-		.valueOf(10));
-	JSONArray jaObj = new JSONArray();
-	jaObj.put(myCObj);
+        Collection<Object> myCObj = Collections.singleton((Object) Integer
+                .valueOf(10));
+        JSONArray jaObj = new JSONArray();
+        jaObj.put(myCObj);
 
-	Collection<Integer> myCInt = Collections.singleton(Integer.valueOf(10));
-	JSONArray jaInt = new JSONArray();
-	jaInt.put(myCInt);
+        Collection<Integer> myCInt = Collections.singleton(Integer.valueOf(10));
+        JSONArray jaInt = new JSONArray();
+        jaInt.put(myCInt);
 
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaRaw));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaObj));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaInt));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaRaw));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaInt));
     }
 
     
@@ -157,41 +157,41 @@ public class JSONArrayTest {
      */
     @Test
     public void verifyPutMap() {
-	
-	final JSONArray expected = new JSONArray("[{\"myKey\":10}]");
+        
+        final JSONArray expected = new JSONArray("[{\"myKey\":10}]");
 
-	@SuppressWarnings("rawtypes")
-	Map myRawC = Collections.singletonMap("myKey", Integer.valueOf(10));
-	JSONArray jaRaw = new JSONArray();
-	jaRaw.put(myRawC);
+        @SuppressWarnings("rawtypes")
+        Map myRawC = Collections.singletonMap("myKey", Integer.valueOf(10));
+        JSONArray jaRaw = new JSONArray();
+        jaRaw.put(myRawC);
 
-	Map<String, Object> myCStrObj = Collections.singletonMap("myKey",
-		(Object) Integer.valueOf(10));
-	JSONArray jaStrObj = new JSONArray();
-	jaStrObj.put(myCStrObj);
+        Map<String, Object> myCStrObj = Collections.singletonMap("myKey",
+                (Object) Integer.valueOf(10));
+        JSONArray jaStrObj = new JSONArray();
+        jaStrObj.put(myCStrObj);
 
-	Map<String, Integer> myCStrInt = Collections.singletonMap("myKey",
-		Integer.valueOf(10));
-	JSONArray jaStrInt = new JSONArray();
-	jaStrInt.put(myCStrInt);
+        Map<String, Integer> myCStrInt = Collections.singletonMap("myKey",
+                Integer.valueOf(10));
+        JSONArray jaStrInt = new JSONArray();
+        jaStrInt.put(myCStrInt);
 
-	Map<?, ?> myCObjObj = Collections.singletonMap((Object) "myKey",
-		(Object) Integer.valueOf(10));
-	JSONArray jaObjObj = new JSONArray();
-	jaObjObj.put(myCObjObj);
+        Map<?, ?> myCObjObj = Collections.singletonMap((Object) "myKey",
+                (Object) Integer.valueOf(10));
+        JSONArray jaObjObj = new JSONArray();
+        jaObjObj.put(myCObjObj);
 
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaRaw));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaStrObj));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaStrInt));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaObjObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaRaw));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaStrObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaStrInt));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaObjObj));
     }
 
     /**

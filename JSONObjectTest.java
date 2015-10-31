@@ -172,37 +172,37 @@ public class JSONObjectTest {
      */
     @Test
     public void verifyConstructor() {
-	
-	final JSONObject expected = new JSONObject("{\"myKey\":10}");
-	
-	@SuppressWarnings("rawtypes")
-	Map myRawC = Collections.singletonMap("myKey", Integer.valueOf(10));
-	JSONObject jaRaw = new JSONObject(myRawC);
+        
+        final JSONObject expected = new JSONObject("{\"myKey\":10}");
+        
+        @SuppressWarnings("rawtypes")
+        Map myRawC = Collections.singletonMap("myKey", Integer.valueOf(10));
+        JSONObject jaRaw = new JSONObject(myRawC);
 
-	Map<String, Object> myCStrObj = Collections.singletonMap("myKey",
-		(Object) Integer.valueOf(10));
-	JSONObject jaStrObj = new JSONObject(myCStrObj);
+        Map<String, Object> myCStrObj = Collections.singletonMap("myKey",
+                (Object) Integer.valueOf(10));
+        JSONObject jaStrObj = new JSONObject(myCStrObj);
 
-	Map<String, Integer> myCStrInt = Collections.singletonMap("myKey",
-		Integer.valueOf(10));
-	JSONObject jaStrInt = new JSONObject(myCStrInt);
+        Map<String, Integer> myCStrInt = Collections.singletonMap("myKey",
+                Integer.valueOf(10));
+        JSONObject jaStrInt = new JSONObject(myCStrInt);
 
-	Map<?, ?> myCObjObj = Collections.singletonMap((Object) "myKey",
-		(Object) Integer.valueOf(10));
-	JSONObject jaObjObj = new JSONObject(myCObjObj);
+        Map<?, ?> myCObjObj = Collections.singletonMap((Object) "myKey",
+                (Object) Integer.valueOf(10));
+        JSONObject jaObjObj = new JSONObject(myCObjObj);
 
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaRaw));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaStrObj));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaStrInt));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaObjObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaRaw));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaStrObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaStrInt));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaObjObj));
     }
     
     /**
@@ -210,33 +210,33 @@ public class JSONObjectTest {
      */
     @Test
     public void verifyPutCollection() {
-	
-	final JSONObject expected = new JSONObject("{\"myCollection\":[10]}");
+        
+        final JSONObject expected = new JSONObject("{\"myCollection\":[10]}");
 
-	@SuppressWarnings("rawtypes")
-	Collection myRawC = Collections.singleton(Integer.valueOf(10));
-	JSONObject jaRaw = new JSONObject();
-	jaRaw.put("myCollection", myRawC);
+        @SuppressWarnings("rawtypes")
+        Collection myRawC = Collections.singleton(Integer.valueOf(10));
+        JSONObject jaRaw = new JSONObject();
+        jaRaw.put("myCollection", myRawC);
 
-	Collection<Object> myCObj = Collections.singleton((Object) Integer
-		.valueOf(10));
-	JSONObject jaObj = new JSONObject();
-	jaObj.put("myCollection", myCObj);
+        Collection<Object> myCObj = Collections.singleton((Object) Integer
+                .valueOf(10));
+        JSONObject jaObj = new JSONObject();
+        jaObj.put("myCollection", myCObj);
 
-	Collection<Integer> myCInt = Collections.singleton(Integer
-		.valueOf(10));
-	JSONObject jaInt = new JSONObject();
-	jaInt.put("myCollection", myCInt);
+        Collection<Integer> myCInt = Collections.singleton(Integer
+                .valueOf(10));
+        JSONObject jaInt = new JSONObject();
+        jaInt.put("myCollection", myCInt);
 
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaRaw));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaObj));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaInt));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaRaw));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaInt));
     }
 
     
@@ -245,41 +245,41 @@ public class JSONObjectTest {
      */
     @Test
     public void verifyPutMap() {
-	
-	final JSONObject expected = new JSONObject("{\"myMap\":{\"myKey\":10}}");
+        
+        final JSONObject expected = new JSONObject("{\"myMap\":{\"myKey\":10}}");
 
-	@SuppressWarnings("rawtypes")
-	Map myRawC = Collections.singletonMap("myKey", Integer.valueOf(10));
-	JSONObject jaRaw = new JSONObject();
-	jaRaw.put("myMap", myRawC);
+        @SuppressWarnings("rawtypes")
+        Map myRawC = Collections.singletonMap("myKey", Integer.valueOf(10));
+        JSONObject jaRaw = new JSONObject();
+        jaRaw.put("myMap", myRawC);
 
-	Map<String, Object> myCStrObj = Collections.singletonMap("myKey",
-		(Object) Integer.valueOf(10));
-	JSONObject jaStrObj = new JSONObject();
-	jaStrObj.put("myMap", myCStrObj);
+        Map<String, Object> myCStrObj = Collections.singletonMap("myKey",
+                (Object) Integer.valueOf(10));
+        JSONObject jaStrObj = new JSONObject();
+        jaStrObj.put("myMap", myCStrObj);
 
-	Map<String, Integer> myCStrInt = Collections.singletonMap("myKey",
-		Integer.valueOf(10));
-	JSONObject jaStrInt = new JSONObject();
-	jaStrInt.put("myMap", myCStrInt);
+        Map<String, Integer> myCStrInt = Collections.singletonMap("myKey",
+                Integer.valueOf(10));
+        JSONObject jaStrInt = new JSONObject();
+        jaStrInt.put("myMap", myCStrInt);
 
-	Map<?, ?> myCObjObj = Collections.singletonMap((Object) "myKey",
-		(Object) Integer.valueOf(10));
-	JSONObject jaObjObj = new JSONObject();
-	jaObjObj.put("myMap", myCObjObj);
+        Map<?, ?> myCObjObj = Collections.singletonMap((Object) "myKey",
+                (Object) Integer.valueOf(10));
+        JSONObject jaObjObj = new JSONObject();
+        jaObjObj.put("myMap", myCObjObj);
 
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaRaw));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaStrObj));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaStrInt));
-	assertTrue(
-		"The RAW Collection should give me the same as the Typed Collection",
-		expected.similar(jaObjObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaRaw));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaStrObj));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaStrInt));
+        assertTrue(
+                "The RAW Collection should give me the same as the Typed Collection",
+                expected.similar(jaObjObj));
     }
 
 
@@ -640,7 +640,7 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonInvalidNumberValues() {
-    	// Number-notations supported by Java and invalid as JSON
+            // Number-notations supported by Java and invalid as JSON
         String str = 
             "{"+
                 "\"hexNumber\":-0x123,"+
@@ -1180,7 +1180,7 @@ public class JSONObjectTest {
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
 
-		/**
+                /**
          * float f = 3.1f;
          * double df = (double) f;
          * double d = 3.1d;
@@ -1220,11 +1220,11 @@ public class JSONObjectTest {
         assertTrue( "Everything is ok here!", inc.get( "bug" ) instanceof Float );
         inc.increment( "bug" ); // after adding 1, increment will call put( String key, double value ) with implicit and "buggy" type-cast from float to double!
         // this.put(key, (Float) value + 1);
-        // 1.	The (Object)value will be typecasted to (Float)value since it is an instanceof Float actually nothing is done. 
-        // 2.	Float instance will be autoboxed into float because the + operator will work on primitives not Objects!
-        // 3.	A float+float operation will be performed and results into a float primitive.
-        // 4.	There is no method that matches the signature put( String key, float value), java-compiler will choose the method
-        //		put( String key, double value) and does an implicit type-cast(!) by appending zero-bits to the mantissa
+        // 1.        The (Object)value will be typecasted to (Float)value since it is an instanceof Float actually nothing is done. 
+        // 2.        Float instance will be autoboxed into float because the + operator will work on primitives not Objects!
+        // 3.        A float+float operation will be performed and results into a float primitive.
+        // 4.        There is no method that matches the signature put( String key, float value), java-compiler will choose the method
+        //                put( String key, double value) and does an implicit type-cast(!) by appending zero-bits to the mantissa
         assertTrue( "JSONObject increment converts Float to Double", jo.get( "bug" ) instanceof Double );
         // correct implementation (with change of behavior) would be:
         // this.put(key, new Float((Float) value + 1)); 
@@ -1397,30 +1397,30 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonObjectToStringSuppressWarningOnCastToCollection() {
-	JSONObject jsonObject = new JSONObject();
-	Collection<String> collection = new ArrayList<String>();
-	collection.add("abc");
-	// ArrayList will be added as an object
-	jsonObject.put("key", collection);
-	String toStr = jsonObject.toString();
-	// [abc] will be added as a JSONArray
-	JSONObject expectedJsonObject = new JSONObject(toStr);
-	/**
-	 * Can't do a Util compare because although they look the same in the
-	 * debugger, one is a collection and the other is a JSONArray.
-	 */
-	assertTrue("keys should be equal", jsonObject.keySet().iterator()
-		.next().equals(expectedJsonObject.keySet().iterator().next()));
-	assertTrue("Collections should be converted to JSONArray",
-		jsonObject.get("key") instanceof JSONArray);
-	JSONArray jsonArray = expectedJsonObject.getJSONArray("key");
-	assertTrue("value size should be equal",
-		collection.size() == jsonArray.length());
-	Iterator<String> it = collection.iterator();
-	for (int i = 0; i < collection.size(); ++i) {
-	    assertTrue("items should be equal for index: " + i, jsonArray
-		    .get(i).toString().equals(it.next().toString()));
-	}
+        JSONObject jsonObject = new JSONObject();
+        Collection<String> collection = new ArrayList<String>();
+        collection.add("abc");
+        // ArrayList will be added as an object
+        jsonObject.put("key", collection);
+        String toStr = jsonObject.toString();
+        // [abc] will be added as a JSONArray
+        JSONObject expectedJsonObject = new JSONObject(toStr);
+        /**
+         * Can't do a Util compare because although they look the same in the
+         * debugger, one is a collection and the other is a JSONArray.
+         */
+        assertTrue("keys should be equal", jsonObject.keySet().iterator()
+                .next().equals(expectedJsonObject.keySet().iterator().next()));
+        assertTrue("Collections should be converted to JSONArray",
+                jsonObject.get("key") instanceof JSONArray);
+        JSONArray jsonArray = expectedJsonObject.getJSONArray("key");
+        assertTrue("value size should be equal",
+                collection.size() == jsonArray.length());
+        Iterator<String> it = collection.iterator();
+        for (int i = 0; i < collection.size(); ++i) {
+            assertTrue("items should be equal for index: " + i, jsonArray
+                    .get(i).toString().equals(it.next().toString()));
+        }
     }
 
     /**
@@ -1469,6 +1469,25 @@ public class JSONObjectTest {
         Integer[] array = { new Integer(1), new Integer(2), new Integer(3) };
         assertTrue("array valueToString() incorrect",
                 jsonArray.toString().equals(JSONObject.valueToString(array))); 
+    }
+
+    /**
+     * Confirm that https://github.com/douglascrockford/JSON-java/issues/167 is fixed.
+     * The following code was throwing a ClassCastException in the 
+     * JSONObject(Map<String, Object>) constructor
+     */
+    @Test
+    public void valueToStringConfirmException() {
+        String expectedStr = "{\"1\":\"myValue\"}";
+        Map<Integer, String> myMap = new HashMap<Integer, String>();
+        myMap.put(1,  "myValue");
+        // this is the test, it should not throw an exception
+        String str = JSONObject.valueToString(myMap);
+        // confirm result, just in case
+        JSONObject jsonObject = new JSONObject(str);
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject, 
+                expectedJsonObject);
     }
 
     /**
