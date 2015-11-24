@@ -65,6 +65,9 @@ Unit tests are maintained in a separate project. Contributing developers can tes
 
 Release history:
 
+20151123    JSONObject and JSONArray initialization with generics. Contains the
+latest code as of 23 Nov, 2015.
+
 20150729    Checkpoint for Maven central repository release. Contains the latest code as of 29 July, 2015. 
 
 JSON-java releases can be found by searching the Maven repository for groupId "org.json" and artifactId "json". For example: 
