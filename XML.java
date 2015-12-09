@@ -31,7 +31,7 @@ import java.util.Iterator;
  * covert a JSONObject into an XML text.
  * 
  * @author JSON.org
- * @version 2015-10-18
+ * @version 2015-12-09
  */
 @SuppressWarnings("boxing")
 public class XML {
