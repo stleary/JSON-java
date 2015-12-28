@@ -25,10 +25,11 @@ Test harness: http://junit.org<br>
 * JSON-java.jar<br>
  
 **To build from the command line using gradle:**
-build.gradle<br>
 ````
-\# In this example, both the JSON-java jar and the test code is built <br>
-\# from the same build file, in the test code directory.
+build.gradle
+# In this example, both the JSON-java jar and the test code is created  <br>
+# from the same build file, in the test code directory. 3rd party jars are
+# obtained from the maven repository.
 apply plugin: 'java'
 jar.baseName = 'JSON-java'
 
