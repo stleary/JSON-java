@@ -11,7 +11,6 @@ Eclipse is the recommended development environment.<br>
 Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or execute the **TestRunner** application directly.<br>
 
 **You will need the following libraries for testing:**<br>
-Test harness: http://junit.org<br> 
 * asm-1.0.2.jar<br>
 * commons-io-2.1.jar<br>
 * commons-lang-2.6.jar<br>
