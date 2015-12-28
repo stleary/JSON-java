@@ -26,9 +26,9 @@ Test harness: http://junit.org<br>
  
 **To build from the command line using gradle:**
 build.gradle<br>
-''''
-# In this example, both the JSON-java jar and the test code is built <br>
-# from the same build file, in the test code directory.
+````
+\# In this example, both the JSON-java jar and the test code is built <br>
+\# from the same build file, in the test code directory.
 apply plugin: 'java'
 jar.baseName = 'JSON-java'
 
@@ -54,7 +54,7 @@ dependencies {
     testCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.1.0'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
 }
-''''
+````
 
 To measure coverage: http://www.eclemma.org/ (just install the latest in Eclipse)<br>
 
