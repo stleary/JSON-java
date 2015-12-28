@@ -2,8 +2,12 @@ package org.json.junit;
 
 import static org.junit.Assert.*;
 
+import java.util.*;
+
 import org.json.*;
 import org.junit.Test;
+
+import com.jayway.jsonpath.*;
 
 /**
  * HTTP cookie specification RFC6265: http://tools.ietf.org/html/rfc6265
@@ -60,7 +64,6 @@ public class CookieListTest {
     @Test
     public void emptyStringCookieList() {
         String cookieStr = "";
-        String expectedCookieStr = "";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
         assertTrue(jsonObject.length() == 0);
     }
@@ -71,10 +74,11 @@ public class CookieListTest {
     @Test
     public void simpleCookieList() {
         String cookieStr = "SID=31d4d96e407aad42";
-        String expectedCookieStr = "{\"SID\":\"31d4d96e407aad42\"}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
-        JSONObject expectedJsonObject = new JSONObject(expectedCookieStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+        // validate JSON content
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
+        assertTrue("Expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
+        assertTrue("expected 31d4d96e407aad42", "31d4d96e407aad42".equals(JsonPath.read(doc, "$.SID")));
     }
 
     /**
@@ -83,10 +87,11 @@ public class CookieListTest {
     @Test
     public void simpleCookieListWithDelimiter() {
         String cookieStr = "SID=31d4d96e407aad42;";
-        String expectedCookieStr = "{\"SID\":\"31d4d96e407aad42\"}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
-        JSONObject expectedJsonObject = new JSONObject(expectedCookieStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+        // validate JSON content
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
+        assertTrue("Expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
+        assertTrue("expected 31d4d96e407aad42", "31d4d96e407aad42".equals(JsonPath.read(doc, "$.SID")));
     }
 
     /**
@@ -102,18 +107,16 @@ public class CookieListTest {
             "  name4=myCookieValue4;  "+
             "name5=myCookieValue5;"+
             "  name6=myCookieValue6;";
-        String expectedCookieStr = 
-            "{"+
-                "\"name1\":\"myCookieValue1\","+
-                "\"name2\":\"myCookieValue2\","+
-                "\"name3\":\"myCookieValue3\","+
-                "\"name4\":\"myCookieValue4\","+
-                "\"name5\":\"myCookieValue5\","+
-                "\"name6\":\"myCookieValue6\""+
-            "}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
-        JSONObject expectedJsonObject = new JSONObject(expectedCookieStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+        // validate JSON content
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
+        assertTrue("Expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
+        assertTrue("expected myCookieValue1", "myCookieValue1".equals(JsonPath.read(doc, "$.name1")));
+        assertTrue("expected myCookieValue2", "myCookieValue2".equals(JsonPath.read(doc, "$.name2")));
+        assertTrue("expected myCookieValue3", "myCookieValue3".equals(JsonPath.read(doc, "$.name3")));
+        assertTrue("expected myCookieValue4", "myCookieValue4".equals(JsonPath.read(doc, "$.name4")));
+        assertTrue("expected myCookieValue5", "myCookieValue5".equals(JsonPath.read(doc, "$.name5")));
+        assertTrue("expected myCookieValue6", "myCookieValue6".equals(JsonPath.read(doc, "$.name6")));
     }
 
     /**
@@ -139,21 +142,16 @@ public class CookieListTest {
                 "  name4=myCookieValue4;  "+
                 "name5=myCookieValue5;"+
                 "  name6=myCookieValue6;";
-            String expectedCookieStr = 
-                "{"+
-                    "\"name1\":\"myCookieValue1\","+
-                    "\"name2\":\"myCookieValue2\","+
-                    "\"name3\":\"myCookieValue3\","+
-                    "\"name4\":\"myCookieValue4\","+
-                    "\"name5\":\"myCookieValue5\","+
-                    "\"name6\":\"myCookieValue6\""+
-                "}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
-        JSONObject expectedJsonObject = new JSONObject(expectedCookieStr);
-        String cookieToStr = CookieList.toString(jsonObject);
-        JSONObject finalJsonObject = CookieList.toJSONObject(cookieToStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
-        Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
+        // validate JSON content
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
+        assertTrue("Expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
+        assertTrue("expected myCookieValue1", "myCookieValue1".equals(JsonPath.read(doc, "$.name1")));
+        assertTrue("expected myCookieValue2", "myCookieValue2".equals(JsonPath.read(doc, "$.name2")));
+        assertTrue("expected myCookieValue3", "myCookieValue3".equals(JsonPath.read(doc, "$.name3")));
+        assertTrue("expected myCookieValue4", "myCookieValue4".equals(JsonPath.read(doc, "$.name4")));
+        assertTrue("expected myCookieValue5", "myCookieValue5".equals(JsonPath.read(doc, "$.name5")));
+        assertTrue("expected myCookieValue6", "myCookieValue6".equals(JsonPath.read(doc, "$.name6")));
     }
 
     /**
@@ -169,22 +167,15 @@ public class CookieListTest {
                 "  name4=my%25CookieValue4;  "+
                 "name5=myCookieValue5;"+
                 "  name6=myCookieValue6;";
-            String expectedCookieStr = 
-                "{"+
-                    "\"name1\":\"myCookieValue1\","+
-                    "\"name2\":\"my Cookie Value 2\","+
-                    "\"name3\":\"my+Cookie&Value;3=\","+
-                    "\"name4\":\"my%CookieValue4\","+
-                    "\"name5\":\"myCookieValue5\","+
-                    "\"name6\":\"myCookieValue6\""+
-                "}";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
-        JSONObject expectedJsonObject = new JSONObject(expectedCookieStr);
-        String cookieToStr = CookieList.toString(jsonObject);
-        JSONObject finalJsonObject = CookieList.toJSONObject(cookieToStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
-        Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
+        // validate JSON content
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
+        assertTrue("Expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
+        assertTrue("expected myCookieValue1", "myCookieValue1".equals(JsonPath.read(doc, "$.name1")));
+        assertTrue("expected my Cookie Value 2", "my Cookie Value 2".equals(JsonPath.read(doc, "$.name2")));
+        assertTrue("expected my+Cookie&Value;3=", "my+Cookie&Value;3=".equals(JsonPath.read(doc, "$.name3")));
+        assertTrue("expected my%CookieValue4", "my%CookieValue4".equals(JsonPath.read(doc, "$.name4")));
+        assertTrue("expected my%CookieValue5", "myCookieValue5".equals(JsonPath.read(doc, "$.name5")));
+        assertTrue("expected myCookieValue6", "myCookieValue6".equals(JsonPath.read(doc, "$.name6")));
     }
-    
-
 }

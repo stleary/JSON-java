@@ -2,17 +2,14 @@ package org.json.junit;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
+
+import com.jayway.jsonpath.*;
 
 
 /**
@@ -306,41 +303,37 @@ public class JSONArrayTest {
     /**
      * Exercise JSONArray.join() by converting a JSONArray into a 
      * comma-separated string. Since this is very nearly a JSON document,
-     * array braces are added to the beginning and end, and it is reconverted
-     * back to a JSONArray for comparison.
+     * array braces are added to the beginning and end prior to validation.
      */
     @Test
     public void join() {
-        String expectedStr =
-            "["+
-                "true,"+
-                "false,"+
-                "\"true\","+
-                "\"false\","+
-                "\"hello\","+
-                "0.002345,"+
-                "\"23.45\","+
-                "42,"+
-                "\"43\","+
-                "["+
-                    "\"world\""+
-                "],"+
-                "{"+
-                    "\"key1\":\"value1\","+
-                    "\"key2\":\"value2\","+
-                    "\"key3\":\"value3\","+
-                    "\"key4\":\"value4\""+
-                "},"+
-                "0,"+
-                "\"-1\""+
-            "]";
-
         JSONArray jsonArray = new JSONArray(arrayStr);
         String joinStr = jsonArray.join(",");
-        JSONArray finalJsonArray = new JSONArray("["+joinStr+"]");
-        JSONArray expectedJsonArray = new JSONArray(expectedStr);
-        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
-        Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
+
+        // validate JSON
+        /**
+         * Don't need to remake the JSONArray to perform the parsing
+         */
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse("["+joinStr+"]");
+        assertTrue("expected 13 items in top level object", ((List<?>)(JsonPath.read(doc, "$"))).size() == 13);
+        assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc,  "$[0]")));
+        assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc,  "$[1]")));
+        assertTrue("expected \"true\"", "true".equals(JsonPath.read(doc,  "$[2]")));
+        assertTrue("expected \"false\"", "false".equals(JsonPath.read(doc,  "$[3]")));
+        assertTrue("expected hello", "hello".equals(JsonPath.read(doc,  "$[4]")));
+        assertTrue("expected 0.002345", Double.valueOf(0.002345).equals(JsonPath.read(doc,  "$[5]")));
+        assertTrue("expected \"23.45\"", "23.45".equals(JsonPath.read(doc,  "$[6]")));
+        assertTrue("expected 42", Integer.valueOf(42).equals(JsonPath.read(doc,  "$[7]")));
+        assertTrue("expected \"43\"", "43".equals(JsonPath.read(doc,  "$[8]")));
+        assertTrue("expected 1 item in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 1);
+        assertTrue("expected world", "world".equals(JsonPath.read(doc,  "$[9][0]")));
+        assertTrue("expected 4 items in [10]", ((Map<?,?>)(JsonPath.read(doc, "$[10]"))).size() == 4);
+        assertTrue("expected value1", "value1".equals(JsonPath.read(doc,  "$[10].key1")));
+        assertTrue("expected value2", "value2".equals(JsonPath.read(doc,  "$[10].key2")));
+        assertTrue("expected value3", "value3".equals(JsonPath.read(doc,  "$[10].key3")));
+        assertTrue("expected value4", "value4".equals(JsonPath.read(doc,  "$[10].key4")));
+        assertTrue("expected 0", Integer.valueOf(0).equals(JsonPath.read(doc,  "$[11]")));
+        assertTrue("expected \"-1\"", "-1".equals(JsonPath.read(doc,  "$[12]")));
     }
 
     /**
@@ -419,33 +412,7 @@ public class JSONArrayTest {
      */
     @Test
     public void put() {
-        String expectedStr =
-            "["+
-                "true,"+
-                "false,"+
-                "["+
-                    "hello,"+
-                    "world"+
-                "],"+
-                "2.5,"+
-                "1,"+
-                "45,"+
-                "\"objectPut\","+
-                "{"+
-                    "\"key10\":\"val10\","+
-                    "\"key20\":\"val20\","+
-                    "\"key30\":\"val30\""+
-                "},"+
-                "{"+
-                    "\"k1\":\"v1\""+
-                "},"+
-                "["+
-                    "1,"+
-                    "2"+
-                "]"+
-            "]";
         JSONArray jsonArray = new JSONArray();
-        JSONArray expectedJsonArray = new JSONArray(expectedStr);
 
         // index 0
         jsonArray.put(true);
@@ -488,9 +455,30 @@ public class JSONArrayTest {
         Collection<Object> collection = new ArrayList<Object>();
         collection.add(1);
         collection.add(2);
-            // 9
+        // 9
         jsonArray.put(collection);
-        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
+
+        // validate JSON
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
+        assertTrue("expected 10 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 10);
+        assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc,  "$[0]")));
+        assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc,  "$[1]")));
+        assertTrue("expected 2 items in [2]", ((List<?>)(JsonPath.read(doc, "$[2]"))).size() == 2);
+        assertTrue("expected hello", "hello".equals(JsonPath.read(doc,  "$[2][0]")));
+        assertTrue("expected world", "world".equals(JsonPath.read(doc,  "$[2][1]")));
+        assertTrue("expected 2.5", Double.valueOf(2.5).equals(JsonPath.read(doc,  "$[3]")));
+        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[4]")));
+        assertTrue("expected 45", Integer.valueOf(45).equals(JsonPath.read(doc,  "$[5]")));
+        assertTrue("expected objectPut", "objectPut".equals(JsonPath.read(doc,  "$[6]")));
+        assertTrue("expected 3 items in [7]", ((Map<?,?>)(JsonPath.read(doc, "$[7]"))).size() == 3);
+        assertTrue("expected val10", "val10".equals(JsonPath.read(doc, "$[7].key10")));
+        assertTrue("expected val20", "val20".equals(JsonPath.read(doc, "$[7].key20")));
+        assertTrue("expected val30", "val30".equals(JsonPath.read(doc, "$[7].key30")));
+        assertTrue("expected 1 item in [8]", ((Map<?,?>)(JsonPath.read(doc, "$[8]"))).size() == 1);
+        assertTrue("expected v1", "v1".equals(JsonPath.read(doc, "$[8].k1")));
+        assertTrue("expected 2 items in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 2);
+        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[9][0]")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc,  "$[9][1]")));
     }
 
     /**
@@ -499,34 +487,7 @@ public class JSONArrayTest {
      */
     @Test
     public void putIndex() {
-        String expectedStr =
-            "["+
-                "true,"+
-                "false,"+
-                "["+
-                    "hello,"+
-                    "world"+
-                "],"+
-                "2.5,"+
-                "1,"+
-                "45,"+
-                "\"objectPut\","+
-                "null,"+
-                "{"+
-                    "\"key10\":\"val10\","+
-                    "\"key20\":\"val20\","+
-                    "\"key30\":\"val30\""+
-                "},"+
-                "["+
-                    "1,"+
-                    "2"+
-                "],"+
-                "{"+
-                    "\"k1\":\"v1\""+
-                "},"+
-            "]";
         JSONArray jsonArray = new JSONArray();
-        JSONArray expectedJsonArray = new JSONArray(expectedStr);
 
         // 1
         jsonArray.put(1, false);
@@ -573,7 +534,29 @@ public class JSONArrayTest {
             jsonArray.put(-1, "abc");
             assertTrue("put index < 0 should have thrown exception", false);
         } catch(Exception ignored) {}
-        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
+
+        // validate JSON
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
+        assertTrue("expected 11 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 11);
+        assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc,  "$[0]")));
+        assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc,  "$[1]")));
+        assertTrue("expected 2 items in [2]", ((List<?>)(JsonPath.read(doc, "$[2]"))).size() == 2);
+        assertTrue("expected hello", "hello".equals(JsonPath.read(doc,  "$[2][0]")));
+        assertTrue("expected world", "world".equals(JsonPath.read(doc,  "$[2][1]")));
+        assertTrue("expected 2.5", Double.valueOf(2.5).equals(JsonPath.read(doc,  "$[3]")));
+        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[4]")));
+        assertTrue("expected 45", Integer.valueOf(45).equals(JsonPath.read(doc,  "$[5]")));
+        assertTrue("expected objectPut", "objectPut".equals(JsonPath.read(doc,  "$[6]")));
+        assertTrue("expected null", null == JsonPath.read(doc,  "$[7]"));
+        assertTrue("expected 3 items in [8]", ((Map<?,?>)(JsonPath.read(doc, "$[8]"))).size() == 3);
+        assertTrue("expected val10", "val10".equals(JsonPath.read(doc, "$[8].key10")));
+        assertTrue("expected val20", "val20".equals(JsonPath.read(doc, "$[8].key20")));
+        assertTrue("expected val30", "val30".equals(JsonPath.read(doc, "$[8].key30")));
+        assertTrue("expected 2 items in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 2);
+        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[9][0]")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc,  "$[9][1]")));
+        assertTrue("expected 1 item in [10]", ((Map<?,?>)(JsonPath.read(doc, "$[10]"))).size() == 1);
+        assertTrue("expected v1", "v1".equals(JsonPath.read(doc, "$[10].k1")));
     }
 
     /**
@@ -587,10 +570,9 @@ public class JSONArrayTest {
                 "1"+
             "]";
         JSONArray jsonArray = new JSONArray(arrayStr);
-        JSONArray expectedJsonArray = new JSONArray();
         jsonArray.remove(0);
         assertTrue("array should be empty", null == jsonArray.remove(5));
-        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
+        assertTrue("jsonArray should be empty", jsonArray.length() == 0);
     }
 
     /**
@@ -648,15 +630,20 @@ public class JSONArrayTest {
      */
     @Test
     public void objectArrayVsIsArray() {
-        String expectedStr = 
-            "["+
-                "1,2,3,4,5,6,7"+
-            "]";
         int[] myInts = { 1, 2, 3, 4, 5, 6, 7 };
         Object myObject = myInts;
         JSONArray jsonArray = new JSONArray(myObject);
-        JSONArray expectedJsonArray = new JSONArray(expectedStr);
-        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
+
+        // validate JSON
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
+        assertTrue("expected 7 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 7);
+        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[0]")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc,  "$[1]")));
+        assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc,  "$[2]")));
+        assertTrue("expected 4", Integer.valueOf(4).equals(JsonPath.read(doc,  "$[3]")));
+        assertTrue("expected 5", Integer.valueOf(5).equals(JsonPath.read(doc,  "$[4]")));
+        assertTrue("expected 6", Integer.valueOf(6).equals(JsonPath.read(doc,  "$[5]")));
+        assertTrue("expected 7", Integer.valueOf(7).equals(JsonPath.read(doc,  "$[6]")));
     }
 
     /**
