@@ -12,15 +12,51 @@ Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or 
 
 **You will need the following libraries for testing:**<br>
 Test harness: http://junit.org<br> 
-* hamcrest-core-1.3.jar (for Junit)<br>
+* asm-1.0.2.jar<br>
+* commons-io-2.1.jar<br>
+* commons-lang-2.6.jar<br>
+* hamcrest-core-1.3.jar<br>
+* json-path-2.1.0.jar<br>
+* json-smart-2.1.1.jar<br>
 * junit-4.12.jar<br>
-
-Mockery: https://github.com/mockito/mockito <br>
 * mockito-all-1.9.5.jar<br>
+* slf4j-api-1.7.12.jar<br>
+* slf-simple-1.7.12.jar<br>
+* JSON-java.jar<br>
+ 
+**To build from the command line using gradle:**
+build.gradle<br>
+''''
+# In this example, both the JSON-java jar and the test code is built <br>
+# from the same build file, in the test code directory.
+apply plugin: 'java'
+jar.baseName = 'JSON-java'
 
-Coverage: http://www.eclemma.org/ (just install the latest in Eclipse)<br>
+sourceSets {
+ main {
+  java {
+   srcDir '../JSON-java/src/org/json'
+  }
+ }
+ test {
+  java {
+   srcDir 'src/org/json/junit'
+  }
+ }
+}
 
-JSON-Java.jar (make this jar of the files to be tested yourself)<br>
+repositories {
+ mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.1.0'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+}
+''''
+
+To measure coverage: http://www.eclemma.org/ (just install the latest in Eclipse)<br>
 
 <b>Conventions</b><br>
 Test filenames should consist of the name of the module being tested, with the suffix "Test". 
