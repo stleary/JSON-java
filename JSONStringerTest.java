@@ -192,6 +192,7 @@ public class JSONStringerTest {
         String str = jsonStringer.toString();
         JSONObject jsonObject = new JSONObject(str);
 
+        // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 7 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 7);
         assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc, "$.trueValue")));
@@ -221,6 +222,7 @@ public class JSONStringerTest {
         String str = jsonStringer.toString();
         JSONArray jsonArray = new JSONArray(str);
 
+        // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
         assertTrue("expected 6 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 6);
         assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc, "$[0]")));
@@ -272,6 +274,7 @@ public class JSONStringerTest {
         String str = jsonStringer.toString();
         JSONObject jsonObject = new JSONObject(str);
 
+        // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 8 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 8);
         assertTrue("expected 4 object2 items", ((Map<?,?>)(JsonPath.read(doc, "$.object2"))).size() == 4);

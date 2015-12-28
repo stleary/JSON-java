@@ -35,8 +35,7 @@ public class EnumTest {
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider()
                 .parse(jsonObject.toString());
-        assertTrue("expecting 2 items in top level object",
-                ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
+        assertTrue("expecting 2 items in top level object", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
         assertTrue("expecting val 2", "val 2".equals(JsonPath.read(doc, "$.value")));
         assertTrue("expecting 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$.intVal")));
 
@@ -50,14 +49,10 @@ public class EnumTest {
         jsonObject = new JSONObject(myEnumClass);
 
         // validate JSON content
-        doc = Configuration.defaultConfiguration().jsonProvider()
-                .parse(jsonObject.toString());
-        assertTrue("expecting 2 items in top level object",
-                ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expecting 2 items in myEnumField object",
-                ((Map<?,?>)(JsonPath.read(doc, "$.myEnumField"))).size() == 2);
-        assertTrue("expecting 0 items in myEnum object",
-                ((Map<?,?>)(JsonPath.read(doc, "$.myEnum"))).size() == 0);
+        doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
+        assertTrue("expecting 2 items in top level object", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
+        assertTrue("expecting 2 items in myEnumField object", ((Map<?,?>)(JsonPath.read(doc, "$.myEnumField"))).size() == 2);
+        assertTrue("expecting 0 items in myEnum object", ((Map<?,?>)(JsonPath.read(doc, "$.myEnum"))).size() == 0);
         assertTrue("expecting 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$.myEnumField.intVal")));
         assertTrue("expecting val 3", "val 3".equals(JsonPath.read(doc, "$.myEnumField.value")));
     }

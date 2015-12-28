@@ -314,10 +314,8 @@ public class JSONArrayTest {
         /**
          * Don't need to remake the JSONArray to perform the parsing
          */
-        Object doc = Configuration.defaultConfiguration().jsonProvider()
-                .parse("["+joinStr+"]");
-        List<?> docList = JsonPath.read(doc, "$");
-        assertTrue("expected 13 items in top level object", docList.size() == 13);
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse("["+joinStr+"]");
+        assertTrue("expected 13 items in top level object", ((List<?>)(JsonPath.read(doc, "$"))).size() == 13);
         assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc,  "$[0]")));
         assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc,  "$[1]")));
         assertTrue("expected \"true\"", "true".equals(JsonPath.read(doc,  "$[2]")));
@@ -327,11 +325,9 @@ public class JSONArrayTest {
         assertTrue("expected \"23.45\"", "23.45".equals(JsonPath.read(doc,  "$[6]")));
         assertTrue("expected 42", Integer.valueOf(42).equals(JsonPath.read(doc,  "$[7]")));
         assertTrue("expected \"43\"", "43".equals(JsonPath.read(doc,  "$[8]")));
-        docList = JsonPath.read(doc, "$[9]");
-        assertTrue("expected 1 array item", docList.size() == 1);
+        assertTrue("expected 1 item in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 1);
         assertTrue("expected world", "world".equals(JsonPath.read(doc,  "$[9][0]")));
-        Map<?,?> docMap = JsonPath.read(doc, "$[10]");
-        assertTrue("expected 4 object items", docMap.size() == 4);
+        assertTrue("expected 4 items in [10]", ((Map<?,?>)(JsonPath.read(doc, "$[10]"))).size() == 4);
         assertTrue("expected value1", "value1".equals(JsonPath.read(doc,  "$[10].key1")));
         assertTrue("expected value2", "value2".equals(JsonPath.read(doc,  "$[10].key2")));
         assertTrue("expected value3", "value3".equals(JsonPath.read(doc,  "$[10].key3")));
@@ -463,30 +459,24 @@ public class JSONArrayTest {
         jsonArray.put(collection);
 
         // validate JSON
-        Object doc = Configuration.defaultConfiguration().jsonProvider()
-                .parse(jsonArray.toString());
-        List<?> docList = JsonPath.read(doc, "$");
-        assertTrue("expected 10 items in top level object", docList.size() == 10);
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
+        assertTrue("expected 10 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 10);
         assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc,  "$[0]")));
         assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc,  "$[1]")));
-        docList = JsonPath.read(doc,  "$[2]");
-        assertTrue("expected 2 items in array", docList.size() == 2);
+        assertTrue("expected 2 items in [2]", ((List<?>)(JsonPath.read(doc, "$[2]"))).size() == 2);
         assertTrue("expected hello", "hello".equals(JsonPath.read(doc,  "$[2][0]")));
         assertTrue("expected world", "world".equals(JsonPath.read(doc,  "$[2][1]")));
         assertTrue("expected 2.5", Double.valueOf(2.5).equals(JsonPath.read(doc,  "$[3]")));
         assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[4]")));
         assertTrue("expected 45", Integer.valueOf(45).equals(JsonPath.read(doc,  "$[5]")));
         assertTrue("expected objectPut", "objectPut".equals(JsonPath.read(doc,  "$[6]")));
-        Map<?,?> docMap = JsonPath.read(doc, "$[7]");
-        assertTrue("expected 3 items in object", docMap.size() == 3);
+        assertTrue("expected 3 items in [7]", ((Map<?,?>)(JsonPath.read(doc, "$[7]"))).size() == 3);
         assertTrue("expected val10", "val10".equals(JsonPath.read(doc, "$[7].key10")));
         assertTrue("expected val20", "val20".equals(JsonPath.read(doc, "$[7].key20")));
         assertTrue("expected val30", "val30".equals(JsonPath.read(doc, "$[7].key30")));
-        docMap = JsonPath.read(doc, "$[8]");
-        assertTrue("expected 1 item in object", docMap.size() == 1);
+        assertTrue("expected 1 item in [8]", ((Map<?,?>)(JsonPath.read(doc, "$[8]"))).size() == 1);
         assertTrue("expected v1", "v1".equals(JsonPath.read(doc, "$[8].k1")));
-        docList = JsonPath.read(doc,  "$[9]");
-        assertTrue("expected 2 items in array", docList.size() == 2);
+        assertTrue("expected 2 items in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 2);
         assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[9][0]")));
         assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc,  "$[9][1]")));
     }
@@ -546,14 +536,11 @@ public class JSONArrayTest {
         } catch(Exception ignored) {}
 
         // validate JSON
-        Object doc = Configuration.defaultConfiguration().jsonProvider()
-                .parse(jsonArray.toString());
-        List<?> docList = JsonPath.read(doc, "$");
-        assertTrue("expected 11 items in top level object", docList.size() == 11);
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
+        assertTrue("expected 11 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 11);
         assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc,  "$[0]")));
         assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc,  "$[1]")));
-        docList = JsonPath.read(doc,  "$[2]");
-        assertTrue("expected 2 items in array", docList.size() == 2);
+        assertTrue("expected 2 items in [2]", ((List<?>)(JsonPath.read(doc, "$[2]"))).size() == 2);
         assertTrue("expected hello", "hello".equals(JsonPath.read(doc,  "$[2][0]")));
         assertTrue("expected world", "world".equals(JsonPath.read(doc,  "$[2][1]")));
         assertTrue("expected 2.5", Double.valueOf(2.5).equals(JsonPath.read(doc,  "$[3]")));
@@ -561,17 +548,14 @@ public class JSONArrayTest {
         assertTrue("expected 45", Integer.valueOf(45).equals(JsonPath.read(doc,  "$[5]")));
         assertTrue("expected objectPut", "objectPut".equals(JsonPath.read(doc,  "$[6]")));
         assertTrue("expected null", null == JsonPath.read(doc,  "$[7]"));
-        Map<?,?> docMap = JsonPath.read(doc, "$[8]");
-        assertTrue("expected 3 items in object", docMap.size() == 3);
+        assertTrue("expected 3 items in [8]", ((Map<?,?>)(JsonPath.read(doc, "$[8]"))).size() == 3);
         assertTrue("expected val10", "val10".equals(JsonPath.read(doc, "$[8].key10")));
         assertTrue("expected val20", "val20".equals(JsonPath.read(doc, "$[8].key20")));
         assertTrue("expected val30", "val30".equals(JsonPath.read(doc, "$[8].key30")));
-        docList = JsonPath.read(doc,  "$[9]");
-        assertTrue("expected 2 items in array", docList.size() == 2);
+        assertTrue("expected 2 items in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 2);
         assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[9][0]")));
         assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc,  "$[9][1]")));
-        docMap = JsonPath.read(doc, "$[10]");
-        assertTrue("expected 1 item in object", docMap.size() == 1);
+        assertTrue("expected 1 item in [10]", ((Map<?,?>)(JsonPath.read(doc, "$[10]"))).size() == 1);
         assertTrue("expected v1", "v1".equals(JsonPath.read(doc, "$[10].k1")));
     }
 
@@ -651,10 +635,8 @@ public class JSONArrayTest {
         JSONArray jsonArray = new JSONArray(myObject);
 
         // validate JSON
-        Object doc = Configuration.defaultConfiguration().jsonProvider()
-                .parse(jsonArray.toString());
-        List<?> docList = JsonPath.read(doc, "$");
-        assertTrue("expected 7 items in top level object", docList.size() == 7);
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
+        assertTrue("expected 7 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 7);
         assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc,  "$[0]")));
         assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc,  "$[1]")));
         assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc,  "$[2]")));
