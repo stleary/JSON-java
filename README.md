@@ -26,7 +26,7 @@ Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or 
 **To build from the command line using gradle:**
 ````
 build.gradle
-# In this example, both the JSON-java jar and the test code is created  <br>
+# In this example, both the JSON-java jar and the test code is created 
 # from the same build file, in the test code directory. 3rd party jars are
 # obtained from the maven repository.
 apply plugin: 'java'
