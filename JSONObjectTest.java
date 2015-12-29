@@ -16,43 +16,10 @@ import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.json.XML;
 import org.junit.Test;
 
 import com.jayway.jsonpath.*;
-
-/**
- * Used in testing when a JSONString is needed
- */
-class MyJsonString implements JSONString {
-
-    @Override
-    public String toJSONString() {
-        return "my string";
-    }
-}
-
-/**
- * Used in testing when Bean behavior is needed
- */
-interface MyBean {
-    public Integer getIntKey();
-    public Double getDoubleKey();
-    public String getStringKey();
-    public String getEscapeStringKey();
-    public Boolean isTrueKey();
-    public Boolean isFalseKey();
-    public StringReader getStringReaderKey();
-};
-
-/**
- * Used in testing when a Bean containing big numbers is needed
- */
-interface MyBigNumberBean {
-    public BigInteger getBigInteger();
-    public BigDecimal getBigDecimal();
-}
 
 /**
  * JSONObject, along with JSONArray, are the central classes of the reference app.
@@ -60,13 +27,6 @@ interface MyBigNumberBean {
  * otherwise be impossible.
  */
 public class JSONObjectTest {
-    /**
-     * Need a class with some public data members for testing, so
-     * JSONObjectTest itself will be used for this purpose.
-     * TODO: Why not use MyBigNumberBean or MyBean?
-     */
-    public Integer publicInt = 42;
-    public String publicString = "abc";
 
     /**
      * JSONObject built from a bean, but only using a null value.
@@ -427,8 +387,8 @@ public class JSONObjectTest {
     public void jsonObjectByObjectAndNames() {
         String[] keys = {"publicString", "publicInt"};
         // just need a class that has public data members
-        JSONObjectTest jsonObjectTest = new JSONObjectTest();
-        JSONObject jsonObject = new JSONObject(jsonObjectTest, keys);
+        MyPublicClass myPublicClass = new MyPublicClass();
+        JSONObject jsonObject = new JSONObject(myPublicClass, keys);
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider()
@@ -1168,10 +1128,10 @@ public class JSONObjectTest {
         /**
          * A bean is also an object. But in order to test the static
          * method getNames(), this particular bean needs some public
-         * data members, which have been added to the class.
+         * data members.
          */
-        JSONObjectTest jsonObjectTest = new JSONObjectTest();
-        names = JSONObject.getNames(jsonObjectTest);
+        MyPublicClass myPublicClass = new MyPublicClass();
+        names = JSONObject.getNames(myPublicClass);
 
         // validate JSON
         jsonArray = new JSONArray(names);
