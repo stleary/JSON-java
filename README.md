@@ -91,32 +91,37 @@ A unit test has the following stages:
 
 | Test file name  | Coverage | Comments |
 | ------------- | ------------- | ---- |
-| Total coverage | 88.9% | | | 
+| Total coverage | 90.6% | | | 
 | | | | 
-| CDL.java | 98% | Reasonable test cases.  |
+| CDL.java | 98.8% | Reasonable test cases.  |
 | Cookie.java  | 98.9%   | Reasonable test cases. |
 | CookieList.java |96.5% | Reasonable test cases. |
 | EnumTest.java | n/a | Just documenting how enums are handled. |
 | HTTP.java | 98.7%| Coverage > 90% | 
 | HTTPTokener.java |93.2% | No test   | 
-| JSONArray.java |95.9% | Coverage > 90% | 
+| JSONArray.java |95.9% | Reasonable test cases | 
 | JSONException.java | 26.7% | No test |
-| JSONML.java | 83.2%| In progress | 
-| JSONObject | 90.9% | Coverage > 90% | 
+| JSONML.java | 86.8%| In progress | 
+| JSONObject | 94.0% | Reasonable test cases | 
 | JSONObject.Null | 87.5% | No test  | 
 | JSONString.java | | No test  | 
 | JSONStringer.java | 93.8%| Coverage > 90% | 
 | JSONTokener.java | 72.1% | In progress | 
-| JSONWriter.java | 88.9% | No test | 
+| JSONWriter.java | 87.5% | No test | 
 | Property.java  | 94.8%  | Coverage > 90% |
-| XML.java | 85.1% | In progress |
+| XML.java | 87.4% | In progress |
 | XMLTokener.java| 82.7%| No test  | 
 
 | Files used in test |
 | ------------- |  
+| MyBean.java |
+| MyBigNumberBean.java |
 | MyEnum.java |
 | MyEnumClass.java |
 | MyEnumField.java |
+| MyJsonString.java |
+| MyPublicClass.java |
+| PropertyTest.java |
 | JunitTestSuite.java | 
 | StringsResourceBundle.java | 
 | TestRunner.java | 
