@@ -655,7 +655,9 @@ public class JSONMLTest {
 
         // lastly, confirm the restored JSONObject XML and JSONArray XML look
         // reasonably similar
-        Util.compareXML(jsonObjectXmlToStr, jsonArrayXmlToStr);
+        JSONObject jsonObjectFromObject = JSONML.toJSONObject(jsonObjectXmlToStr);
+        JSONObject jsonObjectFromArray = JSONML.toJSONObject(jsonArrayXmlToStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObjectFromObject, jsonObjectFromArray);
     }
 
     /**

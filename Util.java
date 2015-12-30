@@ -94,49 +94,4 @@ public class Util {
                 value.toString().equals(expectedValue.toString()));
         }
     }
-
-    /**
-     * Sometimes test completion requires comparison of JSONArray objects that
-     * were produced from a JSONObject, and so unordered. This method is 
-     * imperfect since it only compares the array elements and won't catch
-     * JSON syntax errors but at least it does not rely on ordering
-     * <p>
-     * It is expected that the arrays to be compared come from JSONArray
-     * instances which have been rendered by toString(), and whose syntax
-     * chars have been removed.
-     * <p>
-     * TODO: why are we not simply comparing the JSONArrays?
-     * <p>
-     * @param names an array of strings for comparison
-     * @param expectedNames the other array of strings for comparison
-     */
-    public static void compareActualVsExpectedStringArrays(String[] names,
-            String [] expectedNames) {
-        assertTrue("Array lengths should be equal",
-                names.length == expectedNames.length);
-        List<String> lNames = new ArrayList<String>(Arrays.asList(names));
-        for (int i = 0; i < expectedNames.length; ++i) {
-            String expectedName = expectedNames[i];
-            assertTrue("expected to find "+expectedName, 
-                    lNames.contains(expectedName));
-            lNames.remove(expectedName);
-        }
-    }
-
-    /**
-     * This is stopgap test utility. It is meant to compare strings
-     * of XML, but it does not take ordering into account and should
-     * not be expected to work correctly with complex XML.
-     * @param aXmlStr an XML doc to be compared
-     * @param bXmlStr the other XML doc to be compared
-     */
-    public static void compareXML(String aXmlStr, String bXmlStr) {
-        // TODO For simple tests this may be adequate, but it won't work for
-        // elements with multiple attributes and possibly other cases as well.
-        // Should use XMLUnit or similar.
-        assertTrue("expected equal XML strings \naXmlStr: "+
-                aXmlStr+ "\nbXmlStr: " +bXmlStr, aXmlStr.equals(bXmlStr));
-        
-    }
-
 }
