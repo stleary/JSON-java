@@ -143,6 +143,11 @@ public class CookieListTest {
                 "name5=myCookieValue5;"+
                 "  name6=myCookieValue6;";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
+        // exercise CookieList.toString()
+        String cookieListString = CookieList.toString(jsonObject);
+        // have to convert it back for validation
+        jsonObject = CookieList.toJSONObject(cookieListString);
+
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("Expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);

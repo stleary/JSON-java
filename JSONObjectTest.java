@@ -299,15 +299,6 @@ public class JSONObjectTest {
         when(myBean.isFalseKey()).thenReturn(false);
         when(myBean.getStringReaderKey()).thenReturn(
             new StringReader("") {
-                /**
-                 * TODO: Need to understand why returning a string
-                 * turns "this" into an empty JSONObject,
-                 * but not overriding turns "this" into a string.
-                 */
-                @Override
-                public String toString(){
-                    return "Whatever";
-                }
             });
 
         JSONObject jsonObject = new JSONObject(myBean);
@@ -349,11 +340,11 @@ public class JSONObjectTest {
     }
 
     /**
-     * Exercise the JSONObject from resource bundle functionality
+     * Exercise the JSONObject from resource bundle functionality.
+     * The test resource bundle is uncomplicated, but provides adequate test coverage.
      */
     @Test
     public void jsonObjectByResourceBundle() {
-        // TODO: how to improve resource bundle testing?
         JSONObject jsonObject = new
                 JSONObject("org.json.junit.StringsResourceBundle",
                         Locale.getDefault());
@@ -374,7 +365,6 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonObjectAccumulate() {
-        // TODO: should include an unsupported object
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.accumulate("myArray", true);
@@ -383,6 +373,11 @@ public class JSONObjectTest {
         jsonObject.accumulate("myArray", "h\be\tllo w\u1234orld!");
         jsonObject.accumulate("myArray", 42);
         jsonObject.accumulate("myArray", -23.45e7);
+        // include an unsupported object for coverage
+        try {
+            jsonObject.accumulate("myArray", Double.NaN);
+            assertTrue("Expected exception", false);
+        } catch (JSONException ignored) {}
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
@@ -401,7 +396,6 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonObjectAppend() {
-        // TODO: should include an unsupported object
         JSONObject jsonObject = new JSONObject();
         jsonObject.append("myArray", true);
         jsonObject.append("myArray", false);
@@ -409,6 +403,11 @@ public class JSONObjectTest {
         jsonObject.append("myArray", "h\be\tllo w\u1234orld!");
         jsonObject.append("myArray", 42);
         jsonObject.append("myArray", -23.45e7);
+        // include an unsupported object for coverage
+        try {
+            jsonObject.append("myArray", Double.NaN);
+            assertTrue("Expected exception", false);
+        } catch (JSONException ignored) {}
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
@@ -818,34 +817,49 @@ public class JSONObjectTest {
         /**
          * JSONObject put(String, Object) method stores and serializes
          * bigInt and bigDec correctly. Nothing needs to change. 
-         * TODO: New methods
-         * get|optBigInteger|BigDecimal() should work like other supported
-         * objects. Uncomment the get/opt methods after JSONObject is updated.
          */
         jsonObject = new JSONObject();
         jsonObject.put("bigInt", bigInteger);
         assertTrue("jsonObject.put() handles bigInt correctly",
                 jsonObject.get("bigInt").equals(bigInteger));
-        // assertTrue("jsonObject.getBigInteger() handles bigInt correctly",
-        //         jsonObject.getBigInteger("bigInt").equals(bigInteger));
-        // assertTrue("jsonObject.optBigInteger() handles bigInt correctly",
-        //         jsonObject.optBigInteger("bigInt", BigInteger.ONE).equals(bigInteger));
+        assertTrue("jsonObject.getBigInteger() handles bigInt correctly",
+                jsonObject.getBigInteger("bigInt").equals(bigInteger));
+        assertTrue("jsonObject.optBigInteger() handles bigInt correctly",
+                jsonObject.optBigInteger("bigInt", BigInteger.ONE).equals(bigInteger));
         assertTrue("jsonObject serializes bigInt correctly",
                 jsonObject.toString().equals("{\"bigInt\":123456789012345678901234567890}"));
         jsonObject = new JSONObject();
         jsonObject.put("bigDec", bigDecimal);
         assertTrue("jsonObject.put() handles bigDec correctly",
                 jsonObject.get("bigDec").equals(bigDecimal));
-        // assertTrue("jsonObject.getBigDecimal() handles bigDec correctly",
-        //         jsonObject.getBigDecimal("bigDec").equals(bigDecimal));
-        // assertTrue("jsonObject.optBigDecimal() handles bigDec correctly",
-        //         jsonObject.optBigDecimal("bigDec", BigDecimal.ONE).equals(bigDecimal));
+        assertTrue("jsonObject.getBigDecimal() handles bigDec correctly",
+                jsonObject.getBigDecimal("bigDec").equals(bigDecimal));
+        assertTrue("jsonObject.optBigDecimal() handles bigDec correctly",
+                jsonObject.optBigDecimal("bigDec", BigDecimal.ONE).equals(bigDecimal));
         assertTrue("jsonObject serializes bigDec correctly",
                 jsonObject.toString().equals(
                 "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
 
-        JSONArray jsonArray = new JSONArray();
-        
+        /**
+         * exercise some exceptions
+         */
+        try {
+            jsonObject.getBigDecimal("bigInt");
+            assertTrue("expected an exeption", false);
+        } catch (JSONException ignored) {}
+        obj = jsonObject.optBigDecimal("bigInt", BigDecimal.ONE);
+        assertTrue("expected BigDecimal", obj.equals(BigDecimal.ONE));
+        try {
+            jsonObject.getBigInteger("bigDec");
+            assertTrue("expected an exeption", false);
+        } catch (JSONException ignored) {}
+        jsonObject.put("stringKey",  "abc");
+        try {
+            jsonObject.getBigDecimal("stringKey");
+            assertTrue("expected an exeption", false);
+        } catch (JSONException ignored) {}
+        obj = jsonObject.optBigInteger("bigDec", BigInteger.ONE);
+        assertTrue("expected BigInteger", obj.equals(BigInteger.ONE));
 
         /**
          * JSONObject.numberToString() works correctly, nothing to change.
@@ -904,7 +918,7 @@ public class JSONObjectTest {
                 actualFromPutStr.equals(
                 "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
         // bigInt,bigDec put 
-        jsonArray = new JSONArray();
+        JSONArray jsonArray = new JSONArray();
         jsonArray.put(bigInteger);
         jsonArray.put(bigDecimal);
         actualFromPutStr = jsonArray.toString();
@@ -1105,7 +1119,7 @@ public class JSONObjectTest {
         String str = 
             "{"+
                 "\"keyLong\":9999999991,"+
-                "\"keyDouble\":1.1,"+
+                "\"keyDouble\":1.1"+
              "}";
         JSONObject jsonObject = new JSONObject(str);
         jsonObject.increment("keyInt");
@@ -1115,16 +1129,26 @@ public class JSONObjectTest {
         jsonObject.increment("keyInt");
         jsonObject.increment("keyLong");
         jsonObject.increment("keyDouble");
+        /**
+         * JSONObject constructor won't handle these types correctly, but
+         * adding them via put works.
+         */
         jsonObject.put("keyFloat", new Float(1.1));
+        jsonObject.put("keyBigInt", new BigInteger("123456789123456789123456789123456780"));
+        jsonObject.put("keyBigDec", new BigDecimal("123456789123456789123456789123456780.1"));
         jsonObject.increment("keyFloat");
         jsonObject.increment("keyFloat");
+        jsonObject.increment("keyBigInt");
+        jsonObject.increment("keyBigDec");
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 4 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 4);
+        assertTrue("expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
         assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$.keyInt")));
         assertTrue("expected 9999999993", Long.valueOf(9999999993L).equals(JsonPath.read(doc, "$.keyLong")));
         assertTrue("expected 3.1", Double.valueOf(3.1).equals(JsonPath.read(doc, "$.keyDouble")));
+        assertTrue("expected 123456789123456789123456789123456781", new BigInteger("123456789123456789123456789123456781").equals(JsonPath.read(doc, "$.keyBigInt")));
+        assertTrue("expected 123456789123456789123456789123456781.1", new BigDecimal("123456789123456789123456789123456781.1").equals(JsonPath.read(doc, "$.keyBigDec")));
 
         /**
          * Should work the same way on any platform! @see https://docs.oracle
@@ -1526,8 +1550,6 @@ public class JSONObjectTest {
         assertTrue("expected val1", "val1".equals(JsonPath.read(doc, "$.key1")));
         assertTrue("expected val2", "val2".equals(JsonPath.read(doc, "$.key2")));
         assertTrue("expected val3", "val3".equals(JsonPath.read(doc, "$.key3")));
-
-        // TODO test wrap(package)
     }
 
     /**
