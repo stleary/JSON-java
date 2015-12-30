@@ -11,8 +11,7 @@ import com.jayway.jsonpath.*;
 
 
 /**
- * Tests for JSON-Java JSONStringer. 
- * TODO: Could use a lot more testing. For example, cascade-style productions.
+ * Tests for JSON-Java JSONStringer and JSONWriter.
  */
 public class JSONStringerTest {
 
@@ -234,43 +233,44 @@ public class JSONStringerTest {
     }
 
     /**
-     * Build a nested JSON doc using JSONString API calls,
-     * then convert to JSONObject
+     * Build a nested JSON doc using JSONString API calls, then convert to
+     * JSONObject. Will create a long cascade of output by reusing the
+     * returned values..
      */
     @Test
     public void complexObjectString() {
         JSONStringer jsonStringer = new JSONStringer();
-        jsonStringer.object();
-        jsonStringer.key("trueValue").value(true);
-        jsonStringer.key("falseValue").value(false);
-        jsonStringer.key("nullValue").value(null);
-        jsonStringer.key("stringValue").value("hello world!");
-        jsonStringer.key("object2").object();
-        jsonStringer.key("k1").value("v1");
-        jsonStringer.key("k2").value("v2");
-        jsonStringer.key("k3").value("v3");
-        jsonStringer.key("array1").array();
-        jsonStringer.value(1);
-        jsonStringer.value(2);
-        jsonStringer.object();
-        jsonStringer.key("k4").value("v4");
-        jsonStringer.key("k5").value("v5");
-        jsonStringer.key("k6").value("v6");
-        jsonStringer.key("array2").array();
-        jsonStringer.value(5);
-        jsonStringer.value(6);
-        jsonStringer.value(7);
-        jsonStringer.value(8);
-        jsonStringer.endArray();
-        jsonStringer.endObject();
-        jsonStringer.value(3);
-        jsonStringer.value(4);
-        jsonStringer.endArray();
-        jsonStringer.endObject();
-        jsonStringer.key("complexStringValue").value("h\be\tllo w\u1234orld!");
-        jsonStringer.key("intValue").value(42);
-        jsonStringer.key("doubleValue").value(-23.45e67);
-        jsonStringer.endObject();
+        jsonStringer.object().
+            key("trueValue").value(true).
+            key("falseValue").value(false).
+            key("nullValue").value(null).
+            key("stringValue").value("hello world!").
+            key("object2").object().
+            key("k1").value("v1").
+            key("k2").value("v2").
+            key("k3").value("v3").
+            key("array1").array().
+            value(1).
+            value(2).
+            object().
+            key("k4").value("v4").
+            key("k5").value("v5").
+            key("k6").value("v6").
+            key("array2").array().
+            value(5).
+            value(6).
+            value(7).
+            value(8).
+            endArray().
+            endObject().
+            value(3).
+            value(4).
+            endArray().
+            endObject().
+            key("complexStringValue").value("h\be\tllo w\u1234orld!").
+            key("intValue").value(42).
+            key("doubleValue").value(-23.45e67).
+            endObject();
         String str = jsonStringer.toString();
         JSONObject jsonObject = new JSONObject(str);
 

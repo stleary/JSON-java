@@ -59,24 +59,26 @@ public class Util {
     private static void compareActualVsExpectedObjects(Object value,
             Object expectedValue) {
         if (value instanceof JSONObject && expectedValue instanceof JSONObject) {
+            // Compare JSONObjects
             JSONObject jsonObject = (JSONObject)value;
             JSONObject expectedJsonObject = (JSONObject)expectedValue;
             compareActualVsExpectedJsonObjects(
                     jsonObject, expectedJsonObject);
         } else if (value instanceof JSONArray && expectedValue instanceof JSONArray) {
+            // Compare JSONArrays
             JSONArray jsonArray = (JSONArray)value;
             JSONArray expectedJsonArray = (JSONArray)expectedValue;
             compareActualVsExpectedJsonArrays(
                     jsonArray, expectedJsonArray);
         } else {
             /**
-             * Certain helper classes (e.g. XML) may create Long instead of
-             * Integer for small int values. As long as both are Numbers,
-             * just compare the toString() values.
-             * TODO: this may not work in the case where the underlying types
-             * do not have the same precision.
+             * Compare all other types using toString(). First, the types must
+             * also be equal, unless both are Number type. Certain helper
+             * classes (e.g. XML) may create Long instead of Integer for small
+             * int values.
              */
             if (!(value instanceof Number && expectedValue instanceof Number)) {
+                // Non-Number and non-matching types
                 assertTrue("object types should be equal for actual: "+
                     value.toString()+" ("+
                     value.getClass().toString()+") expected: "+
@@ -86,8 +88,7 @@ public class Util {
                             expectedValue.getClass().toString()));
             }
             /**
-             * When in doubt, compare by string
-             * TODO: should not this be an else to the previous condition?
+             * Same types or both Numbers, compare by toString()
              */
             assertTrue("string values should be equal for actual: "+
                 value.toString()+" expected: "+expectedValue.toString(),
