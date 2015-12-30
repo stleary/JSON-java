@@ -1083,6 +1083,8 @@ public class JSONArray implements Iterable<Object> {
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
+     * @param writer
+     *            Writes the serialized JSON
      * @param indentFactor
      *            The number of spaces to add to each level of indentation.
      * @param indent
@@ -1090,7 +1092,7 @@ public class JSONArray implements Iterable<Object> {
      * @return The writer.
      * @throws JSONException
      */
-    Writer write(Writer writer, int indentFactor, int indent)
+    public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
         try {
             boolean commanate = false;
