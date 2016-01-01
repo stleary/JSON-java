@@ -391,16 +391,16 @@ public class XMLTest {
      */
     @Test
     public void shouldHandleEmptyArray(){
-	final JSONObject jo1 = new JSONObject();
-	jo1.put("array",new Object[]{});
-	final JSONObject jo2 = new JSONObject();
-	jo2.put("array",new JSONArray());
+        final JSONObject jo1 = new JSONObject();
+        jo1.put("array",new Object[]{});
+        final JSONObject jo2 = new JSONObject();
+        jo2.put("array",new JSONArray());
 
-	final String expected = "<jo></jo>";
-	String output1 = XML.toString(jo1,"jo");
-	assertTrue("Expected an empty root tag", expected.equals(output1));
-	String output2 = XML.toString(jo2,"jo");
-	assertTrue("Expected an empty root tag", expected.equals(output2));
+        final String expected = "<jo></jo>";
+        String output1 = XML.toString(jo1,"jo");
+        assertTrue("Expected an empty root tag", expected.equals(output1));
+        String output2 = XML.toString(jo2,"jo");
+        assertTrue("Expected an empty root tag", expected.equals(output2));
     }
     
     /**
@@ -408,16 +408,16 @@ public class XMLTest {
      */
     @Test
     public void shouldHandleEmptyMultiArray(){
-	final JSONObject jo1 = new JSONObject();
-	jo1.put("arr",new Object[]{"One", new String[]{}, "Four"});
-	final JSONObject jo2 = new JSONObject();
-	jo2.put("arr",new JSONArray(new Object[]{"One", new JSONArray(new String[]{}), "Four"}));
+        final JSONObject jo1 = new JSONObject();
+        jo1.put("arr",new Object[]{"One", new String[]{}, "Four"});
+        final JSONObject jo2 = new JSONObject();
+        jo2.put("arr",new JSONArray(new Object[]{"One", new JSONArray(new String[]{}), "Four"}));
 
-	final String expected = "<jo><arr>One</arr><arr></arr><arr>Four</arr></jo>";
-	String output1 = XML.toString(jo1,"jo");
-	assertTrue("Expected a matching array", expected.equals(output1));
-	String output2 = XML.toString(jo2,"jo");
-	assertTrue("Expected a matching array", expected.equals(output2));
+        final String expected = "<jo><arr>One</arr><arr></arr><arr>Four</arr></jo>";
+        String output1 = XML.toString(jo1,"jo");
+        assertTrue("Expected a matching array", expected.equals(output1));
+        String output2 = XML.toString(jo2,"jo");
+        assertTrue("Expected a matching array", expected.equals(output2));
     }
    
     /**
@@ -425,16 +425,16 @@ public class XMLTest {
      */
     @Test
     public void shouldHandleNonEmptyArray(){
-	final JSONObject jo1 = new JSONObject();
-	jo1.put("arr",new String[]{"One", "Two", "Three"});
-	final JSONObject jo2 = new JSONObject();
-	jo2.put("arr",new JSONArray(new String[]{"One", "Two", "Three"}));
+        final JSONObject jo1 = new JSONObject();
+        jo1.put("arr",new String[]{"One", "Two", "Three"});
+        final JSONObject jo2 = new JSONObject();
+        jo2.put("arr",new JSONArray(new String[]{"One", "Two", "Three"}));
 
-	final String expected = "<jo><arr>One</arr><arr>Two</arr><arr>Three</arr></jo>";
-	String output1 = XML.toString(jo1,"jo");
-	assertTrue("Expected a non empty root tag", expected.equals(output1));
-	String output2 = XML.toString(jo2,"jo");
-	assertTrue("Expected a non empty root tag", expected.equals(output2));
+        final String expected = "<jo><arr>One</arr><arr>Two</arr><arr>Three</arr></jo>";
+        String output1 = XML.toString(jo1,"jo");
+        assertTrue("Expected a non empty root tag", expected.equals(output1));
+        String output2 = XML.toString(jo2,"jo");
+        assertTrue("Expected a non empty root tag", expected.equals(output2));
     }
 
     /**
@@ -442,16 +442,16 @@ public class XMLTest {
      */
     @Test
     public void shouldHandleMultiArray(){
-	final JSONObject jo1 = new JSONObject();
-	jo1.put("arr",new Object[]{"One", new String[]{"Two", "Three"}, "Four"});
-	final JSONObject jo2 = new JSONObject();
-	jo2.put("arr",new JSONArray(new Object[]{"One", new JSONArray(new String[]{"Two", "Three"}), "Four"}));
+        final JSONObject jo1 = new JSONObject();
+        jo1.put("arr",new Object[]{"One", new String[]{"Two", "Three"}, "Four"});
+        final JSONObject jo2 = new JSONObject();
+        jo2.put("arr",new JSONArray(new Object[]{"One", new JSONArray(new String[]{"Two", "Three"}), "Four"}));
 
-	final String expected = "<jo><arr>One</arr><arr><array>Two</array><array>Three</array></arr><arr>Four</arr></jo>";
-	String output1 = XML.toString(jo1,"jo");
-	assertTrue("Expected a matching array", expected.equals(output1));
-	String output2 = XML.toString(jo2,"jo");
-	assertTrue("Expected a matching array", expected.equals(output2));
+        final String expected = "<jo><arr>One</arr><arr><array>Two</array><array>Three</array></arr><arr>Four</arr></jo>";
+        String output1 = XML.toString(jo1,"jo");
+        assertTrue("Expected a matching array", expected.equals(output1));
+        String output2 = XML.toString(jo2,"jo");
+        assertTrue("Expected a matching array", expected.equals(output2));
     }
 
     /**
