@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+jar.baseName = 'JSON-java'
+
+sourceSets {
+ test {
+  java {
+   srcDir 'src/test'
+  }
+ }
+}
+
+repositories {
+ mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.1.0'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+    // Use this line if you are testing a JSON-Java release. 
+    // Otherwise add an external jar from your local repository in Eclipse
+    // (The gradle build won't work unless you add a main sourceSets entry and a jar.baseName entry
+    // testCompile group: 'org.json', name: 'json', version: '20151123'
+}
