@@ -295,6 +295,18 @@ public class XML {
             }
         }
     }
+    
+    /**
+     * This method has been deprecated in favor of the
+     * {@link JSONObject.stringToValue(String)} method. Use it instead.
+     * 
+     * @deprecated Use {@link JSONObject#stringToValue(String)} instead.
+     * @param string
+     * @return JSON value of this string or the string
+     */
+    public static Object stringToValue(String string) {
+        return JSONObject.stringToValue(string);
+    }
 
     /**
      * Convert a well-formed (but not necessarily valid) XML string into a
