@@ -1478,7 +1478,6 @@ public class JSONObject {
      * @return A simple JSON value.
      */
     public static Object stringToValue(String string) {
-        Double d;
         if (string.equals("")) {
             return string;
         }
@@ -1497,13 +1496,13 @@ public class JSONObject {
          * produced, then the value will just be a string.
          */
 
-        char b = string.charAt(0);
-        if ((b >= '0' && b <= '9') || b == '-') {
+        char initial = string.charAt(0);
+        if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
                 if (string.indexOf('.') > -1 || string.indexOf('e') > -1
                         || string.indexOf('E') > -1
                         || "-0".equals(string)) {
-                    d = Double.valueOf(string);
+                    Double d = Double.valueOf(string);
                     if (!d.isInfinite() && !d.isNaN()) {
                         return d;
                     }
