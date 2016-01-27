@@ -1502,7 +1502,7 @@ public class JSONObject {
             try {
                 if (string.indexOf('.') > -1 || string.indexOf('e') > -1
                         || string.indexOf('E') > -1
-                        || "0".equals(string.substring(1))) {
+                        || "-0".equals(string)) {
                     d = Double.valueOf(string);
                     if (!d.isInfinite() && !d.isNaN()) {
                         return d;
