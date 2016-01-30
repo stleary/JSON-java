@@ -519,7 +519,9 @@ public class JSONObjectTest {
      */
     @Test
     public void stringToValueNumbersTest() {
-       
+        assertTrue("-0 Should be a Double!",JSONObject.stringToValue("-0")  instanceof Double);
+        assertTrue("-0.0 Should be a Double!",JSONObject.stringToValue("-0.0") instanceof Double);
+        assertTrue("'-' Should be a String!",JSONObject.stringToValue("-") instanceof String);
         assertTrue( "0.2 should be a Double!",
                 JSONObject.stringToValue( "0.2" ) instanceof Double );
         assertTrue( "Doubles should be Doubles, even when incorrectly converting floats!",
