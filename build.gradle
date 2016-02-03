@@ -21,8 +21,6 @@ dependencies {
 publishing {
 	publications {
 		maven(MavenPublication) {
-			artifactId 'json'
-
 			from components.java
 		}
 	}
