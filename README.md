@@ -1,4 +1,5 @@
 JSON in Java [package org.json]
+===============================
 
 JSON is a light-weight, language independent, data interchange format.
 See http://www.JSON.org/
@@ -17,7 +18,13 @@ package.
 
 The package compiles on Java 1.8.
 
+Building
+--------
 
+    ./gradlew clean build
+
+Object Descriptions
+-------------------
 JSONObject.java: The JSONObject can parse text from a String or a JSONTokener
 to produce a map-like object. The object provides methods for manipulating its
 contents, and for producing a JSON compliant object serialization.
@@ -61,16 +68,12 @@ JSONML.java: JSONML provides support for converting between JSONML and XML.
 
 XMLTokener.java: XMLTokener extends JSONTokener for parsing XML text.
 
-Unit tests are maintained in a separate project. Contributing developers can test 
-JSON-java pull requests with the code in this project: 
-https://github.com/stleary/JSON-Java-unit-test
-
-Numeric types in this package comply with ECMA-404: The JSON Data Interchange Format 
-(http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and 
-RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format 
-(https://tools.ietf.org/html/rfc7159#section-6). 
-This package fully supports Integer, Long, and Double Java types. Partial support 
-for BigInteger and BigDecimal values in JSONObject and JSONArray objects is provided 
+Numeric types in this package comply with ECMA-404: The JSON Data Interchange Format
+(http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and
+RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format
+(https://tools.ietf.org/html/rfc7159#section-6).
+This package fully supports Integer, Long, and Double Java types. Partial support
+for BigInteger and BigDecimal values in JSONObject and JSONArray objects is provided
 in the form of get(), opt(), and put() API methods.
 
 Release history:
@@ -78,9 +81,9 @@ Release history:
 20151123    JSONObject and JSONArray initialization with generics. Contains the
 latest code as of 23 Nov, 2015.
 
-20150729    Checkpoint for Maven central repository release. Contains the latest code 
-as of 29 July, 2015. 
+20150729    Checkpoint for Maven central repository release. Contains the latest code
+as of 29 July, 2015.
 
-JSON-java releases can be found by searching the Maven repository for groupId "org.json" 
-and artifactId "json". For example: 
+JSON-java releases can be found by searching the Maven repository for groupId "org.json"
+and artifactId "json". For example:
 https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.json%22%20AND%20a%3A%22json%22
