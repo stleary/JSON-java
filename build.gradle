@@ -1,11 +1,29 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'org.json'
+version = 20160203
+jar.baseName = 'json'
 
 repositories {
-  mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-  testCompile group: 'junit', name: 'junit', version: '4.12'
+	testCompile group: 'junit', name: 'junit', version: '4.12'
   testCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.1.0'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
+	testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
+}
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			artifactId 'json'
+
+			from components.java
+		}
+	}
 }
