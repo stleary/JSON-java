@@ -93,7 +93,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2015-01-30
+ * @version 2016-02-08
  */
 public class JSONObject {
     /**
@@ -901,7 +901,9 @@ public class JSONObject {
                 return myE;
             }
             return Enum.valueOf(clazz, val.toString());
-        } catch (IllegalArgumentException | NullPointerException e) {
+        } catch (IllegalArgumentException e) {
+            return defaultValue;
+        } catch (NullPointerException e) {
             return defaultValue;
         }
     }
