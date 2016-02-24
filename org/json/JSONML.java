@@ -33,7 +33,7 @@ import java.util.Iterator;
  * the JsonML transform.
  *
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2016-01-30
  */
 public class JSONML {
 
@@ -174,7 +174,7 @@ public class JSONML {
                             if (!(token instanceof String)) {
                                 throw x.syntaxError("Missing value");
                             }
-                            newjo.accumulate(attribute, XML.stringToValue((String)token));
+                            newjo.accumulate(attribute, JSONObject.stringToValue((String)token));
                             token = null;
                         } else {
                             newjo.accumulate(attribute, "");
@@ -227,7 +227,7 @@ public class JSONML {
             } else {
                 if (ja != null) {
                     ja.put(token instanceof String
-                        ? XML.stringToValue((String)token)
+                        ? JSONObject.stringToValue((String)token)
                         : token);
                 }
             }
@@ -373,6 +373,8 @@ public class JSONML {
                         sb.append(toString((JSONObject)object));
                     } else if (object instanceof JSONArray) {
                         sb.append(toString((JSONArray)object));
+                    } else {
+                        sb.append(object.toString());
                     }
                 }
             } while (i < length);
