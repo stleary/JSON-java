@@ -32,15 +32,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -95,7 +93,7 @@ import java.util.Set;
  * @author JSON.org
  * @version 2016-02-08
  */
-public class JSONObject {
+public class JSONObject implements Cloneable {
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
      * whilst Java's null is equivalent to the value that JavaScript calls
@@ -149,6 +147,22 @@ public class JSONObject {
      * <code>JSONObject.NULL.toString()</code> returns <code>"null"</code>.
      */
     public static final Object NULL = new Null();
+
+
+    public enum MergeMode {
+        /**
+         * Trying to add duplicate keys will be ignored and previous values will be used.
+         */
+        SKIP_DUPLICATES,
+        /**
+         * Trying to add duplicate keys causes replacing old values.
+         */
+        REPLACE_DUPLICATES,
+        /**
+         * Trying to add duplicate keys changes JSONObject value to JSONArray containing all values.
+         */
+        APPEND_DUPLICATES
+    }
 
     /**
      * Construct an empty JSONObject.
@@ -1836,6 +1850,69 @@ public class JSONObject {
             return writer;
         } catch (IOException exception) {
             throw new JSONException(exception);
+        }
+    }
+
+
+    public JSONObject merge(JSONObject json, MergeMode mergeMode) {
+        if (json != null && json.length() > 0) {
+            if (mergeMode == null) {
+                mergeMode = MergeMode.SKIP_DUPLICATES;
+            }
+
+            switch (mergeMode) {
+                case SKIP_DUPLICATES:
+                    json.keySet().stream().filter(k -> !this.has(k)).forEach(k -> this.put(k, json.get(k)));
+                    break;
+
+                case REPLACE_DUPLICATES:
+                    json.keySet().forEach(k -> this.put(k, json.get(k)));
+                    break;
+
+                case APPEND_DUPLICATES:
+                    json.keySet().forEach(k -> this.accumulate(k, json.get(k)));
+                    break;
+            }
+        }
+        return this;
+    }
+
+    public boolean isEmpty() {
+        return this.length() == 0;
+    }
+
+    public Stream<Entry<String, Object>> stream() {
+        return this.map.entrySet().stream();
+    }
+
+    public JSONObject clone() {
+        return this.map.entrySet().stream().collect(new Collector<>());
+    }
+
+    public class Collector<V> implements java.util.stream.Collector<Entry<String, V>, JSONObject, JSONObject> {
+        @Override
+        public Supplier<JSONObject> supplier() {
+            return JSONObject::new;
+        }
+
+        @Override
+        public BiConsumer<JSONObject, Entry<String, V>> accumulator() {
+            return (json, entry) -> json.put(entry.getKey(), entry.getValue());
+        }
+
+        @Override
+        public BinaryOperator<JSONObject> combiner() {
+            return (json1, json2) -> json1.merge(json2, JSONObject.MergeMode.REPLACE_DUPLICATES);
+        }
+
+        @Override
+        public Function<JSONObject, JSONObject> finisher() {
+            return json -> json;
+        }
+
+        @Override
+        public Set<Characteristics> characteristics() {
+            return EnumSet.of(Characteristics.UNORDERED);
         }
     }
 }
