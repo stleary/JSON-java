@@ -93,7 +93,7 @@ public class JSONArray implements Iterable<Object>, Cloneable {
      * Construct an empty JSONArray.
      */
     public JSONArray() {
-        this.myArrayList = new ArrayList<Object>();
+        this.myArrayList = new ArrayList<>();
     }
 
     /**
@@ -151,7 +151,7 @@ public class JSONArray implements Iterable<Object>, Cloneable {
      * @param collection A Collection.
      */
     public JSONArray(Collection<?> collection) {
-        this.myArrayList = new ArrayList<Object>();
+        this.myArrayList = new ArrayList<>();
         if (collection != null) {
             for (Object o : collection) {
                 this.myArrayList.add(JSONObject.wrap(o));

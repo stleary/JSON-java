@@ -168,7 +168,7 @@ public class JSONObject implements Cloneable {
      * Construct an empty JSONObject.
      */
     public JSONObject() {
-        this.map = new HashMap<String, Object>();
+        this.map = new HashMap<>();
     }
 
     /**
@@ -254,7 +254,7 @@ public class JSONObject implements Cloneable {
      *            the JSONObject.
      */
     public JSONObject(Map<?, ?> map) {
-        this.map = new HashMap<String, Object>();
+        this.map = new HashMap<>();
         if (map != null) {
         	for (final Entry<?, ?> e : map.entrySet()) {
                 final Object value = e.getValue();
