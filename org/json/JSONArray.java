@@ -1052,6 +1052,94 @@ public class JSONArray implements Iterable<Object>, Cloneable {
         return this.stream().collect(new Collector<>());
     }
 
+    public Optional<Object> getOptional(int index) {
+        try {
+            return Optional.of(this.get(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public <E extends Enum<E>> Optional<Enum<E>> getOptionalEnum(Class<E> clazz, int index) {
+        try {
+            return Optional.of(this.getEnum(clazz, index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Boolean> getOptionalBoolean(int index) {
+        try {
+            return Optional.of(this.getBoolean(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<BigInteger> getOptionalBigInteger(int index) {
+        try {
+            return Optional.of(this.getBigInteger(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<BigDecimal> getOptionalBigDecimal(int index) {
+        try {
+            return Optional.of(this.getBigDecimal(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Double> getOptionalDouble(int index) {
+        try {
+            return Optional.of(this.getDouble(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Integer> getOptionalInt(int index) {
+        try {
+            return Optional.of(this.getInt(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<JSONArray> getOptionalJSONArray(int index) {
+        try {
+            return Optional.of(this.getJSONArray(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<JSONObject> getOptionalJSONObject(int index) {
+        try {
+            return Optional.of(this.getJSONObject(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Long> getOptionalLong(int index) {
+        try {
+            return Optional.of(this.getLong(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<String> getOptionalString(int index) {
+        try {
+            return Optional.of(this.getString(index));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
     public class Collector<V> implements java.util.stream.Collector<V, JSONArray, JSONArray> {
         @Override
         public Supplier<JSONArray> supplier() {

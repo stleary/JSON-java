@@ -66,12 +66,12 @@ import java.util.stream.Stream;
  * <p>
  * The <code>put</code> methods add or replace values in an object. For
  * example,
- *
+ * <p>
  * <pre>
  * myString = new JSONObject()
  *         .put(&quot;JSON&quot;, &quot;Hello, World!&quot;).toString();
  * </pre>
- *
+ * <p>
  * produces the string <code>{"JSON": "Hello, World"}</code>.
  * <p>
  * The texts produced by the <code>toString</code> methods strictly conform to
@@ -115,10 +115,9 @@ public class JSONObject implements Cloneable {
         /**
          * A Null object is equal to the null value and to itself.
          *
-         * @param object
-         *            An object to test for nullness.
+         * @param object An object to test for nullness.
          * @return true if the object parameter is the JSONObject.NULL object or
-         *         null.
+         * null.
          */
         @Override
         public boolean equals(Object object) {
@@ -176,10 +175,8 @@ public class JSONObject implements Cloneable {
      * strings is used to identify the keys that should be copied. Missing keys
      * are ignored.
      *
-     * @param jo
-     *            A JSONObject.
-     * @param names
-     *            An array of strings.
+     * @param jo    A JSONObject.
+     * @param names An array of strings.
      */
     public JSONObject(JSONObject jo, String[] names) {
         this();
@@ -194,11 +191,9 @@ public class JSONObject implements Cloneable {
     /**
      * Construct a JSONObject from a JSONTokener.
      *
-     * @param x
-     *            A JSONTokener object containing the source string.
-     * @throws JSONException
-     *             If there is a syntax error in the source string or a
-     *             duplicated key.
+     * @param x A JSONTokener object containing the source string.
+     * @throws JSONException If there is a syntax error in the source string or a
+     *                       duplicated key.
      */
     public JSONObject(JSONTokener x) throws JSONException {
         this();
@@ -208,16 +203,16 @@ public class JSONObject implements Cloneable {
         if (x.nextClean() != '{') {
             throw x.syntaxError("A JSONObject text must begin with '{'");
         }
-        for (;;) {
+        for (; ; ) {
             c = x.nextClean();
             switch (c) {
-            case 0:
-                throw x.syntaxError("A JSONObject text must end with '}'");
-            case '}':
-                return;
-            default:
-                x.back();
-                key = x.nextValue().toString();
+                case 0:
+                    throw x.syntaxError("A JSONObject text must end with '}'");
+                case '}':
+                    return;
+                default:
+                    x.back();
+                    key = x.nextValue().toString();
             }
 
 // The key is followed by ':'.
@@ -231,17 +226,17 @@ public class JSONObject implements Cloneable {
 // Pairs are separated by ','.
 
             switch (x.nextClean()) {
-            case ';':
-            case ',':
-                if (x.nextClean() == '}') {
+                case ';':
+                case ',':
+                    if (x.nextClean() == '}') {
+                        return;
+                    }
+                    x.back();
+                    break;
+                case '}':
                     return;
-                }
-                x.back();
-                break;
-            case '}':
-                return;
-            default:
-                throw x.syntaxError("Expected a ',' or '}'");
+                default:
+                    throw x.syntaxError("Expected a ',' or '}'");
             }
         }
     }
@@ -249,14 +244,13 @@ public class JSONObject implements Cloneable {
     /**
      * Construct a JSONObject from a Map.
      *
-     * @param map
-     *            A map object that can be used to initialize the contents of
+     * @param map A map object that can be used to initialize the contents of
      *            the JSONObject.
      */
     public JSONObject(Map<?, ?> map) {
         this.map = new HashMap<>();
         if (map != null) {
-        	for (final Entry<?, ?> e : map.entrySet()) {
+            for (final Entry<?, ?> e : map.entrySet()) {
                 final Object value = e.getValue();
                 if (value != null) {
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
@@ -272,19 +266,18 @@ public class JSONObject implements Cloneable {
      * <code>"is"</code> followed by an uppercase letter, the method is invoked,
      * and a key and the value returned from the getter method are put into the
      * new JSONObject.
-     *
+     * <p>
      * The key is formed by removing the <code>"get"</code> or <code>"is"</code>
      * prefix. If the second remaining character is not upper case, then the
      * first character is converted to lower case.
-     *
+     * <p>
      * For example, if an object has a method named <code>"getName"</code>, and
      * if the result of calling <code>object.getName()</code> is
      * <code>"Larry Fine"</code>, then the JSONObject will contain
      * <code>"name": "Larry Fine"</code>.
      *
-     * @param bean
-     *            An object that has getter methods that should be used to make
-     *            a JSONObject.
+     * @param bean An object that has getter methods that should be used to make
+     *             a JSONObject.
      */
     public JSONObject(Object bean) {
         this();
@@ -298,12 +291,10 @@ public class JSONObject implements Cloneable {
      * those keys in the object. If a key is not found or not visible, then it
      * will not be copied into the new JSONObject.
      *
-     * @param object
-     *            An object that has fields that should be used to make a
-     *            JSONObject.
-     * @param names
-     *            An array of strings, the names of the fields to be obtained
-     *            from the object.
+     * @param object An object that has fields that should be used to make a
+     *               JSONObject.
+     * @param names  An array of strings, the names of the fields to be obtained
+     *               from the object.
      */
     public JSONObject(Object object, String names[]) {
         this();
@@ -321,13 +312,11 @@ public class JSONObject implements Cloneable {
      * Construct a JSONObject from a source JSON text string. This is the most
      * commonly used JSONObject constructor.
      *
-     * @param source
-     *            A string beginning with <code>{</code>&nbsp;<small>(left
-     *            brace)</small> and ending with <code>}</code>
-     *            &nbsp;<small>(right brace)</small>.
-     * @exception JSONException
-     *                If there is a syntax error in the source string or a
-     *                duplicated key.
+     * @param source A string beginning with <code>{</code>&nbsp;<small>(left
+     *               brace)</small> and ending with <code>}</code>
+     *               &nbsp;<small>(right brace)</small>.
+     * @throws JSONException If there is a syntax error in the source string or a
+     *                       duplicated key.
      */
     public JSONObject(String source) throws JSONException {
         this(new JSONTokener(source));
@@ -336,17 +325,14 @@ public class JSONObject implements Cloneable {
     /**
      * Construct a JSONObject from a ResourceBundle.
      *
-     * @param baseName
-     *            The ResourceBundle base name.
-     * @param locale
-     *            The Locale to load the ResourceBundle for.
-     * @throws JSONException
-     *             If any JSONExceptions are detected.
+     * @param baseName The ResourceBundle base name.
+     * @param locale   The Locale to load the ResourceBundle for.
+     * @throws JSONException If any JSONExceptions are detected.
      */
     public JSONObject(String baseName, Locale locale) throws JSONException {
         this();
         ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale,
-                Thread.currentThread().getContextClassLoader());
+            Thread.currentThread().getContextClassLoader());
 
 // Iterate through the keys in the bundle.
 
@@ -382,26 +368,23 @@ public class JSONObject implements Cloneable {
      * is stored under the key to hold all of the accumulated values. If there
      * is already a JSONArray, then the new value is appended to it. In
      * contrast, the put method replaces the previous value.
-     *
+     * <p>
      * If only one value is accumulated that is not a JSONArray, then the result
      * will be the same as using put. But if multiple values are accumulated,
      * then the result will be like append.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            An object to be accumulated under the key.
+     * @param key   A key string.
+     * @param value An object to be accumulated under the key.
      * @return this.
-     * @throws JSONException
-     *             If the value is an invalid number or if the key is null.
+     * @throws JSONException If the value is an invalid number or if the key is null.
      */
     public JSONObject accumulate(String key, Object value) throws JSONException {
         testValidity(value);
         Object object = this.opt(key);
         if (object == null) {
             this.put(key,
-                    value instanceof JSONArray ? new JSONArray().put(value)
-                            : value);
+                value instanceof JSONArray ? new JSONArray().put(value)
+                    : value);
         } else if (object instanceof JSONArray) {
             ((JSONArray) object).put(value);
         } else {
@@ -416,14 +399,11 @@ public class JSONObject implements Cloneable {
      * JSONArray containing the value parameter. If the key was already
      * associated with a JSONArray, then the value parameter is appended to it.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            An object to be accumulated under the key.
+     * @param key   A key string.
+     * @param value An object to be accumulated under the key.
      * @return this.
-     * @throws JSONException
-     *             If the key is null or if the current value associated with
-     *             the key is not a JSONArray.
+     * @throws JSONException If the key is null or if the current value associated with
+     *                       the key is not a JSONArray.
      */
     public JSONObject append(String key, Object value) throws JSONException {
         testValidity(value);
@@ -434,7 +414,7 @@ public class JSONObject implements Cloneable {
             this.put(key, ((JSONArray) object).put(value));
         } else {
             throw new JSONException("JSONObject[" + key
-                    + "] is not a JSONArray.");
+                                    + "] is not a JSONArray.");
         }
         return this;
     }
@@ -443,8 +423,7 @@ public class JSONObject implements Cloneable {
      * Produce a string from a double. The string "null" will be returned if the
      * number is not finite.
      *
-     * @param d
-     *            A double.
+     * @param d A double.
      * @return A String.
      */
     public static String doubleToString(double d) {
@@ -456,7 +435,7 @@ public class JSONObject implements Cloneable {
 
         String string = Double.toString(d);
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
-                && string.indexOf('E') < 0) {
+            && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
                 string = string.substring(0, string.length() - 1);
             }
@@ -470,11 +449,9 @@ public class JSONObject implements Cloneable {
     /**
      * Get the value object associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The object associated with the key.
-     * @throws JSONException
-     *             if the key is not found.
+     * @throws JSONException if the key is not found.
      */
     public Object get(String key) throws JSONException {
         if (key == null) {
@@ -488,26 +465,23 @@ public class JSONObject implements Cloneable {
     }
 
     /**
-    * Get the enum value associated with a key.
-    * 
-    * @param clazz
-    *           The type of enum to retrieve.
-    * @param key
-    *           A key string.
-    * @return The enum value associated with the key
-    * @throws JSONException
-    *             if the key is not found or if the value cannot be converted
-    *             to an enum.
-    */
+     * Get the enum value associated with a key.
+     *
+     * @param clazz The type of enum to retrieve.
+     * @param key   A key string.
+     * @return The enum value associated with the key
+     * @throws JSONException if the key is not found or if the value cannot be converted
+     *                       to an enum.
+     */
     public <E extends Enum<E>> E getEnum(Class<E> clazz, String key) throws JSONException {
         E val = optEnum(clazz, key);
-        if(val==null) {
+        if (val == null) {
             // JSONException should really take a throwable argument.
             // If it did, I would re-implement this with the Enum.valueOf
             // method and place any thrown exception in the JSONException
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not an enum of type " + quote(clazz.getSimpleName())
-                    + ".");
+                                    + "] is not an enum of type " + quote(clazz.getSimpleName())
+                                    + ".");
         }
         return val;
     }
@@ -515,37 +489,33 @@ public class JSONObject implements Cloneable {
     /**
      * Get the boolean value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The truth.
-     * @throws JSONException
-     *             if the value is not a Boolean or the String "true" or
-     *             "false".
+     * @throws JSONException if the value is not a Boolean or the String "true" or
+     *                       "false".
      */
     public boolean getBoolean(String key) throws JSONException {
         Object object = this.get(key);
         if (object.equals(Boolean.FALSE)
-                || (object instanceof String && ((String) object)
-                        .equalsIgnoreCase("false"))) {
+            || (object instanceof String && ((String) object)
+            .equalsIgnoreCase("false"))) {
             return false;
         } else if (object.equals(Boolean.TRUE)
-                || (object instanceof String && ((String) object)
-                        .equalsIgnoreCase("true"))) {
+                   || (object instanceof String && ((String) object)
+            .equalsIgnoreCase("true"))) {
             return true;
         }
         throw new JSONException("JSONObject[" + quote(key)
-                + "] is not a Boolean.");
+                                + "] is not a Boolean.");
     }
 
     /**
      * Get the BigInteger value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The numeric value.
-     * @throws JSONException
-     *             if the key is not found or if the value cannot 
-     *             be converted to BigInteger.
+     * @throws JSONException if the key is not found or if the value cannot
+     *                       be converted to BigInteger.
      */
     public BigInteger getBigInteger(String key) throws JSONException {
         Object object = this.get(key);
@@ -553,19 +523,17 @@ public class JSONObject implements Cloneable {
             return new BigInteger(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] could not be converted to BigInteger.");
+                                    + "] could not be converted to BigInteger.");
         }
     }
 
     /**
      * Get the BigDecimal value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The numeric value.
-     * @throws JSONException
-     *             if the key is not found or if the value
-     *             cannot be converted to BigDecimal.
+     * @throws JSONException if the key is not found or if the value
+     *                       cannot be converted to BigDecimal.
      */
     public BigDecimal getBigDecimal(String key) throws JSONException {
         Object object = this.get(key);
@@ -573,60 +541,54 @@ public class JSONObject implements Cloneable {
             return new BigDecimal(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] could not be converted to BigDecimal.");
+                                    + "] could not be converted to BigDecimal.");
         }
     }
 
     /**
      * Get the double value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The numeric value.
-     * @throws JSONException
-     *             if the key is not found or if the value is not a Number
-     *             object and cannot be converted to a number.
+     * @throws JSONException if the key is not found or if the value is not a Number
+     *                       object and cannot be converted to a number.
      */
     public double getDouble(String key) throws JSONException {
         Object object = this.get(key);
         try {
             return object instanceof Number ? ((Number) object).doubleValue()
-                    : Double.parseDouble((String) object);
+                : Double.parseDouble((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a number.");
+                                    + "] is not a number.");
         }
     }
 
     /**
      * Get the int value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The integer value.
-     * @throws JSONException
-     *             if the key is not found or if the value cannot be converted
-     *             to an integer.
+     * @throws JSONException if the key is not found or if the value cannot be converted
+     *                       to an integer.
      */
     public int getInt(String key) throws JSONException {
         Object object = this.get(key);
         try {
             return object instanceof Number ? ((Number) object).intValue()
-                    : Integer.parseInt((String) object);
+                : Integer.parseInt((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not an int.");
+                                    + "] is not an int.");
         }
     }
 
     /**
      * Get the JSONArray value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return A JSONArray which is the value.
-     * @throws JSONException
-     *             if the key is not found or if the value is not a JSONArray.
+     * @throws JSONException if the key is not found or if the value is not a JSONArray.
      */
     public JSONArray getJSONArray(String key) throws JSONException {
         Object object = this.get(key);
@@ -634,17 +596,15 @@ public class JSONObject implements Cloneable {
             return (JSONArray) object;
         }
         throw new JSONException("JSONObject[" + quote(key)
-                + "] is not a JSONArray.");
+                                + "] is not a JSONArray.");
     }
 
     /**
      * Get the JSONObject value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return A JSONObject which is the value.
-     * @throws JSONException
-     *             if the key is not found or if the value is not a JSONObject.
+     * @throws JSONException if the key is not found or if the value is not a JSONObject.
      */
     public JSONObject getJSONObject(String key) throws JSONException {
         Object object = this.get(key);
@@ -652,27 +612,25 @@ public class JSONObject implements Cloneable {
             return (JSONObject) object;
         }
         throw new JSONException("JSONObject[" + quote(key)
-                + "] is not a JSONObject.");
+                                + "] is not a JSONObject.");
     }
 
     /**
      * Get the long value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The long value.
-     * @throws JSONException
-     *             if the key is not found or if the value cannot be converted
-     *             to a long.
+     * @throws JSONException if the key is not found or if the value cannot be converted
+     *                       to a long.
      */
     public long getLong(String key) throws JSONException {
         Object object = this.get(key);
         try {
             return object instanceof Number ? ((Number) object).longValue()
-                    : Long.parseLong((String) object);
+                : Long.parseLong((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a long.");
+                                    + "] is not a long.");
         }
     }
 
@@ -721,11 +679,9 @@ public class JSONObject implements Cloneable {
     /**
      * Get the string associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return A string which is the value.
-     * @throws JSONException
-     *             if there is no string value for the key.
+     * @throws JSONException if there is no string value for the key.
      */
     public String getString(String key) throws JSONException {
         Object object = this.get(key);
@@ -738,8 +694,7 @@ public class JSONObject implements Cloneable {
     /**
      * Determine if the JSONObject contains a specific key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return true if the key exists in the JSONObject.
      */
     public boolean has(String key) {
@@ -751,21 +706,19 @@ public class JSONObject implements Cloneable {
      * create one with a value of 1. If there is such a property, and if it is
      * an Integer, Long, Double, or Float, then add one to it.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return this.
-     * @throws JSONException
-     *             If there is already a property with this name that is not an
-     *             Integer, Long, Double, or Float.
+     * @throws JSONException If there is already a property with this name that is not an
+     *                       Integer, Long, Double, or Float.
      */
     public JSONObject increment(String key) throws JSONException {
         Object value = this.opt(key);
         if (value == null) {
             this.put(key, 1);
         } else if (value instanceof BigInteger) {
-            this.put(key, ((BigInteger)value).add(BigInteger.ONE));
+            this.put(key, ((BigInteger) value).add(BigInteger.ONE));
         } else if (value instanceof BigDecimal) {
-            this.put(key, ((BigDecimal)value).add(BigDecimal.ONE));
+            this.put(key, ((BigDecimal) value).add(BigDecimal.ONE));
         } else if (value instanceof Integer) {
             this.put(key, (Integer) value + 1);
         } else if (value instanceof Long) {
@@ -784,10 +737,9 @@ public class JSONObject implements Cloneable {
      * Determine if the value associated with the key is null or if there is no
      * value.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return true if there is no value associated with the key or if the value
-     *         is the JSONObject.NULL object.
+     * is the JSONObject.NULL object.
      */
     public boolean isNull(String key) {
         return JSONObject.NULL.equals(this.opt(key));
@@ -825,7 +777,7 @@ public class JSONObject implements Cloneable {
      * JSONObject.
      *
      * @return A JSONArray containing the key strings, or null if the JSONObject
-     *         is empty.
+     * is empty.
      */
     public JSONArray names() {
         JSONArray ja = new JSONArray();
@@ -839,11 +791,9 @@ public class JSONObject implements Cloneable {
     /**
      * Produce a string from a Number.
      *
-     * @param number
-     *            A Number
+     * @param number A Number
      * @return A String.
-     * @throws JSONException
-     *             If n is a non-finite number.
+     * @throws JSONException If n is a non-finite number.
      */
     public static String numberToString(Number number) throws JSONException {
         if (number == null) {
@@ -855,7 +805,7 @@ public class JSONObject implements Cloneable {
 
         String string = number.toString();
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
-                && string.indexOf('E') < 0) {
+            && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
                 string = string.substring(0, string.length() - 1);
             }
@@ -869,8 +819,7 @@ public class JSONObject implements Cloneable {
     /**
      * Get an optional value associated with a key.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return An object which is the value, or null if there is no value.
      */
     public Object opt(String key) {
@@ -879,11 +828,9 @@ public class JSONObject implements Cloneable {
 
     /**
      * Get the enum value associated with a key.
-     * 
-     * @param clazz
-     *            The type of enum to retrieve.
-     * @param key
-     *            A key string.
+     *
+     * @param clazz The type of enum to retrieve.
+     * @param key   A key string.
      * @return The enum value associated with the key or null if not found
      */
     public <E extends Enum<E>> E optEnum(Class<E> clazz, String key) {
@@ -892,15 +839,12 @@ public class JSONObject implements Cloneable {
 
     /**
      * Get the enum value associated with a key.
-     * 
-     * @param clazz
-     *            The type of enum to retrieve.
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default in case the value is not found
+     *
+     * @param clazz        The type of enum to retrieve.
+     * @param key          A key string.
+     * @param defaultValue The default in case the value is not found
      * @return The enum value associated with the key or defaultValue
-     *            if the value is not found or cannot be assigned to clazz
+     * if the value is not found or cannot be assigned to clazz
      */
     public <E extends Enum<E>> E optEnum(Class<E> clazz, String key, E defaultValue) {
         try {
@@ -926,8 +870,7 @@ public class JSONObject implements Cloneable {
      * Get an optional boolean associated with a key. It returns false if there
      * is no such key, or if the value is not Boolean.TRUE or the String "true".
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return The truth.
      */
     public boolean optBoolean(String key) {
@@ -939,10 +882,8 @@ public class JSONObject implements Cloneable {
      * defaultValue if there is no such key, or if it is not a Boolean or the
      * String "true" or "false" (case insensitive).
      *
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default.
+     * @param key          A key string.
+     * @param defaultValue The default.
      * @return The truth.
      */
     public boolean optBoolean(String key, boolean defaultValue) {
@@ -958,8 +899,7 @@ public class JSONObject implements Cloneable {
      * key or if its value is not a number. If the value is a string, an attempt
      * will be made to evaluate it as a number.
      *
-     * @param key
-     *            A string which is the key.
+     * @param key A string which is the key.
      * @return An object which is the value.
      */
     public double optDouble(String key) {
@@ -971,10 +911,8 @@ public class JSONObject implements Cloneable {
      * there is no such key or if its value is not a number. If the value is a
      * string, an attempt will be made to evaluate it as a number.
      *
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default.
+     * @param key          A key string.
+     * @param defaultValue The default.
      * @return An object which is the value.
      */
     public BigInteger optBigInteger(String key, BigInteger defaultValue) {
@@ -990,10 +928,8 @@ public class JSONObject implements Cloneable {
      * there is no such key or if its value is not a number. If the value is a
      * string, an attempt will be made to evaluate it as a number.
      *
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default.
+     * @param key          A key string.
+     * @param defaultValue The default.
      * @return An object which is the value.
      */
     public BigDecimal optBigDecimal(String key, BigDecimal defaultValue) {
@@ -1009,10 +945,8 @@ public class JSONObject implements Cloneable {
      * there is no such key or if its value is not a number. If the value is a
      * string, an attempt will be made to evaluate it as a number.
      *
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default.
+     * @param key          A key string.
+     * @param defaultValue The default.
      * @return An object which is the value.
      */
     public double optDouble(String key, double defaultValue) {
@@ -1028,8 +962,7 @@ public class JSONObject implements Cloneable {
      * such key or if the value is not a number. If the value is a string, an
      * attempt will be made to evaluate it as a number.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return An object which is the value.
      */
     public int optInt(String key) {
@@ -1041,10 +974,8 @@ public class JSONObject implements Cloneable {
      * is no such key or if the value is not a number. If the value is a string,
      * an attempt will be made to evaluate it as a number.
      *
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default.
+     * @param key          A key string.
+     * @param defaultValue The default.
      * @return An object which is the value.
      */
     public int optInt(String key, int defaultValue) {
@@ -1059,8 +990,7 @@ public class JSONObject implements Cloneable {
      * Get an optional JSONArray associated with a key. It returns null if there
      * is no such key, or if its value is not a JSONArray.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return A JSONArray which is the value.
      */
     public JSONArray optJSONArray(String key) {
@@ -1072,8 +1002,7 @@ public class JSONObject implements Cloneable {
      * Get an optional JSONObject associated with a key. It returns null if
      * there is no such key, or if its value is not a JSONObject.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return A JSONObject which is the value.
      */
     public JSONObject optJSONObject(String key) {
@@ -1086,8 +1015,7 @@ public class JSONObject implements Cloneable {
      * such key or if the value is not a number. If the value is a string, an
      * attempt will be made to evaluate it as a number.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return An object which is the value.
      */
     public long optLong(String key) {
@@ -1099,10 +1027,8 @@ public class JSONObject implements Cloneable {
      * is no such key or if the value is not a number. If the value is a string,
      * an attempt will be made to evaluate it as a number.
      *
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default.
+     * @param key          A key string.
+     * @param defaultValue The default.
      * @return An object which is the value.
      */
     public long optLong(String key, long defaultValue) {
@@ -1118,8 +1044,7 @@ public class JSONObject implements Cloneable {
      * if there is no such key. If the value is not a string and is not null,
      * then it is converted to a string.
      *
-     * @param key
-     *            A key string.
+     * @param key A key string.
      * @return A string which is the value.
      */
     public String optString(String key) {
@@ -1130,10 +1055,8 @@ public class JSONObject implements Cloneable {
      * Get an optional string associated with a key. It returns the defaultValue
      * if there is no such key.
      *
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default.
+     * @param key          A key string.
+     * @param defaultValue The default.
      * @return A string which is the value.
      */
     public String optString(String key, String defaultValue) {
@@ -1149,7 +1072,7 @@ public class JSONObject implements Cloneable {
         boolean includeSuperClass = klass.getClassLoader() != null;
 
         Method[] methods = includeSuperClass ? klass.getMethods() : klass
-                .getDeclaredMethods();
+            .getDeclaredMethods();
         for (int i = 0; i < methods.length; i += 1) {
             try {
                 Method method = methods[i];
@@ -1158,7 +1081,7 @@ public class JSONObject implements Cloneable {
                     String key = "";
                     if (name.startsWith("get")) {
                         if ("getClass".equals(name)
-                                || "getDeclaringClass".equals(name)) {
+                            || "getDeclaringClass".equals(name)) {
                             key = "";
                         } else {
                             key = name.substring(3);
@@ -1167,13 +1090,13 @@ public class JSONObject implements Cloneable {
                         key = name.substring(2);
                     }
                     if (key.length() > 0
-                            && Character.isUpperCase(key.charAt(0))
-                            && method.getParameterTypes().length == 0) {
+                        && Character.isUpperCase(key.charAt(0))
+                        && method.getParameterTypes().length == 0) {
                         if (key.length() == 1) {
                             key = key.toLowerCase();
                         } else if (!Character.isUpperCase(key.charAt(1))) {
                             key = key.substring(0, 1).toLowerCase()
-                                    + key.substring(1);
+                                  + key.substring(1);
                         }
 
                         Object result = method.invoke(bean, (Object[]) null);
@@ -1190,13 +1113,10 @@ public class JSONObject implements Cloneable {
     /**
      * Put a key/boolean pair in the JSONObject.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            A boolean which is the value.
+     * @param key   A key string.
+     * @param value A boolean which is the value.
      * @return this.
-     * @throws JSONException
-     *             If the key is null.
+     * @throws JSONException If the key is null.
      */
     public JSONObject put(String key, boolean value) throws JSONException {
         this.put(key, value ? Boolean.TRUE : Boolean.FALSE);
@@ -1207,10 +1127,8 @@ public class JSONObject implements Cloneable {
      * Put a key/value pair in the JSONObject, where the value will be a
      * JSONArray which is produced from a Collection.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            A Collection value.
+     * @param key   A key string.
+     * @param value A Collection value.
      * @return this.
      * @throws JSONException
      */
@@ -1222,13 +1140,10 @@ public class JSONObject implements Cloneable {
     /**
      * Put a key/double pair in the JSONObject.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            A double which is the value.
+     * @param key   A key string.
+     * @param value A double which is the value.
      * @return this.
-     * @throws JSONException
-     *             If the key is null or if the number is invalid.
+     * @throws JSONException If the key is null or if the number is invalid.
      */
     public JSONObject put(String key, double value) throws JSONException {
         this.put(key, new Double(value));
@@ -1238,13 +1153,10 @@ public class JSONObject implements Cloneable {
     /**
      * Put a key/int pair in the JSONObject.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            An int which is the value.
+     * @param key   A key string.
+     * @param value An int which is the value.
      * @return this.
-     * @throws JSONException
-     *             If the key is null.
+     * @throws JSONException If the key is null.
      */
     public JSONObject put(String key, int value) throws JSONException {
         this.put(key, new Integer(value));
@@ -1254,13 +1166,10 @@ public class JSONObject implements Cloneable {
     /**
      * Put a key/long pair in the JSONObject.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            A long which is the value.
+     * @param key   A key string.
+     * @param value A long which is the value.
      * @return this.
-     * @throws JSONException
-     *             If the key is null.
+     * @throws JSONException If the key is null.
      */
     public JSONObject put(String key, long value) throws JSONException {
         this.put(key, new Long(value));
@@ -1271,10 +1180,8 @@ public class JSONObject implements Cloneable {
      * Put a key/value pair in the JSONObject, where the value will be a
      * JSONObject which is produced from a Map.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            A Map value.
+     * @param key   A key string.
+     * @param value A Map value.
      * @return this.
      * @throws JSONException
      */
@@ -1287,15 +1194,12 @@ public class JSONObject implements Cloneable {
      * Put a key/value pair in the JSONObject. If the value is null, then the
      * key will be removed from the JSONObject if it is present.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            An object which is the value. It should be of one of these
-     *            types: Boolean, Double, Integer, JSONArray, JSONObject, Long,
-     *            String, or the JSONObject.NULL object.
+     * @param key   A key string.
+     * @param value An object which is the value. It should be of one of these
+     *              types: Boolean, Double, Integer, JSONArray, JSONObject, Long,
+     *              String, or the JSONObject.NULL object.
      * @return this.
-     * @throws JSONException
-     *             If the value is non-finite number or if the key is null.
+     * @throws JSONException If the value is non-finite number or if the key is null.
      */
     public JSONObject put(String key, Object value) throws JSONException {
         if (key == null) {
@@ -1315,11 +1219,10 @@ public class JSONObject implements Cloneable {
      * are both non-null, and only if there is not already a member with that
      * name.
      *
-     * @param key string
+     * @param key   string
      * @param value object
      * @return this.
-     * @throws JSONException
-     *             if the key is a duplicate
+     * @throws JSONException if the key is a duplicate
      */
     public JSONObject putOnce(String key, Object value) throws JSONException {
         if (key != null && value != null) {
@@ -1335,15 +1238,12 @@ public class JSONObject implements Cloneable {
      * Put a key/value pair in the JSONObject, but only if the key and the value
      * are both non-null.
      *
-     * @param key
-     *            A key string.
-     * @param value
-     *            An object which is the value. It should be of one of these
-     *            types: Boolean, Double, Integer, JSONArray, JSONObject, Long,
-     *            String, or the JSONObject.NULL object.
+     * @param key   A key string.
+     * @param value An object which is the value. It should be of one of these
+     *              types: Boolean, Double, Integer, JSONArray, JSONObject, Long,
+     *              String, or the JSONObject.NULL object.
      * @return this.
-     * @throws JSONException
-     *             If the value is a non-finite number.
+     * @throws JSONException If the value is a non-finite number.
      */
     public JSONObject putOpt(String key, Object value) throws JSONException {
         if (key != null && value != null) {
@@ -1358,8 +1258,7 @@ public class JSONObject implements Cloneable {
      * allowing JSON text to be delivered in HTML. In JSON text, a string cannot
      * contain a control character or an unescaped quote or backslash.
      *
-     * @param string
-     *            A String
+     * @param string A String
      * @return A String correctly formatted for insertion in a JSON text.
      */
     public static String quote(String string) {
@@ -1391,42 +1290,42 @@ public class JSONObject implements Cloneable {
             b = c;
             c = string.charAt(i);
             switch (c) {
-            case '\\':
-            case '"':
-                w.write('\\');
-                w.write(c);
-                break;
-            case '/':
-                if (b == '<') {
+                case '\\':
+                case '"':
                     w.write('\\');
-                }
-                w.write(c);
-                break;
-            case '\b':
-                w.write("\\b");
-                break;
-            case '\t':
-                w.write("\\t");
-                break;
-            case '\n':
-                w.write("\\n");
-                break;
-            case '\f':
-                w.write("\\f");
-                break;
-            case '\r':
-                w.write("\\r");
-                break;
-            default:
-                if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                        || (c >= '\u2000' && c < '\u2100')) {
-                    w.write("\\u");
-                    hhhh = Integer.toHexString(c);
-                    w.write("0000", 0, 4 - hhhh.length());
-                    w.write(hhhh);
-                } else {
                     w.write(c);
-                }
+                    break;
+                case '/':
+                    if (b == '<') {
+                        w.write('\\');
+                    }
+                    w.write(c);
+                    break;
+                case '\b':
+                    w.write("\\b");
+                    break;
+                case '\t':
+                    w.write("\\t");
+                    break;
+                case '\n':
+                    w.write("\\n");
+                    break;
+                case '\f':
+                    w.write("\\f");
+                    break;
+                case '\r':
+                    w.write("\\r");
+                    break;
+                default:
+                    if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                        || (c >= '\u2000' && c < '\u2100')) {
+                        w.write("\\u");
+                        hhhh = Integer.toHexString(c);
+                        w.write("0000", 0, 4 - hhhh.length());
+                        w.write(hhhh);
+                    } else {
+                        w.write(c);
+                    }
             }
         }
         w.write('"');
@@ -1436,10 +1335,9 @@ public class JSONObject implements Cloneable {
     /**
      * Remove a name and its value, if present.
      *
-     * @param key
-     *            The name to be removed.
+     * @param key The name to be removed.
      * @return The value that was associated with the name, or null if there was
-     *         no value.
+     * no value.
      */
     public Object remove(String key) {
         return this.map.remove(key);
@@ -1459,20 +1357,20 @@ public class JSONObject implements Cloneable {
                 return false;
             }
             Set<String> set = this.keySet();
-            if (!set.equals(((JSONObject)other).keySet())) {
+            if (!set.equals(((JSONObject) other).keySet())) {
                 return false;
             }
             Iterator<String> iterator = set.iterator();
             while (iterator.hasNext()) {
                 String name = iterator.next();
                 Object valueThis = this.get(name);
-                Object valueOther = ((JSONObject)other).get(name);
+                Object valueOther = ((JSONObject) other).get(name);
                 if (valueThis instanceof JSONObject) {
-                    if (!((JSONObject)valueThis).similar(valueOther)) {
+                    if (!((JSONObject) valueThis).similar(valueOther)) {
                         return false;
                     }
                 } else if (valueThis instanceof JSONArray) {
-                    if (!((JSONArray)valueThis).similar(valueOther)) {
+                    if (!((JSONArray) valueThis).similar(valueOther)) {
                         return false;
                     }
                 } else if (!valueThis.equals(valueOther)) {
@@ -1489,8 +1387,7 @@ public class JSONObject implements Cloneable {
      * Try to convert a string into a number, boolean, or null. If the string
      * can't be converted, return the string.
      *
-     * @param string
-     *            A String.
+     * @param string A String.
      * @return A simple JSON value.
      */
     public static Object stringToValue(String string) {
@@ -1516,8 +1413,8 @@ public class JSONObject implements Cloneable {
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
                 if (string.indexOf('.') > -1 || string.indexOf('e') > -1
-                        || string.indexOf('E') > -1
-                        || "-0".equals(string)) {
+                    || string.indexOf('E') > -1
+                    || "-0".equals(string)) {
                     Double d = Double.valueOf(string);
                     if (!d.isInfinite() && !d.isNaN()) {
                         return d;
@@ -1540,22 +1437,20 @@ public class JSONObject implements Cloneable {
     /**
      * Throw an exception if the object is a NaN or infinite number.
      *
-     * @param o
-     *            The object to test.
-     * @throws JSONException
-     *             If o is a non-finite number.
+     * @param o The object to test.
+     * @throws JSONException If o is a non-finite number.
      */
     public static void testValidity(Object o) throws JSONException {
         if (o != null) {
             if (o instanceof Double) {
                 if (((Double) o).isInfinite() || ((Double) o).isNaN()) {
                     throw new JSONException(
-                            "JSON does not allow non-finite numbers.");
+                        "JSON does not allow non-finite numbers.");
                 }
             } else if (o instanceof Float) {
                 if (((Float) o).isInfinite() || ((Float) o).isNaN()) {
                     throw new JSONException(
-                            "JSON does not allow non-finite numbers.");
+                        "JSON does not allow non-finite numbers.");
                 }
             }
         }
@@ -1565,12 +1460,10 @@ public class JSONObject implements Cloneable {
      * Produce a JSONArray containing the values of the members of this
      * JSONObject.
      *
-     * @param names
-     *            A JSONArray containing a list of key strings. This determines
-     *            the sequence of the values in the result.
+     * @param names A JSONArray containing a list of key strings. This determines
+     *              the sequence of the values in the result.
      * @return A JSONArray of values.
-     * @throws JSONException
-     *             If any of the values are non-finite numbers.
+     * @throws JSONException If any of the values are non-finite numbers.
      */
     public JSONArray toJSONArray(JSONArray names) throws JSONException {
         if (names == null || names.length() == 0) {
@@ -1591,9 +1484,9 @@ public class JSONObject implements Cloneable {
      * Warning: This method assumes that the data structure is acyclical.
      *
      * @return a printable, displayable, portable, transmittable representation
-     *         of the object, beginning with <code>{</code>&nbsp;<small>(left
-     *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
-     *         brace)</small>.
+     * of the object, beginning with <code>{</code>&nbsp;<small>(left
+     * brace)</small> and ending with <code>}</code>&nbsp;<small>(right
+     * brace)</small>.
      */
     public String toString() {
         try {
@@ -1608,14 +1501,12 @@ public class JSONObject implements Cloneable {
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
+     * @param indentFactor The number of spaces to add to each level of indentation.
      * @return a printable, displayable, portable, transmittable representation
-     *         of the object, beginning with <code>{</code>&nbsp;<small>(left
-     *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
-     *         brace)</small>.
-     * @throws JSONException
-     *             If the object contains an invalid number.
+     * of the object, beginning with <code>{</code>&nbsp;<small>(left
+     * brace)</small> and ending with <code>}</code>&nbsp;<small>(right
+     * brace)</small>.
+     * @throws JSONException If the object contains an invalid number.
      */
     public String toString(int indentFactor) throws JSONException {
         StringWriter w = new StringWriter();
@@ -1635,18 +1526,16 @@ public class JSONObject implements Cloneable {
      * JSONObject will be made from it and its toJSONString method will be
      * called. Otherwise, the value's toString method will be called, and the
      * result will be quoted.
-     *
+     * <p>
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
-     * @param value
-     *            The value to be serialized.
+     * @param value The value to be serialized.
      * @return a printable, displayable, transmittable representation of the
-     *         object, beginning with <code>{</code>&nbsp;<small>(left
-     *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
-     *         brace)</small>.
-     * @throws JSONException
-     *             If the value is or contains an invalid number.
+     * object, beginning with <code>{</code>&nbsp;<small>(left
+     * brace)</small> and ending with <code>}</code>&nbsp;<small>(right
+     * brace)</small>.
+     * @throws JSONException If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
         if (value == null || value.equals(null)) {
@@ -1668,7 +1557,7 @@ public class JSONObject implements Cloneable {
             return numberToString((Number) value);
         }
         if (value instanceof Boolean || value instanceof JSONObject
-                || value instanceof JSONArray) {
+            || value instanceof JSONArray) {
             return value.toString();
         }
         if (value instanceof Map) {
@@ -1693,8 +1582,7 @@ public class JSONObject implements Cloneable {
      * one of the java packages, turn it into a string. And if it doesn't, try
      * to wrap it in a JSONObject. If the wrapping fails, then null is returned.
      *
-     * @param object
-     *            The object to wrap
+     * @param object The object to wrap
      * @return The wrapped value
      */
     public static Object wrap(Object object) {
@@ -1703,13 +1591,13 @@ public class JSONObject implements Cloneable {
                 return NULL;
             }
             if (object instanceof JSONObject || object instanceof JSONArray
-                    || NULL.equals(object) || object instanceof JSONString
-                    || object instanceof Byte || object instanceof Character
-                    || object instanceof Short || object instanceof Integer
-                    || object instanceof Long || object instanceof Boolean
-                    || object instanceof Float || object instanceof Double
-                    || object instanceof String || object instanceof BigInteger
-                    || object instanceof BigDecimal) {
+                || NULL.equals(object) || object instanceof JSONString
+                || object instanceof Byte || object instanceof Character
+                || object instanceof Short || object instanceof Integer
+                || object instanceof Long || object instanceof Boolean
+                || object instanceof Float || object instanceof Double
+                || object instanceof String || object instanceof BigInteger
+                || object instanceof BigDecimal) {
                 return object;
             }
 
@@ -1726,10 +1614,10 @@ public class JSONObject implements Cloneable {
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage
-                    .getName() : "";
+                .getName() : "";
             if (objectPackageName.startsWith("java.")
-                    || objectPackageName.startsWith("javax.")
-                    || object.getClass().getClassLoader() == null) {
+                || objectPackageName.startsWith("javax.")
+                || object.getClass().getClassLoader() == null) {
                 return object.toString();
             }
             return new JSONObject(object);
@@ -1752,7 +1640,7 @@ public class JSONObject implements Cloneable {
     }
 
     static final Writer writeValue(Writer writer, Object value,
-            int indentFactor, int indent) throws JSONException, IOException {
+                                   int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof JSONObject) {
@@ -1797,17 +1685,14 @@ public class JSONObject implements Cloneable {
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indention of the top level.
+     * @param writer       Writes the serialized JSON
+     * @param indentFactor The number of spaces to add to each level of indentation.
+     * @param indent       The indention of the top level.
      * @return The writer.
      * @throws JSONException
      */
     public Writer write(Writer writer, int indentFactor, int indent)
-            throws JSONException {
+        throws JSONException {
         try {
             boolean commanate = false;
             final int length = this.length();
@@ -1887,6 +1772,94 @@ public class JSONObject implements Cloneable {
 
     public JSONObject clone() {
         return this.map.entrySet().stream().collect(new Collector<>());
+    }
+
+    public Optional<Object> getOptional(String key) {
+        try {
+            return Optional.of(this.get(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public <E extends Enum<E>> Optional<Enum<E>> getOptionalEnum(Class<E> clazz, String key) {
+        try {
+            return Optional.of(this.getEnum(clazz, key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Boolean> getOptionalBoolean(String key) {
+        try {
+            return Optional.of(this.getBoolean(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<BigInteger> getOptionalBigInteger(String key) {
+        try {
+            return Optional.of(this.getBigInteger(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<BigDecimal> getOptionalBigDecimal(String key) {
+        try {
+            return Optional.of(this.getBigDecimal(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Double> getOptionalDouble(String key) {
+        try {
+            return Optional.of(this.getDouble(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Integer> getOptionalInt(String key) {
+        try {
+            return Optional.of(this.getInt(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<JSONArray> getOptionalJSONArray(String key) {
+        try {
+            return Optional.of(this.getJSONArray(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<JSONObject> getOptionalJSONObject(String key) {
+        try {
+            return Optional.of(this.getJSONObject(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Long> getOptionalLong(String key) {
+        try {
+            return Optional.of(this.getLong(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<String> getOptionalString(String key) {
+        try {
+            return Optional.of(this.getString(key));
+        } catch (JSONException | NullPointerException e) {
+            return Optional.empty();
+        }
     }
 
     public class Collector<V> implements java.util.stream.Collector<Entry<String, V>, JSONObject, JSONObject> {
