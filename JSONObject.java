@@ -1838,4 +1838,31 @@ public class JSONObject {
             throw new JSONException(exception);
         }
     }
+
+    /**
+     * Compares the specified object with this object for equality.
+     *
+     * @param object the object to be compared for equality with this object
+     * @return {@code true} if the specified object is equal to this object
+     */
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        JSONObject that = (JSONObject) object;
+        return map.equals(that.map);
+    }
+
+    /**
+     * Returns the hash code value for this object.
+     *
+     * @return the hash code value for this object
+     */
+    public int hashCode() {
+        return map.hashCode();
+    }
 }

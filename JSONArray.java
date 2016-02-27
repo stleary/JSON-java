@@ -1130,4 +1130,31 @@ public class JSONArray implements Iterable<Object> {
             throw new JSONException(e);
         }
     }
+
+    /**
+     * Compares the specified object with this array for equality.
+     *
+     * @param object the object to be compared for equality with this array
+     * @return {@code true} if the specified object is equal to this array
+     */
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        JSONArray jsonArray = (JSONArray) object;
+        return myArrayList.equals(jsonArray.myArrayList);
+    }
+
+    /**
+     * Returns the hash code value for this array.
+     *
+     * @return the hash code value for this array
+     */
+    public int hashCode() {
+        return myArrayList.hashCode();
+    }
 }
