@@ -86,7 +86,7 @@ import java.util.Map.Entry;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-02-08
+ * @version 2016-03-05
  */
 public class JSONObject {
     /**
