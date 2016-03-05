@@ -32,7 +32,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -562,6 +564,65 @@ public class JSONObject {
                     + "] could not be converted to BigDecimal.");
         }
     }
+    
+    /**
+     * Get the java.util.Date value associated with a key.
+     *
+     * @param key
+     *            A key string.
+     * @return The date value.
+     * @throws JSONException
+     *             if the key is not found or if the value is not a Number
+     *             object and cannot be converted to a number.
+     */
+    public Date getDate(String key) throws JSONException {
+        Object object = this.get(key);
+        try {
+            if (object instanceof Date) {
+            	return (Date) object;
+            }
+            if (object instanceof Number) {
+            	return new Date(((Number)object).longValue());
+            }
+            if (object instanceof String) {
+            	Date d = tryDate((String)object, "yyyy-MM-dd' 'HH:mm:ss.SSS", null);
+            	if (d != null) {
+            		return d;
+            	}
+            	d = tryDate((String)object, "yyyy-MM-dd'T'HH:mm:ss.SSSX", null);
+            	if (d != null) {
+            		return d;
+            	}
+            	d = tryDate((String)object, "yyyy-MM-dd'T'HH:mm:ss.SSS", null);
+            	if (d != null) {
+            		return d;
+            	}
+            	d = tryDate((String)object, "yyyy-MM-dd", null);
+            	if (d != null) {
+            		return d;
+            	}
+            	d = tryDate((String)object, "EEE MMM dd HH:mm:ss Z yyyy", "us");
+            	if (d != null) {
+            		return d;
+            	}            	
+            }
+        } catch (Exception e) {
+        }
+        // if we're here it is not a Date
+        throw new JSONException("JSONObject[" + quote(key)
+        	+ "] is not a Date.");
+    }
+    
+    protected Date tryDate(String date, String format, String locale) {
+    	Date ret = null;
+    	try {
+	    	SimpleDateFormat sdf = (locale == null) ? new SimpleDateFormat(format) : 
+	    		new SimpleDateFormat(format, new Locale(locale));
+	    	ret = sdf.parse(date);
+	    } catch (Exception ex1) {
+	    }
+    	return ret;
+    }
 
     /**
      * Get the double value associated with a key.
@@ -985,6 +1046,25 @@ public class JSONObject {
     public BigDecimal optBigDecimal(String key, BigDecimal defaultValue) {
         try {
             return this.getBigDecimal(key);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+    
+    /**
+     * Get an optional Date associated with a key, or the defaultValue if
+     * there is no such key or if its value is not a Date. If the value is a
+     * string, an attempt will be made to evaluate it as a Date.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public Date optDate(String key, Date defaultValue) {
+        try {
+            return this.getDate(key);
         } catch (Exception e) {
             return defaultValue;
         }
