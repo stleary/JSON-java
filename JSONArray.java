@@ -28,11 +28,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
-import java.math.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * A JSONArray is an ordered sequence of values. Its external text form is a
@@ -1129,5 +1127,30 @@ public class JSONArray implements Iterable<Object> {
         } catch (IOException e) {
             throw new JSONException(e);
         }
+    }
+
+    /**
+     * Returns a java.util.List containing all of the elements in this array.
+     * If an element in the array is a JSONArray or JSONObject it will also
+     * be converted.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @return a java.util.List containing the elements of this array
+     */
+    public List<Object> toList() {
+        List<Object> results = new ArrayList<Object>(this.myArrayList.size());
+        for (Object element : this.myArrayList) {
+            if (element == null || JSONObject.NULL.equals(element)) {
+                results.add(null);
+            } else if (element instanceof JSONArray) {
+                results.add(((JSONArray) element).toList());
+            } else if (element instanceof JSONObject) {
+                results.add(((JSONObject) element).toMap());
+            } else {
+                results.add(element);
+            }
+        }
+        return results;
     }
 }
