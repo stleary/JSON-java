@@ -290,9 +290,9 @@ public class JSONObject {
         for (int i = 0; i < names.length; i += 1) {
             String name = names[i];
             try {
-           				Field field = c.getDeclaredField(name);
-           				field.setAccessible(true);
-           				this.putOpt(name, field.get(object));
+           			  	Field field = c.getDeclaredField(name);
+           			  	field.setAccessible(true);
+           				  this.putOpt(name, field.get(object));
            			} catch (Exception ignore) {
            		}
         }
