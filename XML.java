@@ -238,7 +238,7 @@ public class XML {
                             throw x.syntaxError("Missing value");
                         }
                         jsonobject.accumulate(string,
-                                JSONObject.stringToValue((String) token));
+                                XML.stringToValue((String) token));
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -270,7 +270,7 @@ public class XML {
                             string = (String) token;
                             if (string.length() > 0) {
                                 jsonobject.accumulate("content",
-                                        JSONObject.stringToValue(string));
+                                        XML.stringToValue(string));
                             }
 
                         } else if (token == LT) {
@@ -295,17 +295,49 @@ public class XML {
             }
         }
     }
-    
+
     /**
-     * This method has been deprecated in favor of the
-     * {@link JSONObject.stringToValue(String)} method. Use it instead.
+     * Try to convert a string into a number, boolean, or null. If the string
+     * can't be converted, return the string. This is much less ambitious than
+     * JSONObject.stringToValue, especially because it does not attempt to
+     * convert plus forms, octal forms, hex forms, or E forms lacking decimal
+     * points.
      * 
-     * @deprecated Use {@link JSONObject#stringToValue(String)} instead.
      * @param string
-     * @return JSON value of this string or the string
+     *            A String.
+     * @return A simple JSON value.
      */
     public static Object stringToValue(String string) {
-        return JSONObject.stringToValue(string);
+        if ("true".equalsIgnoreCase(string)) {
+            return Boolean.TRUE;
+        }
+        if ("false".equalsIgnoreCase(string)) {
+            return Boolean.FALSE;
+        }
+        if ("null".equalsIgnoreCase(string)) {
+            return JSONObject.NULL;
+        }
+
+        // If it might be a number, try converting it, first as a Long, and then
+        // as a Double. If that doesn't work, return the string.
+        try {
+            char initial = string.charAt(0);
+            if (initial == '-' || (initial >= '0' && initial <= '9')) {
+                Long value = new Long(string);
+                if (value.toString().equals(string)) {
+                    return value;
+                }
+            }
+        } catch (Exception ignore) {
+            try {
+                Double value = new Double(string);
+                if (value.toString().equals(string)) {
+                    return value;
+                }
+            } catch (Exception ignoreAlso) {
+            }
+        }
+        return string;
     }
 
     /**
