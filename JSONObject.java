@@ -30,8 +30,7 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1478,6 +1477,7 @@ public class JSONObject {
      * @return A simple JSON value.
      */
     public static Object stringToValue(String string) {
+        Double d;
         if (string.equals("")) {
             return string;
         }
@@ -1496,23 +1496,23 @@ public class JSONObject {
          * produced, then the value will just be a string.
          */
 
-        char initial = string.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-') {
+        char b = string.charAt(0);
+        if ((b >= '0' && b <= '9') || b == '-') {
             try {
                 if (string.indexOf('.') > -1 || string.indexOf('e') > -1
-                        || string.indexOf('E') > -1
-                        || "-0".equals(string)) {
-                    Double d = Double.valueOf(string);
+                        || string.indexOf('E') > -1) {
+                    d = Double.valueOf(string);
                     if (!d.isInfinite() && !d.isNaN()) {
                         return d;
                     }
                 } else {
                     Long myLong = new Long(string);
                     if (string.equals(myLong.toString())) {
-                        if (myLong.longValue() == myLong.intValue()) {
-                            return Integer.valueOf(myLong.intValue());
+                        if (myLong == myLong.intValue()) {
+                            return myLong.intValue();
+                        } else {
+                            return myLong;
                         }
-                        return myLong;
                     }
                 }
             } catch (Exception ignore) {
