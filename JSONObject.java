@@ -235,7 +235,7 @@ public class JSONObject {
     public JSONObject(Map<?, ?> map) {
         this.map = new HashMap<String, Object>();
         if (map != null) {
-        	for (final Entry<?, ?> e : map.entrySet()) {
+            for (final Entry<?, ?> e : map.entrySet()) {
                 final Object value = e.getValue();
                 if (value != null) {
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
@@ -723,6 +723,23 @@ public class JSONObject {
      */
     public boolean has(String key) {
         return this.map.containsKey(key);
+    }
+    
+    /**
+     * Determine if the JSONObject contains a ignore case key.
+     *
+     * @param key
+     *            A key string.
+     * @return true if the key exists in the JSONObject.
+     */
+    public boolean hasIgnoreCase(String key){
+        Set<String> keySet = this.map.keySet();
+        for (String keyStr : keySet) {
+            if (keyStr.equalsIgnoreCase(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
