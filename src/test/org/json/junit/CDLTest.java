@@ -68,7 +68,7 @@ public class CDLTest {
                     equals(e.getMessage()));
         }
     }
-
+    
     /**
      * Attempts to create a JSONArray from a string with unbalanced quotes
      * in value line. Expects a JSONException.
@@ -104,7 +104,62 @@ public class CDLTest {
             
         }
     }
+    
+    /**
+     * Attempt to create a JSONArray with unbalanced quotes and a properly escaped doubled quote.
+     * Expects a JSONException. 
+     */
+    @Test
+    public void unbalancedEscapedQuote(){
+    	   String badLine = "Col1, Col2\n\"Val1, \"\"Val2\"\"";
+           try {
+               CDL.toJSONArray(badLine);
+               assertTrue("Expecting an exception", false);
+           } catch (JSONException e) {
+               assertTrue("Expecting an exception message",
+                       "Missing close quote '\"'. at 27 [character 16 line 3]".
+                       equals(e.getMessage()));
+               
+           }
+    }
 
+    /**
+     * Assert that there is no error for a single escaped quote within a properly embedded quote.
+     */
+    @Test
+    public void singleEscapedQuote(){
+    	       String singleEscape = "Col1, Col2\nVal1, \"\"\"Val2\"";
+               JSONArray jsonArray = CDL.toJSONArray(singleEscape);
+               
+               String cdlStr = CDL.toString(jsonArray);
+               assertTrue(cdlStr.contains("Col1"));
+               assertTrue(cdlStr.contains("Col2"));
+               assertTrue(cdlStr.contains("Val1"));
+               assertTrue(cdlStr.contains("\"Val2"));
+               
+    }
+    
+    /**
+     * Attempt to create a JSONArray with an escape quote and no enclosing quotes.
+     * Expects a JSONException. 
+     */
+    @Test
+    public void badEscapedQuote(){
+    	       String badLine = "Col1, Col2\nVal1, \"\"Val2";
+    	       
+    	       try {
+                   CDL.toJSONArray(badLine);
+                   assertTrue("Expecting an exception", false);
+               } catch (JSONException e) {
+            	   System.out.println("Message" + e.getMessage());
+                   assertTrue("Expecting an exception message",
+                           "Bad character 'V' (86). at 20 [character 9 line 3]".
+                           equals(e.getMessage()));
+                   
+               }
+               
+    }
+    
     /**
      * call toString with a null array
      */
