@@ -3,6 +3,8 @@ package org.json;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,11 @@ public class JSONPointer {
         }
         if (pointer.startsWith("#/")) {
             pointer = pointer.substring(2);
+            try {
+                pointer = URLDecoder.decode(pointer, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         } else if (pointer.startsWith("/")) {
             pointer = pointer.substring(1);
         } else {
@@ -32,7 +39,9 @@ public class JSONPointer {
     }
 
     private String unescape(String token) {
-        return token.replace("~1", "/").replace("~0", "~");
+        return token.replace("~1", "/").replace("~0", "~")
+                .replace("\\\"", "\"")
+                .replace("\\\\", "\\");
     }
 
     public Object queryFrom(JSONObject document) {
