@@ -3,6 +3,3 @@ build
 .classpath
 .project
 .settings/
-.gitignore
-.gradle
-src/main
