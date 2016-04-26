@@ -12,19 +12,6 @@ public class JSONPointerTest {
 
     private static final JSONObject document;
 
-    // = new JSONObject("{"
-    // + "\"foo\": [\"bar\", \"baz\"], "
-    // + "\"\": 0,"
-    // + "\"a/b\": 1,"
-    // + "\"c%d\": 2,"
-    // + "\"e^f\": 3,"
-    // + "\"g|h\": 4,"
-    // + "\"i\\\\j\": 5,"
-    // + "\"k\\\\\\\"l\": 6,"
-    // + "\" \": 7,"
-    // + "\"m~n\": 8"
-    // + "}");
-
     static {
         document = new JSONObject(new JSONTokener(
                 JSONPointerTest.class.getResourceAsStream("/org/json/junit/jsonpointer-testdoc.json")));
