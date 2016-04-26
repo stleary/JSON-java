@@ -53,7 +53,11 @@ public class JSONPointer {
             if (current instanceof JSONObject) {
                 current = ((JSONObject) current).opt(unescape(token));
             } else if (current instanceof JSONArray) {
-                current = readByIndexToken(current, unescape(token));
+                current = readByIndexToken(current, token);
+            } else {
+                throw new JSONPointerException(format(
+                        "value [%s] is not an array or object therefore its key %s cannot be resolved", current,
+                        token));
             }
         }
         return current;
@@ -61,10 +65,15 @@ public class JSONPointer {
 
     private Object readByIndexToken(Object current, String indexToken) {
         try {
-            return ((JSONArray) current).opt(Integer.parseInt(unescape(indexToken)));
+            int index = Integer.parseInt(indexToken);
+            JSONArray currentArr = (JSONArray) current;
+            if (index >= currentArr.length()) {
+                throw new JSONPointerException(format("index %d is out of bounds - the array has %d elements", index,
+                        currentArr.length()));
+            }
+            return currentArr.get(index);
         } catch (NumberFormatException e) {
-            throw new JSONPointerException(format("%s is not an array index", unescape(indexToken)), e);
+            throw new JSONPointerException(format("%s is not an array index", indexToken), e);
         }
     }
-
 }
