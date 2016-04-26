@@ -44,7 +44,7 @@ public class JSONPointer {
                 .replace("\\\\", "\\");
     }
 
-    public Object queryFrom(JSONObject document) {
+    public Object queryFrom(Object document) {
         if (refTokens.isEmpty()) {
             return document;
         }
