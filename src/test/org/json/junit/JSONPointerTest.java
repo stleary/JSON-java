@@ -94,4 +94,14 @@ public class JSONPointerTest {
         new JSONPointer("key");
     }
 
+    @Test(expected = JSONPointerException.class)
+    public void arrayIndexFailure() {
+        query("/foo/2");
+    }
+
+    @Test(expected = JSONPointerException.class)
+    public void primitiveFailure() {
+        query("/obj/key/failure");
+    }
+
 }
