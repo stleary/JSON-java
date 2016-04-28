@@ -32,6 +32,11 @@ tokens. It can be constructed from a String, Reader, or InputStream.
 JSONException.java: The JSONException is the standard exception type thrown
 by this package.
 
+JSONPointer.java: Implementation of 
+[JSON Pointer (RFC 6901)](https://tools.ietf.org/html/rfc6901). Supports
+JSON Pointers both in the form of string representation and URI fragment
+representation.
+
 JSONString.java: The JSONString interface requires a toJSONString method,
 allowing an object to provide its own serialization.
 
