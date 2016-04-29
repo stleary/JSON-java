@@ -1842,7 +1842,7 @@ public class JSONObject {
      * @return a java.util.Map containing the entrys of this object
      */
     public Map<String, Object> toMap() {
-        Map<String, Object> results = new HashMap<>();
+        Map<String, Object> results = new HashMap<String, Object>();
         for (Entry<String, Object> entry : this.map.entrySet()) {
             Object value;
             if (entry.getValue() == null || NULL.equals(entry.getValue())) {
