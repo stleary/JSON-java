@@ -69,7 +69,12 @@ public class CDL {
             for (;;) {
                 c = x.next();
                 if (c == q) {
-                    break;
+                    //Handle escaped double-quote
+                    if(x.next() != '\"')
+                    {
+                        x.back();
+                        break;
+                    }
                 }
                 if (c == 0 || c == '\n' || c == '\r') {
                     throw x.syntaxError("Missing close quote '" + q + "'.");
