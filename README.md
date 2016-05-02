@@ -24,39 +24,10 @@ Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or 
 * JSON-java.jar<br>
  
 **To build from the command line using gradle:**
+Until the unit tests are merged into the JSON-Java project, the code has to be wired by hand. After cloning JSON-Java-unit-test, create a directory structure under src and copy the JSON-Java files into: src/org/json. Then execute the unit tests and code coverage with: 
 ````
-build.gradle
-# In this example, both the JSON-java jar and the test code is created 
-# from the same build file, in the test code directory. 3rd party jars are
-# obtained from the maven repository.
-apply plugin: 'java'
-jar.baseName = 'JSON-java'
-
-sourceSets {
- main {
-  java {
-   srcDir '../JSON-java/src/org/json'
-  }
- }
- test {
-  java {
-   srcDir 'src/org/json/junit'
-  }
- }
-}
-
-repositories {
- mavenCentral()
-}
-
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.+'
-    testCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.1.0'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
-}
+gradle clean build test jacocoTestReport
 ````
-
-To measure coverage: http://www.eclemma.org/ (just install the latest in Eclipse)<br>
 
 <b>Conventions</b><br>
 Test filenames should consist of the name of the module being tested, with the suffix "Test". 
