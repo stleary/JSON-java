@@ -41,7 +41,7 @@ SOFTWARE.
  * The names for the elements in the JSONObjects can be taken from the names
  * in the first row.
  * @author JSON.org
- * @version 2015-12-09
+ * @version 2016-05-01
  */
 public class CDL {
 
