@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +38,34 @@ SOFTWARE.
  * <a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>. 
  */
 public class JSONPointer {
+    
+    private static final String ENCODING = "utf-8";
 
-    private List<String> refTokens;
+    public static class Builder {
+        
+        private final List<String> refTokens = new ArrayList<String>();
+
+        public Builder append(String token) {
+            refTokens.add(token);
+            return this;
+        }
+
+        public JSONPointer build() {
+            return new JSONPointer(refTokens);
+        }
+
+        public Builder append(int arrayIndex) {
+            refTokens.add(String.valueOf(arrayIndex));
+            return this;
+        }
+        
+    }
+    
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    private final List<String> refTokens;
 
     /**
      * Pre-parses and initializes a new {@code JSONPointer} instance. If you want to
@@ -59,7 +86,7 @@ public class JSONPointer {
         if (pointer.startsWith("#/")) {
             pointer = pointer.substring(2);
             try {
-                pointer = URLDecoder.decode(pointer, "utf-8");
+                pointer = URLDecoder.decode(pointer, ENCODING);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
@@ -72,6 +99,10 @@ public class JSONPointer {
         for (String token : pointer.split("/")) {
             refTokens.add(unescape(token));
         }
+    }
+
+    public JSONPointer(List<String> refTokens) {
+        this.refTokens = refTokens;
     }
 
     private String unescape(String token) {
@@ -122,4 +153,33 @@ public class JSONPointer {
             throw new JSONPointerException(format("%s is not an array index", indexToken), e);
         }
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder rval = new StringBuilder("");
+        for (String token: refTokens) {
+            rval.append('/').append(escape(token));
+        }
+        return rval.toString();
+    }
+
+    private String escape(String token) {
+        return token.replace("~", "~0")
+                .replace("/", "~1")
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"");
+    }
+
+    public String toURIFragment() {
+        try {
+            StringBuilder rval = new StringBuilder("#");
+            for (String token : refTokens) {
+                rval.append('/').append(URLEncoder.encode(token, ENCODING));
+            }
+            return rval.toString();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
 }
