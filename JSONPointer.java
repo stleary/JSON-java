@@ -44,16 +44,42 @@ public class JSONPointer {
     public static class Builder {
         
         private final List<String> refTokens = new ArrayList<String>();
-
-        public Builder append(String token) {
-            refTokens.add(token);
-            return this;
-        }
-
+        
+        /**
+         * Creates a {@code JSONPointer} instance using the tokens previously set using the
+         * {@link #append(String)} method calls.
+         */
         public JSONPointer build() {
             return new JSONPointer(refTokens);
         }
 
+        /**
+         * Adds an arbitary token to the list of reference tokens. It can be any non-null value.
+         * 
+         * Unlike in the case of JSON string or URI fragment representation of JSON pointers, the
+         * argument of this method MUST NOT be escaped. If you want to query the property called
+         * {@code "a~b"} then you should simply pass the {@code "a~b"} string as-is, there is no
+         * need to escape it as {@code "a~0b"}.
+         * 
+         * @param token the new token to be appended to the list
+         * @return {@code this}
+         * @throws NullPointerException if {@code token} is null
+         */
+        public Builder append(String token) {
+            if (token == null) {
+                throw new NullPointerException("token cannot be null");
+            }
+            refTokens.add(token);
+            return this;
+        }
+
+        /**
+         * Adds an integer to the reference token list. Although not necessarily, mostly this token will
+         * denote an array index. 
+         * 
+         * @param arrayIndex the array index to be added to the token list
+         * @return {@code this}
+         */
         public Builder append(int arrayIndex) {
             refTokens.add(String.valueOf(arrayIndex));
             return this;
@@ -61,6 +87,21 @@ public class JSONPointer {
         
     }
     
+    /**
+     * Static factory method for {@link Builder}. Example usage:
+     * 
+     * <pre><code>
+     * JSONPointer pointer = JSONPointer.builder()
+     *       .append("obj")
+     *       .append("other~key").append("another/key")
+     *       .append("\"")
+     *       .append(0)
+     *       .build();
+     * </code></pre>
+     * 
+     *  @return a builder instance which can be used to construct a {@code JSONPointer} instance by chained
+     *  {@link Builder#append(String)} calls.
+     */
     public static Builder builder() {
         return new Builder();
     }
