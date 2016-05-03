@@ -115,6 +115,11 @@ public class JSONPointerTest {
         assertEquals("val", pointer.queryFrom(document));
     }
     
+    @Test(expected = NullPointerException.class)
+    public void nullToken() {
+        JSONPointer.builder().append(null);
+    }
+    
     @Test
     public void toStringEscaping() {
         JSONPointer pointer = JSONPointer.builder()
