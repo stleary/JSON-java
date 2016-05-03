@@ -14,6 +14,11 @@
 	" ": 7,
 	"m~n": 8,
 	"obj" : {
-		"key" : "value"
+		"key" : "value",
+		"other~key" : {
+			"another/key" : [
+				"val"
+			]
+		}
 	}
 }

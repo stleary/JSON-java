@@ -1,5 +1,6 @@
 package org.json.junit;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import org.json.JSONObject;
@@ -28,7 +29,7 @@ public class JSONPointerTest {
 
     @Test(expected = NullPointerException.class)
     public void nullPointer() {
-        new JSONPointer(null);
+        new JSONPointer((String) null);
     }
 
     @Test
@@ -102,6 +103,40 @@ public class JSONPointerTest {
     @Test(expected = JSONPointerException.class)
     public void primitiveFailure() {
         query("/obj/key/failure");
+    }
+    
+    @Test
+    public void builderTest() {
+        JSONPointer pointer = JSONPointer.builder()
+                .append("obj")
+                .append("other~key").append("another/key")
+                .append(0)
+                .build();
+        assertEquals("val", pointer.queryFrom(document));
+    }
+    
+    @Test
+    public void toStringEscaping() {
+        JSONPointer pointer = JSONPointer.builder()
+                .append("obj")
+                .append("other~key").append("another/key")
+                .append("\"")
+                .append(0)
+                .build();
+        assertEquals("/obj/other~0key/another~1key/\\\"/0", pointer.toString());
+    }
+    
+    @Test
+    public void emptyPointerToString() {
+        assertEquals("", new JSONPointer("").toString());
+    }
+    
+    @Test
+    public void toURIFragment() {
+        assertEquals("#/c%25d", new JSONPointer("/c%d").toURIFragment());
+        assertEquals("#/e%5Ef", new JSONPointer("/e^f").toURIFragment());
+        assertEquals("#/g%7Ch", new JSONPointer("/g|h").toURIFragment());
+        assertEquals("#/m%7En", new JSONPointer("/m~n").toURIFragment());
     }
 
 }
