@@ -143,7 +143,7 @@ public class JSONPointer {
     }
 
     public JSONPointer(List<String> refTokens) {
-        this.refTokens = refTokens;
+        this.refTokens = new ArrayList<String>(refTokens);
     }
 
     private String unescape(String token) {
