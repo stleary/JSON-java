@@ -2,6 +2,7 @@ package org.json.junit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 import org.json.JSONObject;
 import org.json.JSONPointer;
@@ -142,6 +143,17 @@ public class JSONPointerTest {
         assertEquals("#/e%5Ef", new JSONPointer("/e^f").toURIFragment());
         assertEquals("#/g%7Ch", new JSONPointer("/g|h").toURIFragment());
         assertEquals("#/m%7En", new JSONPointer("/m~n").toURIFragment());
+    }
+    
+    @Test
+    public void tokenListIsCopiedInConstructor() {
+        JSONPointer.Builder b = JSONPointer.builder().append("key1");
+        JSONPointer jp1 = b.build();
+        b.append("key2");
+        JSONPointer jp2 = b.build();
+        if(jp1.toString().equals(jp2.toString())) {
+            fail("Oops, my pointers are sharing a backing array");
+        }
     }
 
 }
