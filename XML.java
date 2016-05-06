@@ -223,6 +223,7 @@ public class XML {
             tagName = (String) token;
             token = null;
             jsonobject = new JSONObject();
+            boolean nil = false;
             for (;;) {
                 if (token == null) {
                     token = x.nextToken();
@@ -237,9 +238,14 @@ public class XML {
                         if (!(token instanceof String)) {
                             throw x.syntaxError("Missing value");
                         }
-                        jsonobject.accumulate(string,
-                                JSONObject.stringToValue((String) token));
-                        token = null;
+                        if (string.equals("xsi:nil") && token.equals("true")) {
+                        	context.accumulate(tagName, "null");
+                        	nil = true;
+                        	token = null;
+                        } else {
+                            jsonobject.accumulate(string, JSONObject.stringToValue((String) token));
+                            token = null;                            	
+                        }
                     } else {
                         jsonobject.accumulate(string, "");
                     }
@@ -253,7 +259,11 @@ public class XML {
                     if (jsonobject.length() > 0) {
                         context.accumulate(tagName, jsonobject);
                     } else {
-                        context.accumulate(tagName, "");
+                    	if (nil) {
+                    		nil = false;
+                    	} else {
+                    		context.accumulate(tagName, "");
+                    	}
                     }
                     return false;
 
