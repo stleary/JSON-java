@@ -21,8 +21,8 @@ Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or 
 * JSON-java.jar<br>
  
 **To build from the command line using gradle:**
-Until the unit tests are merged into the JSON-Java project, the code has to be wired by hand. 
-\# In an empty directory of your choice, clone JSON-Java-unit-test:
+Until the unit tests are merged into the JSON-Java project, the code has to be wired by hand. <br>
+\# In an empty directory of your choice, clone JSON-Java-unit-test:<br>
 ````
 git clone https://github.com/stleary/JSON-Java-unit-test.git .
 ````
