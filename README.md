@@ -4,13 +4,10 @@ Unit tests to validate the JSON-Java GitHub project code<br>
 
 https://github.com/douglascrockford/JSON-java<br>
 
-*These tests are a work in progress. Help from interested developers is welcome.*<br>
-More coverage is needed, but more importantly, improvements to test quality is needed.<br>
-
-Eclipse is the recommended development environment.<br>
+Gradle and Eclipse is the recommended build tool and IDE.<br>
 Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or execute the **TestRunner** application directly.<br>
 
-**You will need the following libraries for testing:**<br>
+**The following libraries are required:**<br>
 * asm-1.0.2.jar<br>
 * commons-io-2.1.jar<br>
 * commons-lang-2.6.jar<br>
@@ -24,10 +21,31 @@ Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or 
 * JSON-java.jar<br>
  
 **To build from the command line using gradle:**
-Until the unit tests are merged into the JSON-Java project, the code has to be wired by hand. After cloning JSON-Java-unit-test, create a directory structure under src and copy the JSON-Java files into: src/org/json. Then execute the unit tests and code coverage with: 
+Until the unit tests are merged into the JSON-Java project, the code has to be wired by hand. 
+\# In an empty directory of your choice, clone JSON-Java-unit-test:
+````
+git clone https://github.com/stleary/JSON-Java-unit-test.git .
+````
+\# Create a directory structure for the JSON-Java code
+````
+mkdir -p src\org\json
+````
+\# clone JSON-Java 
+````
+git clone https://github.com/stleary/JSON-Java-unit-test.git src\org\json
+````
+\# Build, then execute the unit tests and code coverage
 ````
 gradle clean build test jacocoTestReport
 ````
+Unit test results will be in build\reports\tests\index.html<br>
+Code coverage will be in build\reports\jacoco\html\index.html
+
+To create an Eclipse project, you will need the Eclipse Gradle plug-in, available from the Eclipse Marketplace. I am currently using Gradle IDE	3.6.4.201503050952-RELEASE<br>
+Select File > Import > Gradle > Gradle project <br>
+Browse to the directory where you cloned JSON-Java-unit-test<br>
+Select Build model<br>
+Select built project<br>
 
 <b>Conventions</b><br>
 Test filenames should consist of the name of the module being tested, with the suffix "Test". 
