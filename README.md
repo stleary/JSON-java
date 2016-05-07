@@ -20,7 +20,7 @@ Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or 
 * slf-simple-1.7.12.jar<br>
 * JSON-java.jar<br>
  
-**To build from the command line using gradle:**
+**To build from the command line using gradle:**<br>
 Until the unit tests are merged into the JSON-Java project, the code has to be wired by hand. <br>
 \# In an empty directory of your choice, clone JSON-Java-unit-test:<br>
 ````
