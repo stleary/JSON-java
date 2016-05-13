@@ -28,11 +28,12 @@ git clone https://github.com/stleary/JSON-Java-unit-test.git .
 ````
 \# Create a directory structure for the JSON-Java code
 ````
-mkdir -p src\org\json
+# Windows version
+md /s src\org\json
 ````
 \# clone JSON-Java 
 ````
-git clone https://github.com/stleary/JSON-Java-unit-test.git src\org\json
+git clone https://github.com/stleary/JSON-Java.git src\org\json
 ````
 \# Build, then execute the unit tests and code coverage
 ````
