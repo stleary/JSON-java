@@ -1,13 +1,11 @@
 package org.json;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /*
 Copyright (c) 2002 JSON.org
@@ -36,18 +34,35 @@ SOFTWARE.
 /**
  * A JSON Pointer is a simple query language defined for JSON documents by
  * <a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>.
- *  
+ * 
+ * In a nutshell, JSONPointer allows the user to navigate into a JSON document
+ * using strings, and retrieve targeted objects, like a simple form of XPATH.
+ * Path segments are separated by the '/' char, which signifies the root of
+ * the document when it appears as the first char of the string. Array 
+ * elements are navigated using ordinals, counting from 0. JSONPointer strings
+ * may be extended to any arbitrary number of segments. If the navigation
+ * is successful, the matched item is returned. A matched item may be a
+ * JSONObject, a JSONArray, or a JSON value. If the JSONPointer string building 
+ * fails, an appropriate exception is thrown. If the navigation fails to find
+ * a match, a JSONPointerException is thrown. 
+ * 
  * @author JSON.org
- * @version 2016-05-13
+ * @version 2016-05-14
  */
 public class JSONPointer {
-    
+
+    // used for URL encoding and decoding
     private static final String ENCODING = "utf-8";
 
+    /**
+     * This class allows the user to build a JSONPointer in steps, using
+     * exactly one segment in each step.
+     */
     public static class Builder {
-        
+
+        // Segments for the eventual JSONPointer string
         private final List<String> refTokens = new ArrayList<String>();
-        
+
         /**
          * Creates a {@code JSONPointer} instance using the tokens previously set using the
          * {@link #append(String)} method calls.
@@ -87,9 +102,8 @@ public class JSONPointer {
             refTokens.add(String.valueOf(arrayIndex));
             return this;
         }
-        
     }
-    
+
     /**
      * Static factory method for {@link Builder}. Example usage:
      * 
@@ -109,6 +123,7 @@ public class JSONPointer {
         return new Builder();
     }
 
+    // Segments for the JSONPointer string
     private final List<String> refTokens;
 
     /**
@@ -124,7 +139,7 @@ public class JSONPointer {
             throw new NullPointerException("pointer cannot be null");
         }
         if (pointer.isEmpty()) {
-            refTokens = emptyList();
+            refTokens = Collections.emptyList();
             return;
         }
         if (pointer.startsWith("#/")) {
@@ -184,6 +199,13 @@ public class JSONPointer {
         return current;
     }
 
+    /**
+     * Matches a JSONArray element by ordinal position
+     * @param current the JSONArray to be evaluated
+     * @param indexToken the array index in string form
+     * @return the matched object. If no matching item is found a
+     * JSONPointerException is thrown
+     */
     private Object readByIndexToken(Object current, String indexToken) {
         try {
             int index = Integer.parseInt(indexToken);
@@ -197,7 +219,11 @@ public class JSONPointer {
             throw new JSONPointerException(format("%s is not an array index", indexToken), e);
         }
     }
-    
+
+    /**
+     * Returns a string representing the JSONPointer path value using string
+     * representation
+     */
     @Override
     public String toString() {
         StringBuilder rval = new StringBuilder("");
@@ -207,6 +233,14 @@ public class JSONPointer {
         return rval.toString();
     }
 
+    /**
+     * Escapes path segment values to an unambiguous form.
+     * The escape char to be inserted is '~'. The chars to be escaped 
+     * are ~, which maps to ~0, and /, which maps to ~1. Backslashes
+     * and double quote chars are also escaped.
+     * @param token the JSONPointer segment value to be escaped
+     * @return the escaped value for the token
+     */
     private String escape(String token) {
         return token.replace("~", "~0")
                 .replace("/", "~1")
@@ -214,6 +248,10 @@ public class JSONPointer {
                 .replace("\"", "\\\"");
     }
 
+    /**
+     * Returns a string representing the JSONPointer path value using URI
+     * fragment identifier representation
+     */
     public String toURIFragment() {
         try {
             StringBuilder rval = new StringBuilder("#");
