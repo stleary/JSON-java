@@ -13,6 +13,7 @@ sourceSets {
   test {
     java {
       srcDir 'src/test'
+      exclude 'resources/'
     }
     resources {
        srcDir 'resources'
