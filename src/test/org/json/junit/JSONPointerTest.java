@@ -4,10 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
-import org.json.JSONObject;
-import org.json.JSONPointer;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
+import org.json.*;
 import org.junit.Test;
 
 public class JSONPointerTest {
@@ -16,7 +13,7 @@ public class JSONPointerTest {
 
     static {
         document = new JSONObject(new JSONTokener(
-                JSONPointerTest.class.getResourceAsStream("/org/json/junit/jsonpointer-testdoc.json")));
+                JSONPointerTest.class.getClassLoader().getResourceAsStream("jsonpointer-testdoc.json")));
     }
 
     private Object query(String pointer) {
