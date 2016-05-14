@@ -1,8 +1,6 @@
 package org.json.junit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.json.*;
 import org.junit.Test;
@@ -153,4 +151,62 @@ public class JSONPointerTest {
         }
     }
 
+    /**
+     * Coverage for JSONObject queryFrom()
+     */
+    @Test
+    public void queryFromJSONObject() {
+        String str = "{"+
+                "\"stringKey\":\"hello world!\","+
+                "\"arrayKey\":[0,1,2],"+
+                "\"objectKey\": {"+
+                    "\"a\":\"aVal\","+
+                    "\"b\":\"bVal\""+
+                "}"+
+            "}";    
+        JSONObject jsonObject = new JSONObject(str);
+        Object obj = jsonObject.query("/stringKey");
+        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        obj = jsonObject.query("/arrayKey/1");
+        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        obj = jsonObject.query("/objectKey/b");
+        assertTrue("Expected bVal", "bVal".equals(obj));
+        try {
+            obj = jsonObject.query("/a/b/c");
+            assertTrue("Expected JSONPointerException", false);
+        } catch (JSONPointerException e) {
+            assertTrue("Expected bad key/value exception",
+                    "value [null] is not an array or object therefore its key b cannot be resolved".
+                    equals(e.getMessage()));
+        }
+    }
+
+    /**
+     * Coverage for JSONArray queryFrom()
+     */
+    @Test
+    public void queryFromJSONArray() {
+        String str = "["+
+                "\"hello world!\","+
+                "[0,1,2],"+
+                "{"+
+                    "\"a\":\"aVal\","+
+                    "\"b\":\"bVal\""+
+                "}"+
+            "]";    
+        JSONArray jsonArray = new JSONArray(str);
+        Object obj = jsonArray.query("/0");
+        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        obj = jsonArray.query("/1/1");
+        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        obj = jsonArray.query("/2/b");
+        assertTrue("Expected bVal", "bVal".equals(obj));
+        try {
+            obj = jsonArray.query("/a/b/c");
+            assertTrue("Expected JSONPointerException", false);
+        } catch (JSONPointerException e) {
+            assertTrue("Expected bad index exception",
+                    "a is not an array index".equals(e.getMessage()));
+        }
+    }
 }
