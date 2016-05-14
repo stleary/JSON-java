@@ -78,7 +78,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-03-05
+ * @version 2016-05-13
  */
 public class JSONArray implements Iterable<Object> {
 
@@ -960,6 +960,25 @@ public class JSONArray implements Iterable<Object> {
         return this;
     }
     
+    /**
+     * Creates a JSONPointer using an intialization string and tries to 
+     * match it to an item within this JSONArray. For example, given a
+     * JSONArray initialized with this document:
+     * <pre>
+     * [
+     *     {"b":"c"}
+     * ]
+     * </pre>
+     * and this JSONPointer string: 
+     * <pre>
+     * "/0/b"
+     * </pre>
+     * Then this method will return the String "c"
+     * A JSONPointerException may be thrown from code called by this method.
+     *
+     * @param jsonPointer string that can be used to create a JSONPointer
+     * @return the item matched by the JSONPointer, otherwise null
+     */
     public Object query(String jsonPointer) {
         return new JSONPointer(jsonPointer).queryFrom(this);
     }

@@ -93,7 +93,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-05-01
+ * @version 2016-05-13
  */
 public class JSONObject {
     /**
@@ -1337,7 +1337,26 @@ public class JSONObject {
         }
         return this;
     }
-    
+
+    /**
+     * Creates a JSONPointer using an intialization string and tries to 
+     * match it to an item within this JSONObject. For example, given a
+     * JSONObject initialized with this document:
+     * <pre>
+     * {
+     *     "a":{"b":"c"}
+     * }
+     * </pre>
+     * and this JSONPointer string: 
+     * <pre>
+     * "/a/b"
+     * </pre>
+     * Then this method will return the String "c".
+     * A JSONPointerException may be thrown from code called by this method.
+     *   
+     * @param jsonPointer string that can be used to create a JSONPointer
+     * @return the item matched by the JSONPointer, otherwise null
+     */
     public Object query(String jsonPointer) {
         return new JSONPointer(jsonPointer).queryFrom(this);
     }

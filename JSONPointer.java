@@ -35,7 +35,10 @@ SOFTWARE.
 
 /**
  * A JSON Pointer is a simple query language defined for JSON documents by
- * <a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>. 
+ * <a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>.
+ *  
+ * @author JSON.org
+ * @version 2016-05-13
  */
 public class JSONPointer {
     
