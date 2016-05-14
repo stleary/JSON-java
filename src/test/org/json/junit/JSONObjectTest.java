@@ -72,10 +72,10 @@ public class JSONObjectTest {
         JSONObject jsonObjectByName = new JSONObject(jsonObject, keys);
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObjectByName.toString());
         assertTrue("expected 4 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 4);
-        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(JsonPath.read(doc, "$.falseKey")));
-        assertTrue("expected \"nullKey\":null", null == JsonPath.read(doc, "$.nullKey"));
-        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(JsonPath.read(doc, "$.stringKey")));
-        assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(JsonPath.read(doc, "$.doubleKey")));
+        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(jsonObjectByName.query("/falseKey")));
+        assertTrue("expected \"nullKey\":null", JSONObject.NULL.equals(jsonObjectByName.query("/nullKey")));
+        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(jsonObjectByName.query("/stringKey")));
+        assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(jsonObjectByName.query("/doubleKey")));
     }
 
     /**
@@ -109,13 +109,13 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected \"trueKey\":true", Boolean.TRUE.equals(JsonPath.read(doc, "$.trueKey")));
-        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(JsonPath.read(doc, "$.falseKey")));
-        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(JsonPath.read(doc, "$.stringKey")));
-        assertTrue("expected \"escapeStringKey\":\"h\be\tllo w\u1234orld!\"", "h\be\tllo w\u1234orld!".equals(JsonPath.read(doc,"$.escapeStringKey")));
-        assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(JsonPath.read(doc, "$.doubleKey")));
+        assertTrue("expected \"trueKey\":true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
+        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
+        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(jsonObject.query("/stringKey")));
+        assertTrue("expected \"escapeStringKey\":\"h\be\tllo w\u1234orld!\"", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/escapeStringKey")));
+        assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(jsonObject.query("/doubleKey")));
     }
-    
+
     /**
      * Verifies that the constructor has backwards compatability with RAW types pre-java5.
      */
@@ -249,8 +249,8 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected \"key2\":java.lang.Exception","java.lang.Exception".equals(JsonPath.read(doc, "$.key2")));
         assertTrue("expected 0 key1 items", ((Map<?,?>)(JsonPath.read(doc, "$.key1"))).size() == 0);
+        assertTrue("expected \"key2\":java.lang.Exception","java.lang.Exception".equals(jsonObject.query("/key2")));
     }
 
     /**
@@ -272,12 +272,12 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected \"trueKey\":true", Boolean.TRUE.equals(JsonPath.read(doc, "$.trueKey")));
-        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(JsonPath.read(doc, "$.falseKey")));
-        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(JsonPath.read(doc, "$.stringKey")));
-        assertTrue("expected \"escapeStringKey\":\"h\be\tllo w\u1234orld!\"", "h\be\tllo w\u1234orld!".equals(JsonPath.read(doc,"$.escapeStringKey")));
-        assertTrue("expected \"intKey\":42", Integer.valueOf("42").equals(JsonPath.read(doc, "$.intKey")));
-        assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(JsonPath.read(doc, "$.doubleKey")));
+        assertTrue("expected \"trueKey\":true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
+        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
+        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(jsonObject.query("/stringKey")));
+        assertTrue("expected \"escapeStringKey\":\"h\be\tllo w\u1234orld!\"", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/escapeStringKey")));
+        assertTrue("expected \"intKey\":42", Long.valueOf("42").equals(jsonObject.query("/intKey")));
+        assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(jsonObject.query("/doubleKey")));
     }
 
     /**
@@ -306,13 +306,13 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 8 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 8);
-        assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc, "$.trueKey")));
-        assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc, "$.falseKey")));
-        assertTrue("expected hello world!","hello world!".equals(JsonPath.read(doc, "$.stringKey")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(JsonPath.read(doc,"$.escapeStringKey")));
-        assertTrue("expected 42", Integer.valueOf("42").equals(JsonPath.read(doc, "$.intKey")));
-        assertTrue("expected -23.45e7", Double.valueOf("-23.45e7").equals(JsonPath.read(doc, "$.doubleKey")));
         assertTrue("expected 0 items in stringReaderKey", ((Map<?, ?>) (JsonPath.read(doc, "$.stringReaderKey"))).size() == 0);
+        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
+        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
+        assertTrue("expected hello world!","hello world!".equals(jsonObject.query("/stringKey")));
+        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/escapeStringKey")));
+        assertTrue("expected 42", Integer.valueOf("42").equals(jsonObject.query("/intKey")));
+        assertTrue("expected -23.45e7", Double.valueOf("-23.45e7").equals(jsonObject.query("/doubleKey")));
         // sorry, mockito artifact
         assertTrue("expected 2 callbacks items", ((List<?>)(JsonPath.read(doc, "$.callbacks"))).size() == 2);
         assertTrue("expected 0 handler items", ((Map<?,?>)(JsonPath.read(doc, "$.callbacks[0].handler"))).size() == 0);
@@ -335,8 +335,8 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected \"publicString\":\"abc\"", "abc".equals(JsonPath.read(doc, "$.publicString")));
-        assertTrue("expected \"publicInt\":42", Integer.valueOf(42).equals(JsonPath.read(doc, "$.publicInt")));
+        assertTrue("expected \"publicString\":\"abc\"", "abc".equals(jsonObject.query("/publicString")));
+        assertTrue("expected \"publicInt\":42", Integer.valueOf(42).equals(jsonObject.query("/publicInt")));
     }
 
     /**
@@ -353,11 +353,11 @@ public class JSONObjectTest {
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
         assertTrue("expected 2 greetings items", ((Map<?,?>)(JsonPath.read(doc, "$.greetings"))).size() == 2);
-        assertTrue("expected \"hello\":\"Hello, \"", "Hello, ".equals(JsonPath.read(doc, "$.greetings.hello")));
-        assertTrue("expected \"world\":\"World!\"", "World!".equals(JsonPath.read(doc, "$.greetings.world")));
+        assertTrue("expected \"hello\":\"Hello, \"", "Hello, ".equals(jsonObject.query("/greetings/hello")));
+        assertTrue("expected \"world\":\"World!\"", "World!".equals(jsonObject.query("/greetings/world")));
         assertTrue("expected 2 farewells items", ((Map<?,?>)(JsonPath.read(doc, "$.farewells"))).size() == 2);
-        assertTrue("expected \"later\":\"Later, \"", "Later, ".equals(JsonPath.read(doc, "$.farewells.later")));
-        assertTrue("expected \"world\":\"World!\"", "Alligator!".equals(JsonPath.read(doc, "$.farewells.gator")));
+        assertTrue("expected \"later\":\"Later, \"", "Later, ".equals(jsonObject.query("/farewells/later")));
+        assertTrue("expected \"world\":\"World!\"", "Alligator!".equals(jsonObject.query("/farewells/gator")));
     }
 
     /**
@@ -383,12 +383,12 @@ public class JSONObjectTest {
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
         assertTrue("expected 6 myArray items", ((List<?>)(JsonPath.read(doc, "$.myArray"))).size() == 6);
-        assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc, "$.myArray[0]")));
-        assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc, "$.myArray[1]")));
-        assertTrue("expected hello world!", "hello world!".equals(JsonPath.read(doc, "$.myArray[2]")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(JsonPath.read(doc,"$.myArray[3]")));
-        assertTrue("expected 42", Integer.valueOf(42).equals(JsonPath.read(doc, "$.myArray[4]")));
-        assertTrue("expected -23.45e7", Double.valueOf(-23.45e7).equals(JsonPath.read(doc, "$.myArray[5]")));
+        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/myArray/0")));
+        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/myArray/1")));
+        assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/myArray/2")));
+        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/myArray/3")));
+        assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/myArray/4")));
+        assertTrue("expected -23.45e7", Double.valueOf(-23.45e7).equals(jsonObject.query("/myArray/5")));
     }
 
     /**
@@ -413,12 +413,12 @@ public class JSONObjectTest {
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
         assertTrue("expected 6 myArray items", ((List<?>)(JsonPath.read(doc, "$.myArray"))).size() == 6);
-        assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc, "$.myArray[0]")));
-        assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc, "$.myArray[1]")));
-        assertTrue("expected hello world!", "hello world!".equals(JsonPath.read(doc, "$.myArray[2]")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(JsonPath.read(doc,"$.myArray[3]")));
-        assertTrue("expected 42", Integer.valueOf(42).equals(JsonPath.read(doc, "$.myArray[4]")));
-        assertTrue("expected -23.45e7", Double.valueOf(-23.45e7).equals(JsonPath.read(doc, "$.myArray[5]")));
+        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/myArray/0")));
+        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/myArray/1/")));
+        assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/myArray/2")));
+        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/myArray/3")));
+        assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/myArray/4")));
+        assertTrue("expected -23.45e7", Double.valueOf(-23.45e7).equals(jsonObject.query("/myArray/5")));
     }
 
     /**
@@ -1146,11 +1146,11 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$.keyInt")));
-        assertTrue("expected 9999999993", Long.valueOf(9999999993L).equals(JsonPath.read(doc, "$.keyLong")));
-        assertTrue("expected 3.1", Double.valueOf(3.1).equals(JsonPath.read(doc, "$.keyDouble")));
-        assertTrue("expected 123456789123456789123456789123456781", new BigInteger("123456789123456789123456789123456781").equals(JsonPath.read(doc, "$.keyBigInt")));
-        assertTrue("expected 123456789123456789123456789123456781.1", new BigDecimal("123456789123456789123456789123456781.1").equals(JsonPath.read(doc, "$.keyBigDec")));
+        assertTrue("expected 3", Integer.valueOf(3).equals(jsonObject.query("/keyInt")));
+        assertTrue("expected 9999999993", Long.valueOf(9999999993L).equals(jsonObject.query("/keyLong")));
+        assertTrue("expected 3.1", Double.valueOf(3.1).equals(jsonObject.query("/keyDouble")));
+        assertTrue("expected 123456789123456789123456789123456781", new BigInteger("123456789123456789123456789123456781").equals(jsonObject.query("/keyBigInt")));
+        assertTrue("expected 123456789123456789123456789123456781.1", new BigDecimal("123456789123456789123456789123456781.1").equals(jsonObject.query("/keyBigDec")));
 
         /**
          * Should work the same way on any platform! @see https://docs.oracle
@@ -1175,7 +1175,7 @@ public class JSONObjectTest {
          * missing bits would not fit into the 32 bit float, i.e. the
          * information needed simply is not there!
          */
-        assertTrue("expected 3.0999999046325684", Double.valueOf(3.0999999046325684).equals(JsonPath.read(doc, "$.keyFloat")));
+        assertTrue("expected 3.0999999046325684", Double.valueOf(3.0999999046325684).equals(jsonObject.query("/keyFloat")));
 
         /**
          * float f = 3.1f; double df = (double) f; double d = 3.1d;
@@ -1285,17 +1285,17 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 4 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 4);
-        assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc, "$.trueKey")));
-        assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc, "$.falseKey")));
+        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
+        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
         assertTrue("expected 3 arrayKey items", ((List<?>)(JsonPath.read(doc, "$.arrayKey"))).size() == 3);
-        assertTrue("expected 0", Integer.valueOf(0).equals(JsonPath.read(doc, "$.arrayKey[0]")));
-        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc, "$.arrayKey[1]")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$.arrayKey[2]")));
+        assertTrue("expected 0", Integer.valueOf(0).equals(jsonObject.query("/arrayKey/0")));
+        assertTrue("expected 1", Integer.valueOf(1).equals(jsonObject.query("/arrayKey/1")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(jsonObject.query("/arrayKey/2")));
         assertTrue("expected 4 objectKey items", ((Map<?,?>)(JsonPath.read(doc, "$.objectKey"))).size() == 4);
-        assertTrue("expected myVal1", "myVal1".equals(JsonPath.read(doc, "$.objectKey.myKey1")));
-        assertTrue("expected myVal2", "myVal2".equals(JsonPath.read(doc, "$.objectKey.myKey2")));
-        assertTrue("expected myVal3", "myVal3".equals(JsonPath.read(doc, "$.objectKey.myKey3")));
-        assertTrue("expected myVal4", "myVal4".equals(JsonPath.read(doc, "$.objectKey.myKey4")));
+        assertTrue("expected myVal1", "myVal1".equals(jsonObject.query("/objectKey/myKey1")));
+        assertTrue("expected myVal2", "myVal2".equals(jsonObject.query("/objectKey/myKey2")));
+        assertTrue("expected myVal3", "myVal3".equals(jsonObject.query("/objectKey/myKey3")));
+        assertTrue("expected myVal4", "myVal4".equals(jsonObject.query("/objectKey/myKey4")));
 
         jsonObject.remove("trueKey");
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
@@ -1348,17 +1348,17 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 4 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 4);
-        assertTrue("expected true", Boolean.TRUE.equals(JsonPath.read(doc, "$.trueKey")));
-        assertTrue("expected false", Boolean.FALSE.equals(JsonPath.read(doc, "$.falseKey")));
+        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
+        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
         assertTrue("expected 3 arrayKey items", ((List<?>)(JsonPath.read(doc, "$.arrayKey"))).size() == 3);
-        assertTrue("expected 0", Integer.valueOf(0).equals(JsonPath.read(doc, "$.arrayKey[0]")));
-        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc, "$.arrayKey[1]")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$.arrayKey[2]")));
+        assertTrue("expected 0", Integer.valueOf(0).equals(jsonObject.query("/arrayKey/0")));
+        assertTrue("expected 1", Integer.valueOf(1).equals(jsonObject.query("/arrayKey/1")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(jsonObject.query("/arrayKey/2")));
         assertTrue("expected 4 objectKey items", ((Map<?,?>)(JsonPath.read(doc, "$.objectKey"))).size() == 4);
-        assertTrue("expected myVal1", "myVal1".equals(JsonPath.read(doc, "$.objectKey.myKey1")));
-        assertTrue("expected myVal2", "myVal2".equals(JsonPath.read(doc, "$.objectKey.myKey2")));
-        assertTrue("expected myVal3", "myVal3".equals(JsonPath.read(doc, "$.objectKey.myKey3")));
-        assertTrue("expected myVal4", "myVal4".equals(JsonPath.read(doc, "$.objectKey.myKey4")));
+        assertTrue("expected myVal1", "myVal1".equals(jsonObject.query("/objectKey/myKey1")));
+        assertTrue("expected myVal2", "myVal2".equals(jsonObject.query("/objectKey/myKey2")));
+        assertTrue("expected myVal3", "myVal3".equals(jsonObject.query("/objectKey/myKey3")));
+        assertTrue("expected myVal4", "myVal4".equals(jsonObject.query("/objectKey/myKey4")));
     }
 
     /**
@@ -1379,7 +1379,7 @@ public class JSONObjectTest {
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
         assertTrue("expected 1 key item", ((Map<?,?>)(JsonPath.read(doc, "$.key"))).size() == 1);
-        assertTrue("expected def", "def".equals(JsonPath.read(doc, "$.key.abc")));
+        assertTrue("expected def", "def".equals(jsonObject.query("/key/abc")));
     }
 
     /**
@@ -1401,7 +1401,7 @@ public class JSONObjectTest {
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
         assertTrue("expected 1 key item", ((List<?>)(JsonPath.read(doc, "$.key"))).size() == 1);
-        assertTrue("expected abc", "abc".equals(JsonPath.read(doc, "$.key[0]")));
+        assertTrue("expected abc", "abc".equals(jsonObject.query("/key/0")));
     }
 
     /**
@@ -1517,9 +1517,9 @@ public class JSONObjectTest {
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
         assertTrue("expected 3 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc, "$[0]")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$[1]")));
-        assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$[2]")));
+        assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/0")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/1")));
+        assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
 
         // wrap Array returns JSONArray
         Integer[] array = { new Integer(1), new Integer(2), new Integer(3) };
@@ -1528,16 +1528,16 @@ public class JSONObjectTest {
         // validate JSON
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
         assertTrue("expected 3 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc, "$[0]")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$[1]")));
-        assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$[2]")));
+        assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/0")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/1")));
+        assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
 
         // validate JSON
         doc = Configuration.defaultConfiguration().jsonProvider().parse(integerArrayJsonArray.toString());
         assertTrue("expected 3 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected 1", Integer.valueOf(1).equals(JsonPath.read(doc, "$[0]")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$[1]")));
-        assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$[2]")));
+        assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/0")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/1")));
+        assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
 
         // wrap map returns JSONObject
         Map<String, String> map = new HashMap<String, String>();
@@ -1549,9 +1549,9 @@ public class JSONObjectTest {
         // validate JSON
         doc = Configuration.defaultConfiguration().jsonProvider().parse(mapJsonObject.toString());
         assertTrue("expected 3 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected val1", "val1".equals(JsonPath.read(doc, "$.key1")));
-        assertTrue("expected val2", "val2".equals(JsonPath.read(doc, "$.key2")));
-        assertTrue("expected val3", "val3".equals(JsonPath.read(doc, "$.key3")));
+        assertTrue("expected val1", "val1".equals(mapJsonObject.query("/key1")));
+        assertTrue("expected val2", "val2".equals(mapJsonObject.query("/key2")));
+        assertTrue("expected val3", "val3".equals(mapJsonObject.query("/key3")));
     }
 
     /**
