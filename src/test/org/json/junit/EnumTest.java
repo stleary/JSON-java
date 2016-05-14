@@ -36,8 +36,8 @@ public class EnumTest {
         Object doc = Configuration.defaultConfiguration().jsonProvider()
                 .parse(jsonObject.toString());
         assertTrue("expecting 2 items in top level object", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expecting val 2", "val 2".equals(JsonPath.read(doc, "$.value")));
-        assertTrue("expecting 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$.intVal")));
+        assertTrue("expecting val 2", "val 2".equals(jsonObject.query("/value")));
+        assertTrue("expecting 2", Integer.valueOf(2).equals(jsonObject.query("/intVal")));
 
         /**
          * class which contains enum instances. Each enum should be stored
@@ -53,8 +53,8 @@ public class EnumTest {
         assertTrue("expecting 2 items in top level object", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
         assertTrue("expecting 2 items in myEnumField object", ((Map<?,?>)(JsonPath.read(doc, "$.myEnumField"))).size() == 2);
         assertTrue("expecting 0 items in myEnum object", ((Map<?,?>)(JsonPath.read(doc, "$.myEnum"))).size() == 0);
-        assertTrue("expecting 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$.myEnumField.intVal")));
-        assertTrue("expecting val 3", "val 3".equals(JsonPath.read(doc, "$.myEnumField.value")));
+        assertTrue("expecting 3", Integer.valueOf(3).equals(jsonObject.query("/myEnumField/intVal")));
+        assertTrue("expecting val 3", "val 3".equals(jsonObject.query("/myEnumField/value")));
     }
 
     /**
@@ -74,9 +74,9 @@ public class EnumTest {
         // validate JSON object
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 3 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected VAL1", "VAL1".equals(JsonPath.read(doc, "$.VAL1")));
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$.VAL2")));
-        assertTrue("expected VAL3", "VAL3".equals(JsonPath.read(doc, "$.VAL3")));
+        assertTrue("expected VAL1", MyEnum.VAL1.equals(jsonObject.query("/VAL1")));
+        assertTrue("expected VAL2", MyEnum.VAL2.equals(jsonObject.query("/VAL2")));
+        assertTrue("expected VAL3", MyEnum.VAL3.equals(jsonObject.query("/VAL3")));
 
         MyEnumField myEnumField = MyEnumField.VAL3;
         names = JSONObject.getNames(myEnumField);
@@ -84,9 +84,9 @@ public class EnumTest {
         jsonObject = new JSONObject(myEnumField, names);
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 3 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected VAL1", "VAL1".equals(JsonPath.read(doc, "$.VAL1")));
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$.VAL2")));
-        assertTrue("expected VAL3", "VAL3".equals(JsonPath.read(doc, "$.VAL3")));
+        assertTrue("expected VAL1", MyEnumField.VAL1.equals(jsonObject.query("/VAL1")));
+        assertTrue("expected VAL2", MyEnumField.VAL2.equals(jsonObject.query("/VAL2")));
+        assertTrue("expected VAL3", myEnumField.VAL3.equals(jsonObject.query("/VAL3")));
 
     }
 
@@ -105,8 +105,8 @@ public class EnumTest {
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level objects", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$.myEnum")));
-        assertTrue("expected VAL1", "VAL1".equals(JsonPath.read(doc, "$.myEnumField")));
+        assertTrue("expected VAL2", MyEnum.VAL2.equals(jsonObject.query("/myEnum")));
+        assertTrue("expected VAL1", MyEnumField.VAL1.equals(jsonObject.query("/myEnumField")));
         
         JSONArray jsonArray = new JSONArray();
         jsonArray.put(myEnum);
@@ -115,8 +115,8 @@ public class EnumTest {
         // validate JSON content
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
         assertTrue("expected 2 top level objects", ((List<?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$[0]")));
-        assertTrue("expected VAL1", "VAL1".equals(JsonPath.read(doc, "$[1]")));
+        assertTrue("expected VAL2", MyEnum.VAL2.equals(jsonArray.query("/0")));
+        assertTrue("expected VAL1", MyEnumField.VAL1.equals(jsonArray.query("/1")));
 
         /**
          * Leaving these tests because they exercise get, opt, and remove
@@ -174,8 +174,8 @@ public class EnumTest {
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected val 2", "val 2".equals(JsonPath.read(doc, "$.value")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$.intVal")));
+        assertTrue("expected val 2", "val 2".equals(jsonObject.query("/value")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(jsonObject.query("/intVal")));
 
         MyEnumClass myEnumClass = new MyEnumClass();
         myEnumClass.setMyEnum(MyEnum.VAL1);
@@ -187,8 +187,8 @@ public class EnumTest {
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
         assertTrue("expected 2 myEnumField items", ((Map<?,?>)(JsonPath.read(doc, "$.myEnumField"))).size() == 2);
         assertTrue("expected 0 myEnum items", ((Map<?,?>)(JsonPath.read(doc, "$.myEnum"))).size() == 0);
-        assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$.myEnumField.intVal")));
-        assertTrue("expected val 3", "val 3".equals(JsonPath.read(doc, "$.myEnumField.value")));
+        assertTrue("expected 3", Integer.valueOf(3).equals(jsonObject.query("/myEnumField/intVal")));
+        assertTrue("expected val 3", "val 3".equals(jsonObject.query("/myEnumField/value")));
 
         String [] names = JSONObject.getNames(myEnum);
         jsonObject = new JSONObject(myEnum, names);
@@ -196,9 +196,9 @@ public class EnumTest {
         // validate JSON content
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 3 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected VAL1", "VAL1".equals(JsonPath.read(doc, "$.VAL1")));
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$.VAL2")));
-        assertTrue("expected VAL3", "VAL3".equals(JsonPath.read(doc, "$.VAL3")));
+        assertTrue("expected VAL1", MyEnum.VAL1.equals(jsonObject.query("/VAL1")));
+        assertTrue("expected VAL2", MyEnum.VAL2.equals(jsonObject.query("/VAL2")));
+        assertTrue("expected VAL3", MyEnum.VAL3.equals(jsonObject.query("/VAL3")));
         
         names = JSONObject.getNames(myEnumField);
         jsonObject = new JSONObject(myEnumField, names);
@@ -206,9 +206,9 @@ public class EnumTest {
         // validate JSON content
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 3 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected VAL1", "VAL1".equals(JsonPath.read(doc, "$.VAL1")));
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$.VAL2")));
-        assertTrue("expected VAL3", "VAL3".equals(JsonPath.read(doc, "$.VAL3")));
+        assertTrue("expected VAL1", MyEnumField.VAL1.equals(jsonObject.query("/VAL1")));
+        assertTrue("expected VAL2", MyEnumField.VAL2.equals(jsonObject.query("/VAL2")));
+        assertTrue("expected VAL3", MyEnumField.VAL3.equals(jsonObject.query("/VAL3")));
 
         expectedStr = "{\"myEnum\":\"VAL2\", \"myEnumField\":\"VAL2\"}";
         jsonObject = new JSONObject();
@@ -218,8 +218,8 @@ public class EnumTest {
         // validate JSON content
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$.myEnum")));
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$.myEnumField")));
+        assertTrue("expected VAL2", MyEnum.VAL2.equals(jsonObject.query("/myEnum")));
+        assertTrue("expected VAL2", MyEnumField.VAL2.equals(jsonObject.query("/myEnumField")));
 
         JSONArray jsonArray = new JSONArray();
         jsonArray.put(myEnum);
@@ -228,8 +228,8 @@ public class EnumTest {
         // validate JSON content
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
         assertTrue("expected 2 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$[0]")));
-        assertTrue("expected VAL2", "VAL2".equals(JsonPath.read(doc, "$[1]")));
+        assertTrue("expected VAL2", MyEnum.VAL2.equals(jsonArray.query("/0")));
+        assertTrue("expected VAL2", MyEnumField.VAL2.equals(jsonArray.query("/1")));
     }
 
     /**
@@ -248,8 +248,8 @@ public class EnumTest {
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected val 2", "val 2".equals(JsonPath.read(doc, "$.value")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(JsonPath.read(doc, "$.intVal")));
+        assertTrue("expected val 2", "val 2".equals(jsonObject.query("/value")));
+        assertTrue("expected 2", Integer.valueOf(2).equals(jsonObject.query("/intVal")));
 
         MyEnumClass myEnumClass = new MyEnumClass();
         myEnumClass.setMyEnum(MyEnum.VAL1);
@@ -261,8 +261,8 @@ public class EnumTest {
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
         assertTrue("expected 2 myEnumField items", ((Map<?,?>)(JsonPath.read(doc, "$.myEnumField"))).size() == 2);
         assertTrue("expected 0 myEnum items", ((Map<?,?>)(JsonPath.read(doc, "$.myEnum"))).size() == 0);
-        assertTrue("expected 3", Integer.valueOf(3).equals(JsonPath.read(doc, "$.myEnumField.intVal")));
-        assertTrue("expected val 3", "val 3".equals(JsonPath.read(doc, "$.myEnumField.value")));
+        assertTrue("expected 3", Integer.valueOf(3).equals(jsonObject.query("/myEnumField/intVal")));
+        assertTrue("expected val 3", "val 3".equals(jsonObject.query("/myEnumField/value")));
 
     }
 
