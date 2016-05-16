@@ -1,15 +1,24 @@
 package org.json.junit;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONPointerException;
 import org.junit.Test;
 
-import com.jayway.jsonpath.*;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
 
 
 /**
@@ -685,5 +694,20 @@ public class JSONArrayTest {
         assertTrue("Array value string long",
                 new Long(-1).equals(Long.parseLong((String) it.next())));
         assertTrue("should be at end of array", !it.hasNext());
+    }
+    
+    @Test(expected = JSONPointerException.class)
+    public void queryWithNoResult() {
+        new JSONArray().query("/a/b");
+    }
+    
+    @Test
+    public void optQueryWithNoResult() {
+        assertNull(new JSONArray().optQuery("/a/b"));
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void optQueryWithSyntaxError() {
+        new JSONArray().optQuery("invalid");
     }
 }

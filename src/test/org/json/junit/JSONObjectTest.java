@@ -1,6 +1,7 @@
 package org.json.junit;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -10,16 +11,25 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONPointerException;
 import org.json.XML;
 import org.junit.Test;
 
-import com.jayway.jsonpath.*;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
 
 /**
  * JSONObject, along with JSONArray, are the central classes of the reference app.
@@ -1898,5 +1908,20 @@ public class JSONObjectTest {
                 "<key>null</key>".equals(sJONull));
         String sNull = XML.toString(jsonObjectNull);
         assertTrue("null should emit an empty string", "".equals(sNull));
+    }
+    
+    @Test(expected = JSONPointerException.class)
+    public void queryWithNoResult() {
+        new JSONObject().query("/a/b");
+    }
+    
+    @Test
+    public void optQueryWithNoResult() {
+        assertNull(new JSONObject().optQuery("/a/b"));
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void optQueryWithSyntaxError() {
+        new JSONObject().optQuery("invalid");
     }
 }
