@@ -1341,6 +1341,23 @@ public class JSONObject {
     public Object query(String jsonPointer) {
         return new JSONPointer(jsonPointer).queryFrom(this);
     }
+    
+    /**
+     * Queries and returns a value from this object using {@code jsonPointer}, or
+     * returns null if the query fails due to a missing key.
+     * 
+     * @param jsonPointer the string representation of the JSON pointer
+     * @return the queried value or {@code null}
+     * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
+     */
+    public Object optQuery(String jsonPointer) {
+        JSONPointer pointer = new JSONPointer(jsonPointer);
+        try {
+            return pointer.queryFrom(this);
+        } catch (JSONPointerException e) {
+            return null;
+        }
+    }
 
     /**
      * Produce a string in double quotes with backslash sequences in all the
