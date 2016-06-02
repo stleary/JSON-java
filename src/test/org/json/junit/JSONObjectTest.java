@@ -1924,4 +1924,10 @@ public class JSONObjectTest {
     public void optQueryWithSyntaxError() {
         new JSONObject().optQuery("invalid");
     }
+
+    @Test(expected = JSONException.class)
+    public void invalidEscapeSequence() {
+      String json = "{ \"\\url\": \"value\" }";
+      new JSONObject(json);
+    }
 }
