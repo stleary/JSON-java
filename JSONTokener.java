@@ -281,7 +281,7 @@ public class JSONTokener {
                     try {
                         sb.append((char)Integer.parseInt(this.next(4), 16));
                     } catch (NumberFormatException e) {
-                        throw this.syntaxError("Illegal escape.");
+                        throw this.syntaxError("Illegal escape.", e);
                     }
                     break;
                 case '"':
@@ -437,6 +437,16 @@ public class JSONTokener {
         return new JSONException(message + this.toString());
     }
 
+    /**
+     * Make a JSONException to signal a syntax error.
+     *
+     * @param message The error message.
+     * @param causedBy The throwable that caused the error.
+     * @return  A JSONException object, suitable for throwing
+     */
+    public JSONException syntaxError(String message, Throwable causedBy) {
+        return new JSONException(message + this.toString(), causedBy);
+    }
 
     /**
      * Make a printable string of this JSONTokener.
