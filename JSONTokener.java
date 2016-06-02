@@ -278,7 +278,11 @@ public class JSONTokener {
                     sb.append('\r');
                     break;
                 case 'u':
-                    sb.append((char)Integer.parseInt(this.next(4), 16));
+                    try {
+                        sb.append((char)Integer.parseInt(this.next(4), 16));
+                    } catch (NumberFormatException e) {
+                        throw this.syntaxError("Illegal escape.");
+                    }
                     break;
                 case '"':
                 case '\'':
