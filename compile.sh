@@ -1,3 +1,3 @@
 #!/bin/bash
-javac -d . -cp . *.java zip/*.java
+javac -d . -cp . *.java
 jar cvf json.jar org

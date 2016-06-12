@@ -171,7 +171,7 @@ public class JSONArray implements Iterable<Object> {
     public JSONArray(Object array) throws JSONException {
         this();
         if (array instanceof Collection) {
-            for (Object o: (Collection)array)){
+            for (Object o: ((Collection)array)){
                 this.put(JSONObject.wrap(o));
             }
         } else if (array.getClass().isArray()) {
