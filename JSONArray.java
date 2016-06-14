@@ -26,7 +26,6 @@ package org.json;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -250,7 +249,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
     * Get the enum value associated with an index.
-    * 
+    *
     * @param clazz
     *            The type of enum to retrieve.
     * @param index
@@ -559,7 +558,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Get the enum value associated with a key.
-     * 
+     *
      * @param clazz
      *            The type of enum to retrieve.
      * @param index
@@ -572,7 +571,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Get the enum value associated with a key.
-     * 
+     *
      * @param clazz
      *            The type of enum to retrieve.
      * @param index
@@ -604,8 +603,8 @@ public class JSONArray implements Iterable<Object> {
 
 
     /**
-     * Get the optional BigInteger value associated with an index. The 
-     * defaultValue is returned if there is no value for the index, or if the 
+     * Get the optional BigInteger value associated with an index. The
+     * defaultValue is returned if there is no value for the index, or if the
      * value is not a number and cannot be converted to a number.
      *
      * @param index
@@ -623,8 +622,8 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the optional BigDecimal value associated with an index. The 
-     * defaultValue is returned if there is no value for the index, or if the 
+     * Get the optional BigDecimal value associated with an index. The
+     * defaultValue is returned if there is no value for the index, or if the
      * value is not a number and cannot be converted to a number.
      *
      * @param index
@@ -959,9 +958,9 @@ public class JSONArray implements Iterable<Object> {
         }
         return this;
     }
-    
+
     /**
-     * Creates a JSONPointer using an intialization string and tries to 
+     * Creates a JSONPointer using an intialization string and tries to
      * match it to an item within this JSONArray. For example, given a
      * JSONArray initialized with this document:
      * <pre>
@@ -969,7 +968,7 @@ public class JSONArray implements Iterable<Object> {
      *     {"b":"c"}
      * ]
      * </pre>
-     * and this JSONPointer string: 
+     * and this JSONPointer string:
      * <pre>
      * "/0/b"
      * </pre>
@@ -982,11 +981,11 @@ public class JSONArray implements Iterable<Object> {
     public Object query(String jsonPointer) {
         return new JSONPointer(jsonPointer).queryFrom(this);
     }
-    
+
     /**
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
-     * 
+     *
      * @param jsonPointer the string representation of the JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
@@ -1117,7 +1116,7 @@ public class JSONArray implements Iterable<Object> {
      * @return The writer.
      * @throws JSONException
      */
-    public Writer write(Writer writer) throws JSONException {
+    public <T extends Appendable> T write(T writer) throws JSONException {
         return this.write(writer, 0, 0);
     }
 
@@ -1136,12 +1135,12 @@ public class JSONArray implements Iterable<Object> {
      * @return The writer.
      * @throws JSONException
      */
-    public Writer write(Writer writer, int indentFactor, int indent)
+    public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {
         try {
             boolean commanate = false;
             int length = this.length();
-            writer.write('[');
+            writer.append('[');
 
             if (length == 1) {
                 JSONObject.writeValue(writer, this.myArrayList.get(0),
@@ -1151,10 +1150,10 @@ public class JSONArray implements Iterable<Object> {
 
                 for (int i = 0; i < length; i += 1) {
                     if (commanate) {
-                        writer.write(',');
+                        writer.append(',');
                     }
                     if (indentFactor > 0) {
-                        writer.write('\n');
+                        writer.append('\n');
                     }
                     JSONObject.indent(writer, newindent);
                     JSONObject.writeValue(writer, this.myArrayList.get(i),
@@ -1162,11 +1161,11 @@ public class JSONArray implements Iterable<Object> {
                     commanate = true;
                 }
                 if (indentFactor > 0) {
-                    writer.write('\n');
+                    writer.append('\n');
                 }
                 JSONObject.indent(writer, indent);
             }
-            writer.write(']');
+            writer.append(']');
             return writer;
         } catch (IOException e) {
             throw new JSONException(e);

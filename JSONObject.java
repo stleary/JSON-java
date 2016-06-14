@@ -26,7 +26,6 @@ package org.json;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -475,7 +474,7 @@ public class JSONObject {
 
     /**
     * Get the enum value associated with a key.
-    * 
+    *
     * @param clazz
     *           The type of enum to retrieve.
     * @param key
@@ -530,7 +529,7 @@ public class JSONObject {
      *            A key string.
      * @return The numeric value.
      * @throws JSONException
-     *             if the key is not found or if the value cannot 
+     *             if the key is not found or if the value cannot
      *             be converted to BigInteger.
      */
     public BigInteger getBigInteger(String key) throws JSONException {
@@ -865,7 +864,7 @@ public class JSONObject {
 
     /**
      * Get the enum value associated with a key.
-     * 
+     *
      * @param clazz
      *            The type of enum to retrieve.
      * @param key
@@ -878,7 +877,7 @@ public class JSONObject {
 
     /**
      * Get the enum value associated with a key.
-     * 
+     *
      * @param clazz
      *            The type of enum to retrieve.
      * @param key
@@ -1339,7 +1338,7 @@ public class JSONObject {
     }
 
     /**
-     * Creates a JSONPointer using an intialization string and tries to 
+     * Creates a JSONPointer using an intialization string and tries to
      * match it to an item within this JSONObject. For example, given a
      * JSONObject initialized with this document:
      * <pre>
@@ -1347,24 +1346,24 @@ public class JSONObject {
      *     "a":{"b":"c"}
      * }
      * </pre>
-     * and this JSONPointer string: 
+     * and this JSONPointer string:
      * <pre>
      * "/a/b"
      * </pre>
      * Then this method will return the String "c".
      * A JSONPointerException may be thrown from code called by this method.
-     *   
+     *
      * @param jsonPointer string that can be used to create a JSONPointer
      * @return the item matched by the JSONPointer, otherwise null
      */
     public Object query(String jsonPointer) {
         return new JSONPointer(jsonPointer).queryFrom(this);
     }
-    
+
     /**
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
-     * 
+     *
      * @param jsonPointer the string representation of the JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
@@ -1388,21 +1387,19 @@ public class JSONObject {
      *            A String
      * @return A String correctly formatted for insertion in a JSON text.
      */
-    public static String quote(String string) {
-        StringWriter sw = new StringWriter();
-        synchronized (sw.getBuffer()) {
-            try {
-                return quote(string, sw).toString();
-            } catch (IOException ignored) {
-                // will never happen - we are writing to a string writer
-                return "";
-            }
+    public static String quote(CharSequence string) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            return quote(string, sb).toString();
+        } catch (IOException ignored) {
+            // will never happen - we are writing to a string builder
+            return "";
         }
     }
 
-    public static Writer quote(String string, Writer w) throws IOException {
+    public static <T extends Appendable> T quote(CharSequence string, T w) throws IOException {
         if (string == null || string.length() == 0) {
-            w.write("\"\"");
+            w.append("\"\"");
             return w;
         }
 
@@ -1412,50 +1409,50 @@ public class JSONObject {
         int i;
         int len = string.length();
 
-        w.write('"');
+        w.append('"');
         for (i = 0; i < len; i += 1) {
             b = c;
             c = string.charAt(i);
             switch (c) {
             case '\\':
             case '"':
-                w.write('\\');
-                w.write(c);
+                w.append('\\');
+                w.append(c);
                 break;
             case '/':
                 if (b == '<') {
-                    w.write('\\');
+                    w.append('\\');
                 }
-                w.write(c);
+                w.append(c);
                 break;
             case '\b':
-                w.write("\\b");
+                w.append("\\b");
                 break;
             case '\t':
-                w.write("\\t");
+                w.append("\\t");
                 break;
             case '\n':
-                w.write("\\n");
+                w.append("\\n");
                 break;
             case '\f':
-                w.write("\\f");
+                w.append("\\f");
                 break;
             case '\r':
-                w.write("\\r");
+                w.append("\\r");
                 break;
             default:
                 if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
                         || (c >= '\u2000' && c < '\u2100')) {
-                    w.write("\\u");
+                    w.append("\\u");
                     hhhh = Integer.toHexString(c);
-                    w.write("0000", 0, 4 - hhhh.length());
-                    w.write(hhhh);
+                    w.append("0000", 0, 4 - hhhh.length());
+                    w.append(hhhh);
                 } else {
-                    w.write(c);
+                    w.append(c);
                 }
             }
         }
-        w.write('"');
+        w.append('"');
         return w;
     }
 
@@ -1675,40 +1672,11 @@ public class JSONObject {
      *             If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
-        if (value == null || value.equals(null)) {
-            return "null";
+        try {
+            return writeValue(new StringBuilder(), value, 0, 0).toString();
+        } catch (IOException e) {
+            throw new JSONException(e);
         }
-        if (value instanceof JSONString) {
-            Object object;
-            try {
-                object = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            if (object instanceof String) {
-                return (String) object;
-            }
-            throw new JSONException("Bad value from toJSONString: " + object);
-        }
-        if (value instanceof Number) {
-            return numberToString((Number) value);
-        }
-        if (value instanceof Boolean || value instanceof JSONObject
-                || value instanceof JSONArray) {
-            return value.toString();
-        }
-        if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            return new JSONObject(map).toString();
-        }
-        if (value instanceof Collection) {
-            Collection<?> coll = (Collection<?>) value;
-            return new JSONArray(coll).toString();
-        }
-        if (value.getClass().isArray()) {
-            return new JSONArray(value).toString();
-        }
-        return quote(value.toString());
     }
 
     /**
@@ -1773,14 +1741,14 @@ public class JSONObject {
      * @return The writer.
      * @throws JSONException
      */
-    public Writer write(Writer writer) throws JSONException {
+    public <T extends Appendable> T write(T writer) throws JSONException {
         return this.write(writer, 0, 0);
     }
 
-    static final Writer writeValue(Writer writer, Object value,
+    static final <T extends Appendable> T writeValue(T writer, Object value,
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
-            writer.write("null");
+            writer.append("null");
         } else if (value instanceof JSONObject) {
             ((JSONObject) value).write(writer, indentFactor, indent);
         } else if (value instanceof JSONArray) {
@@ -1794,26 +1762,30 @@ public class JSONObject {
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
         } else if (value instanceof Number) {
-            writer.write(numberToString((Number) value));
+            writer.append(numberToString((Number) value));
         } else if (value instanceof Boolean) {
-            writer.write(value.toString());
+            writer.append(value.toString());
         } else if (value instanceof JSONString) {
-            Object o;
+            String o;
             try {
                 o = ((JSONString) value).toJSONString();
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
+            if (o != null) {
+                writer.append(o);
+            } else {
+                quote(value.toString(), writer);
+            }
         } else {
             quote(value.toString(), writer);
         }
         return writer;
     }
 
-    static final void indent(Writer writer, int indent) throws IOException {
+    static final <T extends Appendable> void indent(T writer, int indent) throws IOException {
         for (int i = 0; i < indent; i += 1) {
-            writer.write(' ');
+            writer.append(' ');
         }
     }
 
@@ -1832,47 +1804,47 @@ public class JSONObject {
      * @return The writer.
      * @throws JSONException
      */
-    public Writer write(Writer writer, int indentFactor, int indent)
+    public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {
         try {
             boolean commanate = false;
             final int length = this.length();
             Iterator<String> keys = this.keys();
-            writer.write('{');
+            writer.append('{');
 
             if (length == 1) {
-                Object key = keys.next();
-                writer.write(quote(key.toString()));
-                writer.write(':');
+                String key = keys.next();
+                quote(key, writer);
+                writer.append(':');
                 if (indentFactor > 0) {
-                    writer.write(' ');
+                    writer.append(' ');
                 }
                 writeValue(writer, this.map.get(key), indentFactor, indent);
             } else if (length != 0) {
                 final int newindent = indent + indentFactor;
                 while (keys.hasNext()) {
-                    Object key = keys.next();
+                    String key = keys.next();
                     if (commanate) {
-                        writer.write(',');
+                        writer.append(',');
                     }
                     if (indentFactor > 0) {
-                        writer.write('\n');
+                        writer.append('\n');
                     }
                     indent(writer, newindent);
-                    writer.write(quote(key.toString()));
-                    writer.write(':');
+                    quote(key, writer);
+                    writer.append(':');
                     if (indentFactor > 0) {
-                        writer.write(' ');
+                        writer.append(' ');
                     }
                     writeValue(writer, this.map.get(key), indentFactor, newindent);
                     commanate = true;
                 }
                 if (indentFactor > 0) {
-                    writer.write('\n');
+                    writer.append('\n');
                 }
                 indent(writer, indent);
             }
-            writer.write('}');
+            writer.append('}');
             return writer;
         } catch (IOException exception) {
             throw new JSONException(exception);
