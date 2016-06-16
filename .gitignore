@@ -3,3 +3,9 @@ build
 .classpath
 .project
 .settings/
+/.gradle/
+/gradle/
+/gradlew
+/gradlew.bat
+.gitmodules
+src/main/
