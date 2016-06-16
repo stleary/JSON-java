@@ -1,26 +1,48 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
-
-jar.baseName = 'JSON-java'
+apply plugin: 'jacoco'
 
 sourceSets {
- test {
-  java {
-   srcDir 'src/test'
+  // Uncomment main if you have merged JSON-Java and JSON-Java-unit-test code
+  main {
+    java {
+      srcDir 'src'
+      exclude 'test/' 
+    }
   }
- }
+  test {
+    java {
+      srcDir 'src/test'
+      exclude 'resources/'
+    }
+    resources {
+       srcDir 'resources'
+    }
+  }
 }
 
 repositories {
- mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.+'
-    testCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.1.0'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
-    // Use this line if you are testing a JSON-Java release. 
-    // Otherwise add an external jar from your local repository in Eclipse
-    // (The gradle build won't work unless you add a main sourceSets entry and a jar.baseName entry
-    // testCompile group: 'org.json', name: 'json', version: '20151123'
+  testCompile group: 'junit', name: 'junit', version: '4.+'
+  testCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.1.0'
+  testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+  // Uncomment if you are testing against a JSON-Java release
+  // testCompile 'org.json:json:20160212'
+  // Uncomment if you have copied a local JSON-Java jar file into this project
+  // testCompile files('./JSON-Java.jar')
 }
+
+test { finalizedBy jacocoTestReport }
+jacocoTestReport{
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/reports/jacoco/html"
+    }
+    executionData = files('build/jacoco/test.exec')
+}
+
