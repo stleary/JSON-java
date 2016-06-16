@@ -80,6 +80,14 @@ in the form of get(), opt(), and put() API methods.
 Although 1.6 compatibility is currently supported, it is not a project goal and may be
 removed in some future release.
 
+In compliance with RFC7169 page 10 section 9, the parser is more lax with what is valid
+JSON than the Generator. For Example, the tab character (U+0009) is allowed when reading
+JSON Text strings, but when output by the Generator, tab is properly converted to \t in
+the string. Other instances may occur where reading invalid JSON text does not cause an
+error to be generated. Malformed JSON Texts such as missing end " (quote) on strings or
+invalid number formats (1.2e6.3) will cause errors as such documents can not be read
+ reliably.
+
 Release history:
 
 20160212    Java 1.6 compatibility, OSGi bundle. Contains the latest code as of 12 Feb, 2016.
