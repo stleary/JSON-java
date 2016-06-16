@@ -15,7 +15,7 @@ The license includes this restriction: "The software shall be used for good,
 not evil." If your conscience cannot live with that, then choose a different
 package.
 
-The package compiles on Java 1.8.
+The package compiles on Java 1.6-1.8.
 
 
 JSONObject.java: The JSONObject can parse text from a String or a JSONTokener
@@ -32,6 +32,10 @@ tokens. It can be constructed from a String, Reader, or InputStream.
 JSONException.java: The JSONException is the standard exception type thrown
 by this package.
 
+JSONPointer.java: Implementation of 
+[JSON Pointer (RFC 6901)](https://tools.ietf.org/html/rfc6901). Supports
+JSON Pointers both in the form of string representation and URI fragment
+representation.
 
 JSONString.java: The JSONString interface requires a toJSONString method,
 allowing an object to provide its own serialization.
@@ -73,7 +77,12 @@ This package fully supports Integer, Long, and Double Java types. Partial suppor
 for BigInteger and BigDecimal values in JSONObject and JSONArray objects is provided 
 in the form of get(), opt(), and put() API methods.
 
+Although 1.6 compatibility is currently supported, it is not a project goal and may be
+removed in some future release.
+
 Release history:
+
+20160212    Java 1.6 compatibility, OSGi bundle. Contains the latest code as of 12 Feb, 2016.
 
 20151123    JSONObject and JSONArray initialization with generics. Contains the
 latest code as of 23 Nov, 2015.
