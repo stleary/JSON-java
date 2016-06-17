@@ -29,15 +29,22 @@ git clone https://github.com/stleary/JSON-Java-unit-test.git .
 \# Create a directory structure for the JSON-Java code
 ````
 # Windows version
-md /s src\org\json
+md /s src\main\java\org\json
+# *nix version
+mkdir -p src/main/java/org/json
 ````
 \# clone JSON-Java 
 ````
-git clone https://github.com/stleary/JSON-Java.git src\org\json
+#Windows version
+git clone https://github.com/stleary/JSON-Java.git src\main\java\org\json
+
+#*Nix version
+git clone https://github.com/stleary/JSON-Java.git src/main/java/org/json
 ````
 \# Build, then execute the unit tests and code coverage
 ````
 gradle clean build test jacocoTestReport
+
 ````
 Unit test results will be in build\reports\tests\index.html<br>
 Code coverage will be in build\reports\jacoco\html\index.html
