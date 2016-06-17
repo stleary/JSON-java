@@ -4,21 +4,8 @@ apply plugin: 'jacoco'
 
 sourceSets {
   // Uncomment main if you have merged JSON-Java and JSON-Java-unit-test code
-  main {
-    java {
-      srcDir 'src'
-      exclude 'test/' 
-    }
-  }
-  test {
-    java {
-      srcDir 'src/test'
-      exclude 'resources/'
-    }
-    resources {
-       srcDir 'resources'
-    }
-  }
+  main
+  test
 }
 
 repositories {

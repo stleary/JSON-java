@@ -1564,6 +1564,26 @@ public class JSONObjectTest {
         assertTrue("expected val3", "val3".equals(mapJsonObject.query("/key3")));
     }
 
+    
+    /**
+     * RFC 7159 defines control characters to be U+0000 through U+001F. This test verifies that the parser is checking for these in expected ways.
+     */
+    @Test
+    public void jsonObjectParseControlCharacters(){
+        for(int i = 0;i<=0x001f;i++){
+            final String charString = String.valueOf((char)i);
+            final String source = "{\"key\":\""+charString+"\"}";
+            try {
+                JSONObject jo = new JSONObject(source);
+                assertTrue("Expected "+charString+"("+i+") in the JSON Object but did not find it.",charString.equals(jo.getString("key")));
+            } catch (JSONException ex) {
+                assertTrue("Only \\0 (U+0000), \\n (U+000A), and \\r (U+000D) should cause an error. Instead "+charString+"("+i+") caused an error",
+                        i=='\0' || i=='\n' || i=='\r'
+                );
+            }
+        }
+    }
+
     /**
      * Explore how JSONObject handles parsing errors.
      */
