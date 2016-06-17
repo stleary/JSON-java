@@ -80,7 +80,7 @@ in the form of get(), opt(), and put() API methods.
 Although 1.6 compatibility is currently supported, it is not a project goal and may be
 removed in some future release.
 
-In compliance with RFC7169 page 10 section 9, the parser is more lax with what is valid
+In compliance with RFC7159 page 10 section 9, the parser is more lax with what is valid
 JSON than the Generator. For Example, the tab character (U+0009) is allowed when reading
 JSON Text strings, but when output by the Generator, tab is properly converted to \t in
 the string. Other instances may occur where reading invalid JSON text does not cause an
