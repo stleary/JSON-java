@@ -62,7 +62,7 @@ When adding a new unit test, don't forget to update <b>JunitTestSuite.java</b>.
 
 <b>The fundamental issues with JSON-Java testing are:</b><br>
 * <b>JSONObjects</b> are unordered, making simple string comparison ineffective. 
-* Comparisons via **equals()** is not currently supported. Neither <b>JSONArray</b> nor <b>JSONObject</b> overrride <b>hashCode()</b> or <b>equals()</b>, so comparison defaults to the <b>Object</b> equals(), which is not useful.
+* Comparisons via **equals()** is not currently supported. Neither <b>JSONArray</b> nor <b>JSONObject</b> override <b>hashCode()</b> or <b>equals()</b>, so comparison defaults to the <b>Object</b> equals(), which is not useful.
 * Access to the <b>JSONArray</b> and <b>JSONObject</b> internal containers for comparison is not currently available.
 
 <b>General issues with unit testing are:</b><br>
