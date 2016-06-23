@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<project name="JSON-java" default="dist" basedir=".">
+   <property name="jar" value="JSON-java.jar"/>
+
+   <target name="build">
+      <javac srcdir="." destdir="." includes="*.java" deprecation="yes" includeantruntime="false">
+         <compilerarg value="-Xlint:unchecked"/>
+      </javac>
+   </target>
+
+   <target name="dist" depends="build">
+      <jar destfile="${jar}">
+         <fileset dir="." includes="**/*.class"/>
+      </jar>
+   </target>
+</project>
+
