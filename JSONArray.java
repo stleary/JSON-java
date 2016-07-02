@@ -434,7 +434,7 @@ public class JSONArray implements Iterable<Object> {
             if (i > 0) {
                 sb.append(separator);
             }
-            sb.append(JSONObject.valueToString(this.myArrayList.get(i)));
+            JSONObject.writeValue(sb, this.myArrayList.get(i));
         }
         return sb.toString();
     }

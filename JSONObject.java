@@ -1672,11 +1672,7 @@ public class JSONObject {
      *             If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
-        try {
-            return writeValue(new StringBuilder(), value, 0, 0).toString();
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
+        return writeValue(new StringBuilder(), value).toString();
     }
 
     /**
@@ -1743,6 +1739,15 @@ public class JSONObject {
      */
     public <T extends Appendable> T write(T writer) throws JSONException {
         return this.write(writer, 0, 0);
+    }
+
+    static <T extends Appendable> T writeValue(T writer, Object value)
+            throws JSONException {
+        try {
+            return writeValue(writer, value, 0 ,0);
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
     }
 
     static final <T extends Appendable> T writeValue(T writer, Object value,
