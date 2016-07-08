@@ -3,6 +3,8 @@ package org.json.junit;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -414,6 +416,20 @@ public class JSONArrayTest {
         assertTrue("Array opt string default implicit",
                 "".equals(jsonArray.optString(-1)));
     }
+    
+    /**
+     * Verifies that the opt methods properly convert string values.
+     */
+    @Test
+    public void optStringConversion(){
+        JSONArray ja = new JSONArray("[\"123\",\"true\",\"false\"]");
+        assertTrue("unexpected optBoolean value",ja.optBoolean(1,false)==true);
+        assertTrue("unexpected optBoolean value",ja.optBoolean(2,true)==false);
+        assertTrue("unexpected optInt value",ja.optInt(0,0)==123);
+        assertTrue("unexpected optLong value",ja.optLong(0,0)==123);
+        assertTrue("unexpected optDouble value",ja.optDouble(0,0.0)==123.0);
+        assertTrue("unexpected optBigInteger value",ja.optBigInteger(0,BigInteger.ZERO).compareTo(new BigInteger("123"))==0);
+        assertTrue("unexpected optBigDecimal value",ja.optBigDecimal(0,BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);    }
 
     /**
      * Exercise the JSONArray.put(value) method with various parameters
