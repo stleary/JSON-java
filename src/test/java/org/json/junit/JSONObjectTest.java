@@ -1735,6 +1735,22 @@ public class JSONObjectTest {
         assertTrue("optString() should return default string",
                 "hi".equals(jsonObject.optString("hiKey", "hi")));
     }
+    
+    /**
+     * Verifies that the opt methods properly convert string values.
+     */
+    @Test
+    public void jsonObjectOptStringConversion() {
+        JSONObject jo = new JSONObject("{\"int\":\"123\",\"true\":\"true\",\"false\":\"false\"}");
+        assertTrue("unexpected optBoolean value",jo.optBoolean("true",false)==true);
+        assertTrue("unexpected optBoolean value",jo.optBoolean("false",true)==false);
+        assertTrue("unexpected optInt value",jo.optInt("int",0)==123);
+        assertTrue("unexpected optLong value",jo.optLong("int",0)==123);
+        assertTrue("unexpected optDouble value",jo.optDouble("int",0.0)==123.0);
+        assertTrue("unexpected optBigInteger value",jo.optBigInteger("int",BigInteger.ZERO).compareTo(new BigInteger("123"))==0);
+        assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
+
+    }
 
     /**
      * Confirm behavior when JSONObject put(key, null object) is called
