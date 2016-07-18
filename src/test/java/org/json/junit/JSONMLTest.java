@@ -698,4 +698,41 @@ public class JSONMLTest {
         Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
     }
 
+    /**
+     * JSON string with lost leading zero and converted "True" to true. See test
+     * result in comment below.
+     */
+    @Test
+    public void testToJSONArray_jsonOutput() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final String expectedJsonString = "[\"root\",[\"id\",\"01\"],[\"id\",1],[\"id\",\"00\"],[\"id\",0],[\"item\",{\"id\":\"01\"}],[\"title\",true]]";
+        final JSONArray actualJsonOutput = JSONML.toJSONArray(originalXml, false);
+        assertEquals(expectedJsonString, actualJsonOutput.toString());
+    }
+
+    /**
+     * JSON string cannot be reverted to original xml. See test result in
+     * comment below.
+     */
+    @Test
+    public void testToJSONArray_reversibility() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final String revertedXml = JSONML.toString(JSONML.toJSONArray(originalXml, false));
+        assertNotEquals(revertedXml, originalXml);
+    }
+
+    /**
+     * test passes when using the new method toJsonML.
+     */
+    @Test
+    public void testToJsonML() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final String expectedJsonString = "[\"root\",[\"id\",\"01\"],[\"id\",\"1\"],[\"id\",\"00\"],[\"id\",\"0\"],[\"item\",{\"id\":\"01\"}],[\"title\",\"True\"]]";
+        final JSONArray json = JSONML.toJSONArray(originalXml,true);
+        assertEquals(expectedJsonString, json.toString());
+        
+        final String reverseXml = JSONML.toString(json);
+        assertEquals(originalXml, reverseXml);
+    }
+
 }

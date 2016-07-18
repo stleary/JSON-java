@@ -1,12 +1,14 @@
 package org.json.junit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONML;
 import org.json.JSONObject;
 import org.json.XML;
 import org.junit.Rule;
@@ -723,4 +725,46 @@ public class XMLTest {
         }
         */
     }
+
+    /**
+     * JSON string lost leading zero and converted "True" to true.
+     */
+    @Test
+    public void testToJSONArray_jsonOutput() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final String expectedJsonString = "{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}";
+        final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, false);
+
+        assertEquals(expectedJsonString, actualJsonOutput.toString());
+    }
+
+    /**
+     * JSON string cannot be reverted to original xml.
+     */
+    @Test
+    public void testToJSONArray_reversibility() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final String revertedXml = XML.toString(XML.toJSONObject(originalXml, false));
+
+        assertNotEquals(revertedXml, originalXml);
+    }
+
+    /**
+     * test passes when using the new method toJsonArray.
+     */
+    @Test
+    public void testToJsonXML() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final String expectedJsonString = "{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"True\"}}";
+
+        final JSONObject json = XML.toJSONObject(originalXml,true);
+        assertEquals(expectedJsonString, json.toString());
+        
+        final String reverseXml = XML.toString(json);
+        // this reversal isn't exactly the same. use JSONML for an exact reversal
+        final String expectedReverseXml = "<root><item><id>01</id></item><id>01</id><id>1</id><id>00</id><id>0</id><title>True</title></root>";
+
+        assertEquals(expectedReverseXml, reverseXml);
+    }
+
 }
