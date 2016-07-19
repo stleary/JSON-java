@@ -93,7 +93,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-05-20
+ * @version 2016-07-19
  */
 public class JSONObject {
     /**
@@ -132,6 +132,7 @@ public class JSONObject {
          *
          * @return The string "null".
          */
+        @Override
         public String toString() {
             return "null";
         }
@@ -242,7 +243,7 @@ public class JSONObject {
     public JSONObject(Map<?, ?> map) {
         this.map = new HashMap<String, Object>();
         if (map != null) {
-        	for (final Entry<?, ?> e : map.entrySet()) {
+            for (final Entry<?, ?> e : map.entrySet()) {
                 final Object value = e.getValue();
                 if (value != null) {
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
@@ -576,12 +577,15 @@ public class JSONObject {
     public double getDouble(String key) throws JSONException {
         Object object = this.get(key);
         try {
-            return object instanceof Number ? ((Number) object).doubleValue()
-                    : Double.parseDouble((String) object);
+            if (object instanceof Number) {
+                return ((Number) object).doubleValue();
+            } else if (object instanceof String) {
+                return Double.parseDouble((String) object);
+            }
         } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a number.");
         }
+        throw new JSONException("JSONObject[" + quote(key)
+                + "] is not a number.");
     }
 
     /**
@@ -597,12 +601,15 @@ public class JSONObject {
     public int getInt(String key) throws JSONException {
         Object object = this.get(key);
         try {
-            return object instanceof Number ? ((Number) object).intValue()
-                    : Integer.parseInt((String) object);
+            if (object instanceof Number) {
+                return ((Number) object).intValue();
+            } else if (object instanceof String) {
+                return Integer.parseInt((String) object);
+            }
         } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not an int.");
+
         }
+        throw new JSONException("JSONObject[" + quote(key) + "] is not an int.");
     }
 
     /**
@@ -654,12 +661,15 @@ public class JSONObject {
     public long getLong(String key) throws JSONException {
         Object object = this.get(key);
         try {
-            return object instanceof Number ? ((Number) object).longValue()
-                    : Long.parseLong((String) object);
+            if (object instanceof Number) {
+                return ((Number) object).longValue();
+            } else if (object instanceof String) {
+                return Long.parseLong((String) object);
+            }
         } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a long.");
+
         }
+        throw new JSONException("JSONObject[" + quote(key) + "] is not a long.");
     }
 
     /**
@@ -932,11 +942,20 @@ public class JSONObject {
      * @return The truth.
      */
     public boolean optBoolean(String key, boolean defaultValue) {
-        try {
-            return this.getBoolean(key);
-        } catch (Exception e) {
+        Object object = this.get(key);
+        if (NULL.equals(object)) {
             return defaultValue;
         }
+        if (object.equals(Boolean.FALSE)
+                || (object instanceof String && ((String) object)
+                        .equalsIgnoreCase("false"))) {
+            return false;
+        } else if (object.equals(Boolean.TRUE)
+                || (object instanceof String && ((String) object)
+                        .equalsIgnoreCase("true"))) {
+            return true;
+        }
+        return defaultValue;
     }
 
     /**
@@ -964,8 +983,12 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public BigInteger optBigInteger(String key, BigInteger defaultValue) {
+        Object object = this.get(key);
+        if (NULL.equals(object)) {
+            return defaultValue;
+        }
         try {
-            return this.getBigInteger(key);
+            return new BigInteger(object.toString());
         } catch (Exception e) {
             return defaultValue;
         }
@@ -983,8 +1006,12 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public BigDecimal optBigDecimal(String key, BigDecimal defaultValue) {
+        Object object = this.opt(key);
+        if (NULL.equals(object)) {
+            return defaultValue;
+        }
         try {
-            return this.getBigDecimal(key);
+            return new BigDecimal(object.toString());
         } catch (Exception e) {
             return defaultValue;
         }
@@ -1002,11 +1029,20 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public double optDouble(String key, double defaultValue) {
-        try {
-            return this.getDouble(key);
-        } catch (Exception e) {
+        Object object = this.get(key);
+        if (NULL.equals(object)) {
             return defaultValue;
         }
+        try {
+            if (object instanceof Number) {
+                return ((Number) object).doubleValue();
+            } else if (object instanceof String) {
+                return Double.parseDouble((String) object);
+            }
+        } catch (Exception e) {
+
+        }
+        return defaultValue;
     }
 
     /**
@@ -1034,11 +1070,20 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public int optInt(String key, int defaultValue) {
-        try {
-            return this.getInt(key);
-        } catch (Exception e) {
+        Object object = this.get(key);
+        if (NULL.equals(object)) {
             return defaultValue;
         }
+        try {
+            if (object instanceof Number) {
+                return ((Number) object).intValue();
+            } else if (object instanceof String) {
+                return Integer.parseInt((String) object);
+            }
+        } catch (Exception e) {
+
+        }
+        return defaultValue;
     }
 
     /**
@@ -1092,11 +1137,20 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public long optLong(String key, long defaultValue) {
-        try {
-            return this.getLong(key);
-        } catch (Exception e) {
+        Object object = this.get(key);
+        if (NULL.equals(object)) {
             return defaultValue;
         }
+        try {
+            if (object instanceof Number) {
+                return ((Number) object).longValue();
+            } else if (object instanceof String) {
+                return Long.parseLong((String) object);
+            }
+        } catch (Exception e) {
+
+        }
+        return defaultValue;
     }
 
     /**
@@ -1621,6 +1675,7 @@ public class JSONObject {
      *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
      *         brace)</small>.
      */
+    @Override
     public String toString() {
         try {
             return this.toString(0);
@@ -1880,13 +1935,13 @@ public class JSONObject {
     }
 
     /**
-     * Returns a java.util.Map containing all of the entrys in this object.
+     * Returns a java.util.Map containing all of the entries in this object.
      * If an entry in the object is a JSONArray or JSONObject it will also
      * be converted.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
-     * @return a java.util.Map containing the entrys of this object
+     * @return a java.util.Map containing the entries of this object
      */
     public Map<String, Object> toMap() {
         Map<String, Object> results = new HashMap<String, Object>();
