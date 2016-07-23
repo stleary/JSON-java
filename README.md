@@ -46,6 +46,13 @@ git clone https://github.com/stleary/JSON-Java.git src/main/java/org/json
 gradle clean build test jacocoTestReport
 
 ````
+\# Eclipse setup requires the Gradle IDE plug-in
+\# I use Gradle IDE	3.6.4.201503050952-RELEASE	org.springsource.ide.eclipse.gradle.feature.feature.group	Pivotal Software, Inc.
+````
+File > Import > Gradle project > (navigate to your directory) > Build Model > (Select your directory) > Finish
+(It is not necessary to run "gradle eclipse" on the project, from the command line)
+````
+
 Unit test results will be in build\reports\tests\index.html<br>
 Code coverage will be in build\reports\jacoco\html\index.html
 
