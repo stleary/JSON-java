@@ -47,7 +47,8 @@ gradle clean build test jacocoTestReport
 
 ````
 \# Eclipse setup requires the Gradle IDE plug-in<br>
-\# I use Gradle IDE	3.6.4.201503050952-RELEASE	org.springsource.ide.eclipse.gradle.feature.feature.group	Pivotal Software, Inc.
+\# I use Gradle IDE	3.6.4.201503050952-RELEASE	org.springsource.ide.eclipse.gradle.feature.feature.group	Pivotal Software, Inc.<br>
+\# From the Eclipse IDE:
 ````
 File > Import > Gradle project > (navigate to your directory) > Build Model > (Select your directory) > Finish
 (It is not necessary to run "gradle eclipse" on the project, from the command line)
