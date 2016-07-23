@@ -46,7 +46,7 @@ git clone https://github.com/stleary/JSON-Java.git src/main/java/org/json
 gradle clean build test jacocoTestReport
 
 ````
-\# Eclipse setup requires the Gradle IDE plug-in
+\# Eclipse setup requires the Gradle IDE plug-in<br>
 \# I use Gradle IDE	3.6.4.201503050952-RELEASE	org.springsource.ide.eclipse.gradle.feature.feature.group	Pivotal Software, Inc.
 ````
 File > Import > Gradle project > (navigate to your directory) > Build Model > (Select your directory) > Finish
