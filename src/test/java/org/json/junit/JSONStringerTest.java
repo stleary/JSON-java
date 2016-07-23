@@ -27,7 +27,7 @@ public class JSONStringerTest {
             jsonStringer.key(null);
             assertTrue("Expected an exception", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message", 
+            assertTrue("Expected an exception message",
                     "Null key.".
                     equals(e.getMessage()));
         }
@@ -44,7 +44,7 @@ public class JSONStringerTest {
             jsonStringer.key("hi");
             assertTrue("Expected an exception", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message", 
+            assertTrue("Expected an exception message",
                     "Misplaced key.".
                     equals(e.getMessage()));
         }
@@ -61,7 +61,7 @@ public class JSONStringerTest {
         try {
             jsonStringer.array();
         } catch (JSONException e) {
-            assertTrue("Expected an exception message", 
+            assertTrue("Expected an exception message",
                     "Misplaced array.".
                     equals(e.getMessage()));
         }
@@ -78,7 +78,7 @@ public class JSONStringerTest {
         try {
             jsonStringer.endArray();
         } catch (JSONException e) {
-            assertTrue("Expected an exception message", 
+            assertTrue("Expected an exception message",
                     "Misplaced endArray.".
                     equals(e.getMessage()));
         }
@@ -95,7 +95,7 @@ public class JSONStringerTest {
         try {
             jsonStringer.endObject();
         } catch (JSONException e) {
-            assertTrue("Expected an exception message", 
+            assertTrue("Expected an exception message",
                     "Misplaced endObject.".
                     equals(e.getMessage()));
         }
@@ -112,7 +112,7 @@ public class JSONStringerTest {
         try {
             jsonStringer.object();
         } catch (JSONException e) {
-            assertTrue("Expected an exception message", 
+            assertTrue("Expected an exception message",
                     "Misplaced object.".
                     equals(e.getMessage()));
         }
@@ -125,7 +125,47 @@ public class JSONStringerTest {
     @Test
     public void exceedNestDepthException() {
         try {
-            new JSONStringer().object().
+            JSONStringer s = new JSONStringer();
+            s.object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
+            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object();
+            s.key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
             key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
             key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
             key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
@@ -165,9 +205,10 @@ public class JSONStringerTest {
             key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
             key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
             key("k").object().key("k").object().key("k").object().key("k").object().key("k").object();
+            fail("Expected an exception message");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message", 
-                    "".
+            assertTrue("Expected an exception message",
+                    "Nesting too deep.".
                     equals(e.getMessage()));
         }
     }
