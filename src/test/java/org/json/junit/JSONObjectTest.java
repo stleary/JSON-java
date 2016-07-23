@@ -2141,5 +2141,14 @@ public class JSONObjectTest {
         assertTrue("key3 list val 2 should not be null", key3Val2List != null);
         assertTrue("key3 list val 2 should have 1 element", key3Val2List.size() == 1);
         assertTrue("key3 list val 2 list element 1 should be null", key3Val2List.get(0) == null);
+
+        // Assert that toMap() is a deep copy
+        jsonObject.getJSONArray("key3").getJSONArray(0).put(0, "still value 1");
+        assertTrue("key3 list val 1 list element 1 should be value1", key3Val1List.get(0).equals("value1"));
+
+        // assert that the new map is mutable
+        assertTrue("Removing a key should succeed", map.remove("key3") != null);
+        assertTrue("Map should have 2 elements", map.size() == 2);
+
     }
 }

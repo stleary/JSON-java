@@ -920,5 +920,13 @@ public class JSONArrayTest {
         assertTrue("val3 list val 2 should not be null", val3Val2List != null);
         assertTrue("val3 list val 2 should have 1 element", val3Val2List.size() == 1);
         assertTrue("val3 list val 2 list element 1 should be null", val3Val2List.get(0) == null);
+
+        // assert that toList() is a deep copy
+        jsonArray.getJSONObject(1).put("key1", "still val1");
+        assertTrue("val2 map key 1 should be val1", val2Map.get("key1").equals("val1"));
+
+        // assert that the new list is mutable
+        assertTrue("Removing an entry should succeed", list.remove(2) != null);
+        assertTrue("List should have 2 elements", list.size() == 2);
     }
 }
