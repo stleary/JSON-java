@@ -3,6 +3,7 @@ package org.json.junit;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -1372,6 +1373,74 @@ public class JSONObjectTest {
     }
 
     /**
+     * Exercise JSONObject toString() method with various indent levels.
+     */
+    @Test
+    public void jsonObjectToStringIndent() {
+        String jsonObject0Str =
+                "{"+
+                        "\"key1\":" +
+                                "[1,2," +
+                                        "{\"key3\":true}" +
+                                "],"+
+                        "\"key2\":" +
+                                "{\"key1\":\"val1\",\"key2\":" +
+                                        "{\"key2\":\"val2\"}" +
+                                "},"+
+                        "\"key3\":" +
+                                "[" +
+                                        "[1,2.1]" +
+                                "," +
+                                        "[null]" +
+                                "]"+
+                        "}";
+
+        String jsonObject1Str =
+                "{\n" +
+                " \"key1\": [\n" +
+                "  1,\n" +
+                "  2,\n" +
+                "  {\"key3\": true}\n" +
+                " ],\n" +
+                " \"key2\": {\n" +
+                "  \"key1\": \"val1\",\n" +
+                "  \"key2\": {\"key2\": \"val2\"}\n" +
+                " },\n" +
+                " \"key3\": [\n" +
+                "  [\n" +
+                "   1,\n" +
+                "   2.1\n" +
+                "  ],\n" +
+                "  [null]\n" +
+                " ]\n" +
+                "}";
+        String jsonObject4Str =
+                "{\n" +
+                "    \"key1\": [\n" +
+                "        1,\n" +
+                "        2,\n" +
+                "        {\"key3\": true}\n" +
+                "    ],\n" +
+                "    \"key2\": {\n" +
+                "        \"key1\": \"val1\",\n" +
+                "        \"key2\": {\"key2\": \"val2\"}\n" +
+                "    },\n" +
+                "    \"key3\": [\n" +
+                "        [\n" +
+                "            1,\n" +
+                "            2.1\n" +
+                "        ],\n" +
+                "        [null]\n" +
+                "    ]\n" +
+                "}";
+        JSONObject jsonObject = new JSONObject(jsonObject0Str);
+        assertEquals(jsonObject0Str, jsonObject.toString());
+        assertEquals(jsonObject0Str, jsonObject.toString(0));
+        assertEquals(jsonObject1Str, jsonObject.toString(1));
+        assertEquals(jsonObject4Str, jsonObject.toString(4));
+    }
+
+    /**
      * Explores how JSONObject handles maps. Insert a string/string map
      * as a value in a JSONObject. It will remain a map. Convert the 
      * JSONObject to string, then create a new JSONObject from the string. 
@@ -1441,7 +1510,7 @@ public class JSONObjectTest {
         String jsonArrayStr = 
             "[1,2,3]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
-        assertTrue("jsonArra valueToString() incorrect",
+        assertTrue("jsonArray valueToString() incorrect",
                 JSONObject.valueToString(jsonArray).equals(jsonArray.toString()));
         Map<String, String> map = new HashMap<String, String>();
         map.put("key1", "val1");
@@ -1840,7 +1909,7 @@ public class JSONObjectTest {
      */
     @Test
     public void write() {
-        String str = "{\"key\":\"value\"}";
+        String str = "{\"key1\":\"value1\",\"key2\":[1,2,3]}";
         String expectedStr = str;
         JSONObject jsonObject = new JSONObject(str);
         StringWriter stringWriter = new StringWriter();
@@ -1849,6 +1918,45 @@ public class JSONObjectTest {
         assertTrue("write() expected " +expectedStr+
                 "but found " +actualStr,
                 expectedStr.equals(actualStr));
+        StringBuilder stringBuilder = new StringBuilder();
+        Appendable appendable = jsonObject.write(stringBuilder);
+        actualStr = appendable.toString();
+        assertTrue("write() expected " +expectedStr+
+                        "but found " +actualStr,
+                expectedStr.equals(actualStr));
+    }
+
+    /**
+     * Exercise the JSONObject write(Appendable, int, int) method
+     */
+    @Test
+    public void write3Param() {
+        String str0 = "{\"key1\":\"value1\",\"key2\":[1,false,3.14]}";
+        String str2 =
+                "{\n" +
+                "   \"key1\": \"value1\",\n" +
+                "   \"key2\": [\n" +
+                "     1,\n" +
+                "     false,\n" +
+                "     3.14\n" +
+                "   ]\n" +
+                " }";
+        String expectedStr = str0;
+        JSONObject jsonObject = new JSONObject(str0);
+        StringWriter stringWriter = new StringWriter();
+        Writer writer = jsonObject.write(stringWriter,0,0);
+        String actualStr = writer.toString();
+        assertEquals(expectedStr, actualStr);
+        expectedStr = str0;
+        StringBuilder stringBuilder = new StringBuilder();
+        Appendable appendable = jsonObject.write(stringBuilder,0,0);
+        actualStr = appendable.toString();
+        assertEquals(expectedStr, actualStr);
+        expectedStr = str2;
+        stringBuilder = new StringBuilder();
+        appendable = jsonObject.write(stringBuilder,2,1);
+        actualStr = appendable.toString();
+        assertEquals(expectedStr, actualStr);
     }
 
     /**
@@ -1965,5 +2073,73 @@ public class JSONObjectTest {
     public void invalidEscapeSequence() {
       String json = "{ \"\\url\": \"value\" }";
       new JSONObject(json);
+    }
+
+    /**
+     * Exercise JSONObject toMap() method.
+     */
+    @Test
+    public void toMap() {
+        String jsonObjectStr =
+                "{" +
+                "\"key1\":" +
+                    "[1,2," +
+                        "{\"key3\":true}" +
+                    "]," +
+                "\"key2\":" +
+                    "{\"key1\":\"val1\",\"key2\":" +
+                        "{\"key2\":null}," +
+                    "\"key3\":42" +
+                    "}," +
+                "\"key3\":" +
+                    "[" +
+                        "[\"value1\",2.1]" +
+                    "," +
+                        "[null]" +
+                    "]" +
+                "}";
+
+        JSONObject jsonObject = new JSONObject(jsonObjectStr);
+        Map map = jsonObject.toMap();
+
+        assertTrue("Map should not be null", map != null);
+        assertTrue("Map should have 3 elements", map.size() == 3);
+
+        List key1List = (List)map.get("key1");
+        assertTrue("key1 should not be null", key1List != null);
+        assertTrue("key1 list should have 3 elements", key1List.size() == 3);
+        assertTrue("key1 value 1 should be 1", key1List.get(0).equals(Integer.valueOf(1)));
+        assertTrue("key1 value 2 should be 2", key1List.get(1).equals(Integer.valueOf(2)));
+
+        Map key1Value3Map = (Map)key1List.get(2);
+        assertTrue("Map should not be null", key1Value3Map != null);
+        assertTrue("Map should have 1 element", key1Value3Map.size() == 1);
+        assertTrue("Map key3 should be true", key1Value3Map.get("key3").equals(Boolean.TRUE));
+
+        Map key2Map = (Map)map.get("key2");
+        assertTrue("key2 should not be null", key2Map != null);
+        assertTrue("key2 map should have 3 elements", key2Map.size() == 3);
+        assertTrue("key2 map key 1 should be val1", key2Map.get("key1").equals("val1"));
+        assertTrue("key2 map key 3 should be 42", key2Map.get("key3").equals(Integer.valueOf(42)));
+
+        Map key2Val2Map = (Map)key2Map.get("key2");
+        assertTrue("key2 map key 2 should not be null", key2Val2Map != null);
+        assertTrue("key2 map key 2 should have an entry", key2Val2Map.containsKey("key2"));
+        assertTrue("key2 map key 2 value should be null", key2Val2Map.get("key2") == null);
+
+        List key3List = (List)map.get("key3");
+        assertTrue("key3 should not be null", key3List != null);
+        assertTrue("key3 list should have 3 elements", key3List.size() == 2);
+
+        List key3Val1List = (List)key3List.get(0);
+        assertTrue("key3 list val 1 should not be null", key3Val1List != null);
+        assertTrue("key3 list val 1 should have 2 elements", key3Val1List.size() == 2);
+        assertTrue("key3 list val 1 list element 1 should be value1", key3Val1List.get(0).equals("value1"));
+        assertTrue("key3 list val 1 list element 2 should be 2.1", key3Val1List.get(1).equals(Double.valueOf("2.1")));
+
+        List key3Val2List = (List)key3List.get(1);
+        assertTrue("key3 list val 2 should not be null", key3Val2List != null);
+        assertTrue("key3 list val 2 should have 1 element", key3Val2List.size() == 1);
+        assertTrue("key3 list val 2 list element 1 should be null", key3Val2List.get(0) == null);
     }
 }
