@@ -28,8 +28,8 @@ git clone https://github.com/stleary/JSON-Java-unit-test.git .
 ````
 \# Create a directory structure for the JSON-Java code
 ````
-# Windows version
-md /s src\main\java\org\json
+# Windows 10 version
+mkdir src\main\java\org\json
 # *nix version
 mkdir -p src/main/java/org/json
 ````
