@@ -60,6 +60,7 @@ public class JSONStringerTest {
         jsonStringer.object().endObject();
         try {
             jsonStringer.array();
+            assertTrue("Expected an exception", false);
         } catch (JSONException e) {
             assertTrue("Expected an exception message",
                     "Misplaced array.".
@@ -77,6 +78,7 @@ public class JSONStringerTest {
         jsonStringer.object();
         try {
             jsonStringer.endArray();
+            assertTrue("Expected an exception", false);
         } catch (JSONException e) {
             assertTrue("Expected an exception message",
                     "Misplaced endArray.".
@@ -94,6 +96,7 @@ public class JSONStringerTest {
         jsonStringer.array();
         try {
             jsonStringer.endObject();
+            assertTrue("Expected an exception", false);
         } catch (JSONException e) {
             assertTrue("Expected an exception message",
                     "Misplaced endObject.".
@@ -111,6 +114,7 @@ public class JSONStringerTest {
         jsonStringer.object().endObject();
         try {
             jsonStringer.object();
+            assertTrue("Expected an exception", false);
         } catch (JSONException e) {
             assertTrue("Expected an exception message",
                     "Misplaced object.".
