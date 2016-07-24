@@ -1916,18 +1916,30 @@ public class JSONObjectTest {
         Writer writer = jsonObject.write(stringWriter);
         String actualStr = writer.toString();
         assertTrue("write() expected " +expectedStr+
-                "but found " +actualStr,
-                expectedStr.equals(actualStr));
-        StringBuilder stringBuilder = new StringBuilder();
-        Appendable appendable = jsonObject.write(stringBuilder);
-        actualStr = appendable.toString();
-        assertTrue("write() expected " +expectedStr+
-                        "but found " +actualStr,
+                " but found " +actualStr,
                 expectedStr.equals(actualStr));
     }
 
     /**
-     * Exercise the JSONObject write(Appendable, int, int) method
+     * Exercise the JSONObject write() method
+     */
+/*
+    @Test
+    public void writeAppendable() {
+        String str = "{\"key1\":\"value1\",\"key2\":[1,2,3]}";
+        String expectedStr = str;
+        JSONObject jsonObject = new JSONObject(str);
+        StringBuilder stringBuilder = new StringBuilder();
+        Appendable appendable = jsonObject.write(stringBuilder);
+        String actualStr = appendable.toString();
+        assertTrue("write() expected " +expectedStr+
+                        " but found " +actualStr,
+                expectedStr.equals(actualStr));
+    }
+*/
+
+    /**
+     * Exercise the JSONObject write(Writer, int, int) method
      */
     @Test
     public void write3Param() {
@@ -1941,23 +1953,50 @@ public class JSONObjectTest {
                 "     3.14\n" +
                 "   ]\n" +
                 " }";
-        String expectedStr = str0;
         JSONObject jsonObject = new JSONObject(str0);
+        String expectedStr = str0;
         StringWriter stringWriter = new StringWriter();
         Writer writer = jsonObject.write(stringWriter,0,0);
         String actualStr = writer.toString();
         assertEquals(expectedStr, actualStr);
-        expectedStr = str0;
+
+        expectedStr = str2;
+        stringWriter = new StringWriter();
+        writer = jsonObject.write(stringWriter,2,1);
+        actualStr = writer.toString();
+        assertEquals(expectedStr, actualStr);
+    }
+
+    /**
+     * Exercise the JSONObject write(Appendable, int, int) method
+     */
+/*
+    @Test
+    public void write3ParamAppendable() {
+        String str0 = "{\"key1\":\"value1\",\"key2\":[1,false,3.14]}";
+        String str2 =
+                "{\n" +
+                        "   \"key1\": \"value1\",\n" +
+                        "   \"key2\": [\n" +
+                        "     1,\n" +
+                        "     false,\n" +
+                        "     3.14\n" +
+                        "   ]\n" +
+                        " }";
+        JSONObject jsonObject = new JSONObject(str0);
+        String expectedStr = str0;
         StringBuilder stringBuilder = new StringBuilder();
         Appendable appendable = jsonObject.write(stringBuilder,0,0);
-        actualStr = appendable.toString();
+        String actualStr = appendable.toString();
         assertEquals(expectedStr, actualStr);
+
         expectedStr = str2;
         stringBuilder = new StringBuilder();
         appendable = jsonObject.write(stringBuilder,2,1);
         actualStr = appendable.toString();
         assertEquals(expectedStr, actualStr);
     }
+*/
 
     /**
      * Exercise the JSONObject equals() method

@@ -802,24 +802,36 @@ public class JSONArrayTest {
     @Test
     public void write() {
         String str = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":2,\"key3\":3}]";
-        String expectedStr = str;
         JSONArray jsonArray = new JSONArray(str);
+        String expectedStr = str;
         StringWriter stringWriter = new StringWriter();
         Writer writer = jsonArray.write(stringWriter);
         String actualStr = writer.toString();
         assertTrue("write() expected " + expectedStr +
-                        "but found " + actualStr,
-                expectedStr.equals(actualStr));
-        StringBuilder stringBuilder = new StringBuilder();
-        Appendable appendable = jsonArray.write(stringBuilder);
-        actualStr = appendable.toString();
-        assertTrue("write() expected " + expectedStr +
-                        "but found " + actualStr,
+                        " but found " + actualStr,
                 expectedStr.equals(actualStr));
     }
 
     /**
-     * Exercise the JSONArray write(Appendable, int, int) method
+     * Exercise the JSONArray write() method using Appendable.
+     */
+/*
+    @Test
+    public void writeAppendable() {
+        String str = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":2,\"key3\":3}]";
+        JSONArray jsonArray = new JSONArray(str);
+        String expectedStr = str;
+        StringBuilder stringBuilder = new StringBuilder();
+        Appendable appendable = jsonArray.write(stringBuilder);
+        String actualStr = appendable.toString();
+        assertTrue("write() expected " + expectedStr +
+                        " but found " + actualStr,
+                expectedStr.equals(actualStr));
+    }
+*/
+
+    /**
+     * Exercise the JSONArray write(Writer, int, int) method
      */
     @Test
     public void write3Param() {
@@ -834,23 +846,51 @@ public class JSONArrayTest {
                 "     \"key3\": 3.14\n" +
                 "   }\n" +
                 " ]";
-        String expectedStr = str0;
         JSONArray jsonArray = new JSONArray(str0);
+        String expectedStr = str0;
         StringWriter stringWriter = new StringWriter();
         Writer writer = jsonArray.write(stringWriter, 0, 0);
         String actualStr = writer.toString();
         assertEquals(expectedStr, actualStr);
-        expectedStr = str0;
+
+        expectedStr = str2;
+        stringWriter = new StringWriter();
+        writer = jsonArray.write(stringWriter, 2, 1);
+        actualStr = writer.toString();
+        assertEquals(expectedStr, actualStr);
+    }
+
+    /**
+     * Exercise the JSONArray write(Appendable, int, int) method
+     */
+/*
+    @Test
+    public void write3ParamAppendable() {
+        String str0 = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":false,\"key3\":3.14}]";
+        String str2 =
+                "[\n" +
+                        "   \"value1\",\n" +
+                        "   \"value2\",\n" +
+                        "   {\n" +
+                        "     \"key1\": 1,\n" +
+                        "     \"key2\": false,\n" +
+                        "     \"key3\": 3.14\n" +
+                        "   }\n" +
+                        " ]";
+        JSONArray jsonArray = new JSONArray(str0);
+        String expectedStr = str0;
         StringBuilder stringBuilder = new StringBuilder();
         Appendable appendable = jsonArray.write(stringBuilder, 0, 0);
-        actualStr = appendable.toString();
+        String actualStr = appendable.toString();
         assertEquals(expectedStr, actualStr);
+
         expectedStr = str2;
         stringBuilder = new StringBuilder();
         appendable = jsonArray.write(stringBuilder, 2, 1);
         actualStr = appendable.toString();
         assertEquals(expectedStr, actualStr);
     }
+*/
 
     /**
      * Exercise JSONArray toString() method with various indent levels.
