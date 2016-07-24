@@ -164,7 +164,7 @@ public class JSONStringTest {
         String output = jsonArray.write(writer).toString();
         assertTrue("String values should be equal", "[\"the toString value\"]".equals(output));
 
-        // The first different between writeValue() and valueToString():
+        // The only different between writeValue() and valueToString():
         // in this case, valueToString throws a JSONException
         try {
             output = JSONObject.valueToString(jsonString);
