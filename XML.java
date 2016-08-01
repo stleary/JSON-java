@@ -110,7 +110,7 @@ public class XML {
      * 
      * @param string
      *            A string.
-     * @throws JSONException
+     * @throws JSONException Thrown if the string contains whitespace or is empty.
      */
     public static void noSpace(String string) throws JSONException {
         int i, length = string.length();
@@ -137,7 +137,7 @@ public class XML {
      * @return true if the close tag is processed.
      * @throws JSONException
      */
-    private static boolean parse(XMLTokener x, JSONObject context, String name)
+    private static boolean parse(XMLTokener x, JSONObject context, String name, boolean keepStrings)
             throws JSONException {
         char c;
         int i;
@@ -238,7 +238,7 @@ public class XML {
                             throw x.syntaxError("Missing value");
                         }
                         jsonobject.accumulate(string,
-                                JSONObject.stringToValue((String) token));
+                                keepStrings ? token : JSONObject.stringToValue((String) token));
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -270,12 +270,12 @@ public class XML {
                             string = (String) token;
                             if (string.length() > 0) {
                                 jsonobject.accumulate("content",
-                                        JSONObject.stringToValue(string));
+                                        keepStrings ? token : JSONObject.stringToValue(string));
                             }
 
                         } else if (token == LT) {
                             // Nested element
-                            if (parse(x, jsonobject, tagName)) {
+                            if (parse(x, jsonobject, tagName,keepStrings)) {
                                 if (jsonobject.length() == 0) {
                                     context.accumulate(tagName, "");
                                 } else if (jsonobject.length() == 1
@@ -301,9 +301,10 @@ public class XML {
      * {@link JSONObject.stringToValue(String)} method. Use it instead.
      * 
      * @deprecated Use {@link JSONObject#stringToValue(String)} instead.
-     * @param string
+     * @param string String to convert
      * @return JSON value of this string or the string
      */
+    @Deprecated
     public static Object stringToValue(String string) {
         return JSONObject.stringToValue(string);
     }
@@ -322,24 +323,49 @@ public class XML {
      * @param string
      *            The source string.
      * @return A JSONObject containing the structured data from the XML string.
-     * @throws JSONException
+     * @throws JSONException Thrown if there is an errors while parsing the string
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
+        return toJSONObject(string, false);
+    }
+
+
+    /**
+     * Convert a well-formed (but not necessarily valid) XML string into a
+     * JSONObject. Some information may be lost in this transformation because
+     * JSON is a data format and XML is a document format. XML uses elements,
+     * attributes, and content text, while JSON uses unordered collections of
+     * name/value pairs and arrays of values. JSON does not does not like to
+     * distinguish between elements and attributes. Sequences of similar
+     * elements are represented as JSONArrays. Content text may be placed in a
+     * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code>
+     * are ignored.
+     * 
+     * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
+     * numbers but will instead be the exact value as seen in the XML document.
+     * 
+     * @param string
+     *            The source string.
+     * @param keepStrings If true, then values will not be coerced into boolean
+     *  or numeric values and will instead be left as strings
+     * @return A JSONObject containing the structured data from the XML string.
+     * @throws JSONException Thrown if there is an errors while parsing the string
+     */
+    public static JSONObject toJSONObject(String string, boolean keepStrings) throws JSONException {
         JSONObject jo = new JSONObject();
         XMLTokener x = new XMLTokener(string);
         while (x.more() && x.skipPast("<")) {
-            parse(x, jo, null);
+            parse(x, jo, null, keepStrings);
         }
         return jo;
     }
-
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
      * 
      * @param object
      *            A JSONObject.
      * @return A string.
-     * @throws JSONException
+     * @throws JSONException Thrown if there is an error parsing the string
      */
     public static String toString(Object object) throws JSONException {
         return toString(object, null);
@@ -353,7 +379,7 @@ public class XML {
      * @param tagName
      *            The optional name of the enclosing tag.
      * @return A string.
-     * @throws JSONException
+     * @throws JSONException Thrown if there is an error parsing the string
      */
     public static String toString(Object object, String tagName)
             throws JSONException {
