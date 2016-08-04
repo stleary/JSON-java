@@ -53,7 +53,7 @@ SOFTWARE.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
- * @version 2016-07-28
+ * @version 2016-08-04
  */
 public class JSONWriter {
     private static final int maxdepth = 200;
@@ -321,6 +321,21 @@ public class JSONWriter {
      * @throws JSONException If the value is out of sequence.
      */
     public JSONWriter value(Object object) throws JSONException {
-        return this.append(JSONObject.valueToString(object));
+        if (this.mode == 'o' || this.mode == 'a') {
+            try {
+                if (this.comma && this.mode == 'a') {
+                    this.writer.append(',');
+                }
+                JSONObject.writeValue(this.writer, object);
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+            if (this.mode == 'o') {
+                this.mode = 'k';
+            }
+            this.comma = true;
+            return this;
+        }
+        throw new JSONException("Value out of sequence.");
     }
 }

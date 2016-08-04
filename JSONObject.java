@@ -25,7 +25,6 @@ package org.json;
  */
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -92,7 +91,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-07-28
+ * @version 2016-08-04
  */
 public class JSONObject {
     /**
@@ -1462,6 +1461,7 @@ public class JSONObject {
         String hhhh;
         int i;
         int len = string.length();
+        int prev = 0;
 
         w.append('"');
         for (i = 0; i < len; i += 1) {
@@ -1470,41 +1470,71 @@ public class JSONObject {
             switch (c) {
             case '\\':
             case '"':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append('\\');
-                w.append(c);
+                prev = i;
                 break;
             case '/':
                 if (b == '<') {
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
                     w.append('\\');
+                    prev = i;
                 }
-                w.append(c);
                 break;
             case '\b':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\b");
+                prev = i + 1;
                 break;
             case '\t':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\t");
+                prev = i + 1;
                 break;
             case '\n':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\n");
+                prev = i + 1;
                 break;
             case '\f':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\f");
+                prev = i + 1;
                 break;
             case '\r':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\r");
+                prev = i + 1;
                 break;
             default:
                 if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
                         || (c >= '\u2000' && c < '\u2100')) {
-                    w.append("\\u");
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
                     hhhh = Integer.toHexString(c);
-                    w.append("0000", 0, 4 - hhhh.length());
+                    w.append("\\u0000", 0, 6 - hhhh.length());
                     w.append(hhhh);
-                } else {
-                    w.append(c);
+                    prev = i + 1;
                 }
             }
+        }
+        if(prev < i) {
+            w.append(string, prev, i);
         }
         w.append('"');
         return w;
@@ -1696,10 +1726,8 @@ public class JSONObject {
      *             If the object contains an invalid number.
      */
     public String toString(int indentFactor) throws JSONException {
-        StringWriter w = new StringWriter();
-        synchronized (w.getBuffer()) {
-            return this.write(w, indentFactor, 0).toString();
-        }
+        StringBuilder w = new StringBuilder();
+        return this.write(w, indentFactor, 0).toString();
     }
 
     /**
