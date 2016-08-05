@@ -25,8 +25,6 @@ package org.json;
  */
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -93,7 +91,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-07-19
+ * @version 2016-08-04
  */
 public class JSONObject {
     /**
@@ -1442,21 +1440,19 @@ public class JSONObject {
      *            A String
      * @return A String correctly formatted for insertion in a JSON text.
      */
-    public static String quote(String string) {
-        StringWriter sw = new StringWriter();
-        synchronized (sw.getBuffer()) {
-            try {
-                return quote(string, sw).toString();
-            } catch (IOException ignored) {
-                // will never happen - we are writing to a string writer
-                return "";
-            }
+    public static String quote(CharSequence string) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            return quote(string, sb).toString();
+        } catch (IOException ignored) {
+            // will never happen - we are writing to a string builder
+            return "";
         }
     }
 
-    public static Writer quote(String string, Writer w) throws IOException {
+    public static <T extends Appendable> T quote(CharSequence string, T w) throws IOException {
         if (string == null || string.length() == 0) {
-            w.write("\"\"");
+            w.append("\"\"");
             return w;
         }
 
@@ -1465,51 +1461,84 @@ public class JSONObject {
         String hhhh;
         int i;
         int len = string.length();
+        int prev = 0;
 
-        w.write('"');
+        w.append('"');
         for (i = 0; i < len; i += 1) {
             b = c;
             c = string.charAt(i);
             switch (c) {
             case '\\':
             case '"':
-                w.write('\\');
-                w.write(c);
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
+                w.append('\\');
+                prev = i;
                 break;
             case '/':
                 if (b == '<') {
-                    w.write('\\');
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
+                    w.append('\\');
+                    prev = i;
                 }
-                w.write(c);
                 break;
             case '\b':
-                w.write("\\b");
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
+                w.append("\\b");
+                prev = i + 1;
                 break;
             case '\t':
-                w.write("\\t");
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
+                w.append("\\t");
+                prev = i + 1;
                 break;
             case '\n':
-                w.write("\\n");
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
+                w.append("\\n");
+                prev = i + 1;
                 break;
             case '\f':
-                w.write("\\f");
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
+                w.append("\\f");
+                prev = i + 1;
                 break;
             case '\r':
-                w.write("\\r");
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
+                w.append("\\r");
+                prev = i + 1;
                 break;
             default:
                 if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
                         || (c >= '\u2000' && c < '\u2100')) {
-                    w.write("\\u");
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
                     hhhh = Integer.toHexString(c);
-                    w.write("0000", 0, 4 - hhhh.length());
-                    w.write(hhhh);
-                } else {
-                    w.write(c);
+                    w.append("\\u0000", 0, 6 - hhhh.length());
+                    w.append(hhhh);
+                    prev = i + 1;
                 }
             }
         }
-        w.write('"');
+        if(prev == 0) {
+            w.append(string);
+        } else if(prev < len) {
+            w.append(string, prev, len);
+        }
+        w.append('"');
         return w;
     }
 
@@ -1699,10 +1728,8 @@ public class JSONObject {
      *             If the object contains an invalid number.
      */
     public String toString(int indentFactor) throws JSONException {
-        StringWriter w = new StringWriter();
-        synchronized (w.getBuffer()) {
-            return this.write(w, indentFactor, 0).toString();
-        }
+        StringBuilder w = new StringBuilder();
+        return this.write(w, indentFactor, 0).toString();
     }
 
     /**
@@ -1730,40 +1757,7 @@ public class JSONObject {
      *             If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
-        if (value == null || value.equals(null)) {
-            return "null";
-        }
-        if (value instanceof JSONString) {
-            Object object;
-            try {
-                object = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            if (object instanceof String) {
-                return (String) object;
-            }
-            throw new JSONException("Bad value from toJSONString: " + object);
-        }
-        if (value instanceof Number) {
-            return numberToString((Number) value);
-        }
-        if (value instanceof Boolean || value instanceof JSONObject
-                || value instanceof JSONArray) {
-            return value.toString();
-        }
-        if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            return new JSONObject(map).toString();
-        }
-        if (value instanceof Collection) {
-            Collection<?> coll = (Collection<?>) value;
-            return new JSONArray(coll).toString();
-        }
-        if (value.getClass().isArray()) {
-            return new JSONArray(value).toString();
-        }
-        return quote(value.toString());
+        return writeValue(new StringBuilder(), value).toString();
     }
 
     /**
@@ -1828,14 +1822,23 @@ public class JSONObject {
      * @return The writer.
      * @throws JSONException
      */
-    public Writer write(Writer writer) throws JSONException {
+    public <T extends Appendable> T write(T writer) throws JSONException {
         return this.write(writer, 0, 0);
     }
 
-    static final Writer writeValue(Writer writer, Object value,
+    static <T extends Appendable> T writeValue(T writer, Object value)
+            throws JSONException {
+        try {
+            return writeValue(writer, value, 0 ,0);
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    static final <T extends Appendable> T writeValue(T writer, Object value,
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
-            writer.write("null");
+            writer.append("null");
         } else if (value instanceof JSONObject) {
             ((JSONObject) value).write(writer, indentFactor, indent);
         } else if (value instanceof JSONArray) {
@@ -1849,26 +1852,30 @@ public class JSONObject {
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
         } else if (value instanceof Number) {
-            writer.write(numberToString((Number) value));
+            writer.append(numberToString((Number) value));
         } else if (value instanceof Boolean) {
-            writer.write(value.toString());
+            writer.append(value.toString());
         } else if (value instanceof JSONString) {
-            Object o;
+            String o;
             try {
                 o = ((JSONString) value).toJSONString();
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
+            if (o != null) {
+                writer.append(o);
+            } else {
+                quote(value.toString(), writer);
+            }
         } else {
             quote(value.toString(), writer);
         }
         return writer;
     }
 
-    static final void indent(Writer writer, int indent) throws IOException {
+    static final <T extends Appendable> void indent(T writer, int indent) throws IOException {
         for (int i = 0; i < indent; i += 1) {
-            writer.write(' ');
+            writer.append(' ');
         }
     }
 
@@ -1887,47 +1894,47 @@ public class JSONObject {
      * @return The writer.
      * @throws JSONException
      */
-    public Writer write(Writer writer, int indentFactor, int indent)
+    public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {
         try {
             boolean commanate = false;
             final int length = this.length();
             Iterator<String> keys = this.keys();
-            writer.write('{');
+            writer.append('{');
 
             if (length == 1) {
-                Object key = keys.next();
-                writer.write(quote(key.toString()));
-                writer.write(':');
+                String key = keys.next();
+                quote(key, writer);
+                writer.append(':');
                 if (indentFactor > 0) {
-                    writer.write(' ');
+                    writer.append(' ');
                 }
                 writeValue(writer, this.map.get(key), indentFactor, indent);
             } else if (length != 0) {
                 final int newindent = indent + indentFactor;
                 while (keys.hasNext()) {
-                    Object key = keys.next();
+                    String key = keys.next();
                     if (commanate) {
-                        writer.write(',');
+                        writer.append(',');
                     }
                     if (indentFactor > 0) {
-                        writer.write('\n');
+                        writer.append('\n');
                     }
                     indent(writer, newindent);
-                    writer.write(quote(key.toString()));
-                    writer.write(':');
+                    quote(key, writer);
+                    writer.append(':');
                     if (indentFactor > 0) {
-                        writer.write(' ');
+                        writer.append(' ');
                     }
                     writeValue(writer, this.map.get(key), indentFactor, newindent);
                     commanate = true;
                 }
                 if (indentFactor > 0) {
-                    writer.write('\n');
+                    writer.append('\n');
                 }
                 indent(writer, indent);
             }
-            writer.write('}');
+            writer.append('}');
             return writer;
         } catch (IOException exception) {
             throw new JSONException(exception);

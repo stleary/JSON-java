@@ -1,7 +1,6 @@
 package org.json;
 
 import java.io.IOException;
-import java.io.Writer;
 
 /*
 Copyright (c) 2006 JSON.org
@@ -50,11 +49,11 @@ SOFTWARE.
  * <p>
  * The first method called must be <code>array</code> or <code>object</code>.
  * There are no methods for adding commas or colons. JSONWriter adds them for
- * you. Objects and arrays can be nested up to 20 levels deep.
+ * you. Objects and arrays can be nested up to 200 levels deep.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
- * @version 2015-12-09
+ * @version 2016-08-04
  */
 public class JSONWriter {
     private static final int maxdepth = 200;
@@ -88,12 +87,12 @@ public class JSONWriter {
     /**
      * The writer that will receive the output.
      */
-    protected Writer writer;
+    protected Appendable writer;
 
     /**
      * Make a fresh JSONWriter. It can be used to build one JSON text.
      */
-    public JSONWriter(Writer w) {
+    public JSONWriter(Appendable w) {
         this.comma = false;
         this.mode = 'i';
         this.stack = new JSONObject[maxdepth];
@@ -102,7 +101,7 @@ public class JSONWriter {
     }
 
     /**
-     * Append a value.
+     * Append a JSON-encoded value.
      * @param string A string value.
      * @return this
      * @throws JSONException If the value is out of sequence.
@@ -114,9 +113,9 @@ public class JSONWriter {
         if (this.mode == 'o' || this.mode == 'a') {
             try {
                 if (this.comma && this.mode == 'a') {
-                    this.writer.write(',');
+                    this.writer.append(',');
                 }
-                this.writer.write(string);
+                this.writer.append(string);
             } catch (IOException e) {
                 throw new JSONException(e);
             }
@@ -127,6 +126,35 @@ public class JSONWriter {
             return this;
         }
         throw new JSONException("Value out of sequence.");
+    }
+
+    /**
+     * Append a value, converting it into a JSON string.
+     *
+     * @param val A value.
+     * @return this
+     * @throws JSONException If the value is out of sequence.
+     */
+    private JSONWriter appendValue(Object val) throws JSONException {
+        try {
+            switch (this.mode) {
+                case 'a':
+                    if (this.comma) {
+                        this.writer.append(',');
+                    }
+                    break;
+                case 'o':
+                    this.mode = 'k';
+                    break;
+                default:
+                    throw new JSONException("Value out of sequence.");
+            }
+            JSONObject.writeValue(this.writer, val);
+            this.comma = true;
+            return this;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
     }
 
     /**
@@ -163,7 +191,7 @@ public class JSONWriter {
         }
         this.pop(mode);
         try {
-            this.writer.write(c);
+            this.writer.append(c);
         } catch (IOException e) {
             throw new JSONException(e);
         }
@@ -207,10 +235,10 @@ public class JSONWriter {
             try {
                 this.stack[this.top - 1].putOnce(string, Boolean.TRUE);
                 if (this.comma) {
-                    this.writer.write(',');
+                    this.writer.append(',');
                 }
-                this.writer.write(JSONObject.quote(string));
-                this.writer.write(':');
+                JSONObject.quote(string, this.writer);
+                this.writer.append(':');
                 this.comma = false;
                 this.mode = 'o';
                 return this;
@@ -300,7 +328,7 @@ public class JSONWriter {
      * @throws JSONException If the number is not finite.
      */
     public JSONWriter value(double d) throws JSONException {
-        return this.value(new Double(d));
+        return this.append(JSONObject.numberToString(Double.valueOf(d)));
     }
 
     /**
@@ -322,6 +350,6 @@ public class JSONWriter {
      * @throws JSONException If the value is out of sequence.
      */
     public JSONWriter value(Object object) throws JSONException {
-        return this.append(JSONObject.valueToString(object));
+        return this.appendValue(object);
     }
 }

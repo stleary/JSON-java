@@ -25,8 +25,6 @@ package org.json;
  */
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -78,7 +76,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-07-19
+ * @version 2016-08-04
  */
 public class JSONArray implements Iterable<Object> {
 
@@ -447,7 +445,7 @@ public class JSONArray implements Iterable<Object> {
             if (i > 0) {
                 sb.append(separator);
             }
-            sb.append(JSONObject.valueToString(this.myArrayList.get(i)));
+            JSONObject.writeValue(sb, this.myArrayList.get(i));
         }
         return sb.toString();
     }
@@ -1017,7 +1015,7 @@ public class JSONArray implements Iterable<Object> {
     }
     
     /**
-     * Creates a JSONPointer using an initialization string and tries to
+     * Creates a JSONPointer using an initialization string and tries to 
      * match it to an item within this JSONArray. For example, given a
      * JSONArray initialized with this document:
      * <pre>
@@ -1159,10 +1157,8 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException
      */
     public String toString(int indentFactor) throws JSONException {
-        StringWriter sw = new StringWriter();
-        synchronized (sw.getBuffer()) {
-            return this.write(sw, indentFactor, 0).toString();
-        }
+        StringBuilder sw = new StringBuilder();
+        return this.write(sw, indentFactor, 0).toString();
     }
 
     /**
@@ -1174,7 +1170,7 @@ public class JSONArray implements Iterable<Object> {
      * @return The writer.
      * @throws JSONException
      */
-    public Writer write(Writer writer) throws JSONException {
+    public <T extends Appendable> T write(T writer) throws JSONException {
         return this.write(writer, 0, 0);
     }
 
@@ -1193,12 +1189,12 @@ public class JSONArray implements Iterable<Object> {
      * @return The writer.
      * @throws JSONException
      */
-    public Writer write(Writer writer, int indentFactor, int indent)
+    public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {
         try {
             boolean commanate = false;
             int length = this.length();
-            writer.write('[');
+            writer.append('[');
 
             if (length == 1) {
                 JSONObject.writeValue(writer, this.myArrayList.get(0),
@@ -1208,10 +1204,10 @@ public class JSONArray implements Iterable<Object> {
 
                 for (int i = 0; i < length; i += 1) {
                     if (commanate) {
-                        writer.write(',');
+                        writer.append(',');
                     }
                     if (indentFactor > 0) {
-                        writer.write('\n');
+                        writer.append('\n');
                     }
                     JSONObject.indent(writer, newindent);
                     JSONObject.writeValue(writer, this.myArrayList.get(i),
@@ -1219,11 +1215,11 @@ public class JSONArray implements Iterable<Object> {
                     commanate = true;
                 }
                 if (indentFactor > 0) {
-                    writer.write('\n');
+                    writer.append('\n');
                 }
                 JSONObject.indent(writer, indent);
             }
-            writer.write(']');
+            writer.append(']');
             return writer;
         } catch (IOException e) {
             throw new JSONException(e);

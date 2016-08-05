@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import java.io.StringWriter;
-
 /**
  * JSONStringer provides a quick and convenient way of producing JSON text.
  * The texts produced strictly conform to JSON syntax rules. No whitespace is
@@ -54,14 +52,14 @@ import java.io.StringWriter;
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
- * @version 2015-12-09
+ * @version 2016-07-28
  */
 public class JSONStringer extends JSONWriter {
     /**
      * Make a fresh JSONStringer. It can be used to build one JSON text.
      */
     public JSONStringer() {
-        super(new StringWriter());
+        super(new StringBuilder());
     }
 
     /**
