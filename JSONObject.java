@@ -1533,8 +1533,10 @@ public class JSONObject {
                 }
             }
         }
-        if(prev < i) {
-            w.append(string, prev, i);
+        if(prev == 0) {
+            w.append(string);
+        } else if(prev < len) {
+            w.append(string, prev, len);
         }
         w.append('"');
         return w;

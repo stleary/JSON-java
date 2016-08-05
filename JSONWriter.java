@@ -49,7 +49,7 @@ SOFTWARE.
  * <p>
  * The first method called must be <code>array</code> or <code>object</code>.
  * There are no methods for adding commas or colons. JSONWriter adds them for
- * you. Objects and arrays can be nested up to 20 levels deep.
+ * you. Objects and arrays can be nested up to 200 levels deep.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
@@ -101,7 +101,7 @@ public class JSONWriter {
     }
 
     /**
-     * Append a value.
+     * Append a JSON-encoded value.
      * @param string A string value.
      * @return this
      * @throws JSONException If the value is out of sequence.
@@ -126,6 +126,35 @@ public class JSONWriter {
             return this;
         }
         throw new JSONException("Value out of sequence.");
+    }
+
+    /**
+     * Append a value, converting it into a JSON string.
+     *
+     * @param val A value.
+     * @return this
+     * @throws JSONException If the value is out of sequence.
+     */
+    private JSONWriter appendValue(Object val) throws JSONException {
+        try {
+            switch (this.mode) {
+                case 'a':
+                    if (this.comma) {
+                        this.writer.append(',');
+                    }
+                    break;
+                case 'o':
+                    this.mode = 'k';
+                    break;
+                default:
+                    throw new JSONException("Value out of sequence.");
+            }
+            JSONObject.writeValue(this.writer, val);
+            this.comma = true;
+            return this;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
     }
 
     /**
@@ -321,21 +350,6 @@ public class JSONWriter {
      * @throws JSONException If the value is out of sequence.
      */
     public JSONWriter value(Object object) throws JSONException {
-        if (this.mode == 'o' || this.mode == 'a') {
-            try {
-                if (this.comma && this.mode == 'a') {
-                    this.writer.append(',');
-                }
-                JSONObject.writeValue(this.writer, object);
-            } catch (IOException e) {
-                throw new JSONException(e);
-            }
-            if (this.mode == 'o') {
-                this.mode = 'k';
-            }
-            this.comma = true;
-            return this;
-        }
-        throw new JSONException("Value out of sequence.");
+        return this.appendValue(object);
     }
 }
