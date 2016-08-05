@@ -1013,7 +1013,7 @@ public class JSONArray implements Iterable<Object> {
         }
         return this;
     }
-
+    
     /**
      * Creates a JSONPointer using an initialization string and tries to 
      * match it to an item within this JSONArray. For example, given a
@@ -1029,14 +1029,14 @@ public class JSONArray implements Iterable<Object> {
      * </pre>
      * Then this method will return the String "c"
      * A JSONPointerException may be thrown from code called by this method.
-     *   
+     *
      * @param jsonPointer string that can be used to create a JSONPointer
      * @return the item matched by the JSONPointer, otherwise null
      */
     public Object query(String jsonPointer) {
         return new JSONPointer(jsonPointer).queryFrom(this);
     }
-
+    
     /**
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
