@@ -90,6 +90,10 @@ invalid number formats (1.2e6.3) will cause errors as such documents can not be 
 
 Release history:
 
+20160807    Java 1.6 compatability fixed, JSONArray.toList() and JSONObject.toMap(),
+RFC4180 compatibility, JSONPointer, some exception fixes, optional XML type conversion. 
+Contains the latest code as of 7 Aug, 2016
+
 20160212    Java 1.6 compatibility, OSGi bundle. Contains the latest code as of 12 Feb, 2016.
 
 20151123    JSONObject and JSONArray initialization with generics. Contains the
