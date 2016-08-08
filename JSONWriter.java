@@ -1,7 +1,6 @@
 package org.json;
 
 import java.io.IOException;
-import java.io.Writer;
 
 /*
 Copyright (c) 2006 JSON.org
@@ -50,11 +49,11 @@ SOFTWARE.
  * <p>
  * The first method called must be <code>array</code> or <code>object</code>.
  * There are no methods for adding commas or colons. JSONWriter adds them for
- * you. Objects and arrays can be nested up to 20 levels deep.
+ * you. Objects and arrays can be nested up to 200 levels deep.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
- * @version 2015-12-09
+ * @version 2016-08-08
  */
 public class JSONWriter {
     private static final int maxdepth = 200;
@@ -88,12 +87,12 @@ public class JSONWriter {
     /**
      * The writer that will receive the output.
      */
-    protected Writer writer;
+    protected Appendable writer;
 
     /**
      * Make a fresh JSONWriter. It can be used to build one JSON text.
      */
-    public JSONWriter(Writer w) {
+    public JSONWriter(Appendable w) {
         this.comma = false;
         this.mode = 'i';
         this.stack = new JSONObject[maxdepth];
@@ -114,9 +113,9 @@ public class JSONWriter {
         if (this.mode == 'o' || this.mode == 'a') {
             try {
                 if (this.comma && this.mode == 'a') {
-                    this.writer.write(',');
+                    this.writer.append(',');
                 }
-                this.writer.write(string);
+                this.writer.append(string);
             } catch (IOException e) {
                 throw new JSONException(e);
             }
@@ -163,7 +162,7 @@ public class JSONWriter {
         }
         this.pop(mode);
         try {
-            this.writer.write(c);
+            this.writer.append(c);
         } catch (IOException e) {
             throw new JSONException(e);
         }
@@ -207,10 +206,10 @@ public class JSONWriter {
             try {
                 this.stack[this.top - 1].putOnce(string, Boolean.TRUE);
                 if (this.comma) {
-                    this.writer.write(',');
+                    this.writer.append(',');
                 }
-                this.writer.write(JSONObject.quote(string));
-                this.writer.write(':');
+                this.writer.append(JSONObject.quote(string));
+                this.writer.append(':');
                 this.comma = false;
                 this.mode = 'o';
                 return this;
