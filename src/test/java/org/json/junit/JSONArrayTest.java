@@ -373,7 +373,10 @@ public class JSONArrayTest {
         assertTrue("Array opt value out of range",
                 null == jsonArray.opt(-1));
 
-        assertTrue("Array opt boolean",
+        assertTrue("Array opt value out of range",
+                null == jsonArray.opt(jsonArray.length()));
+
+         assertTrue("Array opt boolean",
                 Boolean.TRUE == jsonArray.optBoolean(0));
         assertTrue("Array opt boolean default",
                 Boolean.FALSE == jsonArray.optBoolean(-1, Boolean.FALSE));
