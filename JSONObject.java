@@ -942,7 +942,7 @@ public class JSONObject {
      * @return The truth.
      */
     public boolean optBoolean(String key, boolean defaultValue) {
-        Object object = this.get(key);
+        Object object = this.opt(key);
         if (NULL.equals(object)) {
             return defaultValue;
         }
@@ -983,7 +983,7 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public BigInteger optBigInteger(String key, BigInteger defaultValue) {
-        Object object = this.get(key);
+        Object object = this.opt(key);
         if (NULL.equals(object)) {
             return defaultValue;
         }
@@ -1029,7 +1029,7 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public double optDouble(String key, double defaultValue) {
-        Object object = this.get(key);
+        Object object = this.opt(key);
         if (NULL.equals(object)) {
             return defaultValue;
         }
@@ -1070,7 +1070,7 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public int optInt(String key, int defaultValue) {
-        Object object = this.get(key);
+        Object object = this.opt(key);
         if (NULL.equals(object)) {
             return defaultValue;
         }
@@ -1137,7 +1137,7 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public long optLong(String key, long defaultValue) {
-        Object object = this.get(key);
+        Object object = this.opt(key);
         if (NULL.equals(object)) {
             return defaultValue;
         }
