@@ -1727,7 +1727,7 @@ public class JSONObjectTest {
         assertTrue("optBigInteger() should return default BigInteger",
                 BigInteger.TEN.compareTo(jsonObject.optBigInteger("myKey",BigInteger.TEN ))==0);
         assertTrue("optBoolean() should return default boolean",
-                true == jsonObject.optBoolean("myKey", true));
+                 jsonObject.optBoolean("myKey", true));
         assertTrue("optInt() should return default int",
                 42 == jsonObject.optInt("myKey", 42));
         assertTrue("optEnum() should return default Enum",
@@ -1757,7 +1757,7 @@ public class JSONObjectTest {
          assertTrue("optBigInteger() should return default BigInteger",
                  BigInteger.TEN.compareTo(jsonObject.optBigInteger("myKey",BigInteger.TEN ))==0);
          assertTrue("optBoolean() should return default boolean",
-                 true == jsonObject.optBoolean("myKey", true));
+                  jsonObject.optBoolean("myKey", true));
          assertTrue("optInt() should return default int",
                  42 == jsonObject.optInt("myKey", 42));
          assertTrue("optEnum() should return default Enum",
