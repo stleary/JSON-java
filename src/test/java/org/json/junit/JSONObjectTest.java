@@ -1714,26 +1714,64 @@ public class JSONObjectTest {
     }
 
     /**
-     * Exercise JSONObject opt(key, default) method
+     * Exercise JSONObject opt(key, default) method.
      */
     @Test
     public void jsonObjectOptDefault() {
 
-        String str = "{\"myKey\": \"myval\"}";
+        String str = "{\"myKey\": \"myval\", \"hiKey\": null}";
         JSONObject jsonObject = new JSONObject(str);
 
+        assertTrue("optBigDecimal() should return default BigDecimal",
+                BigDecimal.TEN.compareTo(jsonObject.optBigDecimal("myKey", BigDecimal.TEN))==0);
+        assertTrue("optBigInteger() should return default BigInteger",
+                BigInteger.TEN.compareTo(jsonObject.optBigInteger("myKey",BigInteger.TEN ))==0);
         assertTrue("optBoolean() should return default boolean",
-                Boolean.TRUE == jsonObject.optBoolean("myKey", Boolean.TRUE));
+                 jsonObject.optBoolean("myKey", true));
         assertTrue("optInt() should return default int",
                 42 == jsonObject.optInt("myKey", 42));
-        assertTrue("optInt() should return default int",
-                42 == jsonObject.optInt("myKey", 42));
+        assertTrue("optEnum() should return default Enum",
+                MyEnum.VAL1.equals(jsonObject.optEnum(MyEnum.class, "myKey", MyEnum.VAL1)));
+        assertTrue("optJSONArray() should return null ",
+                null==jsonObject.optJSONArray("myKey"));
+        assertTrue("optJSONObject() should return null ",
+                null==jsonObject.optJSONObject("myKey"));
         assertTrue("optLong() should return default long",
                 42 == jsonObject.optLong("myKey", 42));
         assertTrue("optDouble() should return default double",
                 42.3 == jsonObject.optDouble("myKey", 42.3));
         assertTrue("optString() should return default string",
                 "hi".equals(jsonObject.optString("hiKey", "hi")));
+    }
+    
+    /**
+     * Exercise JSONObject opt(key, default) method when the key doesn't exist.
+     */
+    @Test
+    public void jsonObjectOptNoKey() {
+
+         JSONObject jsonObject = new JSONObject();
+
+         assertTrue("optBigDecimal() should return default BigDecimal",
+                 BigDecimal.TEN.compareTo(jsonObject.optBigDecimal("myKey", BigDecimal.TEN))==0);
+         assertTrue("optBigInteger() should return default BigInteger",
+                 BigInteger.TEN.compareTo(jsonObject.optBigInteger("myKey",BigInteger.TEN ))==0);
+         assertTrue("optBoolean() should return default boolean",
+                  jsonObject.optBoolean("myKey", true));
+         assertTrue("optInt() should return default int",
+                 42 == jsonObject.optInt("myKey", 42));
+         assertTrue("optEnum() should return default Enum",
+                 MyEnum.VAL1.equals(jsonObject.optEnum(MyEnum.class, "myKey", MyEnum.VAL1)));
+         assertTrue("optJSONArray() should return null ",
+                 null==jsonObject.optJSONArray("myKey"));
+         assertTrue("optJSONObject() should return null ",
+                 null==jsonObject.optJSONObject("myKey"));
+         assertTrue("optLong() should return default long",
+                 42 == jsonObject.optLong("myKey", 42));
+         assertTrue("optDouble() should return default double",
+                 42.3 == jsonObject.optDouble("myKey", 42.3));
+         assertTrue("optString() should return default string",
+                 "hi".equals(jsonObject.optString("hiKey", "hi")));
     }
     
     /**
