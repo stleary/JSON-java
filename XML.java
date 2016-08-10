@@ -31,7 +31,7 @@ import java.util.Iterator;
  * covert a JSONObject into an XML text.
  * 
  * @author JSON.org
- * @version 2016-01-30
+ * @version 2016-08-10
  */
 @SuppressWarnings("boxing")
 public class XML {
@@ -300,7 +300,7 @@ public class XML {
      * This method has been deprecated in favor of the
      * {@link JSONObject.stringToValue(String)} method. Use it instead.
      * 
-     * @deprecated Use {@link JSONObject#stringToValue(String)} instead.
+     * @deprecated Use JSONObject#stringToValue(String) instead.
      * @param string String to convert
      * @return JSON value of this string or the string
      */
