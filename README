@@ -90,7 +90,11 @@ invalid number formats (1.2e6.3) will cause errors as such documents can not be 
 
 Release history:
 
-20160807    Java 1.6 compatability fixed, JSONArray.toList() and JSONObject.toMap(),
+20160810    Revert code that was breaking opt*() methods.
+
+20160807    This release contains a bug in the JSONObject.opt*() and JSONArray.opt*() methods, 
+it is not recommended for use.
+Java 1.6 compatability fixed, JSONArray.toList() and JSONObject.toMap(),
 RFC4180 compatibility, JSONPointer, some exception fixes, optional XML type conversion. 
 Contains the latest code as of 7 Aug, 2016
 
