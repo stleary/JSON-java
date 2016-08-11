@@ -2,7 +2,10 @@ package org.json.junit;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -643,6 +646,71 @@ public class JSONArrayTest {
     }
 
     /**
+     * Exercise JSONArray toString() method with various indent levels.
+     */
+    @Test
+    public void jsonArrayToStringIndent() {
+        String jsonArray0Str =
+                "[" +
+                    "[1,2," +
+                        "{\"key3\":true}" +
+                    "]," +
+                    "{\"key1\":\"val1\",\"key2\":" +
+                        "{\"key2\":\"val2\"}" +
+                    "}," +
+                    "[" +
+                        "[1,2.1]" +
+                    "," +
+                        "[null]" +
+                    "]" +
+                "]";
+
+        String jsonArray1Str =
+                "[\n" +
+                " [\n" +
+                "  1,\n" +
+                "  2,\n" +
+                "  {\"key3\": true}\n" +
+                " ],\n" +
+                " {\n" +
+                "  \"key1\": \"val1\",\n" +
+                "  \"key2\": {\"key2\": \"val2\"}\n" +
+                " },\n" +
+                " [\n" +
+                "  [\n" +
+                "   1,\n" +
+                "   2.1\n" +
+                "  ],\n" +
+                "  [null]\n" +
+                " ]\n" +
+                "]";
+        String jsonArray4Str =
+                "[\n" +
+                "    [\n" +
+                "        1,\n" +
+                "        2,\n" +
+                "        {\"key3\": true}\n" +
+                "    ],\n" +
+                "    {\n" +
+                "        \"key1\": \"val1\",\n" +
+                "        \"key2\": {\"key2\": \"val2\"}\n" +
+                "    },\n" +
+                "    [\n" +
+                "        [\n" +
+                "            1,\n" +
+                "            2.1\n" +
+                "        ],\n" +
+                "        [null]\n" +
+                "    ]\n" +
+                "]";
+        JSONArray jsonArray = new JSONArray(jsonArray0Str);
+        assertEquals(jsonArray0Str, jsonArray.toString());
+        assertEquals(jsonArray0Str, jsonArray.toString(0));
+        assertEquals(jsonArray1Str, jsonArray.toString(1));
+        assertEquals(jsonArray4Str, jsonArray.toString(4));
+    }
+
+    /**
      * Convert an empty JSONArray to JSONObject
      */
     @Test
@@ -728,5 +796,180 @@ public class JSONArrayTest {
     @Test(expected = IllegalArgumentException.class)
     public void optQueryWithSyntaxError() {
         new JSONArray().optQuery("invalid");
+    }
+
+
+    /**
+     * Exercise the JSONArray write() method
+     */
+    @Test
+    public void write() {
+        String str = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":2,\"key3\":3}]";
+        JSONArray jsonArray = new JSONArray(str);
+        String expectedStr = str;
+        StringWriter stringWriter = new StringWriter();
+        Writer writer = jsonArray.write(stringWriter);
+        String actualStr = writer.toString();
+        assertTrue("write() expected " + expectedStr +
+                        " but found " + actualStr,
+                expectedStr.equals(actualStr));
+    }
+
+    /**
+     * Exercise the JSONArray write() method using Appendable.
+     */
+/*
+    @Test
+    public void writeAppendable() {
+        String str = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":2,\"key3\":3}]";
+        JSONArray jsonArray = new JSONArray(str);
+        String expectedStr = str;
+        StringBuilder stringBuilder = new StringBuilder();
+        Appendable appendable = jsonArray.write(stringBuilder);
+        String actualStr = appendable.toString();
+        assertTrue("write() expected " + expectedStr +
+                        " but found " + actualStr,
+                expectedStr.equals(actualStr));
+    }
+*/
+
+    /**
+     * Exercise the JSONArray write(Writer, int, int) method
+     */
+    @Test
+    public void write3Param() {
+        String str0 = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":false,\"key3\":3.14}]";
+        String str2 =
+                "[\n" +
+                "   \"value1\",\n" +
+                "   \"value2\",\n" +
+                "   {\n" +
+                "     \"key1\": 1,\n" +
+                "     \"key2\": false,\n" +
+                "     \"key3\": 3.14\n" +
+                "   }\n" +
+                " ]";
+        JSONArray jsonArray = new JSONArray(str0);
+        String expectedStr = str0;
+        StringWriter stringWriter = new StringWriter();
+        Writer writer = jsonArray.write(stringWriter, 0, 0);
+        String actualStr = writer.toString();
+        assertEquals(expectedStr, actualStr);
+
+        expectedStr = str2;
+        stringWriter = new StringWriter();
+        writer = jsonArray.write(stringWriter, 2, 1);
+        actualStr = writer.toString();
+        assertEquals(expectedStr, actualStr);
+    }
+
+    /**
+     * Exercise the JSONArray write(Appendable, int, int) method
+     */
+/*
+    @Test
+    public void write3ParamAppendable() {
+        String str0 = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":false,\"key3\":3.14}]";
+        String str2 =
+                "[\n" +
+                        "   \"value1\",\n" +
+                        "   \"value2\",\n" +
+                        "   {\n" +
+                        "     \"key1\": 1,\n" +
+                        "     \"key2\": false,\n" +
+                        "     \"key3\": 3.14\n" +
+                        "   }\n" +
+                        " ]";
+        JSONArray jsonArray = new JSONArray(str0);
+        String expectedStr = str0;
+        StringBuilder stringBuilder = new StringBuilder();
+        Appendable appendable = jsonArray.write(stringBuilder, 0, 0);
+        String actualStr = appendable.toString();
+        assertEquals(expectedStr, actualStr);
+
+        expectedStr = str2;
+        stringBuilder = new StringBuilder();
+        appendable = jsonArray.write(stringBuilder, 2, 1);
+        actualStr = appendable.toString();
+        assertEquals(expectedStr, actualStr);
+    }
+*/
+
+    /**
+     * Exercise JSONArray toString() method with various indent levels.
+     */
+    @Test
+    public void toList() {
+        String jsonArrayStr =
+                "[" +
+                    "[1,2," +
+                        "{\"key3\":true}" +
+                    "]," +
+                    "{\"key1\":\"val1\",\"key2\":" +
+                        "{\"key2\":null}," +
+                    "\"key3\":42,\"key4\":[]" +
+                    "}," +
+                    "[" +
+                        "[\"value1\",2.1]" +
+                    "," +
+                        "[null]" +
+                    "]" +
+                "]";
+
+        JSONArray jsonArray = new JSONArray(jsonArrayStr);
+        List list = jsonArray.toList();
+
+        assertTrue("List should not be null", list != null);
+        assertTrue("List should have 3 elements", list.size() == 3);
+
+        List val1List = (List) list.get(0);
+        assertTrue("val1 should not be null", val1List != null);
+        assertTrue("val1 should have 3 elements", val1List.size() == 3);
+
+        assertTrue("val1 value 1 should be 1", val1List.get(0).equals(Integer.valueOf(1)));
+        assertTrue("val1 value 2 should be 2", val1List.get(1).equals(Integer.valueOf(2)));
+
+        Map key1Value3Map = (Map)val1List.get(2);
+        assertTrue("Map should not be null", key1Value3Map != null);
+        assertTrue("Map should have 1 element", key1Value3Map.size() == 1);
+        assertTrue("Map key3 should be true", key1Value3Map.get("key3").equals(Boolean.TRUE));
+
+        Map val2Map = (Map) list.get(1);
+        assertTrue("val2 should not be null", val2Map != null);
+        assertTrue("val2 should have 4 elements", val2Map.size() == 4);
+        assertTrue("val2 map key 1 should be val1", val2Map.get("key1").equals("val1"));
+        assertTrue("val2 map key 3 should be 42", val2Map.get("key3").equals(Integer.valueOf(42)));
+
+        Map val2Key2Map = (Map)val2Map.get("key2");
+        assertTrue("val2 map key 2 should not be null", val2Key2Map != null);
+        assertTrue("val2 map key 2 should have an entry", val2Key2Map.containsKey("key2"));
+        assertTrue("val2 map key 2 value should be null", val2Key2Map.get("key2") == null);
+
+        List val2Key4List = (List)val2Map.get("key4");
+        assertTrue("val2 map key 4 should not be null", val2Key4List != null);
+        assertTrue("val2 map key 4 should be empty", val2Key4List.isEmpty());
+
+        List val3List = (List) list.get(2);
+        assertTrue("val3 should not be null", val3List != null);
+        assertTrue("val3 should have 2 elements", val3List.size() == 2);
+
+        List val3Val1List = (List)val3List.get(0);
+        assertTrue("val3 list val 1 should not be null", val3Val1List != null);
+        assertTrue("val3 list val 1 should have 2 elements", val3Val1List.size() == 2);
+        assertTrue("val3 list val 1 list element 1 should be value1", val3Val1List.get(0).equals("value1"));
+        assertTrue("val3 list val 1 list element 2 should be 2.1", val3Val1List.get(1).equals(Double.valueOf("2.1")));
+
+        List val3Val2List = (List)val3List.get(1);
+        assertTrue("val3 list val 2 should not be null", val3Val2List != null);
+        assertTrue("val3 list val 2 should have 1 element", val3Val2List.size() == 1);
+        assertTrue("val3 list val 2 list element 1 should be null", val3Val2List.get(0) == null);
+
+        // assert that toList() is a deep copy
+        jsonArray.getJSONObject(1).put("key1", "still val1");
+        assertTrue("val2 map key 1 should be val1", val2Map.get("key1").equals("val1"));
+
+        // assert that the new list is mutable
+        assertTrue("Removing an entry should succeed", list.remove(2) != null);
+        assertTrue("List should have 2 elements", list.size() == 2);
     }
 }
