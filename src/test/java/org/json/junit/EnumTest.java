@@ -1,13 +1,18 @@
 package org.json.junit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.json.*;
-import org.junit.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.Test;
 
-import com.jayway.jsonpath.*;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
 
 /**
  * Enums are not explicitly supported in JSON-Java. But because enums act like
@@ -50,11 +55,12 @@ public class EnumTest {
 
         // validate JSON content
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expecting 2 items in top level object", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expecting 2 items in myEnumField object", ((Map<?,?>)(JsonPath.read(doc, "$.myEnumField"))).size() == 2);
-        assertTrue("expecting 0 items in myEnum object", ((Map<?,?>)(JsonPath.read(doc, "$.myEnum"))).size() == 0);
-        assertTrue("expecting 3", Integer.valueOf(3).equals(jsonObject.query("/myEnumField/intVal")));
-        assertTrue("expecting val 3", "val 3".equals(jsonObject.query("/myEnumField/value")));
+        assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
+        assertTrue("expected 2 myEnumField items", "VAL3".equals((JsonPath.read(doc, "$.myEnumField"))));
+        assertTrue("expected 0 myEnum items", "VAL1".equals((JsonPath.read(doc, "$.myEnum"))));
+
+        assertTrue("expecting MyEnumField.VAL3", MyEnumField.VAL3.equals(jsonObject.query("/myEnumField")));
+        assertTrue("expecting MyEnum.VAL1", MyEnum.VAL1.equals(jsonObject.query("/myEnum")));
     }
 
     /**
@@ -87,6 +93,45 @@ public class EnumTest {
         assertTrue("expected VAL1", MyEnumField.VAL1.equals(jsonObject.query("/VAL1")));
         assertTrue("expected VAL2", MyEnumField.VAL2.equals(jsonObject.query("/VAL2")));
         assertTrue("expected VAL3", myEnumField.VAL3.equals(jsonObject.query("/VAL3")));
+    }
+    
+    /**
+     * Verify that enums are handled consistently between JSONArray and JSONObject
+     */
+    @Test
+    public void verifyEnumConsistency(){
+        JSONObject jo = new JSONObject();
+        
+        jo.put("value", MyEnumField.VAL2);
+        String expected="{\"value\":\"VAL2\"}";
+        String actual = jo.toString();
+        assertTrue("Expected "+expected+" but actual was "+actual, expected.equals(actual));
+
+        jo.accumulate("value", MyEnumField.VAL1);
+        expected="{\"value\":[\"VAL2\",\"VAL1\"]}";
+        actual = jo.toString();
+        assertTrue("Expected "+expected+" but actual was "+actual, expected.equals(actual));
+
+        jo.remove("value");
+        jo.append("value", MyEnumField.VAL1);
+        expected="{\"value\":[\"VAL1\"]}";
+        actual = jo.toString();
+        assertTrue("Expected "+expected+" but actual was "+actual, expected.equals(actual));
+
+        jo.put("value", EnumSet.of(MyEnumField.VAL2));
+        expected="{\"value\":[\"VAL2\"]}";
+        actual = jo.toString();
+        assertTrue("Expected "+expected+" but actual was "+actual, expected.equals(actual));
+
+        JSONArray ja = new JSONArray();
+        ja.put(MyEnumField.VAL2);
+        jo.put("value", ja);
+        actual = jo.toString();
+        assertTrue("Expected "+expected+" but actual was "+actual, expected.equals(actual));
+
+        jo.put("value", new MyEnumField[]{MyEnumField.VAL2});
+        actual = jo.toString();
+        assertTrue("Expected "+expected+" but actual was "+actual, expected.equals(actual));
 
     }
 
@@ -185,10 +230,8 @@ public class EnumTest {
         // validate JSON content
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected 2 myEnumField items", ((Map<?,?>)(JsonPath.read(doc, "$.myEnumField"))).size() == 2);
-        assertTrue("expected 0 myEnum items", ((Map<?,?>)(JsonPath.read(doc, "$.myEnum"))).size() == 0);
-        assertTrue("expected 3", Integer.valueOf(3).equals(jsonObject.query("/myEnumField/intVal")));
-        assertTrue("expected val 3", "val 3".equals(jsonObject.query("/myEnumField/value")));
+        assertTrue("expected VAL3", "VAL3".equals((JsonPath.read(doc, "$.myEnumField"))));
+        assertTrue("expected VAL1", "VAL1".equals((JsonPath.read(doc, "$.myEnum"))));
 
         String [] names = JSONObject.getNames(myEnum);
         jsonObject = new JSONObject(myEnum, names);
@@ -233,23 +276,20 @@ public class EnumTest {
     }
 
     /**
-     * Wrap should handle enums exactly the same way as the JSONObject(Object)
-     * constructor. 
+     * Wrap should handle enums exactly as a value type like Integer, Boolean, or String.
      */
     @Test
     public void wrap() {
-        MyEnum myEnum = MyEnum.VAL2;
-        JSONObject jsonObject = (JSONObject)JSONObject.wrap(myEnum);
-        assertTrue("simple enum has no getters", jsonObject.length() == 0);
+        assertTrue("simple enum has no getters", JSONObject.wrap(MyEnum.VAL2) instanceof MyEnum);
 
         MyEnumField myEnumField = MyEnumField.VAL2;
-        jsonObject = (JSONObject)JSONObject.wrap(myEnumField);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("enum",myEnumField);
 
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected val 2", "val 2".equals(jsonObject.query("/value")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(jsonObject.query("/intVal")));
+        assertTrue("expected 1 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
+        assertTrue("expected VAL2", MyEnumField.VAL2.equals(jsonObject.query("/enum")));
 
         MyEnumClass myEnumClass = new MyEnumClass();
         myEnumClass.setMyEnum(MyEnum.VAL1);
@@ -259,11 +299,11 @@ public class EnumTest {
         // validate JSON content
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
         assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected 2 myEnumField items", ((Map<?,?>)(JsonPath.read(doc, "$.myEnumField"))).size() == 2);
-        assertTrue("expected 0 myEnum items", ((Map<?,?>)(JsonPath.read(doc, "$.myEnum"))).size() == 0);
-        assertTrue("expected 3", Integer.valueOf(3).equals(jsonObject.query("/myEnumField/intVal")));
-        assertTrue("expected val 3", "val 3".equals(jsonObject.query("/myEnumField/value")));
+        assertTrue("expected VAL3", "VAL3".equals((JsonPath.read(doc, "$.myEnumField"))));
+        assertTrue("expected VAL1", "VAL1".equals((JsonPath.read(doc, "$.myEnum"))));
 
+        assertTrue("expecting MyEnumField.VAL3", MyEnumField.VAL3.equals(jsonObject.query("/myEnumField")));
+        assertTrue("expecting MyEnum.VAL1", MyEnum.VAL1.equals(jsonObject.query("/myEnum")));
     }
 
     /**

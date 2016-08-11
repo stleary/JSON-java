@@ -20,4 +20,7 @@ public enum MyEnumField {
     public Integer getIntVal() {
         return intVal;
     }
+    public String toString(){
+        return value;
+    }
 }
