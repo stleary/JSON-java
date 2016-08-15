@@ -78,7 +78,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-05-20
+ * @version 2016-08/15
  */
 public class JSONArray implements Iterable<Object> {
 
@@ -961,7 +961,7 @@ public class JSONArray implements Iterable<Object> {
     }
     
     /**
-     * Creates a JSONPointer using an intialization string and tries to 
+     * Creates a JSONPointer using an initialization string and tries to 
      * match it to an item within this JSONArray. For example, given a
      * JSONArray initialized with this document:
      * <pre>

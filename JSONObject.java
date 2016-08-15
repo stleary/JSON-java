@@ -93,7 +93,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-05-20
+ * @version 2016-08-15
  */
 public class JSONObject {
     /**
@@ -132,6 +132,7 @@ public class JSONObject {
          *
          * @return The string "null".
          */
+        @Override
         public String toString() {
             return "null";
         }
@@ -1621,6 +1622,7 @@ public class JSONObject {
      *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
      *         brace)</small>.
      */
+    @Override
     public String toString() {
         try {
             return this.toString(0);
@@ -1885,13 +1887,13 @@ public class JSONObject {
     }
 
     /**
-     * Returns a java.util.Map containing all of the entrys in this object.
+     * Returns a java.util.Map containing all of the entries in this object.
      * If an entry in the object is a JSONArray or JSONObject it will also
      * be converted.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
-     * @return a java.util.Map containing the entrys of this object
+     * @return a java.util.Map containing the entries of this object
      */
     public Map<String, Object> toMap() {
         Map<String, Object> results = new HashMap<String, Object>();
