@@ -1,9 +1,9 @@
 package org.json.junit;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.CDL;
 import org.json.JSONArray;
@@ -49,7 +50,7 @@ public class JSONObjectTest {
         MyBean myBean = null;
         new JSONObject(myBean);
     }
-
+    
     /**
      * A JSONObject can be created with no content
      */
@@ -165,6 +166,54 @@ public class JSONObjectTest {
                 expected.similar(jaObjObj));
     }
     
+    /**
+     * Tests Number serialization.
+     */
+    @Test
+    public void verifyNumberOutput(){
+        JSONObject jsonObject = new JSONObject(new MyNumberContainer());
+        String actual = jsonObject.toString();
+        
+        // before wrapping of Number is allowed the number was converted as a bean
+        String expected = "{\"myNumber\":{\"number\":42}}";
+        //String expected = "{\"myNumber\":42}";
+        assertEquals("Not Equal", expected , actual);
+        
+        // put handles objects differently than the constructor.
+        jsonObject = new JSONObject();
+        jsonObject.put("myNumber", new MyNumberContainer());
+        actual = jsonObject.toString();
+        // the output is the toString of the container. i.e org.json.junit.MyNumberContainer@4f063c0a
+        // the hex is the memory address which will change each run.
+        expected = "{\"myNumber\":\""+jsonObject.get("myNumber")+"\"}";
+        assertEquals("Not Equal", expected , actual);
+        
+        jsonObject = new JSONObject(Collections.singletonMap("myNumber", new AtomicInteger(42)));
+        actual = jsonObject.toString();
+        // before wrapping of Number is allowed the number was converted to a string
+        expected = "{\"myNumber\":\"42\"}";
+        assertEquals("Not Equal", expected , actual);
+        
+        // put handles objects differently than the constructor.
+        jsonObject = new JSONObject();
+        jsonObject.put("myNumber", new AtomicInteger(42));
+        actual = jsonObject.toString();
+        expected = "{\"myNumber\":42}";
+        assertEquals("Not Equal", expected , actual);
+        
+        // verify Fraction output
+        jsonObject = new JSONObject(Collections.singletonMap("myNumber", new Fraction(4,2)));
+        actual = jsonObject.toString();
+        expected = "{\"myNumber\":{\"denominator\":2,\"numerator\":4}}";
+        assertEquals("Not Equal", expected , actual);
+               
+        jsonObject = new JSONObject();
+        jsonObject.put("myNumber", new Fraction(4,2));
+        actual = jsonObject.toString();
+        expected = "{\"myNumber\":4/2}"; // this is NOT valid JSON!!!!!!!!!!! BUG!
+        assertEquals("Not Equal", expected , actual);
+    }
+
     /**
      * Verifies that the put Collection has backwards compatability with RAW types pre-java5.
      */
