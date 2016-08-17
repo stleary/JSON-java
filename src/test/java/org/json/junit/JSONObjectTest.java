@@ -202,10 +202,9 @@ public class JSONObjectTest {
         
         // verify Fraction output
         jsonObject = new JSONObject(Collections.singletonMap("myNumber", new Fraction(4,2)));
-        actual = jsonObject.toString();
-        expected = "{\"myNumber\":{\"denominator\":2,\"numerator\":4}}";
-        assertEquals("Not Equal", expected , actual);
-               
+        assertEquals("Numerator", BigInteger.valueOf(4) , jsonObject.query("/myNumber/numerator"));
+        assertEquals("Denominator", BigInteger.valueOf(2) , jsonObject.query("/myNumber/denominator"));
+
         jsonObject = new JSONObject();
         jsonObject.put("myNumber", new Fraction(4,2));
         actual = jsonObject.toString();
