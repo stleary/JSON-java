@@ -181,11 +181,10 @@ public class JSONObjectTest {
         
         // put handles objects differently than the constructor.
         jsonObject = new JSONObject();
-        jsonObject.put("myNumber", new MyNumberContainer());
+        jsonObject.put("myNumber", new MyNumber());
         actual = jsonObject.toString();
-        // the output is the toString of the container. i.e org.json.junit.MyNumberContainer@4f063c0a
-        // the hex is the memory address which will change each run.
-        expected = "{\"myNumber\":\""+jsonObject.get("myNumber")+"\"}";
+        // the output is the toString of the number as a string.
+        expected = "{\"myNumber\":\"42\"}";
         assertEquals("Not Equal", expected , actual);
         
         jsonObject = new JSONObject(Collections.singletonMap("myNumber", new AtomicInteger(42)));
