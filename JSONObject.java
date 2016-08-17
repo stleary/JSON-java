@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -137,6 +138,12 @@ public class JSONObject {
             return "null";
         }
     }
+    
+    /**
+     * Regex that expresses the allowable pattern of JSON numbers.
+     * <a href="http://stackoverflow.com/a/13340826/6030888">http://stackoverflow.com/a/13340826/6030888</a>
+     */
+    private static final Pattern JSON_NUMBER_PATTERN = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
 
     /**
      * The map where the JSONObject's properties are kept.
@@ -838,7 +845,7 @@ public class JSONObject {
         }
         testValidity(number);
 
-// Shave off trailing zeros and decimal point, if possible.
+        // Shave off trailing zeros and decimal point, if possible.
 
         String string = number.toString();
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
@@ -1693,7 +1700,14 @@ public class JSONObject {
             throw new JSONException("Bad value from toJSONString: " + object);
         }
         if (value instanceof Number) {
-            return numberToString((Number) value);
+            // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
+            final String numberAsString = numberToString((Number) value);
+            // Do we really want to take a REGEX hit for every number encountered?
+            // Is there a faster check?
+            if (JSON_NUMBER_PATTERN.matcher(numberAsString).matches()) {
+                return numberAsString;
+            }
+            return quote(numberAsString);
         }
         if (value instanceof Boolean || value instanceof JSONObject
                 || value instanceof JSONArray) {
@@ -1779,6 +1793,26 @@ public class JSONObject {
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.write("null");
+        } else if (value instanceof JSONString) {
+            Object o;
+            try {
+                o = ((JSONString) value).toJSONString();
+            } catch (Exception e) {
+                throw new JSONException(e);
+            }
+            writer.write(o != null ? o.toString() : quote(value.toString()));
+        } else if (value instanceof Number) {
+            // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
+            final String numberAsString = numberToString((Number) value);
+            // Do we really want to take a REGEX hit for every number encountered?
+            // Is there a faster check?
+            if (JSON_NUMBER_PATTERN.matcher(numberAsString).matches()) {
+                writer.write(numberAsString);
+            } else {
+                quote(numberAsString,writer);
+            }
+        } else if (value instanceof Boolean) {
+            writer.write(value.toString());
         } else if (value instanceof JSONObject) {
             ((JSONObject) value).write(writer, indentFactor, indent);
         } else if (value instanceof JSONArray) {
@@ -1791,18 +1825,6 @@ public class JSONObject {
             new JSONArray(coll).write(writer, indentFactor, indent);
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
-        } else if (value instanceof Number) {
-            writer.write(numberToString((Number) value));
-        } else if (value instanceof Boolean) {
-            writer.write(value.toString());
-        } else if (value instanceof JSONString) {
-            Object o;
-            try {
-                o = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
         } else {
             quote(value.toString(), writer);
         }
