@@ -183,8 +183,8 @@ public class JSONObjectTest {
         jsonObject = new JSONObject();
         jsonObject.put("myNumber", new MyNumber());
         actual = jsonObject.toString();
-        // the output is the toString of the number as a string.
-        expected = "{\"myNumber\":\"42\"}";
+        // the output is the toString of the number as a number.
+        expected = "{\"myNumber\":42}";
         assertEquals("Not Equal", expected , actual);
         
         jsonObject = new JSONObject(Collections.singletonMap("myNumber", new AtomicInteger(42)));
