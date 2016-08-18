@@ -1835,23 +1835,23 @@ public class JSONObject {
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
         try {
-            boolean commanate = false;
             final int length = this.length();
-            Iterator<String> keys = this.keys();
+            Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
             writer.write('{');
 
             if (length == 1) {
-                Object key = keys.next();
-                writer.write(quote(key.toString()));
+                Entry<String, Object> entry = iterator.next();
+                writer.write(quote(entry.getKey()));
                 writer.write(':');
                 if (indentFactor > 0) {
                     writer.write(' ');
                 }
-                writeValue(writer, this.map.get(key), indentFactor, indent);
+                writeValue(writer, entry.getValue(), indentFactor, indent);
             } else if (length != 0) {
+                boolean commanate = false;
                 final int newindent = indent + indentFactor;
-                while (keys.hasNext()) {
-                    Object key = keys.next();
+                while (iterator.hasNext()) {
+                    Entry<String, Object> entry = iterator.next();
                     if (commanate) {
                         writer.write(',');
                     }
@@ -1859,12 +1859,12 @@ public class JSONObject {
                         writer.write('\n');
                     }
                     indent(writer, newindent);
-                    writer.write(quote(key.toString()));
+                    writer.write(quote(entry.getKey()));
                     writer.write(':');
                     if (indentFactor > 0) {
                         writer.write(' ');
                     }
-                    writeValue(writer, this.map.get(key), indentFactor, newindent);
+                    writeValue(writer, entry.getValue(), indentFactor, newindent);
                     commanate = true;
                 }
                 if (indentFactor > 0) {
