@@ -1710,6 +1710,9 @@ public class JSONObject {
         if (value.getClass().isArray()) {
             return new JSONArray(value).toString();
         }
+        if(value instanceof Enum<?>){
+            return quote(((Enum<?>)value).name());
+        }
         return quote(value.toString());
     }
 
@@ -1737,7 +1740,7 @@ public class JSONObject {
                     || object instanceof Long || object instanceof Boolean
                     || object instanceof Float || object instanceof Double
                     || object instanceof String || object instanceof BigInteger
-                    || object instanceof BigDecimal) {
+                    || object instanceof BigDecimal || object instanceof Enum) {
                 return object;
             }
 
@@ -1799,6 +1802,8 @@ public class JSONObject {
             writer.write(numberToString((Number) value));
         } else if (value instanceof Boolean) {
             writer.write(value.toString());
+        } else if (value instanceof Enum<?>) {
+            writer.write(quote(((Enum<?>)value).name()));
         } else if (value instanceof JSONString) {
             Object o;
             try {
