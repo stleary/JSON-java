@@ -715,8 +715,7 @@ public class JSONObject {
      *             if there is no value for the key.
      */
     public String getString(String key) throws JSONException {
-        Object object = this.get(key);
-        return object.toString();
+        return this.get(key).toString();
     }
 
     /**
