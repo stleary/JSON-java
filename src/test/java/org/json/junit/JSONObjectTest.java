@@ -171,44 +171,85 @@ public class JSONObjectTest {
      */
     @Test
     public void verifyNumberOutput(){
+        /**
+         * MyNumberContainer is a POJO, so call JSONObject(bean), 
+         * which builds a map of getter names/values
+         * The only getter is getMyNumber (key=myNumber), 
+         * whose return value is MyNumber. MyNumber extends Number, 
+         * but is not recognized as such by wrap() per current
+         * implementation, so wrap() returns the default new JSONObject(bean).
+         * The only getter is getNumber (key=number), whose return value is
+         * BigDecimal(42). 
+         */
         JSONObject jsonObject = new JSONObject(new MyNumberContainer());
         String actual = jsonObject.toString();
-        
-        // before wrapping of Number is allowed the number was converted as a bean
         String expected = "{\"myNumber\":{\"number\":42}}";
-        //String expected = "{\"myNumber\":42}";
         assertEquals("Not Equal", expected , actual);
         
-        // put handles objects differently than the constructor.
+        /**
+         * JSONObject.put() handles objects differently than the 
+         * bean constructor. Where the bean ctor wraps objects before 
+         * placing them in the map, put() inserts the object without wrapping.
+         * In this case, a MyNumber instance is the value.
+         * The MyNumber.toString() method is responsible for
+         * returning a reasonable value: the string '42'.
+         */
         jsonObject = new JSONObject();
         jsonObject.put("myNumber", new MyNumber());
         actual = jsonObject.toString();
-        // the output is the toString of the number as a number.
         expected = "{\"myNumber\":42}";
         assertEquals("Not Equal", expected , actual);
-        
+
+        /**
+         * Calls the JSONObject(Map) ctor, which calls wrap() for values.
+         * AtomicInteger is a Number, but is not recognized by wrap(), per
+         * current implementation. However, the type is
+         * 'java.util.concurrent.atomic', so due to the 'java' prefix,
+         * wrap() inserts the value as a string. That is why 42 comes back
+         * wrapped in quotes.
+         */
         jsonObject = new JSONObject(Collections.singletonMap("myNumber", new AtomicInteger(42)));
         actual = jsonObject.toString();
-        // before wrapping of Number is allowed the number was converted to a string
         expected = "{\"myNumber\":\"42\"}";
         assertEquals("Not Equal", expected , actual);
-        
-        // put handles objects differently than the constructor.
+
+        /**
+         * JSONObject.put() inserts the AtomicInteger directly into the
+         * map not calling wrap(). In toString()->write()->writeValue(), 
+         * AtomicInteger is recognized as a Number, and converted via
+         * numberToString() into the unquoted string '42'.
+         */
         jsonObject = new JSONObject();
         jsonObject.put("myNumber", new AtomicInteger(42));
         actual = jsonObject.toString();
         expected = "{\"myNumber\":42}";
         assertEquals("Not Equal", expected , actual);
-        
-        // verify Fraction output
+
+        /**
+         * Calls the JSONObject(Map) ctor, which calls wrap() for values.
+         * Fraction is a Number, but is not recognized by wrap(), per
+         * current implementation. As a POJO, Franction is handled as a
+         * bean and inserted into a contained JSONObject. It has 2 getters,
+         * for numerator and denominator. 
+         */
         jsonObject = new JSONObject(Collections.singletonMap("myNumber", new Fraction(4,2)));
+        assertEquals(1, jsonObject.length());
+        assertEquals(2, ((JSONObject)(jsonObject.get("myNumber"))).length());
         assertEquals("Numerator", BigInteger.valueOf(4) , jsonObject.query("/myNumber/numerator"));
         assertEquals("Denominator", BigInteger.valueOf(2) , jsonObject.query("/myNumber/denominator"));
 
+        /**
+         * JSONObject.put() inserts the Fraction directly into the
+         * map not calling wrap(). In toString()->write()->writeValue(), 
+         * Fraction is recognized as a Number, and converted via
+         * numberToString() into the unquoted string '4/2'. But the 
+         * BigDecimal sanity check fails, so writeValue() defaults
+         * to returning a safe JSON quoted string. Pretty slick!
+         */
         jsonObject = new JSONObject();
         jsonObject.put("myNumber", new Fraction(4,2));
         actual = jsonObject.toString();
-        expected = "{\"myNumber\":4/2}"; // this is NOT valid JSON!!!!!!!!!!! BUG!
+        expected = "{\"myNumber\":\"4/2\"}"; // valid JSON, bug fixed
         assertEquals("Not Equal", expected , actual);
     }
 
@@ -2224,44 +2265,44 @@ public class JSONObjectTest {
                 "}";
 
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
-        Map map = jsonObject.toMap();
+        Map<?,?> map = jsonObject.toMap();
 
         assertTrue("Map should not be null", map != null);
         assertTrue("Map should have 3 elements", map.size() == 3);
 
-        List key1List = (List)map.get("key1");
+        List<?> key1List = (List<?>)map.get("key1");
         assertTrue("key1 should not be null", key1List != null);
         assertTrue("key1 list should have 3 elements", key1List.size() == 3);
         assertTrue("key1 value 1 should be 1", key1List.get(0).equals(Integer.valueOf(1)));
         assertTrue("key1 value 2 should be 2", key1List.get(1).equals(Integer.valueOf(2)));
 
-        Map key1Value3Map = (Map)key1List.get(2);
+        Map<?,?> key1Value3Map = (Map<?,?>)key1List.get(2);
         assertTrue("Map should not be null", key1Value3Map != null);
         assertTrue("Map should have 1 element", key1Value3Map.size() == 1);
         assertTrue("Map key3 should be true", key1Value3Map.get("key3").equals(Boolean.TRUE));
 
-        Map key2Map = (Map)map.get("key2");
+        Map<?,?> key2Map = (Map<?,?>)map.get("key2");
         assertTrue("key2 should not be null", key2Map != null);
         assertTrue("key2 map should have 3 elements", key2Map.size() == 3);
         assertTrue("key2 map key 1 should be val1", key2Map.get("key1").equals("val1"));
         assertTrue("key2 map key 3 should be 42", key2Map.get("key3").equals(Integer.valueOf(42)));
 
-        Map key2Val2Map = (Map)key2Map.get("key2");
+        Map<?,?> key2Val2Map = (Map<?,?>)key2Map.get("key2");
         assertTrue("key2 map key 2 should not be null", key2Val2Map != null);
         assertTrue("key2 map key 2 should have an entry", key2Val2Map.containsKey("key2"));
         assertTrue("key2 map key 2 value should be null", key2Val2Map.get("key2") == null);
 
-        List key3List = (List)map.get("key3");
+        List<?> key3List = (List<?>)map.get("key3");
         assertTrue("key3 should not be null", key3List != null);
         assertTrue("key3 list should have 3 elements", key3List.size() == 2);
 
-        List key3Val1List = (List)key3List.get(0);
+        List<?> key3Val1List = (List<?>)key3List.get(0);
         assertTrue("key3 list val 1 should not be null", key3Val1List != null);
         assertTrue("key3 list val 1 should have 2 elements", key3Val1List.size() == 2);
         assertTrue("key3 list val 1 list element 1 should be value1", key3Val1List.get(0).equals("value1"));
         assertTrue("key3 list val 1 list element 2 should be 2.1", key3Val1List.get(1).equals(Double.valueOf("2.1")));
 
-        List key3Val2List = (List)key3List.get(1);
+        List<?> key3Val2List = (List<?>)key3List.get(1);
         assertTrue("key3 list val 2 should not be null", key3Val2List != null);
         assertTrue("key3 list val 2 should have 1 element", key3Val2List.size() == 1);
         assertTrue("key3 list val 2 list element 1 should be null", key3Val2List.get(0) == null);
