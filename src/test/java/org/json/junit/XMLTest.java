@@ -281,6 +281,7 @@ public class XMLTest {
             "<euroX>A &#x20ac;22&#x20AC;</euroX>"+
             "<unknown>some text &copy;</unknown>"+
             "<known>&#x0022; &quot; &amp; &apos; &lt; &gt;</known>"+
+            "<high>&#x1D122; &#x10165;</high>" +
             "</root>";
         String expectedStr = 
             "{\"root\":{" +
@@ -288,7 +289,8 @@ public class XMLTest {
             "\"euro\":\"A €33\"," +
             "\"euroX\":\"A €22€\"," +
             "\"unknown\":\"some text &copy;\"," +
-            "\"known\":\"\\\" \\\" & ' < >\"" +
+            "\"known\":\"\\\" \\\" & ' < >\"," +
+            "\"high\":\"𝄢 𐅥\""+
             "}}";
         
         compareStringToJSONObject(xmlStr, expectedStr);
