@@ -297,16 +297,30 @@ public class XMLTest {
     }
     
     /**
-     * Tests that certain unicode characters are escaped.
+     * Tests that control characters are escaped.
      */
     @Test
     public void testJsonToXmlEscape(){
-        JSONObject json = new JSONObject("{ \"amount\": \"10,00 €\", \"description\": \"Ação Válida\" }");
+        final String jsonSrc = "{\"amount\":\"10,00 €\","
+                + "\"description\":\"Ação Válida\u0085\","
+                + "\"xmlEntities\":\"\\\" ' & < >\""
+                + "}";
+        JSONObject json = new JSONObject(jsonSrc);
         String xml = XML.toString(json);
-        assertFalse("Escaping € failed. Found in XML output.", xml.contains("€"));
+        //test control character not existing
+        assertFalse("Escaping \u0085 failed. Found in XML output.", xml.contains("\u0085"));
+        assertTrue("Escaping \u0085 failed. Entity not found in XML output.", xml.contains("&#x85;"));
+        // test normal unicode existing
+        assertTrue("Escaping € failed. Not found in XML output.", xml.contains("€"));
         assertTrue("Escaping ç failed. Not found in XML output.", xml.contains("ç"));
         assertTrue("Escaping ã failed. Not found in XML output.", xml.contains("ã"));
         assertTrue("Escaping á failed. Not found in XML output.", xml.contains("á"));
+        // test XML Entities converted
+        assertTrue("Escaping \" failed. Not found in XML output.", xml.contains("&quot;"));
+        assertTrue("Escaping ' failed. Not found in XML output.", xml.contains("&apos;"));
+        assertTrue("Escaping & failed. Not found in XML output.", xml.contains("&amp;"));
+        assertTrue("Escaping < failed. Not found in XML output.", xml.contains("&lt;"));
+        assertTrue("Escaping > failed. Not found in XML output.", xml.contains("&gt;"));
     }
 
     /**
