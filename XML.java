@@ -61,6 +61,42 @@ public class XML {
 
     /** The Character '/'. */
     public static final Character SLASH = '/';
+    
+    /**
+     * Creates an iterator for navigating Code Points in a string instead of
+     * characters.
+     * 
+     * @see <a href=
+     *      "http://stackoverflow.com/a/21791059/6030888">http://stackoverflow.com/a/21791059/6030888</a>
+     */
+    private static Iterable<Integer> codePointIterator(final String string) {
+        return new Iterable<Integer>() {
+            @Override
+            public Iterator<Integer> iterator() {
+                return new Iterator<Integer>() {
+                    private int nextIndex = 0;
+                    private int length = string.length();
+
+                    @Override
+                    public boolean hasNext() {
+                        return this.nextIndex < this.length;
+                    }
+
+                    @Override
+                    public Integer next() {
+                        int result = string.codePointAt(this.nextIndex);
+                        this.nextIndex += Character.charCount(result);
+                        return result;
+                    }
+
+                    @Override
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
 
     /**
      * Replace special characters with XML escapes:
@@ -79,8 +115,7 @@ public class XML {
      */
     public static String escape(String string) {
         StringBuilder sb = new StringBuilder(string.length());
-        for (int i = 0, length = string.length(); i < length; i++) {
-            char c = string.charAt(i);
+        for (final int c : codePointIterator(string)) {
             switch (c) {
             case '&':
                 sb.append("&amp;");
@@ -98,18 +133,18 @@ public class XML {
                 sb.append("&apos;");
                 break;
             default:
-                if (c < ' ' || (c >= '\u0080' && c < '\u00a0') || (c >= '\u2000' && c < '\u2100')) {
+                if (Character.isISOControl(c)) {
                     sb.append("&#x");
                     sb.append(Integer.toHexString(c));
                     sb.append(";");
                 } else {
-                    sb.append(c);
+                    sb.append(new String(Character.toChars(c)));
                 }
             }
         }
         return sb.toString();
     }
-
+    
     /**
      * Removes XML escapes from the string.
      * 
