@@ -64,7 +64,11 @@ public class XML {
     
     /**
      * Creates an iterator for navigating Code Points in a string instead of
-     * characters.
+     * characters. Once Java7 support is dropped, this can be replaced with
+     * <code>
+     * string.codePoints()
+     * </code>
+     * which is available in Java8 and above.
      * 
      * @see <a href=
      *      "http://stackoverflow.com/a/21791059/6030888">http://stackoverflow.com/a/21791059/6030888</a>
