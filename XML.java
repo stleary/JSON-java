@@ -35,7 +35,6 @@ import java.util.Iterator;
  */
 @SuppressWarnings("boxing")
 public class XML {
-
     /** The Character '&amp;'. */
     public static final Character AMP = '&';
 
@@ -71,6 +70,7 @@ public class XML {
      * &lt; <small>(less than)</small> is replaced by &amp;lt;
      * &gt; <small>(greater than)</small> is replaced by &amp;gt;
      * &quot; <small>(double quote)</small> is replaced by &amp;quot;
+     * &apos; <small>(single quote / apostrophe)</small> is replaced by &amp;apos;
      * </pre>
      * 
      * @param string
@@ -98,6 +98,67 @@ public class XML {
                 sb.append("&apos;");
                 break;
             default:
+                if (c < ' ' || (c >= '\u0080' && c < '\u00a0') || (c >= '\u2000' && c < '\u2100')) {
+                    sb.append("&#x");
+                    sb.append(Integer.toHexString(c));
+                    sb.append(";");
+                } else {
+                    sb.append(c);
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Removes XML escapes from the string.
+     * 
+     * @param string
+     *            string to remove escapes from
+     * @return string with converted entities
+     */
+    public static String unescape(String string) {
+        StringBuilder sb = new StringBuilder(string.length());
+        for (int i = 0, length = string.length(); i < length; i++) {
+            char c = string.charAt(i);
+            if (c == AMP) {
+                final int semic = string.indexOf(';', i);
+                if (semic > i) {
+                    final String entity = string.substring(i + 1, semic);
+                    if (entity.charAt(0) == '#') {
+                        char cc;
+                        if (entity.charAt(1) == 'x') {
+                            // hex encoded unicode
+                            cc = (char) Integer.parseInt(entity.substring(2), 16);
+                        } else {
+                            // decimal encoded unicode
+                            cc = (char) Integer.parseInt(entity.substring(1));
+                        }
+                        sb.append(cc);
+                    } else {
+                        if ("quot".equalsIgnoreCase(entity)) {
+                            sb.append('"');
+                        } else if ("amp".equalsIgnoreCase(entity)) {
+                            sb.append(AMP);
+                        } else if ("apos".equalsIgnoreCase(entity)) {
+                            sb.append('\'');
+                        } else if ("lt".equalsIgnoreCase(entity)) {
+                            sb.append('<');
+                        } else if ("gt".equalsIgnoreCase(entity)) {
+                            sb.append('>');
+                        } else {
+                            sb.append(AMP).append(entity).append(';');
+                        }
+                    }
+                    // skip past the entity we just parsed.
+                    i += entity.length() + 1;
+                } else {
+                    // this shouldn't happen in most cases since the parser
+                    // errors on unclosed enties.
+                    sb.append(c);
+                }
+            } else {
+                // not part of an entity
                 sb.append(c);
             }
         }
@@ -227,7 +288,6 @@ public class XML {
                 if (token == null) {
                     token = x.nextToken();
                 }
-
                 // attribute = value
                 if (token instanceof String) {
                     string = (String) token;
@@ -238,7 +298,7 @@ public class XML {
                             throw x.syntaxError("Missing value");
                         }
                         jsonobject.accumulate(string,
-                                keepStrings ? token : JSONObject.stringToValue((String) token));
+                                keepStrings ? unescape((String)token) : stringToValue((String) token));
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -270,7 +330,7 @@ public class XML {
                             string = (String) token;
                             if (string.length() > 0) {
                                 jsonobject.accumulate("content",
-                                        keepStrings ? token : JSONObject.stringToValue(string));
+                                        keepStrings ? unescape(string) : stringToValue(string));
                             }
 
                         } else if (token == LT) {
@@ -297,16 +357,18 @@ public class XML {
     }
     
     /**
-     * This method has been deprecated in favor of the
-     * {@link JSONObject.stringToValue(String)} method. Use it instead.
+     * This method is the same as {@link JSONObject.stringToValue(String)}
+     * except that this also tries to unescape String values.
      * 
-     * @deprecated Use JSONObject#stringToValue(String) instead.
      * @param string String to convert
      * @return JSON value of this string or the string
      */
-    @Deprecated
     public static Object stringToValue(String string) {
-        return JSONObject.stringToValue(string);
+        Object ret = JSONObject.stringToValue(string);
+        if(ret instanceof String){
+            return unescape((String)ret);
+        }
+        return ret;
     }
 
     /**

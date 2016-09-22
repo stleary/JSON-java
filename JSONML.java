@@ -175,7 +175,7 @@ public class JSONML {
                             if (!(token instanceof String)) {
                                 throw x.syntaxError("Missing value");
                             }
-                            newjo.accumulate(attribute, keepStrings ? token :JSONObject.stringToValue((String)token));
+                            newjo.accumulate(attribute, keepStrings ? token :XML.stringToValue((String)token));
                             token = null;
                         } else {
                             newjo.accumulate(attribute, "");
@@ -226,7 +226,7 @@ public class JSONML {
             } else {
                 if (ja != null) {
                     ja.put(token instanceof String
-                        ? keepStrings ? token :JSONObject.stringToValue((String)token)
+                        ? keepStrings ? token :XML.stringToValue((String)token)
                         : token);
                 }
             }
