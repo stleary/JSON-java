@@ -119,8 +119,8 @@ public class XML {
      */
     public static String escape(String string) {
         StringBuilder sb = new StringBuilder(string.length());
-        for (final int c : codePointIterator(string)) {
-            switch (c) {
+        for (final int cp : codePointIterator(string)) {
+            switch (cp) {
             case '&':
                 sb.append("&amp;");
                 break;
@@ -137,12 +137,12 @@ public class XML {
                 sb.append("&apos;");
                 break;
             default:
-                if (Character.isISOControl(c)) {
+                if (Character.isISOControl(cp)) {
                     sb.append("&#x");
-                    sb.append(Integer.toHexString(c));
+                    sb.append(Integer.toHexString(cp));
                     sb.append(";");
                 } else {
-                    sb.append(new String(Character.toChars(c)));
+                    sb.appendCodePoint(cp);
                 }
             }
         }
@@ -173,7 +173,7 @@ public class XML {
                             // decimal encoded unicode
                             cp = Integer.parseInt(entity.substring(1));
                         }
-                        sb.append(new String(Character.toChars(cp)));
+                        sb.appendCodePoint(cp);
                     } else {
                         if ("quot".equalsIgnoreCase(entity)) {
                             sb.append('"');
