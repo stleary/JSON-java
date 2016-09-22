@@ -165,15 +165,15 @@ public class XML {
                 if (semic > i) {
                     final String entity = string.substring(i + 1, semic);
                     if (entity.charAt(0) == '#') {
-                        char cc;
+                        int cp;
                         if (entity.charAt(1) == 'x') {
                             // hex encoded unicode
-                            cc = (char) Integer.parseInt(entity.substring(2), 16);
+                            cp = Integer.parseInt(entity.substring(2), 16);
                         } else {
                             // decimal encoded unicode
-                            cc = (char) Integer.parseInt(entity.substring(1));
+                            cp = Integer.parseInt(entity.substring(1));
                         }
-                        sb.append(cc);
+                        sb.append(new String(Character.toChars(cp)));
                     } else {
                         if ("quot".equalsIgnoreCase(entity)) {
                             sb.append('"');
