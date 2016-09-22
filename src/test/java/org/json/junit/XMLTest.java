@@ -1,6 +1,7 @@
 package org.json.junit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -293,7 +294,19 @@ public class XMLTest {
         compareStringToJSONObject(xmlStr, expectedStr);
         compareReaderToJSONObject(xmlStr, expectedStr);
         compareFileToJSONObject(xmlStr, expectedStr);
-        
+    }
+    
+    /**
+     * Tests that certain unicode characters are escaped.
+     */
+    @Test
+    public void testJsonToXmlEscape(){
+        JSONObject json = new JSONObject("{ \"amount\": \"10,00 €\", \"description\": \"Ação Válida\" }");
+        String xml = XML.toString(json);
+        assertFalse("Escaping € failed. Found in XML output.", xml.contains("€"));
+        assertTrue("Escaping ç failed. Not found in XML output.", xml.contains("ç"));
+        assertTrue("Escaping ã failed. Not found in XML output.", xml.contains("ã"));
+        assertTrue("Escaping á failed. Not found in XML output.", xml.contains("á"));
     }
 
     /**
