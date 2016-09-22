@@ -268,6 +268,35 @@ public class XMLTest {
     }
 
     /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testXmlEscapeToJson(){
+        String xmlStr = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<root>"+
+            "<rawQuote>\"</rawQuote>"+
+            "<euro>A &#8364;33</euro>"+
+            "<euroX>A &#x20ac;22&#x20AC;</euroX>"+
+            "<unknown>some text &copy;</unknown>"+
+            "<known>&#x0022; &quot; &amp; &apos; &lt; &gt;</known>"+
+            "</root>";
+        String expectedStr = 
+            "{\"root\":{" +
+            "\"rawQuote\":\"\\\"\"," +
+            "\"euro\":\"A €33\"," +
+            "\"euroX\":\"A €22€\"," +
+            "\"unknown\":\"some text &copy;\"," +
+            "\"known\":\"\\\" \\\" & ' < >\"" +
+            "}}";
+        
+        compareStringToJSONObject(xmlStr, expectedStr);
+        compareReaderToJSONObject(xmlStr, expectedStr);
+        compareFileToJSONObject(xmlStr, expectedStr);
+        
+    }
+
+    /**
      * Valid XML with comments to JSONObject
      */
     @Test
@@ -675,8 +704,8 @@ public class XMLTest {
      * @param expectedStr the expected JSON string
      */
     private void compareStringToJSONObject(String xmlStr, String expectedStr) {
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
