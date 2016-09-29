@@ -137,7 +137,7 @@ public class XML {
                 sb.append("&apos;");
                 break;
             default:
-                if (Character.isISOControl(cp)) {
+                if (mustEscape(cp)) {
                     sb.append("&#x");
                     sb.append(Integer.toHexString(cp));
                     sb.append(";");
@@ -149,6 +149,32 @@ public class XML {
         return sb.toString();
     }
     
+    /**
+     * @param cp code point to test
+     * @return true if the code point is not valid for an XML
+     */
+    private static boolean mustEscape(int cp) {
+        /* Valid range from https://www.w3.org/TR/REC-xml/#charsets
+         * 
+         * #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF] 
+         * 
+         * any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. 
+         */
+        // isISOControl is true when (cp >= 0 && cp <= 0x1F) || (cp >= 0x7F && cp <= 0x9F)
+        // all ISO control characters are out of range except tabs and new lines
+        return (Character.isISOControl(cp)
+                && cp != 0x9
+                && cp != 0xA
+                && cp != 0xD
+                ) || !(
+                    // valid the range of acceptable characters that aren't control
+                    (cp >= 0x20 && cp <= 0xD7FF)
+                    || (cp >= 0xE000 && cp <= 0xFFFD)
+                    || (cp >= 0x10000 && cp <= 0x10FFFF)
+                )
+        ;
+    }
+
     /**
      * Removes XML escapes from the string.
      * 
