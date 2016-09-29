@@ -166,12 +166,12 @@ public class XML {
                 && cp != 0x9
                 && cp != 0xA
                 && cp != 0xD
-                ) || !(
-                    // valid the range of acceptable characters that aren't control
-                    (cp >= 0x20 && cp <= 0xD7FF)
-                    || (cp >= 0xE000 && cp <= 0xFFFD)
-                    || (cp >= 0x10000 && cp <= 0x10FFFF)
-                )
+            ) || !(
+                // valid the range of acceptable characters that aren't control
+                (cp >= 0x20 && cp <= 0xD7FF)
+                || (cp >= 0xE000 && cp <= 0xFFFD)
+                || (cp >= 0x10000 && cp <= 0x10FFFF)
+            )
         ;
     }
 
