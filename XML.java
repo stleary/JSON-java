@@ -186,7 +186,7 @@ public class XML {
         StringBuilder sb = new StringBuilder(string.length());
         for (int i = 0, length = string.length(); i < length; i++) {
             char c = string.charAt(i);
-            if (c == AMP) {
+            if (c == '&') {
                 final int semic = string.indexOf(';', i);
                 if (semic > i) {
                     final String entity = string.substring(i + 1, semic);
@@ -204,7 +204,7 @@ public class XML {
                         if ("quot".equalsIgnoreCase(entity)) {
                             sb.append('"');
                         } else if ("amp".equalsIgnoreCase(entity)) {
-                            sb.append(AMP);
+                            sb.append('&');
                         } else if ("apos".equalsIgnoreCase(entity)) {
                             sb.append('\'');
                         } else if ("lt".equalsIgnoreCase(entity)) {
@@ -212,7 +212,7 @@ public class XML {
                         } else if ("gt".equalsIgnoreCase(entity)) {
                             sb.append('>');
                         } else {
-                            sb.append(AMP).append(entity).append(';');
+                            sb.append('&').append(entity).append(';');
                         }
                     }
                     // skip past the entity we just parsed.
