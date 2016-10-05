@@ -79,6 +79,11 @@ public class JSONPointerTest {
     }
 
     @Test
+    public void uriFragmentNotationRoot() {
+        assertSame(document, query("#"));
+    }
+
+    @Test
     public void uriFragmentPercentHandling() {
         assertSame(document.get("c%d"), query("#/c%25d"));
         assertSame(document.get("e^f"), query("#/e%5Ef"));

@@ -9,3 +9,4 @@ build
 /gradlew.bat
 .gitmodules
 src/main/
+.idea
