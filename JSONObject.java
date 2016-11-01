@@ -1631,6 +1631,20 @@ public class JSONObject {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof JSONObject)) return false;
+
+        JSONObject otherObject = (JSONObject) o;
+        return map.equals(otherObject.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return map.hashCode();
+    }
+
     /**
      * Make a prettyprinted JSON text of this JSONObject.
      * <p>
