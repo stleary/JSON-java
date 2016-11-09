@@ -1479,6 +1479,7 @@ public class JSONObject {
      *           The names to be removed.
      * @return the ArrayLits that has the all values that were associated with the 
      *          name, or null if there was no value.
+     * @author Seyed Ali Roshan
      */
      public ArrayList<Object> removeAll(String... keys) {
          ArrayList<Object> outPut = new ArrayList<>();
