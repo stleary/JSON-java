@@ -205,6 +205,7 @@ public class JSONObject {
             default:
                 x.back();
                 key = x.nextValue().toString();
+                break;
             }
 
 // The key is followed by ':'.
@@ -219,6 +220,7 @@ public class JSONObject {
 
             switch (x.nextClean()) {
             case ';':
+                break;
             case ',':
                 if (x.nextClean() == '}') {
                     return;
