@@ -35,7 +35,6 @@ import java.util.Iterator;
  */
 @SuppressWarnings("boxing")
 public class XML {
-
     /** The Character '&amp;'. */
     public static final Character AMP = '&';
 
@@ -62,6 +61,46 @@ public class XML {
 
     /** The Character '/'. */
     public static final Character SLASH = '/';
+    
+    /**
+     * Creates an iterator for navigating Code Points in a string instead of
+     * characters. Once Java7 support is dropped, this can be replaced with
+     * <code>
+     * string.codePoints()
+     * </code>
+     * which is available in Java8 and above.
+     * 
+     * @see <a href=
+     *      "http://stackoverflow.com/a/21791059/6030888">http://stackoverflow.com/a/21791059/6030888</a>
+     */
+    private static Iterable<Integer> codePointIterator(final String string) {
+        return new Iterable<Integer>() {
+            @Override
+            public Iterator<Integer> iterator() {
+                return new Iterator<Integer>() {
+                    private int nextIndex = 0;
+                    private int length = string.length();
+
+                    @Override
+                    public boolean hasNext() {
+                        return this.nextIndex < this.length;
+                    }
+
+                    @Override
+                    public Integer next() {
+                        int result = string.codePointAt(this.nextIndex);
+                        this.nextIndex += Character.charCount(result);
+                        return result;
+                    }
+
+                    @Override
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
 
     /**
      * Replace special characters with XML escapes:
@@ -71,6 +110,7 @@ public class XML {
      * &lt; <small>(less than)</small> is replaced by &amp;lt;
      * &gt; <small>(greater than)</small> is replaced by &amp;gt;
      * &quot; <small>(double quote)</small> is replaced by &amp;quot;
+     * &apos; <small>(single quote / apostrophe)</small> is replaced by &amp;apos;
      * </pre>
      * 
      * @param string
@@ -79,9 +119,8 @@ public class XML {
      */
     public static String escape(String string) {
         StringBuilder sb = new StringBuilder(string.length());
-        for (int i = 0, length = string.length(); i < length; i++) {
-            char c = string.charAt(i);
-            switch (c) {
+        for (final int cp : codePointIterator(string)) {
+            switch (cp) {
             case '&':
                 sb.append("&amp;");
                 break;
@@ -98,6 +137,93 @@ public class XML {
                 sb.append("&apos;");
                 break;
             default:
+                if (mustEscape(cp)) {
+                    sb.append("&#x");
+                    sb.append(Integer.toHexString(cp));
+                    sb.append(";");
+                } else {
+                    sb.appendCodePoint(cp);
+                }
+            }
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * @param cp code point to test
+     * @return true if the code point is not valid for an XML
+     */
+    private static boolean mustEscape(int cp) {
+        /* Valid range from https://www.w3.org/TR/REC-xml/#charsets
+         * 
+         * #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF] 
+         * 
+         * any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. 
+         */
+        // isISOControl is true when (cp >= 0 && cp <= 0x1F) || (cp >= 0x7F && cp <= 0x9F)
+        // all ISO control characters are out of range except tabs and new lines
+        return (Character.isISOControl(cp)
+                && cp != 0x9
+                && cp != 0xA
+                && cp != 0xD
+            ) || !(
+                // valid the range of acceptable characters that aren't control
+                (cp >= 0x20 && cp <= 0xD7FF)
+                || (cp >= 0xE000 && cp <= 0xFFFD)
+                || (cp >= 0x10000 && cp <= 0x10FFFF)
+            )
+        ;
+    }
+
+    /**
+     * Removes XML escapes from the string.
+     * 
+     * @param string
+     *            string to remove escapes from
+     * @return string with converted entities
+     */
+    public static String unescape(String string) {
+        StringBuilder sb = new StringBuilder(string.length());
+        for (int i = 0, length = string.length(); i < length; i++) {
+            char c = string.charAt(i);
+            if (c == '&') {
+                final int semic = string.indexOf(';', i);
+                if (semic > i) {
+                    final String entity = string.substring(i + 1, semic);
+                    if (entity.charAt(0) == '#') {
+                        int cp;
+                        if (entity.charAt(1) == 'x') {
+                            // hex encoded unicode
+                            cp = Integer.parseInt(entity.substring(2), 16);
+                        } else {
+                            // decimal encoded unicode
+                            cp = Integer.parseInt(entity.substring(1));
+                        }
+                        sb.appendCodePoint(cp);
+                    } else {
+                        if ("quot".equalsIgnoreCase(entity)) {
+                            sb.append('"');
+                        } else if ("amp".equalsIgnoreCase(entity)) {
+                            sb.append('&');
+                        } else if ("apos".equalsIgnoreCase(entity)) {
+                            sb.append('\'');
+                        } else if ("lt".equalsIgnoreCase(entity)) {
+                            sb.append('<');
+                        } else if ("gt".equalsIgnoreCase(entity)) {
+                            sb.append('>');
+                        } else {
+                            sb.append('&').append(entity).append(';');
+                        }
+                    }
+                    // skip past the entity we just parsed.
+                    i += entity.length() + 1;
+                } else {
+                    // this shouldn't happen in most cases since the parser
+                    // errors on unclosed enties.
+                    sb.append(c);
+                }
+            } else {
+                // not part of an entity
                 sb.append(c);
             }
         }
@@ -227,7 +353,6 @@ public class XML {
                 if (token == null) {
                     token = x.nextToken();
                 }
-
                 // attribute = value
                 if (token instanceof String) {
                     string = (String) token;
@@ -238,7 +363,7 @@ public class XML {
                             throw x.syntaxError("Missing value");
                         }
                         jsonobject.accumulate(string,
-                                keepStrings ? token : JSONObject.stringToValue((String) token));
+                                keepStrings ? unescape((String)token) : stringToValue((String) token));
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -270,7 +395,7 @@ public class XML {
                             string = (String) token;
                             if (string.length() > 0) {
                                 jsonobject.accumulate("content",
-                                        keepStrings ? token : JSONObject.stringToValue(string));
+                                        keepStrings ? unescape(string) : stringToValue(string));
                             }
 
                         } else if (token == LT) {
@@ -297,16 +422,18 @@ public class XML {
     }
     
     /**
-     * This method has been deprecated in favor of the
-     * {@link JSONObject.stringToValue(String)} method. Use it instead.
+     * This method is the same as {@link JSONObject.stringToValue(String)}
+     * except that this also tries to unescape String values.
      * 
-     * @deprecated Use JSONObject#stringToValue(String) instead.
      * @param string String to convert
      * @return JSON value of this string or the string
      */
-    @Deprecated
     public static Object stringToValue(String string) {
-        return JSONObject.stringToValue(string);
+        Object ret = JSONObject.stringToValue(string);
+        if(ret instanceof String){
+            return unescape((String)ret);
+        }
+        return ret;
     }
 
     /**
