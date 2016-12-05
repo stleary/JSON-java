@@ -22,7 +22,7 @@ JSONObject.java: The JSONObject can parse text from a String or a JSONTokener
 to produce a map-like object. The object provides methods for manipulating its
 contents, and for producing a JSON compliant object serialization.
 
-JSONArray.java: The JSONObject can parse text from a String or a JSONTokener
+JSONArray.java: The JSONArray can parse text from a String or a JSONTokener
 to produce a vector-like object. The object provides methods for manipulating
 its contents, and for producing a JSON compliant array serialization.
 
