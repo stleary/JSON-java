@@ -84,7 +84,7 @@ public class CDL {
             return sb.toString();
         case ',':
             x.back();
-            return "";
+            return " ";
         default:
             x.back();
             return x.nextTo(',');
