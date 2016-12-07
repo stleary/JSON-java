@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JSON-Java" default="dist">
+
+        <property file="build.properties" />
+
+    	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build.dir}"/>
+	</target>
+
+	<target name="compile" depends="init"
+        description="compile the source " >
+		<!-- Compile the java code from ${source.dir} into ${build.dir} -->
+		<javac srcdir="${source.dir}" destdir="${build.dir}" debug="on">
+		</javac>
+	</target>
+
+	<target name="dist" depends="compile"
+        description="generate the distribution" >
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist}/lib"/>
+
+		<!-- Put everything in ${build.dir} into the MyProject-${DSTAMP}.jar file -->
+		<jar jarfile="${dist}/java-json-${DSTAMP}.jar" >
+			<fileset dir="${build.dir}"/>
+		</jar>
+	</target>
+
+	<target name="clean" description="clean up" >
+		<!-- Delete the ${build.dir} and ${dist} directory trees -->
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist}"/>
+	</target>
+</project>
