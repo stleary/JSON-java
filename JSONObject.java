@@ -201,6 +201,9 @@ public class JSONObject {
             case 0:
                 throw x.syntaxError("A JSONObject text must end with '}'");
             case '}':
+                if (x.nextClean() != 0) {
+                    throw x.syntaxError("Extra characters after closing '}'");
+                }
                 return;
             default:
                 x.back();
@@ -221,11 +224,17 @@ public class JSONObject {
             case ';':
             case ',':
                 if (x.nextClean() == '}') {
+                    if (x.nextClean() != 0) {
+                        throw x.syntaxError("Extra characters after closing '}'");
+                    }
                     return;
                 }
                 x.back();
                 break;
             case '}':
+                if (x.nextClean() != 0) {
+                    throw x.syntaxError("Extra characters after closing '}'");
+                }
                 return;
             default:
                 throw x.syntaxError("Expected a ',' or '}'");
