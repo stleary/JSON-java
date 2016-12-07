@@ -1,6 +1,6 @@
 package org.json;
 
-/*
+/*   
 Copyright (c) 2002 JSON.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
