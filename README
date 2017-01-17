@@ -22,12 +22,18 @@ JSONObject.java: The JSONObject can parse text from a String or a JSONTokener
 to produce a map-like object. The object provides methods for manipulating its
 contents, and for producing a JSON compliant object serialization.
 
+JSONObjectKeyOrder.java: The JSONObject can stored the key names in order.Most time 
+hash code order is ok,some case order it is  useful. With type get method ,the opt** is just try cast ,
+we need is**(isInt).
+
 JSONArray.java: The JSONArray can parse text from a String or a JSONTokener
 to produce a vector-like object. The object provides methods for manipulating
 its contents, and for producing a JSON compliant array serialization.
 
 JSONTokener.java: The JSONTokener breaks a text into a sequence of individual
 tokens. It can be constructed from a String, Reader, or InputStream.
+
+JSONTokenerKeyOrder.java:The JSONTokenerKeyOrder process JSONObjectKeyOrder.
 
 JSONException.java: The JSONException is the standard exception type thrown
 by this package.
