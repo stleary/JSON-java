@@ -35,6 +35,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A JSONArray is an ordered sequence of values. Its external text form is a
@@ -82,6 +84,11 @@ import java.util.Map;
  */
 public class JSONArray implements Iterable<Object> {
 
+    /**
+     * Logger for retrieving otherwise invisible Exceptions.
+     */
+    private static final Logger LOGGER = Logger.getLogger(JSONArray.class.getName());
+    
     /**
      * The arrayList where the JSONArray's properties are kept.
      */
@@ -244,7 +251,7 @@ public class JSONArray implements Iterable<Object> {
             return object instanceof Number ? ((Number) object).doubleValue()
                     : Double.parseDouble((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.");
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
     }
 
@@ -289,7 +296,7 @@ public class JSONArray implements Iterable<Object> {
             return new BigDecimal(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONArray[" + index +
-                    "] could not convert to BigDecimal.");
+                    "] could not convert to BigDecimal.", e);
         }
     }
 
@@ -309,7 +316,7 @@ public class JSONArray implements Iterable<Object> {
             return new BigInteger(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONArray[" + index +
-                    "] could not convert to BigInteger.");
+                    "] could not convert to BigInteger.", e);
         }
     }
 
@@ -328,7 +335,7 @@ public class JSONArray implements Iterable<Object> {
             return object instanceof Number ? ((Number) object).intValue()
                     : Integer.parseInt((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.");
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
     }
 
@@ -384,7 +391,7 @@ public class JSONArray implements Iterable<Object> {
             return object instanceof Number ? ((Number) object).longValue()
                     : Long.parseLong((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.");
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
     }
 
@@ -489,6 +496,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return this.getBoolean(index);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -521,6 +529,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return this.getDouble(index);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -553,6 +562,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return this.getInt(index);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -596,8 +606,10 @@ public class JSONArray implements Iterable<Object> {
             }
             return Enum.valueOf(clazz, val.toString());
         } catch (IllegalArgumentException e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         } catch (NullPointerException e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -618,6 +630,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return this.getBigInteger(index);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -637,6 +650,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return this.getBigDecimal(index);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -696,6 +710,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return this.getLong(index);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -996,6 +1011,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return pointer.queryFrom(this);
         } catch (JSONPointerException e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return null;
         }
     }
@@ -1085,6 +1101,7 @@ public class JSONArray implements Iterable<Object> {
         try {
             return this.toString(0);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return null;
         }
     }
