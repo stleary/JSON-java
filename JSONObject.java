@@ -1157,9 +1157,9 @@ public class JSONObject {
                             && Character.isUpperCase(key.charAt(0))
                             && method.getParameterTypes().length == 0) {
                         if (key.length() == 1) {
-                            key = key.toLowerCase();
+                            key = key.toLowerCase(Locale.ROOT);
                         } else if (!Character.isUpperCase(key.charAt(1))) {
-                            key = key.substring(0, 1).toLowerCase()
+                            key = key.substring(0, 1).toLowerCase(Locale.ROOT)
                                     + key.substring(1);
                         }
 
