@@ -2,6 +2,12 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 
+tasks.withType(JavaCompile) { 
+     // this subproject requires -parameters option
+     options.compilerArgs << '-parameters'
+     options.encoding = 'UTF-8' 
+}
+
 sourceSets {
   // Uncomment main if you have merged JSON-Java and JSON-Java-unit-test code
   main
