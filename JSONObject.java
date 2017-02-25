@@ -1359,7 +1359,29 @@ public class JSONObject {
      * @return the item matched by the JSONPointer, otherwise null
      */
     public Object query(String jsonPointer) {
-        return new JSONPointer(jsonPointer).queryFrom(this);
+        return query(new JSONPointer(jsonPointer));
+    }
+    /**
+     * Uses a uaer initialized JSONPointer  and tries to 
+     * match it to an item within this JSONObject. For example, given a
+     * JSONObject initialized with this document:
+     * <pre>
+     * {
+     *     "a":{"b":"c"}
+     * }
+     * </pre>
+     * and this JSONPointer: 
+     * <pre>
+     * "/a/b"
+     * </pre>
+     * Then this method will return the String "c".
+     * A JSONPointerException may be thrown from code called by this method.
+     *   
+     * @param jsonPointer string that can be used to create a JSONPointer
+     * @return the item matched by the JSONPointer, otherwise null
+     */
+    public Object query(JSONPointer jsonPointer) {
+        return jsonPointer.queryFrom(this);
     }
     
     /**
@@ -1371,9 +1393,20 @@ public class JSONObject {
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
      */
     public Object optQuery(String jsonPointer) {
-        JSONPointer pointer = new JSONPointer(jsonPointer);
+    	return optQuery(new JSONPointer(jsonPointer));
+    }
+    
+    /**
+     * Queries and returns a value from this object using {@code jsonPointer}, or
+     * returns null if the query fails due to a missing key.
+     * 
+     * @param The JSON pointer
+     * @return the queried value or {@code null}
+     * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
+     */
+    public Object optQuery(JSONPointer jsonPointer) {
         try {
-            return pointer.queryFrom(this);
+            return jsonPointer.queryFrom(this);
         } catch (JSONPointerException e) {
             return null;
         }
