@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+  Maven "Project Object Model" for JSON-Java
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  to deploy the project, do the following inside your git repository
+
+   `$ mvn deploy`
+
+  that's it - the rest is taken care of by the script further down, under <build>
+
+  This was tested this using maven 3, available from http://maven.apache.org/download.html
+  After deploying the project, there will be a custom maven repository available.
+  Now the JSON-Java library can be used in any maven project by adding it
+  to the pom.xml like this:
+
+  <repositories>
+      <repository>
+          <id>douglascrockford-json-java</id>
+          <name>Douglas Crockford's JSON-Java Maven Repository</name>
+          <url>https://douglascrockford.github.com/JSON-java/repository/</url>
+      </repository>
+  </repositories>
+
+  and adding the library as a dependency like this:
+
+  <dependency>
+    <groupId>org.json</groupId>
+    <artifactId>JSON-Java</artifactId>
+    <version>git-df6190f3fc</version>
+  </dependencies>
+-->
+
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.json</groupId>
+  <artifactId>JSON-Java</artifactId>
+  <version>git-df6190f3fc</version>
+
+  <packaging>jar</packaging>
+
+  <name>JSON-Java</name>
+  <url>http://www.json.org/java/</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <scm>
+    <tag>df6190f3fc</tag>
+    <url>https://github.com/douglascrockford/JSON-java</url>
+    <connection>scm:git:git://github.com/douglascrockford/JSON-java.git</connection>
+  </scm>
+
+  <dependencies>
+  <dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.10</version>
+  </dependency>
+  </dependencies>
+
+  <distributionManagement>
+    <repository>
+      <id>gh-pages</id>
+      <url>file:///${basedir}/repository/</url>
+    </repository>
+  </distributionManagement>
+
+  <build>
+    <sourceDirectory>.</sourceDirectory>
+    <testSourceDirectory>.</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions>
+          <execution>
+            <id>github-repository-update</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>bash</executable>
+              <arguments>
+                <!--
+                  "-x": verbose
+                  "-e": stop execution of script on errors
+                  "-c": execute the commands found in the next argument
+                  -->
+                <argument>-xec</argument>
+                <!--
+                    a whole bunch of git commnds to deploy &
+                    make the generated jar accessible on github
+                    the index mus be clean
+                    if it is dirty, the script will fail
+                  -->
+                <argument>
+                  <![CDATA[
+                  if ! git diff-index --quiet --cached HEAD
+                  then
+                        echo You have uncommited changes in the index - please commit them first
+                        exit 1
+                  fi
+                  oldref=$(git symbolic-ref HEAD)
+                  git symbolic-ref HEAD refs/heads/gh-pages
+                  rm .git/index
+                  git add repository
+                  git commit -m "auto-publishing version $(git describe --always)"
+                  git push origin gh-pages;
+                  git symbolic-ref HEAD $oldref
+                  git reset
+                  ]]>
+                </argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
