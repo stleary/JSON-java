@@ -1015,7 +1015,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
      */
     public Object optQuery(String jsonPointer) {
-    	return query(new JSONPointer(jsonPointer));
+    	return optQuery(new JSONPointer(jsonPointer));
     }
     
     /**
