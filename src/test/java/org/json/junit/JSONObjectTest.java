@@ -52,6 +52,23 @@ public class JSONObjectTest {
     }
     
     /**
+     * The JSON parser is permissive of unambiguous unquoted keys and values.
+     * Such JSON text should be allowed, even if it does not strictly conform
+     * to the spec. However, after being parsed, toString() should emit strictly
+     * conforming JSON text.  
+     */
+    @Test
+    public void unquotedText() {
+        String str = "{key1:value1, key2:42}";
+        JSONObject jsonObject = new JSONObject(str);
+        String textStr = jsonObject.toString();
+        assertTrue("expected key1", textStr.contains("\"key1\""));
+        assertTrue("expected value1", textStr.contains("\"value1\""));
+        assertTrue("expected key2", textStr.contains("\"key2\""));
+        assertTrue("expected 42", textStr.contains("42"));
+    }
+    
+    /**
      * A JSONObject can be created with no content
      */
     @Test
