@@ -157,7 +157,7 @@ public class JSONPointerTest {
     }
 
     /**
-     * Coverage for JSONObject queryFrom()
+     * Coverage for JSONObject query(String)
      */
     @Test
     public void queryFromJSONObject() {
@@ -187,7 +187,61 @@ public class JSONPointerTest {
     }
 
     /**
-     * Coverage for JSONArray queryFrom()
+     * Coverage for JSONObject query(JSONPointer)
+     */
+    @Test
+    public void queryFromJSONObjectUsingPointer() {
+        String str = "{"+
+                "\"stringKey\":\"hello world!\","+
+                "\"arrayKey\":[0,1,2],"+
+                "\"objectKey\": {"+
+                    "\"a\":\"aVal\","+
+                    "\"b\":\"bVal\""+
+                "}"+
+            "}";    
+        JSONObject jsonObject = new JSONObject(str);
+        Object obj = jsonObject.query(new JSONPointer("/stringKey"));
+        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        obj = jsonObject.query(new JSONPointer("/arrayKey/1"));
+        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        obj = jsonObject.query(new JSONPointer("/objectKey/b"));
+        assertTrue("Expected bVal", "bVal".equals(obj));
+        try {
+            obj = jsonObject.query(new JSONPointer("/a/b/c"));
+            assertTrue("Expected JSONPointerException", false);
+        } catch (JSONPointerException e) {
+            assertTrue("Expected bad key/value exception",
+                    "value [null] is not an array or object therefore its key b cannot be resolved".
+                    equals(e.getMessage()));
+        }
+    }
+
+    /**
+     * Coverage for JSONObject optQuery(JSONPointer)
+     */
+    @Test
+    public void optQueryFromJSONObjectUsingPointer() {
+        String str = "{"+
+                "\"stringKey\":\"hello world!\","+
+                "\"arrayKey\":[0,1,2],"+
+                "\"objectKey\": {"+
+                    "\"a\":\"aVal\","+
+                    "\"b\":\"bVal\""+
+                "}"+
+            "}";    
+        JSONObject jsonObject = new JSONObject(str);
+        Object obj = jsonObject.optQuery(new JSONPointer("/stringKey"));
+        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        obj = jsonObject.optQuery(new JSONPointer("/arrayKey/1"));
+        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        obj = jsonObject.optQuery(new JSONPointer("/objectKey/b"));
+        assertTrue("Expected bVal", "bVal".equals(obj));
+        obj = jsonObject.optQuery(new JSONPointer("/a/b/c"));
+        assertTrue("Expected null", obj == null);
+    }
+    
+    /**
+     * Coverage for JSONArray query(String)
      */
     @Test
     public void queryFromJSONArray() {
@@ -213,5 +267,58 @@ public class JSONPointerTest {
             assertTrue("Expected bad index exception",
                     "a is not an array index".equals(e.getMessage()));
         }
+    }
+
+    /**
+     * Coverage for JSONArray query(JSONPointer)
+     */
+    @Test
+    public void queryFromJSONArrayUsingPointer() {
+        String str = "["+
+                "\"hello world!\","+
+                "[0,1,2],"+
+                "{"+
+                    "\"a\":\"aVal\","+
+                    "\"b\":\"bVal\""+
+                "}"+
+            "]";    
+        JSONArray jsonArray = new JSONArray(str);
+        Object obj = jsonArray.query(new JSONPointer("/0"));
+        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        obj = jsonArray.query(new JSONPointer("/1/1"));
+        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        obj = jsonArray.query(new JSONPointer("/2/b"));
+        assertTrue("Expected bVal", "bVal".equals(obj));
+        try {
+            obj = jsonArray.query(new JSONPointer("/a/b/c"));
+            assertTrue("Expected JSONPointerException", false);
+        } catch (JSONPointerException e) {
+            assertTrue("Expected bad index exception",
+                    "a is not an array index".equals(e.getMessage()));
+        }
+    }
+
+    /**
+     * Coverage for JSONArray optQuery(JSONPointer)
+     */
+    @Test
+    public void optQueryFromJSONArrayUsingPointer() {
+        String str = "["+
+                "\"hello world!\","+
+                "[0,1,2],"+
+                "{"+
+                    "\"a\":\"aVal\","+
+                    "\"b\":\"bVal\""+
+                "}"+
+            "]";    
+        JSONArray jsonArray = new JSONArray(str);
+        Object obj = jsonArray.optQuery(new JSONPointer("/0"));
+        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+        obj = jsonArray.optQuery(new JSONPointer("/1/1"));
+        assertTrue("Expected 1", Integer.valueOf(1).equals(obj));
+        obj = jsonArray.optQuery(new JSONPointer("/2/b"));
+        assertTrue("Expected bVal", "bVal".equals(obj));
+        obj = jsonArray.optQuery(new JSONPointer("/a/b/c"));
+        assertTrue("Expected null", obj == null);
     }
 }
