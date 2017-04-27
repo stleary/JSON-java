@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,7 +91,7 @@ public class EnumTest {
         assertTrue("expected 3 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 3);
         assertTrue("expected VAL1", MyEnumField.VAL1.equals(jsonObject.query("/VAL1")));
         assertTrue("expected VAL2", MyEnumField.VAL2.equals(jsonObject.query("/VAL2")));
-        assertTrue("expected VAL3", myEnumField.VAL3.equals(jsonObject.query("/VAL3")));
+        assertTrue("expected VAL3", MyEnumField.VAL3.equals(jsonObject.query("/VAL3")));
     }
     
     /**

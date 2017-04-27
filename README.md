@@ -2,7 +2,7 @@
 
 Unit tests to validate the JSON-Java GitHub project code<br>
 
-https://github.com/douglascrockford/JSON-java<br>
+https://github.com/stleary/JSON-java<br>
 
 Gradle and Eclipse is the recommended build tool and IDE.<br>
 Run individual tests or <b>JunitTestSuite</b> using <b>EclEmma Coverage</b>, or execute the **TestRunner** application directly.<br>
