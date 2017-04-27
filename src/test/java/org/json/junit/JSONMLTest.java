@@ -782,7 +782,7 @@ public class JSONMLTest {
     
 // this test does not pass for the following reasons:
 // 1. Our XML parser does not handle generic HTML entities, only valid XML entities. Hence &nbsp;
-//    or other HTML specific entites would fail on reversability
+//    or other HTML specific entities would fail on reversability
 // 2. Our JSON implementation for storing the XML attributes uses the standard unordered map.
 //    This means that <tag attr1="v1" attr2="v2" /> can not be reversed reliably.  
 //    /**
