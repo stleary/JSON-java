@@ -6,6 +6,7 @@ import java.util.*;
  * A resource bundle class
  */
 public class StringsResourceBundle extends ListResourceBundle {
+    @Override
     public Object[][] getContents() {
         return contents;
     }

@@ -7,9 +7,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -47,8 +47,7 @@ public class JSONObjectTest {
      */
     @Test(expected=NullPointerException.class)
     public void jsonObjectByNullBean() {
-        MyBean myBean = null;
-        new JSONObject(myBean);
+        assertNull("Expected an exception",new JSONObject((MyBean)null));
     }
     
     /**
@@ -66,6 +65,26 @@ public class JSONObjectTest {
         assertTrue("expected value1", textStr.contains("\"value1\""));
         assertTrue("expected key2", textStr.contains("\"key2\""));
         assertTrue("expected 42", textStr.contains("42"));
+    }
+    
+    @Test
+    public void testLongFromString(){
+        String str = "26315000000253009";
+        JSONObject json = new JSONObject();
+        json.put("key", str);
+        
+        final Object actualKey = json.opt("key");
+        assert str.equals(actualKey) : "Incorrect key value. Got " + actualKey
+                + " expected " + str;
+        
+        final long actualLong = json.optLong("key");
+        assert actualLong != 0 : "Unable to extract long value for string " + str;
+        assert 26315000000253009L == actualLong : "Incorrect key value. Got "
+                + actualLong + " expected " + str;
+
+        final String actualString = json.optString("key");
+        assert str.equals(actualString) : "Incorrect key value. Got "
+                + actualString + " expected " + str;
     }
     
     /**
@@ -245,7 +264,7 @@ public class JSONObjectTest {
         /**
          * Calls the JSONObject(Map) ctor, which calls wrap() for values.
          * Fraction is a Number, but is not recognized by wrap(), per
-         * current implementation. As a POJO, Franction is handled as a
+         * current implementation. As a POJO, Fraction is handled as a
          * bean and inserted into a contained JSONObject. It has 2 getters,
          * for numerator and denominator. 
          */
@@ -271,7 +290,7 @@ public class JSONObjectTest {
     }
 
     /**
-     * Verifies that the put Collection has backwards compatability with RAW types pre-java5.
+     * Verifies that the put Collection has backwards compatibility with RAW types pre-java5.
      */
     @Test
     public void verifyPutCollection() {
@@ -400,6 +419,7 @@ public class JSONObjectTest {
      * JSONObject built from a bean. In this case all but one of the 
      * bean getters return valid JSON types
      */
+    @SuppressWarnings("boxing")
     @Test
     public void jsonObjectByBean() {
         /**
@@ -479,6 +499,7 @@ public class JSONObjectTest {
     /**
      * Exercise the JSONObject.accumulate() method
      */
+    @SuppressWarnings("boxing")
     @Test
     public void jsonObjectAccumulate() {
 
@@ -510,6 +531,7 @@ public class JSONObjectTest {
     /**
      * Exercise the JSONObject append() functionality
      */
+    @SuppressWarnings("boxing")
     @Test
     public void jsonObjectAppend() {
         JSONObject jsonObject = new JSONObject();
@@ -540,6 +562,7 @@ public class JSONObjectTest {
     /**
      * Exercise the JSONObject doubleToString() method
      */
+    @SuppressWarnings("boxing")
     @Test
     public void jsonObjectDoubleToString() {
         String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68", "null", "null" };
@@ -906,6 +929,7 @@ public class JSONObjectTest {
      * Document behaviors of big numbers. Includes both JSONObject
      * and JSONArray tests
      */
+    @SuppressWarnings("boxing")
     @Test
     public void bigNumberOperations() {
         /**
@@ -1232,6 +1256,7 @@ public class JSONObjectTest {
     /**
      * Exercise the JSONObject increment() method.
      */
+    @SuppressWarnings("cast")
     @Test
     public void jsonObjectIncrement() {
         String str = 
@@ -1285,7 +1310,7 @@ public class JSONObjectTest {
          * http://www.h-schmidt.net/FloatConverter/) The same happens to 3.1,
          * that decimal number (base10 representation) is periodic in base2
          * representation, therefore appending zero-bits is inaccurate. Only
-         * repeating the periodically occuring bits (0110) would be a proper
+         * repeating the periodically occurring bits (0110) would be a proper
          * conversion. However one cannot detect from a 32 bit IEE754
          * representation which bits would "repeat infinitely", since the
          * missing bits would not fit into the 32 bit float, i.e. the
@@ -1350,6 +1375,7 @@ public class JSONObjectTest {
     /**
      * Exercise JSONObject numberToString() method
      */
+    @SuppressWarnings("boxing")
     @Test
     public void jsonObjectNumberToString() {
         String str;
@@ -1372,6 +1398,7 @@ public class JSONObjectTest {
     /**
      * Exercise JSONObject put() and similar() methods
      */
+    @SuppressWarnings("boxing")
     @Test
     public void jsonObjectPut() {
         String expectedStr = 
@@ -1641,6 +1668,7 @@ public class JSONObjectTest {
      * The following code was throwing a ClassCastException in the 
      * JSONObject(Map<String, Object>) constructor
      */
+    @SuppressWarnings("boxing")
     @Test
     public void valueToStringConfirmException() {
         Map<Integer, String> myMap = new HashMap<Integer, String>();
@@ -1672,7 +1700,7 @@ public class JSONObjectTest {
 
         /**
          * This test is to document the preferred behavior if BigDecimal is
-         * supported. Previously  bd returned as a string, since it
+         * supported. Previously bd returned as a string, since it
          * is recognized as being a Java package class. Now with explicit
          * support for big numbers, it remains a BigDecimal 
          */
@@ -1761,13 +1789,13 @@ public class JSONObjectTest {
     /**
      * Explore how JSONObject handles parsing errors.
      */
+    @SuppressWarnings("boxing")
     @Test
     public void jsonObjectParsingErrors() {
         try {
             // does not start with '{'
             String str = "abc";
-            new JSONObject(str);
-            assertTrue("Expected an exception", false);
+            assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
             assertTrue("Expecting an exception message", 
                     "A JSONObject text must begin with '{' at 1 [character 2 line 1]".
@@ -1776,8 +1804,7 @@ public class JSONObjectTest {
         try {
             // does not end with '}'
             String str = "{";
-            new JSONObject(str);
-            assertTrue("Expected an exception", false);
+            assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
             assertTrue("Expecting an exception message", 
                     "A JSONObject text must end with '}' at 2 [character 3 line 1]".
@@ -1786,8 +1813,7 @@ public class JSONObjectTest {
         try {
             // key with no ':'
             String str = "{\"myKey\" = true}";
-            new JSONObject(str);
-            assertTrue("Expected an exception", false);
+            assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
             assertTrue("Expecting an exception message", 
                     "Expected a ':' after a key at 10 [character 11 line 1]".
@@ -1796,8 +1822,7 @@ public class JSONObjectTest {
         try {
             // entries with no ',' separator
             String str = "{\"myKey\":true \"myOtherKey\":false}";
-            new JSONObject(str);
-            assertTrue("Expected an exception", false);
+            assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
             assertTrue("Expecting an exception message", 
                     "Expected a ',' or '}' at 15 [character 16 line 1]".
@@ -2051,16 +2076,19 @@ public class JSONObjectTest {
      * Exercise the JSONObject write() method
      */
     @Test
-    public void write() {
+    public void write() throws IOException {
         String str = "{\"key1\":\"value1\",\"key2\":[1,2,3]}";
         String expectedStr = str;
         JSONObject jsonObject = new JSONObject(str);
         StringWriter stringWriter = new StringWriter();
-        Writer writer = jsonObject.write(stringWriter);
-        String actualStr = writer.toString();
-        assertTrue("write() expected " +expectedStr+
-                " but found " +actualStr,
-                expectedStr.equals(actualStr));
+        try {
+            String actualStr = jsonObject.write(stringWriter).toString();
+            assertTrue("write() expected " +expectedStr+
+                    " but found " +actualStr,
+                    expectedStr.equals(actualStr));
+        } finally {
+            stringWriter.close();
+        }
     }
 
     /**
@@ -2085,7 +2113,7 @@ public class JSONObjectTest {
      * Exercise the JSONObject write(Writer, int, int) method
      */
     @Test
-    public void write3Param() {
+    public void write3Param() throws IOException {
         String str0 = "{\"key1\":\"value1\",\"key2\":[1,false,3.14]}";
         String str2 =
                 "{\n" +
@@ -2099,15 +2127,21 @@ public class JSONObjectTest {
         JSONObject jsonObject = new JSONObject(str0);
         String expectedStr = str0;
         StringWriter stringWriter = new StringWriter();
-        Writer writer = jsonObject.write(stringWriter,0,0);
-        String actualStr = writer.toString();
-        assertEquals(expectedStr, actualStr);
+        try {
+            String actualStr = jsonObject.write(stringWriter,0,0).toString();
+            assertEquals(expectedStr, actualStr);
+        } finally {
+            stringWriter.close();
+        }
 
         expectedStr = str2;
         stringWriter = new StringWriter();
-        writer = jsonObject.write(stringWriter,2,1);
-        actualStr = writer.toString();
-        assertEquals(expectedStr, actualStr);
+        try {
+            String actualStr = jsonObject.write(stringWriter,2,1).toString();
+            assertEquals(expectedStr, actualStr);
+        } finally {
+            stringWriter.close();
+        }
     }
 
     /**
@@ -2210,12 +2244,13 @@ public class JSONObjectTest {
         obj = null;
         jsonObjectNull.put("key", obj);
         value = jsonObjectNull.opt("key");
-        assertTrue("opt() null should find null", value == null);
-        if (value == null) {
-            value = "";
-        }
-        string = value instanceof String ? (String)value : null;
-        assertTrue("should convert null to empty string", "".equals(string));
+        assertNull("opt() null should find null", value);
+        // what is this trying to do? It appears to test absolutely nothing...
+//        if (value == null) {
+//            value = "";
+//        }
+//        string = value instanceof String ? (String)value : null;
+//        assertTrue("should convert null to empty string", "".equals(string));
         try {
             value = jsonObjectNull.get("key");
             assertTrue("get() null should throw exception", false);
@@ -2254,7 +2289,7 @@ public class JSONObjectTest {
     @Test(expected = JSONException.class)
     public void invalidEscapeSequence() {
       String json = "{ \"\\url\": \"value\" }";
-      new JSONObject(json);
+      assertNull("Expected an exception",new JSONObject(json));
     }
 
     /**

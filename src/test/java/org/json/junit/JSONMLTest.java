@@ -711,8 +711,7 @@ public class JSONMLTest {
     }
 
     /**
-     * JSON string cannot be reverted to original xml. See test result in
-     * comment below.
+     * JSON string cannot be reverted to original xml when type guessing is used.
      */
     @Test
     public void testToJSONArray_reversibility() {
@@ -722,10 +721,11 @@ public class JSONMLTest {
     }
 
     /**
-     * test passes when using the new method toJsonML.
+     * JSON string cannot be reverted to original xml when type guessing is used.
+     * When we force all the values as string, the original text comes back.
      */
     @Test
-    public void testToJsonML() {
+    public void testToJSONArray_reversibility2() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
         final String expectedJsonString = "[\"root\",[\"id\",\"01\"],[\"id\",\"1\"],[\"id\",\"00\"],[\"id\",\"0\"],[\"item\",{\"id\":\"01\"}],[\"title\",\"True\"]]";
         final JSONArray json = JSONML.toJSONArray(originalXml,true);
@@ -735,4 +735,72 @@ public class JSONMLTest {
         assertEquals(originalXml, reverseXml);
     }
 
+    /**
+     * JSON can be reverted to original xml.
+     */
+    @Test
+    public void testToJSONArray_reversibility3() {
+        final String originalXml = "<readResult><errors someAttr=\"arrtValue\"><code>400</code></errors><errors><code>402</code></errors></readResult>";
+        final JSONArray jsonArray = JSONML.toJSONArray(originalXml, false);
+        final String revertedXml = JSONML.toString(jsonArray);
+        assertEquals(revertedXml, originalXml);
+    }
+    
+    /**
+     * JSON string cannot be reverted to original xml. See test result in
+     * comment below.
+     */
+    @Test
+    public void testToJSONObject_reversibility() {
+        final String originalXml = "<readResult><errors someAttr=\"arrtValue\"><code>400</code></errors><errors><code>402</code></errors></readResult>";
+        final JSONObject originalObject=JSONML.toJSONObject(originalXml,false);
+        final String originalJson = originalObject.toString();
+        final String xml = JSONML.toString(originalObject);
+        final JSONObject revertedObject = JSONML.toJSONObject(xml, false);
+        final String newJson = revertedObject.toString();
+        assertTrue("JSON Objects are not similar",originalObject.similar(revertedObject));
+        assertEquals("original JSON does not equal the new JSON",originalJson, newJson);
+    }
+
+// these tests do not pass for the following reasons:
+// 1. Our XML parser does not handle generic HTML entities, only valid XML entities. Hence &nbsp;
+//     or other HTML specific entities would fail on reversability
+// 2. Our JSON implementation for storing the XML attributes uses the standard unordered map.
+//     This means that <tag attr1="v1" attr2="v2" /> can not be reversed reliably.  
+//
+//    /**
+//     * Test texts taken from jsonml.org. Currently our implementation FAILS this conversion but shouldn't.
+//     * Technically JsonML should be able to transform any valid xhtml document, but ours only supports
+//     * standard XML entities, not HTML entities.
+//     */
+//    @Test
+//    public void testAttributeConversionReversabilityHTML() {
+//        final String originalXml = "<table class=\"MyTable\" style=\"background-color:yellow\"><tr><td class=\"MyTD\" style=\"border:1px solid black\">#5D28D1</td><td class=\"MyTD\" style=\"background-color:red\">Example text here</td></tr><tr><td class=\"MyTD\" style=\"border:1px solid black\">#AF44EF</td><td class=\"MyTD\" style=\"background-color:green\">127310656</td></tr><tr><td class=\"MyTD\" style=\"border:1px solid black\">#AAD034</td><td class=\"MyTD\" style=\"background-color:blue\">&nbsp;<span style=\"background-color:maroon\">&copy;</span>&nbsp;</td></tr></table>";
+//        final String expectedJsonString = "[\"table\",{\"class\" : \"MyTable\",\"style\" : \"background-color:yellow\"},[\"tr\",[\"td\",{\"class\" : \"MyTD\",\"style\" : \"border:1px solid black\"},\"#550758\"],[\"td\",{\"class\" : \"MyTD\",\"style\" : \"background-color:red\"},\"Example text here\"]],[\"tr\",[\"td\",{\"class\" : \"MyTD\",\"style\" : \"border:1px solid black\"},\"#993101\"],[\"td\",{\"class\" : \"MyTD\",\"style\" : \"background-color:green\"},\"127624015\"]],[\"tr\",[\"td\",{\"class\" : \"MyTD\",\"style\" : \"border:1px solid black\"},\"#E33D87\"],[\"td\",{\"class\" : \"MyTD\",\"style\" : \"background-color:blue\"},\"\u00A0\",[\"span\",{ \"style\" : \"background-color:maroon\" },\"\u00A9\"],\"\u00A0\"]]]";
+//        final JSONArray json = JSONML.toJSONArray(originalXml,true);
+//        final String actualJsonString = json.toString();
+//        
+//        final String reverseXml = JSONML.toString(json);
+//        assertNotEquals(originalXml, reverseXml);
+//
+//        assertNotEquals(expectedJsonString, actualJsonString);
+//    }
+//    
+//    /**
+//     * Test texts taken from jsonml.org but modified to have XML entities only.
+//     */
+//    @Test
+//    public void testAttributeConversionReversabilityXML() {
+//        final String originalXml = "<table class=\"MyTable\" style=\"background-color:yellow\"><tr><td class=\"MyTD\" style=\"border:1px solid black\">#5D28D1</td><td class=\"MyTD\" style=\"background-color:red\">Example text here</td></tr><tr><td class=\"MyTD\" style=\"border:1px solid black\">#AF44EF</td><td class=\"MyTD\" style=\"background-color:green\">127310656</td></tr><tr><td class=\"MyTD\" style=\"border:1px solid black\">#AAD034</td><td class=\"MyTD\" style=\"background-color:blue\">&amp;<span style=\"background-color:maroon\">&gt;</span>&lt;</td></tr></table>";
+//        final String expectedJsonString = "[\"table\",{\"class\" : \"MyTable\",\"style\" : \"background-color:yellow\"},[\"tr\",[\"td\",{\"class\" : \"MyTD\",\"style\" : \"border:1px solid black\"},\"#550758\"],[\"td\",{\"class\" : \"MyTD\",\"style\" : \"background-color:red\"},\"Example text here\"]],[\"tr\",[\"td\",{\"class\" : \"MyTD\",\"style\" : \"border:1px solid black\"},\"#993101\"],[\"td\",{\"class\" : \"MyTD\",\"style\" : \"background-color:green\"},\"127624015\"]],[\"tr\",[\"td\",{\"class\" : \"MyTD\",\"style\" : \"border:1px solid black\"},\"#E33D87\"],[\"td\",{\"class\" : \"MyTD\",\"style\" : \"background-color:blue\"},\"&\",[\"span\",{ \"style\" : \"background-color:maroon\" },\">\"],\"<\"]]]";
+//        final JSONArray jsonML = JSONML.toJSONArray(originalXml,true);
+//        final String actualJsonString = jsonML.toString();
+//        
+//        final String reverseXml = JSONML.toString(jsonML);
+//        // currently not equal because the hashing of the attribute objects makes the attribute
+//        // order not happen the same way twice 
+//        assertEquals(originalXml, reverseXml);
+//
+//        assertEquals(expectedJsonString, actualJsonString);
+//    }
 }

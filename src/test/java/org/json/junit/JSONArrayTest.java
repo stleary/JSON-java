@@ -1,11 +1,11 @@
 package org.json.junit;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class JSONArrayTest {
     @Test(expected=NullPointerException.class)
     public void nullException() {
         String str = null;
-        new JSONArray(str);
+        assertNull("Should throw an exception", new JSONArray(str));
     }
 
     /**
@@ -72,8 +72,7 @@ public class JSONArrayTest {
     public void emptStr() {
         String str = "";
         try {
-            new JSONArray(str);
-            assertTrue("Should throw an exception", false);
+            assertNull("Should throw an exception", new JSONArray(str));
         } catch (JSONException e) {
             assertTrue("Expected an exception message", 
                     "A JSONArray text must start with '[' at 1 [character 2 line 1]".
@@ -90,8 +89,7 @@ public class JSONArrayTest {
     public void badObject() {
         String str = "abc";
         try {
-            new JSONArray((Object)str);
-            assertTrue("Should throw an exception", false);
+            assertNull("Should throw an exception", new JSONArray((Object)str));
         } catch (JSONException e) {
             assertTrue("Expected an exception message", 
                     "JSONArray initial value should be a string or collection or array.".
@@ -100,7 +98,7 @@ public class JSONArrayTest {
     }
     
     /**
-     * Verifies that the constructor has backwards compatability with RAW types pre-java5.
+     * Verifies that the constructor has backwards compatibility with RAW types pre-java5.
      */
     @Test
     public void verifyConstructor() {
@@ -130,7 +128,7 @@ public class JSONArrayTest {
     }
 
     /**
-     * Verifies that the put Collection has backwards compatability with RAW types pre-java5.
+     * Verifies that the put Collection has backwards compatibility with RAW types pre-java5.
      */
     @Test
     public void verifyPutCollection() {
@@ -164,7 +162,7 @@ public class JSONArrayTest {
 
     
     /**
-     * Verifies that the put Map has backwards compatability with RAW types pre-java5.
+     * Verifies that the put Map has backwards compatibility with RAW types pre-java5.
      */
     @Test
     public void verifyPutMap() {
@@ -209,9 +207,10 @@ public class JSONArrayTest {
      * Create a JSONArray doc with a variety of different elements.
      * Confirm that the values can be accessed via the get[type]() API methods
      */
+    @SuppressWarnings("boxing")
     @Test
     public void getArrayValues() {
-        JSONArray jsonArray = new JSONArray(arrayStr);
+        JSONArray jsonArray = new JSONArray(this.arrayStr);
         // booleans
         assertTrue("Array true",
                 true == jsonArray.getBoolean(0));
@@ -255,7 +254,7 @@ public class JSONArrayTest {
      */
     @Test
     public void failedGetArrayValues() {
-        JSONArray jsonArray = new JSONArray(arrayStr);
+        JSONArray jsonArray = new JSONArray(this.arrayStr);
         try {
             jsonArray.getBoolean(4);
             assertTrue("expected getBoolean to fail", false);
@@ -321,7 +320,7 @@ public class JSONArrayTest {
      */
     @Test
     public void join() {
-        JSONArray jsonArray = new JSONArray(arrayStr);
+        JSONArray jsonArray = new JSONArray(this.arrayStr);
         String joinStr = jsonArray.join(",");
 
         // validate JSON
@@ -357,7 +356,7 @@ public class JSONArrayTest {
     public void length() {
         assertTrue("expected empty JSONArray length 0",
                 new JSONArray().length() == 0);
-        JSONArray jsonArray = new JSONArray(arrayStr);
+        JSONArray jsonArray = new JSONArray(this.arrayStr);
         assertTrue("expected JSONArray length 13", jsonArray.length() == 13);
         JSONArray nestedJsonArray = jsonArray.getJSONArray(9);
         assertTrue("expected JSONArray length 1", nestedJsonArray.length() == 1);
@@ -368,9 +367,10 @@ public class JSONArrayTest {
      * Confirm that the values can be accessed via the opt[type](index)
      * and opt[type](index, default) API methods.
      */
+    @SuppressWarnings("boxing")
     @Test 
     public void opt() {
-        JSONArray jsonArray = new JSONArray(arrayStr);
+        JSONArray jsonArray = new JSONArray(this.arrayStr);
         assertTrue("Array opt value true",
                 Boolean.TRUE == jsonArray.opt(0));
         assertTrue("Array opt value out of range",
@@ -441,6 +441,7 @@ public class JSONArrayTest {
      * Exercise the JSONArray.put(value) method with various parameters
      * and confirm the resulting JSONArray.
      */
+    @SuppressWarnings("boxing")
     @Test
     public void put() {
         JSONArray jsonArray = new JSONArray();
@@ -516,6 +517,7 @@ public class JSONArrayTest {
      * Exercise the JSONArray.put(index, value) method with various parameters
      * and confirm the resulting JSONArray.
      */
+    @SuppressWarnings("boxing")
     @Test
     public void putIndex() {
         JSONArray jsonArray = new JSONArray();
@@ -596,11 +598,11 @@ public class JSONArrayTest {
      */
     @Test
     public void remove() {
-        String arrayStr = 
+        String arrayStr1 = 
             "["+
                 "1"+
             "]";
-        JSONArray jsonArray = new JSONArray(arrayStr);
+        JSONArray jsonArray = new JSONArray(arrayStr1);
         jsonArray.remove(0);
         assertTrue("array should be empty", null == jsonArray.remove(5));
         assertTrue("jsonArray should be empty", jsonArray.length() == 0);
@@ -612,11 +614,11 @@ public class JSONArrayTest {
      */
     @Test
     public void notSimilar() {
-        String arrayStr = 
+        String arrayStr1 = 
             "["+
                 "1"+
             "]";
-        JSONArray jsonArray = new JSONArray(arrayStr);
+        JSONArray jsonArray = new JSONArray(arrayStr1);
         JSONArray otherJsonArray = new JSONArray();
         assertTrue("arrays lengths differ", !jsonArray.similar(otherJsonArray));
 
@@ -745,9 +747,10 @@ public class JSONArrayTest {
     /**
      * Exercise the JSONArray iterator.
      */
+    @SuppressWarnings("boxing")
     @Test
     public void iterator() {
-        JSONArray jsonArray = new JSONArray(arrayStr);
+        JSONArray jsonArray = new JSONArray(this.arrayStr);
         Iterator<Object> it = jsonArray.iterator();
         assertTrue("Array true",
                 Boolean.TRUE.equals(it.next()));
@@ -803,16 +806,20 @@ public class JSONArrayTest {
      * Exercise the JSONArray write() method
      */
     @Test
-    public void write() {
+    public void write() throws IOException {
         String str = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":2,\"key3\":3}]";
         JSONArray jsonArray = new JSONArray(str);
         String expectedStr = str;
         StringWriter stringWriter = new StringWriter();
-        Writer writer = jsonArray.write(stringWriter);
-        String actualStr = writer.toString();
-        assertTrue("write() expected " + expectedStr +
-                        " but found " + actualStr,
-                expectedStr.equals(actualStr));
+        try {
+            jsonArray.write(stringWriter);
+            String actualStr = stringWriter.toString();
+            assertTrue("write() expected " + expectedStr +
+                            " but found " + actualStr,
+                    expectedStr.equals(actualStr));
+        } finally {
+            stringWriter.close();
+        }
     }
 
     /**
@@ -837,7 +844,7 @@ public class JSONArrayTest {
      * Exercise the JSONArray write(Writer, int, int) method
      */
     @Test
-    public void write3Param() {
+    public void write3Param() throws IOException {
         String str0 = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":false,\"key3\":3.14}]";
         String str2 =
                 "[\n" +
@@ -852,15 +859,20 @@ public class JSONArrayTest {
         JSONArray jsonArray = new JSONArray(str0);
         String expectedStr = str0;
         StringWriter stringWriter = new StringWriter();
-        Writer writer = jsonArray.write(stringWriter, 0, 0);
-        String actualStr = writer.toString();
-        assertEquals(expectedStr, actualStr);
-
-        expectedStr = str2;
+        try {
+            String actualStr = jsonArray.write(stringWriter, 0, 0).toString();
+            assertEquals(expectedStr, actualStr);
+        } finally {
+            stringWriter.close();
+        }
         stringWriter = new StringWriter();
-        writer = jsonArray.write(stringWriter, 2, 1);
-        actualStr = writer.toString();
-        assertEquals(expectedStr, actualStr);
+        try {
+            expectedStr = str2;
+            String actualStr = jsonArray.write(stringWriter, 2, 1).toString();
+            assertEquals(expectedStr, actualStr);
+        } finally {
+            stringWriter.close();
+        }
     }
 
     /**
@@ -917,49 +929,49 @@ public class JSONArrayTest {
                 "]";
 
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
-        List list = jsonArray.toList();
+        List<?> list = jsonArray.toList();
 
         assertTrue("List should not be null", list != null);
         assertTrue("List should have 3 elements", list.size() == 3);
 
-        List val1List = (List) list.get(0);
+        List<?> val1List = (List<?>) list.get(0);
         assertTrue("val1 should not be null", val1List != null);
         assertTrue("val1 should have 3 elements", val1List.size() == 3);
 
         assertTrue("val1 value 1 should be 1", val1List.get(0).equals(Integer.valueOf(1)));
         assertTrue("val1 value 2 should be 2", val1List.get(1).equals(Integer.valueOf(2)));
 
-        Map key1Value3Map = (Map)val1List.get(2);
+        Map<?,?> key1Value3Map = (Map<?,?>)val1List.get(2);
         assertTrue("Map should not be null", key1Value3Map != null);
         assertTrue("Map should have 1 element", key1Value3Map.size() == 1);
         assertTrue("Map key3 should be true", key1Value3Map.get("key3").equals(Boolean.TRUE));
 
-        Map val2Map = (Map) list.get(1);
+        Map<?,?> val2Map = (Map<?,?>) list.get(1);
         assertTrue("val2 should not be null", val2Map != null);
         assertTrue("val2 should have 4 elements", val2Map.size() == 4);
         assertTrue("val2 map key 1 should be val1", val2Map.get("key1").equals("val1"));
         assertTrue("val2 map key 3 should be 42", val2Map.get("key3").equals(Integer.valueOf(42)));
 
-        Map val2Key2Map = (Map)val2Map.get("key2");
+        Map<?,?> val2Key2Map = (Map<?,?>)val2Map.get("key2");
         assertTrue("val2 map key 2 should not be null", val2Key2Map != null);
         assertTrue("val2 map key 2 should have an entry", val2Key2Map.containsKey("key2"));
         assertTrue("val2 map key 2 value should be null", val2Key2Map.get("key2") == null);
 
-        List val2Key4List = (List)val2Map.get("key4");
+        List<?> val2Key4List = (List<?>)val2Map.get("key4");
         assertTrue("val2 map key 4 should not be null", val2Key4List != null);
         assertTrue("val2 map key 4 should be empty", val2Key4List.isEmpty());
 
-        List val3List = (List) list.get(2);
+        List<?> val3List = (List<?>) list.get(2);
         assertTrue("val3 should not be null", val3List != null);
         assertTrue("val3 should have 2 elements", val3List.size() == 2);
 
-        List val3Val1List = (List)val3List.get(0);
+        List<?> val3Val1List = (List<?>)val3List.get(0);
         assertTrue("val3 list val 1 should not be null", val3Val1List != null);
         assertTrue("val3 list val 1 should have 2 elements", val3Val1List.size() == 2);
         assertTrue("val3 list val 1 list element 1 should be value1", val3Val1List.get(0).equals("value1"));
         assertTrue("val3 list val 1 list element 2 should be 2.1", val3Val1List.get(1).equals(Double.valueOf("2.1")));
 
-        List val3Val2List = (List)val3List.get(1);
+        List<?> val3Val2List = (List<?>)val3List.get(1);
         assertTrue("val3 list val 2 should not be null", val3Val2List != null);
         assertTrue("val3 list val 2 should have 1 element", val3Val2List.size() == 1);
         assertTrue("val3 list val 2 list element 1 should be null", val3Val2List.get(0) == null);

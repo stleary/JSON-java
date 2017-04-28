@@ -4,11 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONML;
 import org.json.JSONObject;
 import org.json.XML;
 import org.junit.Rule;
