@@ -25,11 +25,12 @@ SOFTWARE.
 */
 
 import java.util.Iterator;
+import java.util.Locale;
 
 /**
  * Convert an HTTP header to a JSONObject and back.
  * @author JSON.org
- * @version 2014-05-03
+ * @version 2015-12-09
  */
 public class HTTP {
 
@@ -74,7 +75,7 @@ public class HTTP {
         String         token;
 
         token = x.nextToken();
-        if (token.toUpperCase().startsWith("HTTP")) {
+        if (token.toUpperCase(Locale.ROOT).startsWith("HTTP")) {
 
 // Response
 

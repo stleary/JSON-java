@@ -71,7 +71,7 @@ public class JSONTokener {
      * Construct a JSONTokener from an InputStream.
      * @param inputStream The source.
      */
-    public JSONTokener(InputStream inputStream) throws JSONException {
+    public JSONTokener(InputStream inputStream) {
         this(new InputStreamReader(inputStream));
     }
 
@@ -90,6 +90,8 @@ public class JSONTokener {
      * Back up one character. This provides a sort of lookahead capability,
      * so that you can test for a digit or letter before attempting to parse
      * the next number or identifier.
+     * @throws JSONException Thrown if trying to step back more than 1 step
+     *  or if already at the start of the string
      */
     public void back() throws JSONException {
         if (this.usePrevious || this.index <= 0) {
@@ -121,6 +123,9 @@ public class JSONTokener {
         return -1;
     }
 
+    /**
+     * @return true if at the end of the file and we didn't step back
+     */
     public boolean end() {
         return this.eof && !this.usePrevious;
     }
@@ -130,6 +135,8 @@ public class JSONTokener {
      * Determine if the source string still contains characters that next()
      * can consume.
      * @return true if not yet at the end of the source.
+     * @throws JSONException thrown if there is an error stepping forward
+     *  or backward while checking for more data.
      */
     public boolean more() throws JSONException {
         this.next();
@@ -145,6 +152,7 @@ public class JSONTokener {
      * Get the next character in the source string.
      *
      * @return The next character, or 0 if past the end of the source string.
+     * @throws JSONException Thrown if there is an error reading the source string.
      */
     public char next() throws JSONException {
         int c;
@@ -225,7 +233,7 @@ public class JSONTokener {
 
     /**
      * Get the next char in the string, skipping whitespace.
-     * @throws JSONException
+     * @throws JSONException Thrown if there is an error reading the source string.
      * @return  A character, or 0 if there are no more characters.
      */
     public char nextClean() throws JSONException {
@@ -278,7 +286,11 @@ public class JSONTokener {
                     sb.append('\r');
                     break;
                 case 'u':
-                    sb.append((char)Integer.parseInt(this.next(4), 16));
+                    try {
+                        sb.append((char)Integer.parseInt(this.next(4), 16));
+                    } catch (NumberFormatException e) {
+                        throw this.syntaxError("Illegal escape.", e);
+                    }
                     break;
                 case '"':
                 case '\'':
@@ -305,6 +317,8 @@ public class JSONTokener {
      * end of line, whichever comes first.
      * @param  delimiter A delimiter character.
      * @return   A string.
+     * @throws JSONException Thrown if there is an error while searching
+     *  for the delimiter
      */
     public String nextTo(char delimiter) throws JSONException {
         StringBuilder sb = new StringBuilder();
@@ -326,6 +340,8 @@ public class JSONTokener {
      * characters or the end of line, whichever comes first.
      * @param delimiters A set of delimiter characters.
      * @return A string, trimmed.
+     * @throws JSONException Thrown if there is an error while searching
+     *  for the delimiter
      */
     public String nextTo(String delimiters) throws JSONException {
         char c;
@@ -397,6 +413,8 @@ public class JSONTokener {
      * @param to A character to skip to.
      * @return The requested character, or zero if the requested character
      * is not found.
+     * @throws JSONException Thrown if there is an error while searching
+     *  for the to character
      */
     public char skipTo(char to) throws JSONException {
         char c;
@@ -433,12 +451,23 @@ public class JSONTokener {
         return new JSONException(message + this.toString());
     }
 
+    /**
+     * Make a JSONException to signal a syntax error.
+     *
+     * @param message The error message.
+     * @param causedBy The throwable that caused the error.
+     * @return  A JSONException object, suitable for throwing
+     */
+    public JSONException syntaxError(String message, Throwable causedBy) {
+        return new JSONException(message + this.toString(), causedBy);
+    }
 
     /**
      * Make a printable string of this JSONTokener.
      *
      * @return " at {index} [character {character} line {line}]"
      */
+    @Override
     public String toString() {
         return " at " + this.index + " [character " + this.character + " line " +
             this.line + "]";

@@ -41,7 +41,7 @@ SOFTWARE.
  * The names for the elements in the JSONObjects can be taken from the names
  * in the first row.
  * @author JSON.org
- * @version 2015-05-01
+ * @version 2016-05-01
  */
 public class CDL {
 
@@ -69,7 +69,12 @@ public class CDL {
             for (;;) {
                 c = x.next();
                 if (c == q) {
-                    break;
+                    //Handle escaped double-quote
+                    if(x.next() != '\"')
+                    {
+                        x.back();
+                        break;
+                    }
                 }
                 if (c == 0 || c == '\n' || c == '\r') {
                     throw x.syntaxError("Missing close quote '" + q + "'.");
