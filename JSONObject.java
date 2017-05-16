@@ -540,7 +540,7 @@ public class JSONObject {
             return new BigInteger(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] could not be converted to BigInteger.");
+                    + "] could not be converted to BigInteger.", e);
         }
     }
 
@@ -556,11 +556,14 @@ public class JSONObject {
      */
     public BigDecimal getBigDecimal(String key) throws JSONException {
         Object object = this.get(key);
+        if (object instanceof BigDecimal) {
+            return (BigDecimal)object;
+        }
         try {
             return new BigDecimal(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] could not be converted to BigDecimal.");
+                    + "] could not be converted to BigDecimal.", e);
         }
     }
 
@@ -578,10 +581,10 @@ public class JSONObject {
         Object object = this.get(key);
         try {
             return object instanceof Number ? ((Number) object).doubleValue()
-                    : Double.parseDouble((String) object);
+                    : new BigDecimal((String) object).doubleValue();
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a number.");
+                    + "] is not a number.", e);
         }
     }
 
@@ -602,7 +605,7 @@ public class JSONObject {
                     : Integer.parseInt((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not an int.");
+                    + "] is not an int.", e);
         }
     }
 
@@ -659,7 +662,7 @@ public class JSONObject {
                     : Long.parseLong((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a long.");
+                    + "] is not a long.", e);
         }
     }
 
@@ -678,7 +681,7 @@ public class JSONObject {
         int i = 0;
         while (iterator.hasNext()) {
             names[i] = iterator.next();
-            i += 1;
+            i++;
         }
         return names;
     }
@@ -933,7 +936,15 @@ public class JSONObject {
      * @return The truth.
      */
     public boolean optBoolean(String key, boolean defaultValue) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof Boolean){
+            return ((Boolean) val).booleanValue();
+        }
         try {
+            // we'll use the get anyway because it does string conversion.
             return this.getBoolean(key);
         } catch (Exception e) {
             return defaultValue;
@@ -965,8 +976,23 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public BigInteger optBigInteger(String key, BigInteger defaultValue) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof BigInteger){
+            return (BigInteger) val;
+        }
+        if (val instanceof BigDecimal){
+            return ((BigDecimal) val).toBigInteger();
+        }
         try {
-            return this.getBigInteger(key);
+            // the other opt functions handle implicit conversions, i.e. 
+            // jo.put("double",1.1d);
+            // jo.optInt("double"); -- will return 1, not an error
+            // this conversion to BigDecimal then to BigInteger is to maintain
+            // that type cast support that may truncate the decimal.
+            return new BigDecimal(val.toString()).toBigInteger();
         } catch (Exception e) {
             return defaultValue;
         }
@@ -984,8 +1010,25 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public BigDecimal optBigDecimal(String key, BigDecimal defaultValue) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof BigDecimal){
+            return (BigDecimal) val;
+        }
+        if (val instanceof BigInteger){
+            return new BigDecimal((BigInteger) val);
+        }
+        if (val instanceof Double){
+            return new BigDecimal(((Double) val).doubleValue());
+        }
+        if (val instanceof Long || val instanceof Integer
+                || val instanceof Short || val instanceof Byte){
+            return new BigDecimal(((Number) val).longValue());
+        }
         try {
-            return this.getBigDecimal(key);
+            return new BigDecimal(val.toString());
         } catch (Exception e) {
             return defaultValue;
         }
@@ -1003,11 +1046,21 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public double optDouble(String key, double defaultValue) {
-        try {
-            return this.getDouble(key);
-        } catch (Exception e) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
             return defaultValue;
         }
+        if (val instanceof Number){
+            return ((Number) val).doubleValue();
+        }
+        if (val instanceof String) {
+            try {
+                return new BigDecimal((String) val).doubleValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
     /**
@@ -1035,11 +1088,22 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public int optInt(String key, int defaultValue) {
-        try {
-            return this.getInt(key);
-        } catch (Exception e) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
             return defaultValue;
         }
+        if (val instanceof Number){
+            return ((Number) val).intValue();
+        }
+        
+        if (val instanceof String) {
+            try {
+                return new BigDecimal(val.toString()).intValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
     /**
@@ -1093,11 +1157,22 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public long optLong(String key, long defaultValue) {
-        try {
-            return this.getLong(key);
-        } catch (Exception e) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
             return defaultValue;
         }
+        if (val instanceof Number){
+            return ((Number) val).longValue();
+        }
+        
+        if (val instanceof String) {
+            try {
+                return new BigDecimal(val.toString()).longValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
     /**
@@ -1583,7 +1658,7 @@ public class JSONObject {
                         return d;
                     }
                 } else {
-                    Long myLong = new Long(string);
+                    Long myLong = Long.valueOf(string);
                     if (string.equals(myLong.toString())) {
                         if (myLong.longValue() == myLong.intValue()) {
                             return Integer.valueOf(myLong.intValue());
