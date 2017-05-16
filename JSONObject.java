@@ -767,9 +767,9 @@ public class JSONObject {
         } else if (value instanceof Long) {
             this.put(key, ((Long) value).longValue() + 1L);
         } else if (value instanceof Double) {
-            this.put(key, ((Double) value).doubleValue() + 1D);
+            this.put(key, ((Double) value).doubleValue() + 1.0d);
         } else if (value instanceof Float) {
-            this.put(key, ((Float) value).floatValue() + 1F);
+            this.put(key, ((Float) value).floatValue() + 1.0f);
         } else {
             throw new JSONException("Unable to increment [" + quote(key) + "].");
         }
