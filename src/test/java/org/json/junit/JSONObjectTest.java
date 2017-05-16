@@ -1001,7 +1001,8 @@ public class JSONObjectTest {
             assertTrue("expected an exeption", false);
         } catch (JSONException ignored) {}
         obj = jsonObject.optBigInteger("bigDec", BigInteger.ONE);
-        assertTrue("expected BigInteger", obj.equals(BigInteger.ONE));
+        assertTrue("expected BigInteger", obj instanceof BigInteger);
+        assertEquals(bigDecimal.toBigInteger(), obj);
 
         /**
          * JSONObject.numberToString() works correctly, nothing to change.
