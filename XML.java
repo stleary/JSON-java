@@ -211,7 +211,7 @@ public class XML {
                             sb.append('<');
                         } else if ("gt".equalsIgnoreCase(entity)) {
                             sb.append('>');
-                        } else {
+                        } else {// unsupported xml entity. leave encoded
                             sb.append('&').append(entity).append(';');
                         }
                     }
@@ -219,7 +219,7 @@ public class XML {
                     i += entity.length() + 1;
                 } else {
                     // this shouldn't happen in most cases since the parser
-                    // errors on unclosed enties.
+                    // errors on unclosed entries.
                     sb.append(c);
                 }
             } else {
@@ -508,7 +508,7 @@ public class XML {
      * @return A string.
      * @throws JSONException Thrown if there is an error parsing the string
      */
-    public static String toString(Object object, String tagName)
+    public static String toString(final Object object, final String tagName)
             throws JSONException {
         StringBuilder sb = new StringBuilder();
         JSONArray ja;
@@ -595,21 +595,19 @@ public class XML {
 
         }
 
-        if (object != null) {
-            if (object.getClass().isArray()) {
-                object = new JSONArray(object);
-            }
-
-            if (object instanceof JSONArray) {
+        if (object != null && (object instanceof JSONArray ||  object.getClass().isArray())) {
+            if(object.getClass().isArray()) {
+                ja = new JSONArray(object);
+            } else {
                 ja = (JSONArray) object;
-                for (Object val : ja) {
-                    // XML does not have good support for arrays. If an array
-                    // appears in a place where XML is lacking, synthesize an
-                    // <array> element.
-                    sb.append(toString(val, tagName == null ? "array" : tagName));
-                }
-                return sb.toString();
             }
+            for (Object val : ja) {
+                // XML does not have good support for arrays. If an array
+                // appears in a place where XML is lacking, synthesize an
+                // <array> element.
+                sb.append(toString(val, tagName == null ? "array" : tagName));
+            }
+            return sb.toString();
         }
 
         string = (object == null) ? "null" : escape(object.toString());

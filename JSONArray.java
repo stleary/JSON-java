@@ -183,7 +183,7 @@ public class JSONArray implements Iterable<Object> {
 
     @Override
     public Iterator<Object> iterator() {
-        return myArrayList.iterator();
+        return this.myArrayList.iterator();
     }
 
     /**
@@ -1115,6 +1115,7 @@ public class JSONArray implements Iterable<Object> {
      * @return a printable, displayable, transmittable representation of the
      *         array.
      */
+    @Override
     public String toString() {
         try {
             return this.toString(0);
@@ -1124,7 +1125,7 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Make a prettyprinted JSON text of this JSONArray. Warning: This method
+     * Make a pretty-printed JSON text of this JSONArray. Warning: This method
      * assumes that the data structure is acyclical.
      *
      * @param indentFactor
@@ -1166,7 +1167,7 @@ public class JSONArray implements Iterable<Object> {
      * @param indentFactor
      *            The number of spaces to add to each level of indentation.
      * @param indent
-     *            The indention of the top level.
+     *            The indentation of the top level.
      * @return The writer.
      * @throws JSONException
      */

@@ -68,11 +68,11 @@ public class JSONPointer {
          * {@link #append(String)} method calls.
          */
         public JSONPointer build() {
-            return new JSONPointer(refTokens);
+            return new JSONPointer(this.refTokens);
         }
 
         /**
-         * Adds an arbitary token to the list of reference tokens. It can be any non-null value.
+         * Adds an arbitrary token to the list of reference tokens. It can be any non-null value.
          * 
          * Unlike in the case of JSON string or URI fragment representation of JSON pointers, the
          * argument of this method MUST NOT be escaped. If you want to query the property called
@@ -87,7 +87,7 @@ public class JSONPointer {
             if (token == null) {
                 throw new NullPointerException("token cannot be null");
             }
-            refTokens.add(token);
+            this.refTokens.add(token);
             return this;
         }
 
@@ -99,7 +99,7 @@ public class JSONPointer {
          * @return {@code this}
          */
         public Builder append(int arrayIndex) {
-            refTokens.add(String.valueOf(arrayIndex));
+            this.refTokens.add(String.valueOf(arrayIndex));
             return this;
         }
     }
@@ -134,29 +134,30 @@ public class JSONPointer {
      * @param pointer the JSON String or URI Fragment representation of the JSON pointer.
      * @throws IllegalArgumentException if {@code pointer} is not a valid JSON pointer
      */
-    public JSONPointer(String pointer) {
+    public JSONPointer(final String pointer) {
         if (pointer == null) {
             throw new NullPointerException("pointer cannot be null");
         }
         if (pointer.isEmpty() || pointer.equals("#")) {
-            refTokens = Collections.emptyList();
+            this.refTokens = Collections.emptyList();
             return;
         }
+        String refs;
         if (pointer.startsWith("#/")) {
-            pointer = pointer.substring(2);
+            refs = pointer.substring(2);
             try {
-                pointer = URLDecoder.decode(pointer, ENCODING);
+                refs = URLDecoder.decode(refs, ENCODING);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
         } else if (pointer.startsWith("/")) {
-            pointer = pointer.substring(1);
+            refs = pointer.substring(1);
         } else {
             throw new IllegalArgumentException("a JSON pointer should start with '/' or '#/'");
         }
-        refTokens = new ArrayList<String>();
-        for (String token : pointer.split("/")) {
-            refTokens.add(unescape(token));
+        this.refTokens = new ArrayList<String>();
+        for (String token : refs.split("/")) {
+            this.refTokens.add(unescape(token));
         }
     }
 
@@ -181,11 +182,11 @@ public class JSONPointer {
      * @throws JSONPointerException if an error occurs during evaluation
      */
     public Object queryFrom(Object document) {
-        if (refTokens.isEmpty()) {
+        if (this.refTokens.isEmpty()) {
             return document;
         }
         Object current = document;
-        for (String token : refTokens) {
+        for (String token : this.refTokens) {
             if (current instanceof JSONObject) {
                 current = ((JSONObject) current).opt(unescape(token));
             } else if (current instanceof JSONArray) {
@@ -206,6 +207,7 @@ public class JSONPointer {
      * @return the matched object. If no matching item is found a
      * JSONPointerException is thrown
      */
+    @SuppressWarnings("boxing")
     private Object readByIndexToken(Object current, String indexToken) {
         try {
             int index = Integer.parseInt(indexToken);
@@ -227,7 +229,7 @@ public class JSONPointer {
     @Override
     public String toString() {
         StringBuilder rval = new StringBuilder("");
-        for (String token: refTokens) {
+        for (String token: this.refTokens) {
             rval.append('/').append(escape(token));
         }
         return rval.toString();
@@ -255,7 +257,7 @@ public class JSONPointer {
     public String toURIFragment() {
         try {
             StringBuilder rval = new StringBuilder("#");
-            for (String token : refTokens) {
+            for (String token : this.refTokens) {
                 rval.append('/').append(URLEncoder.encode(token, ENCODING));
             }
             return rval.toString();
