@@ -154,13 +154,26 @@ public class JSONArray implements Iterable<Object> {
      *            A Collection.
      */
     public JSONArray(Collection<?> collection) {
+    	this(collection, false);
+    }
+    
+    /**
+     * Construct a JSONArray from a Collection.
+     *
+     * @param collection
+     *            A Collection.
+     * @param useJavaNullAsJsonNull
+     *            If true, Java null values will be mapped to JSON null values; otherwise keys with null values will be omitted
+     */
+    public JSONArray(Collection<?> collection, boolean useJavaNullAsJsonNull) {
         this.myArrayList = new ArrayList<Object>();
         if (collection != null) {
         	for (Object o: collection){
-        		this.myArrayList.add(JSONObject.wrap(o));
+        		this.myArrayList.add(JSONObject.wrap(o, useJavaNullAsJsonNull));
         	}
         }
     }
+    
 
     /**
      * Construct a JSONArray from an array
@@ -169,11 +182,23 @@ public class JSONArray implements Iterable<Object> {
      *             If not an array.
      */
     public JSONArray(Object array) throws JSONException {
+    	this(array, false);
+    }
+    
+    /**
+     * Construct a JSONArray from an array
+     *
+     * @throws JSONException
+     *             If not an array.
+     * @param useJavaNullAsJsonNull
+     *            If true, Java null values will be mapped to JSON null values; otherwise keys with null values will be omitted
+     */
+    public JSONArray(Object array, boolean useJavaNullAsJsonNull) throws JSONException {
         this();
         if (array.getClass().isArray()) {
             int length = Array.getLength(array);
             for (int i = 0; i < length; i += 1) {
-                this.put(JSONObject.wrap(Array.get(array, i)));
+                this.put(JSONObject.wrap(Array.get(array, i), useJavaNullAsJsonNull));
             }
         } else {
             throw new JSONException(
