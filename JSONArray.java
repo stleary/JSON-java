@@ -518,11 +518,63 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public double optDouble(int index, double defaultValue) {
-        try {
-            return this.getDouble(index);
-        } catch (Exception e) {
+        Object val = this.opt(index);
+        if (JSONObject.NULL.equals(val)) {
             return defaultValue;
         }
+        if (val instanceof Number){
+            return ((Number) val).doubleValue();
+        }
+        if (val instanceof String) {
+            try {
+                return new BigDecimal((String) val).doubleValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get the optional double value associated with an index. NaN is returned
+     * if there is no value for the index, or if the value is not a number and
+     * cannot be converted to a number.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The value.
+     */
+    public float optFloat(int index) {
+        return this.optFloat(index, Float.NaN);
+    }
+
+    /**
+     * Get the optional double value associated with an index. The defaultValue
+     * is returned if there is no value for the index, or if the value is not a
+     * number and cannot be converted to a number.
+     *
+     * @param index
+     *            subscript
+     * @param defaultValue
+     *            The default value.
+     * @return The value.
+     */
+    public float optFloat(int index, float defaultValue) {
+        Object val = this.opt(index);
+        if (JSONObject.NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof Number){
+            return ((Number) val).floatValue();
+        }
+        if (val instanceof String) {
+            try {
+                return new BigDecimal((String) val).floatValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
     /**
@@ -550,11 +602,22 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public int optInt(int index, int defaultValue) {
-        try {
-            return this.getInt(index);
-        } catch (Exception e) {
+        Object val = this.opt(index);
+        if (JSONObject.NULL.equals(val)) {
             return defaultValue;
         }
+        if (val instanceof Number){
+            return ((Number) val).intValue();
+        }
+        
+        if (val instanceof String) {
+            try {
+                return new BigDecimal(val.toString()).intValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
     /**
@@ -615,8 +678,25 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public BigInteger optBigInteger(int index, BigInteger defaultValue) {
+        Object val = this.opt(index);
+        if (JSONObject.NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof BigInteger){
+            return (BigInteger) val;
+        }
+        if (val instanceof BigDecimal){
+            return ((BigDecimal) val).toBigInteger();
+        }
+        if (val instanceof Double || val instanceof Float){
+            return new BigDecimal(((Number) val).doubleValue()).toBigInteger();
+        }
+        if (val instanceof Long || val instanceof Integer
+                || val instanceof Short || val instanceof Byte){
+            return BigInteger.valueOf(((Number) val).longValue());
+        }
         try {
-            return this.getBigInteger(index);
+            return new BigDecimal(val.toString()).toBigInteger();
         } catch (Exception e) {
             return defaultValue;
         }
@@ -634,8 +714,25 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public BigDecimal optBigDecimal(int index, BigDecimal defaultValue) {
+        Object val = this.opt(index);
+        if (JSONObject.NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof BigDecimal){
+            return (BigDecimal) val;
+        }
+        if (val instanceof BigInteger){
+            return new BigDecimal((BigInteger) val);
+        }
+        if (val instanceof Double || val instanceof Float){
+            return new BigDecimal(((Number) val).doubleValue());
+        }
+        if (val instanceof Long || val instanceof Integer
+                || val instanceof Short || val instanceof Byte){
+            return new BigDecimal(((Number) val).longValue());
+        }
         try {
-            return this.getBigDecimal(index);
+            return new BigDecimal(val.toString());
         } catch (Exception e) {
             return defaultValue;
         }
@@ -693,11 +790,53 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public long optLong(int index, long defaultValue) {
-        try {
-            return this.getLong(index);
-        } catch (Exception e) {
+        Object val = this.opt(index);
+        if (JSONObject.NULL.equals(val)) {
             return defaultValue;
         }
+        if (val instanceof Number){
+            return ((Number) val).longValue();
+        }
+        
+        if (val instanceof String) {
+            try {
+                return new BigDecimal(val.toString()).longValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get an optional {@link Number} value associated with a key, or the default if there
+     * is no such key or if the value is not a number. If the value is a string,
+     * an attempt will be made to evaluate it as a number ({@link BigDecimal}). This method
+     * would be used in cases where type coercion of the number value is unwanted.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public Number optNumber(int index, Number defaultValue) {
+        Object val = this.opt(index);
+        if (JSONObject.NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof Number){
+            return (Number) val;
+        }
+        
+        if (val instanceof String) {
+            try {
+                return new BigDecimal(val.toString());
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
     /**

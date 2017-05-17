@@ -952,53 +952,6 @@ public class JSONObject {
     }
 
     /**
-     * Get an optional double associated with a key, or NaN if there is no such
-     * key or if its value is not a number. If the value is a string, an attempt
-     * will be made to evaluate it as a number.
-     *
-     * @param key
-     *            A string which is the key.
-     * @return An object which is the value.
-     */
-    public double optDouble(String key) {
-        return this.optDouble(key, Double.NaN);
-    }
-
-    /**
-     * Get an optional BigInteger associated with a key, or the defaultValue if
-     * there is no such key or if its value is not a number. If the value is a
-     * string, an attempt will be made to evaluate it as a number.
-     *
-     * @param key
-     *            A key string.
-     * @param defaultValue
-     *            The default.
-     * @return An object which is the value.
-     */
-    public BigInteger optBigInteger(String key, BigInteger defaultValue) {
-        Object val = this.opt(key);
-        if (NULL.equals(val)) {
-            return defaultValue;
-        }
-        if (val instanceof BigInteger){
-            return (BigInteger) val;
-        }
-        if (val instanceof BigDecimal){
-            return ((BigDecimal) val).toBigInteger();
-        }
-        try {
-            // the other opt functions handle implicit conversions, i.e. 
-            // jo.put("double",1.1d);
-            // jo.optInt("double"); -- will return 1, not an error
-            // this conversion to BigDecimal then to BigInteger is to maintain
-            // that type cast support that may truncate the decimal.
-            return new BigDecimal(val.toString()).toBigInteger();
-        } catch (Exception e) {
-            return defaultValue;
-        }
-    }
-
-    /**
      * Get an optional BigDecimal associated with a key, or the defaultValue if
      * there is no such key or if its value is not a number. If the value is a
      * string, an attempt will be made to evaluate it as a number.
@@ -1035,6 +988,60 @@ public class JSONObject {
     }
 
     /**
+     * Get an optional BigInteger associated with a key, or the defaultValue if
+     * there is no such key or if its value is not a number. If the value is a
+     * string, an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public BigInteger optBigInteger(String key, BigInteger defaultValue) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof BigInteger){
+            return (BigInteger) val;
+        }
+        if (val instanceof BigDecimal){
+            return ((BigDecimal) val).toBigInteger();
+        }
+        if (val instanceof Double || val instanceof Float){
+            return new BigDecimal(((Number) val).doubleValue()).toBigInteger();
+        }
+        if (val instanceof Long || val instanceof Integer
+                || val instanceof Short || val instanceof Byte){
+            return BigInteger.valueOf(((Number) val).longValue());
+        }
+        try {
+            // the other opt functions handle implicit conversions, i.e. 
+            // jo.put("double",1.1d);
+            // jo.optInt("double"); -- will return 1, not an error
+            // this conversion to BigDecimal then to BigInteger is to maintain
+            // that type cast support that may truncate the decimal.
+            return new BigDecimal(val.toString()).toBigInteger();
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get an optional double associated with a key, or NaN if there is no such
+     * key or if its value is not a number. If the value is a string, an attempt
+     * will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A string which is the key.
+     * @return An object which is the value.
+     */
+    public double optDouble(String key) {
+        return this.optDouble(key, Double.NaN);
+    }
+
+    /**
      * Get an optional double associated with a key, or the defaultValue if
      * there is no such key or if its value is not a number. If the value is a
      * string, an attempt will be made to evaluate it as a number.
@@ -1056,6 +1063,48 @@ public class JSONObject {
         if (val instanceof String) {
             try {
                 return new BigDecimal((String) val).doubleValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get the optional double value associated with an index. NaN is returned
+     * if there is no value for the index, or if the value is not a number and
+     * cannot be converted to a number.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The value.
+     */
+    public float optFloat(String key) {
+        return this.optFloat(key, Float.NaN);
+    }
+
+    /**
+     * Get the optional double value associated with an index. The defaultValue
+     * is returned if there is no value for the index, or if the value is not a
+     * number and cannot be converted to a number.
+     *
+     * @param index
+     *            subscript
+     * @param defaultValue
+     *            The default value.
+     * @return The value.
+     */
+    public float optFloat(String key, float defaultValue) {
+        Object val = this.opt(key);
+        if (JSONObject.NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof Number){
+            return ((Number) val).floatValue();
+        }
+        if (val instanceof String) {
+            try {
+                return new BigDecimal((String) val).floatValue();
             } catch (Exception e) {
                 return defaultValue;
             }
@@ -1168,6 +1217,53 @@ public class JSONObject {
         if (val instanceof String) {
             try {
                 return new BigDecimal(val.toString()).longValue();
+            } catch (Exception e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+    
+    /**
+     * Get an optional {@link Number} value associated with a key, or <code>null</code>
+     * if there is no such key or if the value is not a number. If the value is a string,
+     * an attempt will be made to evaluate it as a number ({@link BigDecimal}). This method
+     * would be used in cases where type coercion of the number value is unwanted.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public Number optNumber(String key) {
+        return this.optNumber(key, null);
+    }
+
+    /**
+     * Get an optional {@link Number} value associated with a key, or the default if there
+     * is no such key or if the value is not a number. If the value is a string,
+     * an attempt will be made to evaluate it as a number ({@link BigDecimal}). This method
+     * would be used in cases where type coercion of the number value is unwanted.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public Number optNumber(String key, Number defaultValue) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof Number){
+            return (Number) val;
+        }
+        
+        if (val instanceof String) {
+            try {
+                return new BigDecimal(val.toString());
             } catch (Exception e) {
                 return defaultValue;
             }
