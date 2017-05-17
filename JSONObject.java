@@ -1020,8 +1020,8 @@ public class JSONObject {
         if (val instanceof BigInteger){
             return new BigDecimal((BigInteger) val);
         }
-        if (val instanceof Double){
-            return new BigDecimal(((Double) val).doubleValue());
+        if (val instanceof Double || val instanceof Float){
+            return new BigDecimal(((Number) val).doubleValue());
         }
         if (val instanceof Long || val instanceof Integer
                 || val instanceof Short || val instanceof Byte){
