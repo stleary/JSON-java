@@ -614,6 +614,10 @@ public class JSONObjectTest {
                 jsonObject.optDouble("doubleKey") == -23.45e7);
         assertTrue("opt doubleKey with Default should be double", 
                 jsonObject.optDouble("doubleStrKey", Double.NaN) == 1);
+        assertTrue("optFloat doubleKey should be float", 
+                jsonObject.optFloat("doubleKey") == -23.45e7f);
+        assertTrue("optFloat doubleKey with Default should be float", 
+                jsonObject.optFloat("doubleStrKey", Float.NaN) == 1f);
         assertTrue("intKey should be int", 
                 jsonObject.optInt("intKey") == 42);
         assertTrue("opt intKey should be int", 
@@ -630,6 +634,18 @@ public class JSONObjectTest {
                 jsonObject.optLong("longKey", 0) == 1234567890123456789L);
         assertTrue("longStrKey should be long", 
                 jsonObject.getLong("longStrKey") == 987654321098765432L);
+        assertTrue("optNumber int should return Integer",
+                jsonObject.optNumber("intKey") instanceof Integer);
+        assertTrue("optNumber long should return Long",
+                jsonObject.optNumber("longKey") instanceof Long);
+        assertTrue("optNumber double should return Double",
+                jsonObject.optNumber("doubleKey") instanceof Double);
+        assertTrue("optNumber Str int should return BigDecimal",
+                jsonObject.optNumber("intStrKey") instanceof BigDecimal);
+        assertTrue("optNumber Str long should return BigDecimal",
+                jsonObject.optNumber("longStrKey") instanceof BigDecimal);
+        assertTrue("optNumber Str double should return BigDecimal",
+                jsonObject.optNumber("doubleStrKey") instanceof BigDecimal);
         assertTrue("xKey should not exist",
                 jsonObject.isNull("xKey"));
         assertTrue("stringKey should exist",
@@ -1937,9 +1953,13 @@ public class JSONObjectTest {
         assertTrue("optJSONObject() should return null ",
                 null==jsonObject.optJSONObject("myKey"));
         assertTrue("optLong() should return default long",
-                42 == jsonObject.optLong("myKey", 42));
+                42l == jsonObject.optLong("myKey", 42l));
         assertTrue("optDouble() should return default double",
-                42.3 == jsonObject.optDouble("myKey", 42.3));
+                42.3d == jsonObject.optDouble("myKey", 42.3d));
+        assertTrue("optFloat() should return default float",
+                42.3f == jsonObject.optFloat("myKey", 42.3f));
+        assertTrue("optNumber() should return default Number",
+                42l == jsonObject.optNumber("myKey", Long.valueOf(42)).longValue());
         assertTrue("optString() should return default string",
                 "hi".equals(jsonObject.optString("hiKey", "hi")));
     }
@@ -1967,9 +1987,13 @@ public class JSONObjectTest {
          assertTrue("optJSONObject() should return null ",
                  null==jsonObject.optJSONObject("myKey"));
          assertTrue("optLong() should return default long",
-                 42 == jsonObject.optLong("myKey", 42));
+                 42l == jsonObject.optLong("myKey", 42l));
          assertTrue("optDouble() should return default double",
-                 42.3 == jsonObject.optDouble("myKey", 42.3));
+                 42.3d == jsonObject.optDouble("myKey", 42.3d));
+         assertTrue("optFloat() should return default float",
+                 42.3f == jsonObject.optFloat("myKey", 42.3f));
+         assertTrue("optNumber() should return default Number",
+                 42l == jsonObject.optNumber("myKey", Long.valueOf(42)).longValue());
          assertTrue("optString() should return default string",
                  "hi".equals(jsonObject.optString("hiKey", "hi")));
     }
@@ -1983,11 +2007,13 @@ public class JSONObjectTest {
         assertTrue("unexpected optBoolean value",jo.optBoolean("true",false)==true);
         assertTrue("unexpected optBoolean value",jo.optBoolean("false",true)==false);
         assertTrue("unexpected optInt value",jo.optInt("int",0)==123);
-        assertTrue("unexpected optLong value",jo.optLong("int",0)==123);
-        assertTrue("unexpected optDouble value",jo.optDouble("int",0.0)==123.0);
+        assertTrue("unexpected optLong value",jo.optLong("int",0)==123l);
+        assertTrue("unexpected optDouble value",jo.optDouble("int",0.0d)==123.0d);
+        assertTrue("unexpected optFloat value",jo.optFloat("int",0.0f)==123.0f);
         assertTrue("unexpected optBigInteger value",jo.optBigInteger("int",BigInteger.ZERO).compareTo(new BigInteger("123"))==0);
         assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
-
+        assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
+        assertTrue("unexpected optNumber value",jo.optNumber("int",BigInteger.ZERO).longValue()==123l);
     }
 
     /**
