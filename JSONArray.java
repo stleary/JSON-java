@@ -816,8 +816,6 @@ public class JSONArray implements Iterable<Object> {
      *
      * @param index
      *            The index must be between 0 and length() - 1.
-     * @param defaultValue
-     *            The default.
      * @return An object which is the value.
      */
     public Number optNumber(int index) {
@@ -858,7 +856,7 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Get the optional string value associated with an index. It returns an
      * empty string if there is no value at that index. If the value is not a
-     * string and is not null, then it is coverted to a string.
+     * string and is not null, then it is converted to a string.
      *
      * @param index
      *            The index must be between 0 and length() - 1.

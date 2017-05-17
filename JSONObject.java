@@ -1232,8 +1232,6 @@ public class JSONObject {
      *
      * @param key
      *            A key string.
-     * @param defaultValue
-     *            The default.
      * @return An object which is the value.
      */
     public Number optNumber(String key) {
