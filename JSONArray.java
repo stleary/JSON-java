@@ -536,7 +536,7 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the optional double value associated with an index. NaN is returned
+     * Get the optional float value associated with an index. NaN is returned
      * if there is no value for the index, or if the value is not a number and
      * cannot be converted to a number.
      *
@@ -549,7 +549,7 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the optional double value associated with an index. The defaultValue
+     * Get the optional float value associated with an index. The defaultValue
      * is returned if there is no value for the index, or if the value is not a
      * number and cannot be converted to a number.
      *
@@ -806,6 +806,22 @@ public class JSONArray implements Iterable<Object> {
             }
         }
         return defaultValue;
+    }
+
+    /**
+     * Get an optional {@link Number} value associated with a key, or <code>null</code>
+     * if there is no such key or if the value is not a number. If the value is a string,
+     * an attempt will be made to evaluate it as a number ({@link BigDecimal}). This method
+     * would be used in cases where type coercion of the number value is unwanted.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public Number optNumber(int index) {
+        return this.optNumber(index, null);
     }
 
     /**
