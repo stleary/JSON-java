@@ -249,6 +249,49 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
+     * Get the float value associated with a key.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The numeric value.
+     * @throws JSONException
+     *             if the key is not found or if the value is not a Number
+     *             object and cannot be converted to a number.
+     */
+    public float getFloat(int index) throws JSONException {
+        Object object = this.get(index);
+        try {
+            return object instanceof Number ? ((Number) object).floatValue()
+                    : Float.parseFloat(object.toString());
+        } catch (Exception e) {
+            throw new JSONException("JSONArray[" + index
+                    + "] is not a number.", e);
+        }
+    }
+
+    /**
+     * Get the Number value associated with a key.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The numeric value.
+     * @throws JSONException
+     *             if the key is not found or if the value is not a Number
+     *             object and cannot be converted to a number.
+     */
+    public Number getNumber(int index) throws JSONException {
+        Object object = this.get(index);
+        try {
+            if (object instanceof Number) {
+                return (Number)object;
+            }
+            return JSONObject.stringToNumber(object.toString());
+        } catch (Exception e) {
+            throw new JSONException("JSONArray[" + index + "] is not a number.");
+        }
+    }
+
+    /**
     * Get the enum value associated with an index.
     * 
     * @param clazz
@@ -266,9 +309,8 @@ public class JSONArray implements Iterable<Object> {
             // JSONException should really take a throwable argument.
             // If it did, I would re-implement this with the Enum.valueOf
             // method and place any thrown exception in the JSONException
-            throw new JSONException("JSONObject[" + JSONObject.quote(Integer.toString(index))
-                    + "] is not an enum of type " + JSONObject.quote(clazz.getSimpleName())
-                    + ".");
+            throw new JSONException("JSONArray[" + index + "] is not an enum of type "
+                    + JSONObject.quote(clazz.getSimpleName()) + ".");
         }
         return val;
     }
@@ -845,7 +887,7 @@ public class JSONArray implements Iterable<Object> {
         
         if (val instanceof String) {
             try {
-                return new BigDecimal(val.toString());
+                return JSONObject.stringToNumber((String) val);
             } catch (Exception e) {
                 return defaultValue;
             }
