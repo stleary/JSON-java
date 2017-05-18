@@ -581,7 +581,7 @@ public class JSONObject {
         Object object = this.get(key);
         try {
             return object instanceof Number ? ((Number) object).doubleValue()
-                    : new BigDecimal((String) object).doubleValue();
+                    : Double.parseDouble(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
                     + "] is not a number.", e);
@@ -1068,7 +1068,7 @@ public class JSONObject {
         }
         if (val instanceof String) {
             try {
-                return new BigDecimal((String) val).doubleValue();
+                return Double.parseDouble((String) val);
             } catch (Exception e) {
                 return defaultValue;
             }
@@ -1110,7 +1110,7 @@ public class JSONObject {
         }
         if (val instanceof String) {
             try {
-                return new BigDecimal((String) val).floatValue();
+                return Float.parseFloat((String) val);
             } catch (Exception e) {
                 return defaultValue;
             }
@@ -1247,7 +1247,7 @@ public class JSONObject {
     /**
      * Get an optional {@link Number} value associated with a key, or the default if there
      * is no such key or if the value is not a number. If the value is a string,
-     * an attempt will be made to evaluate it as a number ({@link BigDecimal}). This method
+     * an attempt will be made to evaluate it as a number. This method
      * would be used in cases where type coercion of the number value is unwanted.
      *
      * @param key
@@ -1267,7 +1267,44 @@ public class JSONObject {
         
         if (val instanceof String) {
             try {
-                return new BigDecimal((String) val);
+                // decimal representation
+                if (((String)val).indexOf('.')>=0 || ((String)val).indexOf('e')>=0 || ((String)val).indexOf('E')>=0) {
+                    // quick dirty way to see if we need a BigDecimal instead of a Double
+                    if (((String)val).length()>14) {
+                        return new BigDecimal((String)val);
+                    }
+                    return Double.valueOf((String)val);
+                }
+                // integer representation.
+                // This will narrow any values to the smallest reasonable Object representation
+                // (Integer, Long, or BigInteger)
+                // The compare string length method reduces GC,
+                // but leads to smaller integers being placed in larger wrappers even though not
+                // needed. i.e. 1,000,000,000 -> Long even though it's an Integer
+                // 1,000,000,000,000,000,000 -> BigInteger even though it's a Long
+                
+                // string version
+                if(((String)val).length()<=9){
+                    return Integer.valueOf((String)val);
+                }
+                if(((String)val).length()<=18){
+                    return Long.valueOf((String)val);
+                }
+                return new BigInteger((String)val);
+
+                // BigInteger version: We use a similar bitLenth compare as
+                // BigInteger#intValueExact uses. Increases GC, but objects hold
+                // only what they need. i.e. Less runtime overhead if the value is
+                // long lived. Which is the better tradeoff?
+
+                //BigInteger bi = new BigInteger((String)val);
+                //if(bi.bitLength()<=31){
+                //    return Integer.valueOf(bi.intValue());
+                //}
+                //if(bi.bitLength()<=63){
+                //    return Long.valueOf(bi.longValue());
+                //}
+                //return bi;
             } catch (Exception e) {
                 return defaultValue;
             }
