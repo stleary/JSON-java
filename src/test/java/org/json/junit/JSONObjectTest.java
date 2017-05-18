@@ -2,6 +2,7 @@ package org.json.junit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -2016,13 +2017,14 @@ public class JSONObjectTest {
         assertTrue("unexpected optNumber value",jo.optNumber("int",BigInteger.ZERO).longValue()==123l);
         
         // Test type coercion from larger to smaller
-        final BigDecimal largeValue = new BigDecimal("19007199254740993.35481234487103587486413587843213584");
-        assertEquals(largeValue,jo.optBigDecimal("largeNumber", null));
-        assertEquals(largeValue.toBigInteger(),jo.optBigInteger("largeNumber", null));
-        assertEquals(largeValue.doubleValue(), jo.optDouble("largeNumber"), 0.0d);
-        assertEquals(largeValue.floatValue(), jo.optFloat("largeNumber"), 0.0f);
-        assertEquals(largeValue.longValue(), jo.optLong("largeNumber"));
-        assertEquals(largeValue.intValue(), jo.optInt("largeNumber"));
+        assertEquals(new BigInteger("19007199254740993"), jo.optBigInteger("largeNumber",null));
+        assertEquals(1.9007199254740992E16, jo.optDouble("largeNumber"),0.0);
+        assertEquals(1.90071995E16f, jo.optFloat("largeNumber"),0.0f);
+        assertEquals(19007199254740993l, jo.optLong("largeNumber"));
+        assertEquals(1874919425, jo.optInt("largeNumber"));
+        
+        // the integer portion of the actual value is larger than a double can hold.
+        assertNotEquals((long)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"), jo.optLong("largeNumber"));
     }
 
     /**
