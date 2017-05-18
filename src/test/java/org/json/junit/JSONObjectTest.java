@@ -2025,6 +2025,9 @@ public class JSONObjectTest {
         
         // the integer portion of the actual value is larger than a double can hold.
         assertNotEquals((long)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"), jo.optLong("largeNumber"));
+        assertNotEquals((int)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"), jo.optInt("largeNumber"));
+        assertEquals(19007199254740992l, (long)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"));
+        assertEquals(2147483647, (int)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"));
     }
 
     /**
