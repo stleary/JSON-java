@@ -1068,7 +1068,11 @@ public class JSONObject {
             // jo.optInt("double"); -- will return 1, not an error
             // this conversion to BigDecimal then to BigInteger is to maintain
             // that type cast support that may truncate the decimal.
-            return new BigDecimal(val.toString()).toBigInteger();
+            final String valStr = val.toString();
+            if(isDecimalNotation(valStr)) {
+                return new BigDecimal(valStr).toBigInteger();
+            }
+            return new BigInteger(valStr);
         } catch (Exception e) {
             return defaultValue;
         }
@@ -1759,12 +1763,22 @@ public class JSONObject {
             return false;
         }
     }
-
+    
+    /**
+     * Tests if the value should be tried as a decimal. It makes no test if there are actual digits.
+     * 
+     * @param val value to test
+     * @return true if the string is "-0" or if it contains '.', 'e', or 'E', false otherwise.
+     */
+    protected static boolean isDecimalNotation(final String val) {
+        return val.indexOf('.') > -1 || val.indexOf('e') > -1
+                || val.indexOf('E') > -1 || "-0".equals(val);
+    }
+    
     /**
      * Converts a string to a number using the narrowest possible type. Possible 
      * returns for this function are BigDecimal, Double, BigInteger, Long, and Integer.
-     * 
-     * An Exception is thrown if
+     * When a Double is returned, it should always be a valid Double and not NaN or +-infinity.
      * 
      * @param val value to convert
      * @return Number representation of the value.
@@ -1775,46 +1789,52 @@ public class JSONObject {
         char initial = val.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             // decimal representation
-            if (val.indexOf('.') > -1 || val.indexOf('e') > -1
-                    || val.indexOf('E') > -1
-                    || "-0".equals(val)) {
+            if (isDecimalNotation(val)) {
                 // quick dirty way to see if we need a BigDecimal instead of a Double
+                // this only handles some cases of overflow or underflow
                 if (val.length()>14) {
                     return new BigDecimal(val);
                 }
-                return Double.valueOf(val);
+                final Double d = Double.valueOf(val);
+                if (d.isInfinite() || d.isNaN()) {
+                    // if we can't parse it as a double, go up to BigDecimal
+                    // this is probably due to underflow like 4.32e-678
+                    // or overflow like 4.65e5324. The size of the string is small
+                    // but can't be held in a Double.
+                    return new BigDecimal(val);
+                }
+                return d;
             }
             // integer representation.
             // This will narrow any values to the smallest reasonable Object representation
             // (Integer, Long, or BigInteger)
+            
+            // string version
             // The compare string length method reduces GC,
             // but leads to smaller integers being placed in larger wrappers even though not
             // needed. i.e. 1,000,000,000 -> Long even though it's an Integer
             // 1,000,000,000,000,000,000 -> BigInteger even though it's a Long
-            
-            // string version
-            if(val.length()<=9){
-                return Integer.valueOf(val);
-            }
-            if(val.length()<=18){
-                return Long.valueOf(val);
-            }
-            return new BigInteger(val);
+            //if(val.length()<=9){
+            //    return Integer.valueOf(val);
+            //}
+            //if(val.length()<=18){
+            //    return Long.valueOf(val);
+            //}
+            //return new BigInteger(val);
             
             // BigInteger version: We use a similar bitLenth compare as
             // BigInteger#intValueExact uses. Increases GC, but objects hold
             // only what they need. i.e. Less runtime overhead if the value is
             // long lived. Which is the better tradeoff? This is closer to what's
             // in stringToValue.
-            
-            //BigInteger bi = new BigInteger((String)val);
-            //if(bi.bitLength()<=31){
-            //    return Integer.valueOf(bi.intValue());
-            //}
-            //if(bi.bitLength()<=63){
-            //    return Long.valueOf(bi.longValue());
-            //}
-            //return bi;
+            BigInteger bi = new BigInteger(val);
+            if(bi.bitLength()<=31){
+                return Integer.valueOf(bi.intValue());
+            }
+            if(bi.bitLength()<=63){
+                return Long.valueOf(bi.longValue());
+            }
+            return bi;
         }
         throw new NumberFormatException("val ["+val+"] is not a valid number.");
     }
@@ -1849,9 +1869,9 @@ public class JSONObject {
         char initial = string.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
-                if (string.indexOf('.') > -1 || string.indexOf('e') > -1
-                        || string.indexOf('E') > -1
-                        || "-0".equals(string)) {
+                // if we want full Big Number support this block can be replaced with:
+                // return stringToNumber(string);
+                if (isDecimalNotation(string)) {
                     Double d = Double.valueOf(string);
                     if (!d.isInfinite() && !d.isNaN()) {
                         return d;

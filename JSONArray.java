@@ -738,7 +738,11 @@ public class JSONArray implements Iterable<Object> {
             return BigInteger.valueOf(((Number) val).longValue());
         }
         try {
-            return new BigDecimal(val.toString()).toBigInteger();
+            final String valStr = val.toString();
+            if(JSONObject.isDecimalNotation(valStr)) {
+                return new BigDecimal(valStr).toBigInteger();
+            }
+            return new BigInteger(valStr);
         } catch (Exception e) {
             return defaultValue;
         }
