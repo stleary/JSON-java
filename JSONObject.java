@@ -980,11 +980,14 @@ public class JSONObject {
                 || val instanceof Short || val instanceof Byte){
             return new BigDecimal(((Number) val).longValue());
         }
-        try {
-            return new BigDecimal(val.toString());
-        } catch (Exception e) {
-            return defaultValue;
+        if (val instanceof String) {
+            try {
+                return new BigDecimal((String) val);
+            } catch (Exception e) {
+                return defaultValue;
+            }
         }
+        return defaultValue;
     }
 
     /**
@@ -1016,16 +1019,19 @@ public class JSONObject {
                 || val instanceof Short || val instanceof Byte){
             return BigInteger.valueOf(((Number) val).longValue());
         }
-        try {
-            // the other opt functions handle implicit conversions, i.e. 
-            // jo.put("double",1.1d);
-            // jo.optInt("double"); -- will return 1, not an error
-            // this conversion to BigDecimal then to BigInteger is to maintain
-            // that type cast support that may truncate the decimal.
-            return new BigDecimal(val.toString()).toBigInteger();
-        } catch (Exception e) {
-            return defaultValue;
+        if (val instanceof String) {
+            try {
+                // the other opt functions handle implicit conversions, i.e. 
+                // jo.put("double",1.1d);
+                // jo.optInt("double"); -- will return 1, not an error
+                // this conversion to BigDecimal then to BigInteger is to maintain
+                // that type cast support that may truncate the decimal.
+                return new BigDecimal((String) val).toBigInteger();
+            } catch (Exception e) {
+                return defaultValue;
+            }
         }
+        return defaultValue;
     }
 
     /**
@@ -1147,7 +1153,7 @@ public class JSONObject {
         
         if (val instanceof String) {
             try {
-                return new BigDecimal(val.toString()).intValue();
+                return new BigDecimal((String) val).intValue();
             } catch (Exception e) {
                 return defaultValue;
             }
@@ -1216,7 +1222,7 @@ public class JSONObject {
         
         if (val instanceof String) {
             try {
-                return new BigDecimal(val.toString()).longValue();
+                return new BigDecimal((String) val).longValue();
             } catch (Exception e) {
                 return defaultValue;
             }
@@ -1261,7 +1267,7 @@ public class JSONObject {
         
         if (val instanceof String) {
             try {
-                return new BigDecimal(val.toString());
+                return new BigDecimal((String) val);
             } catch (Exception e) {
                 return defaultValue;
             }
