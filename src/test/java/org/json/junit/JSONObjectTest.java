@@ -2003,7 +2003,7 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonObjectOptStringConversion() {
-        JSONObject jo = new JSONObject("{\"int\":\"123\",\"true\":\"true\",\"false\":\"false\"}");
+        JSONObject jo = new JSONObject("{\"int\":\"123\",\"true\":\"true\",\"false\":\"false\",\"largeNumber\":\"19007199254740993.35481234487103587486413587843213584\"}");
         assertTrue("unexpected optBoolean value",jo.optBoolean("true",false)==true);
         assertTrue("unexpected optBoolean value",jo.optBoolean("false",true)==false);
         assertTrue("unexpected optInt value",jo.optInt("int",0)==123);
@@ -2014,6 +2014,15 @@ public class JSONObjectTest {
         assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
         assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
         assertTrue("unexpected optNumber value",jo.optNumber("int",BigInteger.ZERO).longValue()==123l);
+        
+        // Test type coercion from larger to smaller
+        final BigDecimal largeValue = new BigDecimal("19007199254740993.35481234487103587486413587843213584");
+        assertEquals(largeValue,jo.optBigDecimal("largeNumber", null));
+        assertEquals(largeValue.toBigInteger(),jo.optBigInteger("largeNumber", null));
+        assertEquals(largeValue.doubleValue(), jo.optDouble("largeNumber"), 0.0d);
+        assertEquals(largeValue.floatValue(), jo.optFloat("largeNumber"), 0.0f);
+        assertEquals(largeValue.longValue(), jo.optLong("largeNumber"));
+        assertEquals(largeValue.intValue(), jo.optInt("largeNumber"));
     }
 
     /**
