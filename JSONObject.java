@@ -1849,10 +1849,10 @@ public class JSONObject {
 
             if (object instanceof Collection) {
                 Collection<?> coll = (Collection<?>) object;
-                return new JSONArray(coll);
+                return new JSONArray(coll, useJavaNullAsJsonNull);
             }
             if (object.getClass().isArray()) {
-                return new JSONArray(object);
+                return new JSONArray(object, useJavaNullAsJsonNull);
             }
             if (object instanceof Map) {
                 Map<?, ?> map = (Map<?, ?>) object;
@@ -1866,7 +1866,7 @@ public class JSONObject {
                     || object.getClass().getClassLoader() == null) {
                 return object.toString();
             }
-            return new JSONObject(object);
+            return new JSONObject(object, useJavaNullAsJsonNull);
         } catch (Exception exception) {
             return null;
         }
