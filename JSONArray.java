@@ -244,7 +244,7 @@ public class JSONArray implements Iterable<Object> {
             return object instanceof Number ? ((Number) object).doubleValue()
                     : Double.parseDouble((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.");
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
     }
 
@@ -287,7 +287,7 @@ public class JSONArray implements Iterable<Object> {
             }
             return JSONObject.stringToNumber(object.toString());
         } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.");
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
     }
 
@@ -331,7 +331,7 @@ public class JSONArray implements Iterable<Object> {
             return new BigDecimal(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONArray[" + index +
-                    "] could not convert to BigDecimal.");
+                    "] could not convert to BigDecimal.", e);
         }
     }
 
@@ -351,7 +351,7 @@ public class JSONArray implements Iterable<Object> {
             return new BigInteger(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONArray[" + index +
-                    "] could not convert to BigInteger.");
+                    "] could not convert to BigInteger.", e);
         }
     }
 
@@ -370,7 +370,7 @@ public class JSONArray implements Iterable<Object> {
             return object instanceof Number ? ((Number) object).intValue()
                     : Integer.parseInt((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.");
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
     }
 
@@ -426,7 +426,7 @@ public class JSONArray implements Iterable<Object> {
             return object instanceof Number ? ((Number) object).longValue()
                     : Long.parseLong((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.");
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
     }
 
@@ -569,7 +569,7 @@ public class JSONArray implements Iterable<Object> {
         }
         if (val instanceof String) {
             try {
-                return new BigDecimal((String) val).doubleValue();
+                return Double.parseDouble((String) val);
             } catch (Exception e) {
                 return defaultValue;
             }
@@ -611,7 +611,7 @@ public class JSONArray implements Iterable<Object> {
         }
         if (val instanceof String) {
             try {
-                return new BigDecimal((String) val).floatValue();
+                return Float.parseFloat((String) val);
             } catch (Exception e) {
                 return defaultValue;
             }
