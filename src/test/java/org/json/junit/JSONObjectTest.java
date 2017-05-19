@@ -708,7 +708,7 @@ public class JSONObjectTest {
          * This test documents a need for BigDecimal conversion.
          */
         Object obj = JSONObject.stringToValue( "299792.457999999984" );
-        assertTrue( "evaluates to 299792.458 doubld instead of 299792.457999999984 BigDecimal!",
+        assertTrue( "evaluates to 299792.458 double instead of 299792.457999999984 BigDecimal!",
                  obj.equals(new Double(299792.458)) );
         assertTrue( "1 should be an Integer!",
                 JSONObject.stringToValue( "1" ) instanceof Integer );
@@ -2042,7 +2042,7 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonObjectOptStringConversion() {
-        JSONObject jo = new JSONObject("{\"int\":\"123\",\"true\":\"true\",\"false\":\"false\",\"largeNumber\":\"19007199254740993.35481234487103587486413587843213584\"}");
+        JSONObject jo = new JSONObject("{\"int\":\"123\",\"true\":\"true\",\"false\":\"false\"}");
         assertTrue("unexpected optBoolean value",jo.optBoolean("true",false)==true);
         assertTrue("unexpected optBoolean value",jo.optBoolean("false",true)==false);
         assertTrue("unexpected optInt value",jo.optInt("int",0)==123);
@@ -2053,17 +2053,38 @@ public class JSONObjectTest {
         assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
         assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
         assertTrue("unexpected optNumber value",jo.optNumber("int",BigInteger.ZERO).longValue()==123l);
+    }
+    
+    /**
+     * Verifies that the opt methods properly convert string values to numbers and coerce them consistently.
+     */
+    @Test
+    public void jsonObjectOptCoercion() {
+        JSONObject jo = new JSONObject("{\"largeNumberStr\":\"19007199254740993.35481234487103587486413587843213584\"}");
+        // currently the parser doesn't recognize BigDecimal, to we have to put it manually
+        jo.put("largeNumber", new BigDecimal("19007199254740993.35481234487103587486413587843213584"));
         
         // Test type coercion from larger to smaller
+        assertEquals(new BigDecimal("19007199254740993.35481234487103587486413587843213584"), jo.optBigDecimal("largeNumber",null));
         assertEquals(new BigInteger("19007199254740993"), jo.optBigInteger("largeNumber",null));
         assertEquals(1.9007199254740992E16, jo.optDouble("largeNumber"),0.0);
         assertEquals(1.90071995E16f, jo.optFloat("largeNumber"),0.0f);
         assertEquals(19007199254740993l, jo.optLong("largeNumber"));
         assertEquals(1874919425, jo.optInt("largeNumber"));
-        
+
+        // conversion from a string
+        assertEquals(new BigDecimal("19007199254740993.35481234487103587486413587843213584"), jo.optBigDecimal("largeNumberStr",null));
+        assertEquals(new BigInteger("19007199254740993"), jo.optBigInteger("largeNumberStr",null));
+        assertEquals(1.9007199254740992E16, jo.optDouble("largeNumberStr"),0.0);
+        assertEquals(1.90071995E16f, jo.optFloat("largeNumberStr"),0.0f);
+        assertEquals(19007199254740993l, jo.optLong("largeNumberStr"));
+        assertEquals(1874919425, jo.optInt("largeNumberStr"));
+
         // the integer portion of the actual value is larger than a double can hold.
         assertNotEquals((long)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"), jo.optLong("largeNumber"));
         assertNotEquals((int)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"), jo.optInt("largeNumber"));
+        assertNotEquals((long)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"), jo.optLong("largeNumberStr"));
+        assertNotEquals((int)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"), jo.optInt("largeNumberStr"));
         assertEquals(19007199254740992l, (long)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"));
         assertEquals(2147483647, (int)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"));
     }
