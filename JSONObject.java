@@ -41,6 +41,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -159,6 +161,11 @@ public class JSONObject {
      * <code>JSONObject.NULL.toString()</code> returns <code>"null"</code>.
      */
     public static final Object NULL = new Null();
+    
+    /**
+     * Logger for retrieving otherwise invisible Exceptions.
+     */
+    private static final Logger LOGGER = Logger.getLogger(JSONObject.class.getName());
 
     /**
      * Construct an empty JSONObject.
@@ -183,6 +190,7 @@ public class JSONObject {
             try {
                 this.putOnce(names[i], jo.opt(names[i]));
             } catch (Exception ignore) {
+                LOGGER.log(Level.FINE, ignore.getMessage(), ignore);
             }
         }
     }
@@ -309,6 +317,7 @@ public class JSONObject {
             try {
                 this.putOpt(name, c.getField(name).get(object));
             } catch (Exception ignore) {
+                LOGGER.log(Level.FINE, ignore.getMessage(), ignore);
             }
         }
     }
@@ -549,7 +558,7 @@ public class JSONObject {
             return new BigInteger(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] could not be converted to BigInteger.");
+                    + "] could not be converted to BigInteger.", e);
         }
     }
 
@@ -569,7 +578,7 @@ public class JSONObject {
             return new BigDecimal(object.toString());
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] could not be converted to BigDecimal.");
+                    + "] could not be converted to BigDecimal.", e);
         }
     }
 
@@ -590,7 +599,7 @@ public class JSONObject {
                     : Double.parseDouble((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a number.");
+                    + "] is not a number.", e);
         }
     }
 
@@ -611,7 +620,7 @@ public class JSONObject {
                     : Integer.parseInt((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not an int.");
+                    + "] is not an int.", e);
         }
     }
 
@@ -668,7 +677,7 @@ public class JSONObject {
                     : Long.parseLong((String) object);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a long.");
+                    + "] is not a long.", e);
         }
     }
 
@@ -912,8 +921,10 @@ public class JSONObject {
             }
             return Enum.valueOf(clazz, val.toString());
         } catch (IllegalArgumentException e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         } catch (NullPointerException e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -945,6 +956,7 @@ public class JSONObject {
         try {
             return this.getBoolean(key);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -977,6 +989,7 @@ public class JSONObject {
         try {
             return this.getBigInteger(key);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -996,6 +1009,7 @@ public class JSONObject {
         try {
             return this.getBigDecimal(key);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -1015,6 +1029,7 @@ public class JSONObject {
         try {
             return this.getDouble(key);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -1047,6 +1062,7 @@ public class JSONObject {
         try {
             return this.getInt(key);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -1105,6 +1121,7 @@ public class JSONObject {
         try {
             return this.getLong(key);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return defaultValue;
         }
     }
@@ -1179,6 +1196,7 @@ public class JSONObject {
                     }
                 }
             } catch (Exception ignore) {
+                LOGGER.log(Level.FINE, ignore.getMessage(), ignore);
             }
         }
     }
@@ -1433,6 +1451,7 @@ public class JSONObject {
         try {
             return jsonPointer.queryFrom(this);
         } catch (JSONPointerException e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return null;
         }
     }
@@ -1454,6 +1473,7 @@ public class JSONObject {
                 return quote(string, sw).toString();
             } catch (IOException ignored) {
                 // will never happen - we are writing to a string writer
+                LOGGER.log(Level.FINE, ignored.getMessage(), ignored);
                 return "";
             }
         }
@@ -1565,7 +1585,8 @@ public class JSONObject {
                 }
             }
             return true;
-        } catch (Throwable exception) {
+        } catch (Exception exception) {
+            LOGGER.log(Level.FINE, exception.getMessage(), exception);
             return false;
         }
     }
@@ -1617,6 +1638,7 @@ public class JSONObject {
                     }
                 }
             } catch (Exception ignore) {
+                LOGGER.log(Level.FINE, ignore.getMessage(), ignore);
             }
         }
         return string;
@@ -1685,6 +1707,7 @@ public class JSONObject {
         try {
             return this.toString(0);
         } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
             return null;
         }
     }
@@ -1762,6 +1785,7 @@ public class JSONObject {
             } catch (NumberFormatException ex){
                 // The Number value is not a valid JSON number.
                 // Instead we will quote it as a string
+                LOGGER.log(Level.FINE, ex.getMessage(), ex);
                 return quote(numberAsString);
             }
         }
@@ -1835,6 +1859,7 @@ public class JSONObject {
             }
             return new JSONObject(object);
         } catch (Exception exception) {
+            LOGGER.log(Level.FINE, exception.getMessage(), exception);
             return null;
         }
     }
@@ -1876,6 +1901,7 @@ public class JSONObject {
             } catch (NumberFormatException ex){
                 // The Number value is not a valid JSON number.
                 // Instead we will quote it as a string
+                LOGGER.log(Level.FINE, ex.getMessage(), ex);
                 quote(numberAsString, writer);
             }
         } else if (value instanceof Boolean) {
