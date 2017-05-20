@@ -1276,7 +1276,7 @@ public class JSONObjectTest {
          * JSONObject constructor won't handle these types correctly, but
          * adding them via put works.
          */
-        jsonObject.put("keyFloat", new Float(1.1));
+        jsonObject.put("keyFloat", 1.1f);
         jsonObject.put("keyBigInt", new BigInteger("123456789123456789123456789123456780"));
         jsonObject.put("keyBigDec", new BigDecimal("123456789123456789123456789123456780.1"));
         jsonObject.increment("keyFloat");
@@ -1316,7 +1316,7 @@ public class JSONObjectTest {
          * missing bits would not fit into the 32 bit float, i.e. the
          * information needed simply is not there!
          */
-        assertTrue("expected 3.0999999046325684", Double.valueOf(3.0999999046325684).equals(jsonObject.query("/keyFloat")));
+        assertEquals(Float.valueOf(3.1f), jsonObject.query("/keyFloat"));
 
         /**
          * float f = 3.1f; double df = (double) f; double d = 3.1d;
@@ -1364,7 +1364,7 @@ public class JSONObjectTest {
         // 3.        A float+float operation will be performed and results into a float primitive.
         // 4.        There is no method that matches the signature put( String key, float value), java-compiler will choose the method
         //                put( String key, double value) and does an implicit type-cast(!) by appending zero-bits to the mantissa
-        assertTrue( "JSONObject increment converts Float to Double", jo.get( "bug" ) instanceof Double );
+        assertTrue( "JSONObject increment converts Float to Double", jo.get( "bug" ) instanceof Float );
         // correct implementation (with change of behavior) would be:
         // this.put(key, new Float((Float) value + 1)); 
         // Probably it would be better to deprecate the method and remove some day, while convenient processing the "payload" is not
