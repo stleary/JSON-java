@@ -42,7 +42,7 @@ public class JSONML {
      * @param arrayForm true if array form, false if object form.
      * @param ja      The JSONArray that is containing the current tag or null
      *     if we are at the outermost level.
-     * @param keepStrings	Don't type-convert text nodes and attibute values
+     * @param keepStrings	Don't type-convert text nodes and attribute values
      * @return A JSONArray if the value is the outermost tag, otherwise null.
      * @throws JSONException
      */
