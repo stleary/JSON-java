@@ -149,18 +149,18 @@ public class JSONWriter {
 
     /**
      * End something.
-     * @param mode Mode
+     * @param m Mode
      * @param c Closing character
      * @return this
      * @throws JSONException If unbalanced.
      */
-    private JSONWriter end(char mode, char c) throws JSONException {
-        if (this.mode != mode) {
-            throw new JSONException(mode == 'a'
+    private JSONWriter end(char m, char c) throws JSONException {
+        if (this.mode != m) {
+            throw new JSONException(m == 'a'
                 ? "Misplaced endArray."
                 : "Misplaced endObject.");
         }
-        this.pop(mode);
+        this.pop(m);
         try {
             this.writer.append(c);
         } catch (IOException e) {

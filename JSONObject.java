@@ -126,6 +126,15 @@ public class JSONObject {
         public boolean equals(Object object) {
             return object == null || object == this;
         }
+        /**
+         * A Null object is equal to the null value and to itself.
+         *
+         * @return always returns 0.
+         */
+        @Override
+        public int hashCode() {
+            return 0;
+        }
 
         /**
          * Get the "null" string value.
@@ -801,13 +810,13 @@ public class JSONObject {
         } else if (value instanceof BigDecimal) {
             this.put(key, ((BigDecimal)value).add(BigDecimal.ONE));
         } else if (value instanceof Integer) {
-            this.put(key, (Integer) value + 1);
+            this.put(key, ((Integer) value).intValue() + 1);
         } else if (value instanceof Long) {
-            this.put(key, (Long) value + 1);
+            this.put(key, ((Long) value).longValue() + 1L);
         } else if (value instanceof Double) {
-            this.put(key, (Double) value + 1);
+            this.put(key, ((Double) value).doubleValue() + 1.0d);
         } else if (value instanceof Float) {
-            this.put(key, (Float) value + 1);
+            this.put(key, ((Float) value).floatValue() + 1.0f);
         } else {
             throw new JSONException("Unable to increment [" + quote(key) + "].");
         }
@@ -934,7 +943,7 @@ public class JSONObject {
      * @param defaultValue
      *            The default in case the value is not found
      * @return The enum value associated with the key or defaultValue
-     *            if the value is not found or cannot be assigned to clazz
+     *            if the value is not found or cannot be assigned to <code>clazz</code>
      */
     public <E extends Enum<E>> E optEnum(Class<E> clazz, String key, E defaultValue) {
         try {
@@ -1437,7 +1446,23 @@ public class JSONObject {
      *             If the key is null or if the number is invalid.
      */
     public JSONObject put(String key, double value) throws JSONException {
-        this.put(key, new Double(value));
+        this.put(key, Double.valueOf(value));
+        return this;
+    }
+    
+    /**
+     * Put a key/float pair in the JSONObject.
+     *
+     * @param key
+     *            A key string.
+     * @param value
+     *            A float which is the value.
+     * @return this.
+     * @throws JSONException
+     *             If the key is null or if the number is invalid.
+     */
+    public JSONObject put(String key, float value) throws JSONException {
+        this.put(key, Float.valueOf(value));
         return this;
     }
 
@@ -1453,7 +1478,7 @@ public class JSONObject {
      *             If the key is null.
      */
     public JSONObject put(String key, int value) throws JSONException {
-        this.put(key, new Integer(value));
+        this.put(key, Integer.valueOf(value));
         return this;
     }
 
@@ -1469,7 +1494,7 @@ public class JSONObject {
      *             If the key is null.
      */
     public JSONObject put(String key, long value) throws JSONException {
-        this.put(key, new Long(value));
+        this.put(key, Long.valueOf(value));
         return this;
     }
 
@@ -1559,7 +1584,7 @@ public class JSONObject {
     }
 
     /**
-     * Creates a JSONPointer using an intialization string and tries to 
+     * Creates a JSONPointer using an initialization string and tries to 
      * match it to an item within this JSONObject. For example, given a
      * JSONObject initialized with this document:
      * <pre>
@@ -1581,7 +1606,7 @@ public class JSONObject {
         return query(new JSONPointer(jsonPointer));
     }
     /**
-     * Uses a uaer initialized JSONPointer  and tries to 
+     * Uses a user initialized JSONPointer  and tries to 
      * match it to an item within this JSONObject. For example, given a
      * JSONObject initialized with this document:
      * <pre>
@@ -1959,7 +1984,7 @@ public class JSONObject {
     }
 
     /**
-     * Make a prettyprinted JSON text of this JSONObject.
+     * Make a pretty-printed JSON text of this JSONObject.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
@@ -2024,7 +2049,8 @@ public class JSONObject {
             final String numberAsString = numberToString((Number) value);
             try {
                 // Use the BigDecimal constructor for it's parser to validate the format.
-                new BigDecimal(numberAsString);
+                @SuppressWarnings("unused")
+                BigDecimal unused = new BigDecimal(numberAsString);
                 // Close enough to a JSON number that we will return it unquoted
                 return numberAsString;
             } catch (NumberFormatException ex){
@@ -2185,7 +2211,7 @@ public class JSONObject {
      * @param indentFactor
      *            The number of spaces to add to each level of indentation.
      * @param indent
-     *            The indention of the top level.
+     *            The indentation of the top level.
      * @return The writer.
      * @throws JSONException
      */
