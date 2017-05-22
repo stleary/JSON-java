@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 /**
  * This provides static methods to convert an XML text into a JSONObject, and to
@@ -513,10 +514,7 @@ public class XML {
         StringBuilder sb = new StringBuilder();
         JSONArray ja;
         JSONObject jo;
-        String key;
-        Iterator<String> keys;
         String string;
-        Object value;
 
         if (object instanceof JSONObject) {
 
@@ -529,16 +527,14 @@ public class XML {
 
             // Loop thru the keys.
             jo = (JSONObject) object;
-            keys = jo.keys();
-            while (keys.hasNext()) {
-                key = keys.next();
-                value = jo.opt(key);
+            for (final Entry<String, ?> entry : jo.entrySet()) {
+            	final String key = entry.getKey();
+                Object value = entry.getValue();
                 if (value == null) {
                     value = "";
                 } else if (value.getClass().isArray()) {
                     value = new JSONArray(value);
                 }
-                string = value instanceof String ? (String) value : null;
 
                 // Emit content in body
                 if ("content".equals(key)) {

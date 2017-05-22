@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map.Entry;
 
 /**
  * Convert an HTTP header to a JSONObject and back.
@@ -126,8 +126,6 @@ public class HTTP {
      *  information.
      */
     public static String toString(JSONObject jo) throws JSONException {
-        Iterator<String>    keys = jo.keys();
-        String              string;
         StringBuilder       sb = new StringBuilder();
         if (jo.has("Status-Code") && jo.has("Reason-Phrase")) {
             sb.append(jo.getString("HTTP-Version"));
@@ -147,14 +145,14 @@ public class HTTP {
             throw new JSONException("Not enough material for an HTTP header.");
         }
         sb.append(CRLF);
-        while (keys.hasNext()) {
-            string = keys.next();
-            if (!"HTTP-Version".equals(string)      && !"Status-Code".equals(string) &&
-                    !"Reason-Phrase".equals(string) && !"Method".equals(string) &&
-                    !"Request-URI".equals(string)   && !jo.isNull(string)) {
-                sb.append(string);
+        for (final Entry<String,?> entry : jo.entrySet()) {
+        	final String key = entry.getKey();
+            if (!"HTTP-Version".equals(key)      && !"Status-Code".equals(key) &&
+                    !"Reason-Phrase".equals(key) && !"Method".equals(key) &&
+                    !"Request-URI".equals(key)   && !JSONObject.NULL.equals(entry.getValue())) {
+                sb.append(key);
                 sb.append(": ");
-                sb.append(jo.getString(string));
+                sb.append(jo.optString(key));
                 sb.append(CRLF);
             }
         }

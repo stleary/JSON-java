@@ -1,5 +1,7 @@
 package org.json;
 
+import java.util.Map.Entry;
+
 /*
 Copyright (c) 2008 JSON.org
 
@@ -23,9 +25,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-import java.util.Iterator;
-
 
 /**
  * This provides static methods to convert an XML text into a JSONArray or
@@ -397,13 +396,10 @@ public class JSONML {
     public static String toString(JSONArray ja) throws JSONException {
         int                 i;
         JSONObject          jo;
-        String              key;
-        Iterator<String>    keys;
         int                 length;
         Object              object;
         StringBuilder        sb = new StringBuilder();
         String              tagName;
-        String               value;
 
 // Emit <tagName
 
@@ -420,17 +416,16 @@ public class JSONML {
 
 // Emit the attributes
 
-            keys = jo.keys();
-            while (keys.hasNext()) {
-                key = keys.next();
+            for (final Entry<String, ?> entry : jo.entrySet()) {
+            	final String key = entry.getKey();
                 XML.noSpace(key);
-                value = jo.optString(key);
+                final Object value = entry.getValue();
                 if (value != null) {
                     sb.append(' ');
                     sb.append(XML.escape(key));
                     sb.append('=');
                     sb.append('"');
-                    sb.append(XML.escape(value));
+                    sb.append(XML.escape(value.toString()));
                     sb.append('"');
                 }
             }
@@ -482,12 +477,10 @@ public class JSONML {
         StringBuilder sb = new StringBuilder();
         int                 i;
         JSONArray           ja;
-        String              key;
-        Iterator<String>    keys;
         int                 length;
         Object              object;
         String              tagName;
-        String              value;
+        Object              value;
 
 //Emit <tagName
 
@@ -502,18 +495,17 @@ public class JSONML {
 
 //Emit the attributes
 
-        keys = jo.keys();
-        while (keys.hasNext()) {
-            key = keys.next();
+        for (final Entry<String, ?> entry : jo.entrySet()) {
+        	final String key = entry.getKey();
             if (!"tagName".equals(key) && !"childNodes".equals(key)) {
                 XML.noSpace(key);
-                value = jo.optString(key);
+                value = entry.getValue();
                 if (value != null) {
                     sb.append(' ');
                     sb.append(XML.escape(key));
                     sb.append('=');
                     sb.append('"');
-                    sb.append(XML.escape(value));
+                    sb.append(XML.escape(value.toString()));
                     sb.append('"');
                 }
             }
