@@ -393,6 +393,20 @@ public class JSONArrayTest {
         assertTrue("Array opt double default implicit",
            new Double(jsonArray.optDouble(99)).isNaN());
 
+        assertTrue("Array opt float",
+                new Float(23.45e-4).equals(jsonArray.optFloat(5)));
+        assertTrue("Array opt float default",
+                new Float(1).equals(jsonArray.optFloat(0, 1)));
+        assertTrue("Array opt float default implicit",
+           new Float(jsonArray.optFloat(99)).isNaN());
+
+        assertTrue("Array opt Number",
+                new Double(23.45e-4).equals(jsonArray.optNumber(5)));
+        assertTrue("Array opt Number default",
+                new Double(1).equals(jsonArray.optNumber(0, 1d)));
+        assertTrue("Array opt Number default implicit",
+           new Double(jsonArray.optNumber(99,Double.NaN).doubleValue()).isNaN());
+
         assertTrue("Array opt int",
                 new Integer(42).equals(jsonArray.optInt(7)));
         assertTrue("Array opt int default",
