@@ -241,7 +241,7 @@ public class JSONObject {
             }
         }
     }
-
+    
     /**
      * Construct a JSONObject from a Map.
      *
@@ -250,15 +250,28 @@ public class JSONObject {
      *            the JSONObject.
      */
     public JSONObject(Map<?, ?> map) {
+    	this(map, false);
+    }
+    
+    /**
+     * Construct a JSONObject from a Map.
+     *
+     * @param map
+     *            A map object that can be used to initialize the contents of
+     *            the JSONObject.
+     * @param useJavaNullAsJsonNull
+     *            If true, Java null values will be mapped to JSON null values; otherwise keys with null values will be omitted
+     */
+    public JSONObject(Map<?, ?> map, boolean useJavaNullAsJsonNull) {
         this.map = new HashMap<String, Object>();
         if (map != null) {
         	for (final Entry<?, ?> e : map.entrySet()) {
                 final Object value = e.getValue();
-                if (value != null) {
-                    this.map.put(String.valueOf(e.getKey()), wrap(value));
+                if (value != null || useJavaNullAsJsonNull) {
+                	this.map.put(String.valueOf(e.getKey()), wrap(value, useJavaNullAsJsonNull));
                 }
             }
-        }
+        }    	
     }
 
     /**
@@ -283,9 +296,37 @@ public class JSONObject {
      *            a JSONObject.
      */
     public JSONObject(Object bean) {
-        this();
-        this.populateMap(bean);
+        this(bean, false);
     }
+    
+    /**
+     * Construct a JSONObject from an Object using bean getters. It reflects on
+     * all of the public methods of the object. For each of the methods with no
+     * parameters and a name starting with <code>"get"</code> or
+     * <code>"is"</code> followed by an uppercase letter, the method is invoked,
+     * and a key and the value returned from the getter method are put into the
+     * new JSONObject.
+     *
+     * The key is formed by removing the <code>"get"</code> or <code>"is"</code>
+     * prefix. If the second remaining character is not upper case, then the
+     * first character is converted to lower case.
+     *
+     * For example, if an object has a method named <code>"getName"</code>, and
+     * if the result of calling <code>object.getName()</code> is
+     * <code>"Larry Fine"</code>, then the JSONObject will contain
+     * <code>"name": "Larry Fine"</code>.
+     *
+     * @param bean
+     *            An object that has getter methods that should be used to make
+     *            a JSONObject.
+     * @param useJavaNullAsJsonNull
+     *            If true, Java null values will be mapped to JSON null values; otherwise keys with null values will be omitted
+     */
+    public JSONObject(Object bean, boolean useJavaNullAsJsonNull) {
+        this();
+        this.populateMap(bean, useJavaNullAsJsonNull);
+    }
+    
 
     /**
      * Construct a JSONObject from an Object, using reflection to find the
@@ -1356,7 +1397,7 @@ public class JSONObject {
         return NULL.equals(object) ? defaultValue : object.toString();
     }
 
-    private void populateMap(Object bean) {
+    private void populateMap(Object bean, boolean useJavaNullAsJsonNull) {
         Class<?> klass = bean.getClass();
 
 // If klass is a System class then set includeSuperClass to false.
@@ -1392,8 +1433,8 @@ public class JSONObject {
                         }
 
                         Object result = method.invoke(bean, (Object[]) null);
-                        if (result != null) {
-                            this.map.put(key, wrap(result));
+                        if (result != null || useJavaNullAsJsonNull) {
+                            this.map.put(key, wrap(result, useJavaNullAsJsonNull));
                         }
                     }
                 }
@@ -2093,6 +2134,24 @@ public class JSONObject {
      * @return The wrapped value
      */
     public static Object wrap(Object object) {
+    	return wrap(object, false);
+    }
+    
+    /**
+     * Wrap an object, if necessary. If the object is null, return the NULL
+     * object. If it is an array or collection, wrap it in a JSONArray. If it is
+     * a map, wrap it in a JSONObject. If it is a standard property (Double,
+     * String, et al) then it is already wrapped. Otherwise, if it comes from
+     * one of the java packages, turn it into a string. And if it doesn't, try
+     * to wrap it in a JSONObject. If the wrapping fails, then null is returned.
+     *
+     * @param object
+     *            The object to wrap
+     * @param useJavaNullAsJsonNull
+     *            If true, Java null values will be mapped to JSON null values; otherwise keys with null values will be omitted
+     * @return The wrapped value
+     */
+    public static Object wrap(Object object, boolean useJavaNullAsJsonNull) {
         try {
             if (object == null) {
                 return NULL;
@@ -2110,14 +2169,14 @@ public class JSONObject {
 
             if (object instanceof Collection) {
                 Collection<?> coll = (Collection<?>) object;
-                return new JSONArray(coll);
+                return new JSONArray(coll, useJavaNullAsJsonNull);
             }
             if (object.getClass().isArray()) {
-                return new JSONArray(object);
+                return new JSONArray(object, useJavaNullAsJsonNull);
             }
             if (object instanceof Map) {
                 Map<?, ?> map = (Map<?, ?>) object;
-                return new JSONObject(map);
+                return new JSONObject(map, useJavaNullAsJsonNull);
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage
@@ -2127,7 +2186,7 @@ public class JSONObject {
                     || object.getClass().getClassLoader() == null) {
                 return object.toString();
             }
-            return new JSONObject(object);
+            return new JSONObject(object, useJavaNullAsJsonNull);
         } catch (Exception exception) {
             return null;
         }
