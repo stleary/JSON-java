@@ -378,7 +378,7 @@ public class XML {
                     if (jsonobject.length() > 0) {
                         context.accumulate(tagName, jsonobject);
                     } else {
-                        context.accumulate(tagName, "");
+                        context.accumulate(tagName, JSONObject.NULL);
                     }
                     return false;
 
@@ -533,8 +533,8 @@ public class XML {
             while (keys.hasNext()) {
                 key = keys.next();
                 value = jo.opt(key);
-                if (value == null) {
-                    value = "";
+                if (JSONObject.NULL.equals(value)) {
+                    value = null;
                 } else if (value.getClass().isArray()) {
                     value = new JSONArray(value);
                 }
@@ -553,7 +553,7 @@ public class XML {
                             i++;
                         }
                     } else {
-                        sb.append(escape(value.toString()));
+                        sb.append(escape(String.valueOf(value)));
                     }
 
                     // Emit an array of similar keys
@@ -576,9 +576,19 @@ public class XML {
                 } else if ("".equals(value)) {
                     sb.append('<');
                     sb.append(key);
-                    sb.append("/>");
+                    sb.append('>');
+                    sb.append("</");
+                    sb.append(key);
+                    sb.append('>');
 
                     // Emit a new tag <k>
+
+                } else if (value == null) {
+                    sb.append('<');
+                    sb.append(key);
+                    sb.append("/>");
+
+                    // Emit a new empty tag <k/>
 
                 } else {
                     sb.append(toString(value, key));
