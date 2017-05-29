@@ -1259,24 +1259,32 @@ public class JSONArray implements Iterable<Object> {
             return false;
         }
         int len = this.length();
+        boolean[] verify = new boolean[len];
         if (len != ((JSONArray)other).length()) {
             return false;
         }
         for (int i = 0; i < len; i += 1) {
-            Object valueThis = this.get(i);
-            Object valueOther = ((JSONArray)other).get(i);
-            if (valueThis instanceof JSONObject) {
-                if (!((JSONObject)valueThis).similar(valueOther)) {
-                    return false;
-                }
-            } else if (valueThis instanceof JSONArray) {
-                if (!((JSONArray)valueThis).similar(valueOther)) {
-                    return false;
-                }
-            } else if (!valueThis.equals(valueOther)) {
-                return false;
-            }
+           for (int j = 0; j < len; j += 1) {
+               Object valueThis = this.get(i);
+               Object valueOther = ((JSONArray)other).get(j);
+               if (valueThis instanceof JSONObject) {
+                   if (((JSONObject)valueThis).similar(valueOther)) {
+                      verify[i] = true;
+                   }
+               } else if (valueThis instanceof JSONArray) {
+                   if (((JSONArray)valueThis).similar(valueOther)) {
+                       verify[i] = true;
+                   }
+               } else if (valueThis.equals(valueOther)) {
+                   verify[i] = true;
+               }
+           }
         }
+        for (int i = 0; i < len; i += 1) {
+           if(!verify[i]){
+				          return false;
+	          }
+		      }
         return true;
     }
 
