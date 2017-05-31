@@ -395,9 +395,10 @@ public class JSONObject {
         testValidity(value);
         Object object = this.opt(key);
         if (object == null) {
-            this.put(key,
-                    value instanceof JSONArray ? new JSONArray().put(value)
-                            : value);
+            //this is the modified line  The old version would put the raw value
+            //this forces an array when the accumulate version is used
+            
+            this.put(key, new JSONArray().put(value));
         } else if (object instanceof JSONArray) {
             ((JSONArray) object).put(value);
         } else {
