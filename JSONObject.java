@@ -863,7 +863,7 @@ public class JSONObject {
      *
      * @see Map#entrySet()
      *
-     * @return A keySet.
+     * @return An Entry Set
      */
     protected Set<Entry<String, Object>> entrySet() {
         return this.map.entrySet();
@@ -2218,8 +2218,7 @@ public class JSONObject {
     }
 
     /**
-     * Write the contents of the JSONObject as JSON text to a writer. For
-     * compactness, no whitespace is added.
+     * Write the contents of the JSONObject as JSON text to a writer.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
