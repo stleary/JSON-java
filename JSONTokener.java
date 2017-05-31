@@ -39,13 +39,19 @@ SOFTWARE.
  * @version 2014-05-03
  */
 public class JSONTokener {
-
-    private long    character;
+    /** current read character. */
+    private long character;
+    /** flag to indicate if the end of the input has been found. */
     private boolean eof;
-    private long    index;
-    private long    line;
-    private char    previous;
-    private Reader  reader;
+    /** current read index of the input. */
+    private long index;
+    /** current line of the input. */
+    private long line;
+    /** previous index of the input. */
+    private char previous;
+    /** Reader for the input. */
+    private final Reader reader;
+    /** flag to indicate that a previous character was requested. */
     private boolean usePrevious;
 
 
