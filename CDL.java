@@ -148,7 +148,8 @@ public class CDL {
      */
     public static String rowToString(JSONArray ja) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < ja.length(); i += 1) {
+        int jsonArrayLength  = ja.length();
+        for (int i = 0; i < jsonArrayLength; i += 1) {
             if (i > 0) {
                 sb.append(',');
             }
