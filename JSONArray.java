@@ -1263,8 +1263,14 @@ public class JSONArray implements Iterable<Object> {
             return false;
         }
         for (int i = 0; i < len; i += 1) {
-            Object valueThis = this.get(i);
-            Object valueOther = ((JSONArray)other).get(i);
+            Object valueThis = this.myArrayList.get(i);
+            Object valueOther = ((JSONArray)other).myArrayList.get(i);
+            if(valueThis == valueOther) {
+            	return true;
+            }
+            if(valueThis == null) {
+            	return false;
+            }
             if (valueThis instanceof JSONObject) {
                 if (!((JSONObject)valueThis).similar(valueOther)) {
                     return false;

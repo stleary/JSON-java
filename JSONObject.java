@@ -245,14 +245,14 @@ public class JSONObject {
     /**
      * Construct a JSONObject from a Map.
      *
-     * @param map
+     * @param m
      *            A map object that can be used to initialize the contents of
      *            the JSONObject.
      */
-    public JSONObject(Map<?, ?> map) {
+    public JSONObject(Map<?, ?> m) {
         this.map = new HashMap<String, Object>();
-        if (map != null) {
-        	for (final Entry<?, ?> e : map.entrySet()) {
+        if (m != null) {
+        	for (final Entry<?, ?> e : m.entrySet()) {
                 final Object value = e.getValue();
                 if (value != null) {
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
@@ -729,14 +729,7 @@ public class JSONObject {
         if (length == 0) {
             return null;
         }
-        Iterator<String> iterator = jo.keys();
-        String[] names = new String[length];
-        int i = 0;
-        while (iterator.hasNext()) {
-            names[i] = iterator.next();
-            i++;
-        }
-        return names;
+        return jo.keySet().toArray(new String[length]);
     }
 
     /**
@@ -837,8 +830,11 @@ public class JSONObject {
     }
 
     /**
-     * Get an enumeration of the keys of the JSONObject.
+     * Get an enumeration of the keys of the JSONObject. Modifying this key Set will also
+     * modify the JSONObject. Use with caution.
      *
+     * @see Set#iterator()
+     * 
      * @return An iterator of the keys.
      */
     public Iterator<String> keys() {
@@ -846,12 +842,31 @@ public class JSONObject {
     }
 
     /**
-     * Get a set of keys of the JSONObject.
+     * Get a set of keys of the JSONObject. Modifying this key Set will also modify the
+     * JSONObject. Use with caution.
+     *
+     * @see Map#keySet()
      *
      * @return A keySet.
      */
     public Set<String> keySet() {
         return this.map.keySet();
+    }
+
+    /**
+     * Get a set of entries of the JSONObject. These are raw values and may not
+     * match what is returned by the JSONObject get* and opt* functions. Modifying 
+     * the returned EntrySet or the Entry objects contained therein will modify the
+     * backing JSONObject. This does not return a clone or a read-only view.
+     * 
+     * Use with caution.
+     *
+     * @see Map#entrySet()
+     *
+     * @return An Entry Set
+     */
+    protected Set<Entry<String, Object>> entrySet() {
+        return this.map.entrySet();
     }
 
     /**
@@ -871,12 +886,10 @@ public class JSONObject {
      *         is empty.
      */
     public JSONArray names() {
-        JSONArray ja = new JSONArray();
-        Iterator<String> keys = this.keys();
-        while (keys.hasNext()) {
-            ja.put(keys.next());
-        }
-        return ja.length() == 0 ? null : ja;
+    	if(this.map.isEmpty()) {
+    		return null;
+    	}
+        return new JSONArray(this.map.keySet());
     }
 
     /**
@@ -1762,15 +1775,19 @@ public class JSONObject {
             if (!(other instanceof JSONObject)) {
                 return false;
             }
-            Set<String> set = this.keySet();
-            if (!set.equals(((JSONObject)other).keySet())) {
+            if (!this.keySet().equals(((JSONObject)other).keySet())) {
                 return false;
             }
-            Iterator<String> iterator = set.iterator();
-            while (iterator.hasNext()) {
-                String name = iterator.next();
-                Object valueThis = this.get(name);
+            for (final Entry<String,?> entry : this.entrySet()) {
+                String name = entry.getKey();
+                Object valueThis = entry.getValue();
                 Object valueOther = ((JSONObject)other).get(name);
+                if(valueThis == valueOther) {
+                	return true;
+                }
+                if(valueThis == null) {
+                	return false;
+                }
                 if (valueThis instanceof JSONObject) {
                     if (!((JSONObject)valueThis).similar(valueOther)) {
                         return false;
@@ -2201,8 +2218,7 @@ public class JSONObject {
     }
 
     /**
-     * Write the contents of the JSONObject as JSON text to a writer. For
-     * compactness, no whitespace is added.
+     * Write the contents of the JSONObject as JSON text to a writer.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
@@ -2220,21 +2236,19 @@ public class JSONObject {
         try {
             boolean commanate = false;
             final int length = this.length();
-            Iterator<String> keys = this.keys();
             writer.write('{');
 
             if (length == 1) {
-                Object key = keys.next();
-                writer.write(quote(key.toString()));
+            	final Entry<String,?> entry = this.entrySet().iterator().next();
+                writer.write(quote(entry.getKey()));
                 writer.write(':');
                 if (indentFactor > 0) {
                     writer.write(' ');
                 }
-                writeValue(writer, this.map.get(key), indentFactor, indent);
+                writeValue(writer, entry.getValue(), indentFactor, indent);
             } else if (length != 0) {
                 final int newindent = indent + indentFactor;
-                while (keys.hasNext()) {
-                    Object key = keys.next();
+                for (final Entry<String,?> entry : this.entrySet()) {
                     if (commanate) {
                         writer.write(',');
                     }
@@ -2242,12 +2256,12 @@ public class JSONObject {
                         writer.write('\n');
                     }
                     indent(writer, newindent);
-                    writer.write(quote(key.toString()));
+                    writer.write(quote(entry.getKey()));
                     writer.write(':');
                     if (indentFactor > 0) {
                         writer.write(' ');
                     }
-                    writeValue(writer, this.map.get(key), indentFactor, newindent);
+                    writeValue(writer, entry.getValue(), indentFactor, newindent);
                     commanate = true;
                 }
                 if (indentFactor > 0) {
@@ -2273,7 +2287,7 @@ public class JSONObject {
      */
     public Map<String, Object> toMap() {
         Map<String, Object> results = new HashMap<String, Object>();
-        for (Entry<String, Object> entry : this.map.entrySet()) {
+        for (Entry<String, Object> entry : this.entrySet()) {
             Object value;
             if (entry.getValue() == null || NULL.equals(entry.getValue())) {
                 value = null;
