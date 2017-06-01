@@ -1308,6 +1308,17 @@ public class JSONArray implements Iterable<Object> {
         }
         return jo;
     }
+    
+    /**
+     * Returns the JSONArray as an ArrayList.
+     * 
+     * @return a copy of the JSONArray as an ArrayList.
+     */
+    public ArrayList<Object> toArrayList() {
+        ArrayList<Object> copy = new ArrayList<Object>(this.myArrayList.size());
+        for (Object o : this.myArrayList) copy.add((Object) o.clone());
+        return copy;
+    }
 
     /**
      * Make a JSON text of this JSONArray. For compactness, no unnecessary
