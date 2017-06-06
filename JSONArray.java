@@ -186,6 +186,20 @@ public class JSONArray implements Iterable<Object> {
         return this.myArrayList.iterator();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof JSONArray)) return false;
+
+        JSONArray otherArray = (JSONArray) o;
+        return myArrayList.equals(otherArray.myArrayList);
+    }
+
+    @Override
+    public int hashCode() {
+        return myArrayList.hashCode();
+    }
+
     /**
      * Get the object value associated with an index.
      *
