@@ -270,8 +270,6 @@ public class JSONTokener {
             c = this.next();
             switch (c) {
             case 0:
-            case '\n':
-            case '\r':
                 throw this.syntaxError("Unterminated string");
             case '\\':
                 c = this.next();
@@ -330,7 +328,7 @@ public class JSONTokener {
         StringBuilder sb = new StringBuilder();
         for (;;) {
             char c = this.next();
-            if (c == delimiter || c == 0 || c == '\n' || c == '\r') {
+            if (c == delimiter || c == 0) {
                 if (c != 0) {
                     this.back();
                 }
@@ -354,8 +352,7 @@ public class JSONTokener {
         StringBuilder sb = new StringBuilder();
         for (;;) {
             c = this.next();
-            if (delimiters.indexOf(c) >= 0 || c == 0 ||
-                    c == '\n' || c == '\r') {
+            if (delimiters.indexOf(c) >= 0 || c == 0) {
                 if (c != 0) {
                     this.back();
                 }
