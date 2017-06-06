@@ -34,7 +34,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -164,7 +164,7 @@ public class JSONObject {
      * Construct an empty JSONObject.
      */
     public JSONObject() {
-        this.map = new HashMap<String, Object>();
+        this.map = new LinkedHashMap<String, Object>();
     }
 
     /**
@@ -250,7 +250,7 @@ public class JSONObject {
      *            the JSONObject.
      */
     public JSONObject(Map<?, ?> m) {
-        this.map = new HashMap<String, Object>();
+        this.map = new LinkedHashMap<String, Object>();
         if (m != null) {
         	for (final Entry<?, ?> e : m.entrySet()) {
                 final Object value = e.getValue();
@@ -2286,7 +2286,7 @@ public class JSONObject {
      * @return a java.util.Map containing the entries of this object
      */
     public Map<String, Object> toMap() {
-        Map<String, Object> results = new HashMap<String, Object>();
+        Map<String, Object> results = new LinkedHashMap<String, Object>();
         for (Entry<String, Object> entry : this.entrySet()) {
             Object value;
             if (entry.getValue() == null || NULL.equals(entry.getValue())) {
