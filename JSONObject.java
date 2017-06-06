@@ -2240,12 +2240,17 @@ public class JSONObject {
 
             if (length == 1) {
             	final Entry<String,?> entry = this.entrySet().iterator().next();
-                writer.write(quote(entry.getKey()));
+                final String key = entry.getKey();
+                writer.write(quote(key));
                 writer.write(':');
                 if (indentFactor > 0) {
                     writer.write(' ');
                 }
-                writeValue(writer, entry.getValue(), indentFactor, indent);
+                try{
+                    writeValue(writer, entry.getValue(), indentFactor, indent);
+                } catch (Exception e) {
+                    throw new JSONException("Unable to write JSONObject value for key: " + key, e);
+                }
             } else if (length != 0) {
                 final int newindent = indent + indentFactor;
                 for (final Entry<String,?> entry : this.entrySet()) {
@@ -2256,12 +2261,17 @@ public class JSONObject {
                         writer.write('\n');
                     }
                     indent(writer, newindent);
-                    writer.write(quote(entry.getKey()));
+                    final String key = entry.getKey();
+                    writer.write(quote(key));
                     writer.write(':');
                     if (indentFactor > 0) {
                         writer.write(' ');
                     }
-                    writeValue(writer, entry.getValue(), indentFactor, newindent);
+                    try {
+                        writeValue(writer, entry.getValue(), indentFactor, newindent);
+                    } catch (Exception e) {
+                        throw new JSONException("Unable to write JSONObject value for key: " + key, e);
+                    }
                     commanate = true;
                 }
                 if (indentFactor > 0) {
