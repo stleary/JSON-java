@@ -1761,7 +1761,25 @@ public class JSONObject {
     public Object remove(String key) {
         return this.map.remove(key);
     }
-
+    
+    /**
+     * Remove all names and their values, if present.
+     * it's work like normal remove but it use for a group of key.
+     * @param keys
+     *           The names to be removed.
+     * @return the ArrayLits that has the all values that were associated with the 
+     *          name, or null if there was no value.
+     */
+     public ArrayList<Object> removeAll(String... keys) {
+         ArrayList<Object> outPut = new ArrayList<>();
+         for (String key : keys) {
+             outPut.add(remove(key));
+         }
+         if(outPut.isEmpty())
+             outPut = null;
+         return outPut;
+     }
+ 
     /**
      * Determine if two JSONObjects are similar.
      * They must contain the same set of names which must be associated with
