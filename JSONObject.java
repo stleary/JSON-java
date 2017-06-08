@@ -250,8 +250,10 @@ public class JSONObject {
      *            the JSONObject.
      */
     public JSONObject(Map<?, ?> m) {
-        this.map = new HashMap<String, Object>(m == null ? 0 : m.size());
-        if (m != null) {
+        if (m == null) {
+            this.map = new HashMap<String, Object>();
+        } else {
+            this.map = new HashMap<String, Object>(m.size());
         	for (final Entry<?, ?> e : m.entrySet()) {
                 final Object value = e.getValue();
                 if (value != null) {
