@@ -178,7 +178,7 @@ public class JSONObject {
      *            An array of strings.
      */
     public JSONObject(JSONObject jo, String[] names) {
-        this();
+        this(names.length);
         for (int i = 0; i < names.length; i += 1) {
             try {
                 this.putOnce(names[i], jo.opt(names[i]));
@@ -250,7 +250,7 @@ public class JSONObject {
      *            the JSONObject.
      */
     public JSONObject(Map<?, ?> m) {
-        this.map = new HashMap<String, Object>();
+        this.map = new HashMap<String, Object>(m == null ? 0 : m.size());
         if (m != null) {
         	for (final Entry<?, ?> e : m.entrySet()) {
                 final Object value = e.getValue();
@@ -302,7 +302,7 @@ public class JSONObject {
      *            from the object.
      */
     public JSONObject(Object object, String names[]) {
-        this();
+        this(names.length);
         Class<?> c = object.getClass();
         for (int i = 0; i < names.length; i += 1) {
             String name = names[i];
@@ -370,6 +370,17 @@ public class JSONObject {
                 target.put(path[last], bundle.getString((String) key));
             }
         }
+    }
+    
+    /**
+     * Constructor to specify an initial capacity of the internal map. Useful for library 
+     * internal calls where we know, or at least can best guess, how big this JSONObject
+     * will be.
+     * 
+     * @param initialCapacity initial capacity of the internal map.
+     */
+    protected JSONObject(int initialCapacity){
+        this.map = new HashMap<String, Object>(initialCapacity);
     }
 
     /**

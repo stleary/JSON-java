@@ -154,7 +154,7 @@ public class JSONArray implements Iterable<Object> {
      *            A Collection.
      */
     public JSONArray(Collection<?> collection) {
-        this.myArrayList = new ArrayList<Object>();
+        this.myArrayList = new ArrayList<Object>(collection == null ? 0 : collection.size());
         if (collection != null) {
         	for (Object o: collection){
         		this.myArrayList.add(JSONObject.wrap(o));
@@ -172,6 +172,7 @@ public class JSONArray implements Iterable<Object> {
         this();
         if (array.getClass().isArray()) {
             int length = Array.getLength(array);
+            this.myArrayList.ensureCapacity(length);
             for (int i = 0; i < length; i += 1) {
                 this.put(JSONObject.wrap(Array.get(array, i)));
             }
@@ -495,7 +496,7 @@ public class JSONArray implements Iterable<Object> {
      * Get the optional object value associated with an index.
      *
      * @param index
-     *            The index must be between 0 and length() - 1.
+     *            The index must be between 0 and length() - 1. If not, null is returned.
      * @return An object value, or null if there is no object at that index.
      */
     public Object opt(int index) {
@@ -1150,7 +1151,13 @@ public class JSONArray implements Iterable<Object> {
         }
         if (index < this.length()) {
             this.myArrayList.set(index, value);
+        } else if(index == this.length()){
+            // simple append
+            this.put(value);
         } else {
+            // if we are inserting past the length, we want to grow the array all at once
+            // instead of incrementally.
+            this.myArrayList.ensureCapacity(index + 1);
             while (index != this.length()) {
                 this.put(JSONObject.NULL);
             }
@@ -1302,7 +1309,7 @@ public class JSONArray implements Iterable<Object> {
         if (names == null || names.length() == 0 || this.length() == 0) {
             return null;
         }
-        JSONObject jo = new JSONObject();
+        JSONObject jo = new JSONObject(names.length());
         for (int i = 0; i < names.length(); i += 1) {
             jo.put(names.getString(i), this.opt(i));
         }

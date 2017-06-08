@@ -41,7 +41,7 @@ public class Property {
      * @throws JSONException
      */
     public static JSONObject toJSONObject(java.util.Properties properties) throws JSONException {
-        JSONObject jo = new JSONObject();
+        JSONObject jo = new JSONObject(properties == null ? 0 : properties.size());
         if (properties != null && !properties.isEmpty()) {
             Enumeration<?> enumProperties = properties.propertyNames();
             while(enumProperties.hasMoreElements()) {
