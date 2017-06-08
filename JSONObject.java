@@ -164,6 +164,7 @@ public class JSONObject {
      * Construct an empty JSONObject.
      */
     public JSONObject() {
+        // HashMap is used on purpose to ensure that elements are unordered
         this.map = new HashMap<String, Object>();
     }
 
@@ -216,7 +217,7 @@ public class JSONObject {
                 key = x.nextValue().toString();
             }
 
-// The key is followed by ':'.
+            // The key is followed by ':'.
 
             c = x.nextClean();
             if (c != ':') {
@@ -224,7 +225,7 @@ public class JSONObject {
             }
             this.putOnce(key, x.nextValue());
 
-// Pairs are separated by ','.
+            // Pairs are separated by ','.
 
             switch (x.nextClean()) {
             case ';':
