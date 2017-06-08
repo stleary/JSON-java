@@ -2010,6 +2010,8 @@ public class JSONObjectTest {
     public void jsonObjectOptNoKey() {
 
          JSONObject jsonObject = new JSONObject();
+         
+         assertNull(jsonObject.opt(null));
 
          assertTrue("optBigDecimal() should return default BigDecimal",
                  BigDecimal.TEN.compareTo(jsonObject.optBigDecimal("myKey", BigDecimal.TEN))==0);
@@ -2088,6 +2090,46 @@ public class JSONObjectTest {
         assertEquals(19007199254740992l, (long)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"));
         assertEquals(2147483647, (int)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"));
     }
+    
+    /**
+     * Verifies that the optBigDecimal method properly converts values to BigDecimal and coerce them consistently.
+     */
+    @Test
+    public void jsonObjectOptBigDecimal() {
+        JSONObject jo = new JSONObject().put("int", 123).put("long", 654L)
+                .put("float", 1.234f).put("double", 2.345d)
+                .put("bigInteger", new BigInteger("1234"))
+                .put("bigDecimal", new BigDecimal("1234.56789"))
+                .put("nullVal", JSONObject.NULL);
+        
+        assertEquals(new BigDecimal("123"),jo.optBigDecimal("int", null));
+        assertEquals(new BigDecimal("654"),jo.optBigDecimal("long", null));
+        assertEquals(new BigDecimal(1.234f),jo.optBigDecimal("float", null));
+        assertEquals(new BigDecimal(2.345d),jo.optBigDecimal("double", null));
+        assertEquals(new BigDecimal("1234"),jo.optBigDecimal("bigInteger", null));
+        assertEquals(new BigDecimal("1234.56789"),jo.optBigDecimal("bigDecimal", null));
+        assertNull(jo.optBigDecimal("nullVal", null));
+    }
+    
+    /**
+     * Verifies that the optBigDecimal method properly converts values to BigDecimal and coerce them consistently.
+     */
+    @Test
+    public void jsonObjectOptBigInteger() {
+        JSONObject jo = new JSONObject().put("int", 123).put("long", 654L)
+                .put("float", 1.234f).put("double", 2.345d)
+                .put("bigInteger", new BigInteger("1234"))
+                .put("bigDecimal", new BigDecimal("1234.56789"))
+                .put("nullVal", JSONObject.NULL);
+        
+        assertEquals(new BigInteger("123"),jo.optBigInteger("int", null));
+        assertEquals(new BigInteger("654"),jo.optBigInteger("long", null));
+        assertEquals(new BigInteger("1"),jo.optBigInteger("float", null));
+        assertEquals(new BigInteger("2"),jo.optBigInteger("double", null));
+        assertEquals(new BigInteger("1234"),jo.optBigInteger("bigInteger", null));
+        assertEquals(new BigInteger("1234"),jo.optBigInteger("bigDecimal", null));
+        assertNull(jo.optBigDecimal("nullVal", null));
+    }
 
     /**
      * Confirm behavior when JSONObject put(key, null object) is called
@@ -2099,13 +2141,13 @@ public class JSONObjectTest {
         String str = "{\"myKey\": \"myval\"}";
         JSONObject jsonObjectRemove = new JSONObject(str);
         jsonObjectRemove.remove("myKey");
+        assertEquals("jsonObject should be empty",0 ,jsonObjectRemove.length());
 
         JSONObject jsonObjectPutNull = new JSONObject(str);
         jsonObjectPutNull.put("myKey", (Object) null);
+        assertEquals("jsonObject should be empty",0 ,jsonObjectPutNull.length());
 
-        // validate JSON
-        assertTrue("jsonObject should be empty", jsonObjectRemove.length() == 0
-                && jsonObjectPutNull.length() == 0);
+
     }
 
     /**
@@ -2190,6 +2232,70 @@ public class JSONObjectTest {
             stringWriter.close();
         }
     }
+    
+    /**
+     * Confirms that exceptions thrown when writing values are wrapped properly.
+     */
+    @Test
+    public void testJSONWriterException() throws IOException {
+        final JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("someKey",new BrokenToString());
+
+        // test single element JSONObject
+        try(StringWriter writer = new StringWriter();) {
+            jsonObject.write(writer).toString();
+            fail("Expected an exception, got a String value");
+        } catch (JSONException e) {
+            assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
+        } catch(Exception e) {
+            fail("Expected JSONException");
+        }
+
+        //test multiElement
+        jsonObject.put("somethingElse", "a value");
+        
+        try (StringWriter writer = new StringWriter()) {
+            jsonObject.write(writer).toString();
+            fail("Expected an exception, got a String value");
+        } catch (JSONException e) {
+            assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
+        } catch(Exception e) {
+            fail("Expected JSONException");
+        }
+        
+        // test a more complex object
+        try (StringWriter writer = new StringWriter()) {
+            new JSONObject()
+                .put("somethingElse", "a value")
+                .put("someKey", new JSONArray()
+                        .put(new JSONObject().put("key1", new BrokenToString())))
+                .write(writer).toString();
+            fail("Expected an exception, got a String value");
+        } catch (JSONException e) {
+            assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
+        } catch(Exception e) {
+            fail("Expected JSONException");
+        }
+       
+        // test a more slightly complex object
+        try (StringWriter writer = new StringWriter()) {
+            new JSONObject()
+                .put("somethingElse", "a value")
+                .put("someKey", new JSONArray()
+                        .put(new JSONObject().put("key1", new BrokenToString()))
+                        .put(12345)
+                 )
+                .write(writer).toString();
+            fail("Expected an exception, got a String value");
+        } catch (JSONException e) {
+            assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
+        } catch(Exception e) {
+            fail("Expected JSONException");
+        }
+       
+    }
+
 
     /**
      * Exercise the JSONObject write() method
@@ -2467,5 +2573,17 @@ public class JSONObjectTest {
         assertTrue("Removing a key should succeed", map.remove("key3") != null);
         assertTrue("Map should have 2 elements", map.size() == 2);
 
+    }
+    
+    /**
+     * test class for verifying write errors.
+     * @author John Aylward
+     *
+     */
+    private static class BrokenToString {
+        @Override
+        public String toString() {
+            throw new IllegalStateException("Something went horribly wrong!");
+        }
     }
 }

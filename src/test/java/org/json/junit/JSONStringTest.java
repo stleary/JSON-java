@@ -242,7 +242,7 @@ public class JSONStringTest {
             jsonArray.write(writer).toString();
             fail("Expected an exception, got a String value");
         } catch (JSONException e) {
-            assertTrue("Exception message does not match", "the exception value".equals(e.getMessage()));
+            assertEquals("Unable to write JSONArray value at index: 0", e.getMessage());
         } catch(Exception e) {
             fail("Expected JSONException");
         } finally {
