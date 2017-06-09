@@ -164,7 +164,12 @@ public class JSONObject {
      * Construct an empty JSONObject.
      */
     public JSONObject() {
-        // HashMap is used on purpose to ensure that elements are unordered
+        // HashMap is used on purpose to ensure that elements are unordered by 
+        // the specification.
+        // JSON tends to be a portable transfer format to allows the container 
+        // implementations to rearrange their items for a faster element 
+        // retrieval based on associative access.
+        // Therefore, an implementation mustn't rely on the order of the item.
         this.map = new HashMap<String, Object>();
     }
 
