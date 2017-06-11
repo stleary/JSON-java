@@ -1,5 +1,7 @@
 package org.json.junit;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.EnumSet;
@@ -325,6 +327,7 @@ public class EnumTest {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("strKey", "value");
+        jsonObject.put("strKey2", "VAL1");
         jsonObject.put("enumKey", myEnumField);
         jsonObject.put("enumClassKey", myEnumClass);
 
@@ -360,11 +363,18 @@ public class EnumTest {
 
         // opt with default the wrong value
         actualEnum = jsonObject.optEnum(MyEnumField.class, "strKey", null);
-        assertTrue("opt null", actualEnum == null);
+        assertNull("opt null", actualEnum);
+
+        // opt with default the string value
+        actualEnum = jsonObject.optEnum(MyEnumField.class, "strKey2", null);
+        assertEquals(MyEnumField.VAL1, actualEnum);
 
         // opt with default an index that does not exist
         actualEnum = jsonObject.optEnum(MyEnumField.class, "noKey", null);
-        assertTrue("opt null", actualEnum == null);
+        assertNull("opt null", actualEnum);
+        
+        assertNull("Expected Null when the enum class is null",
+                jsonObject.optEnum(null, "enumKey"));
 
         /**
          * Exercise the proposed enum API methods on JSONArray
