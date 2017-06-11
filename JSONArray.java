@@ -1384,8 +1384,12 @@ public class JSONArray implements Iterable<Object> {
             writer.write('[');
 
             if (length == 1) {
-                JSONObject.writeValue(writer, this.myArrayList.get(0),
-                        indentFactor, indent);
+                try {
+                    JSONObject.writeValue(writer, this.myArrayList.get(0),
+                            indentFactor, indent);
+                } catch (Exception e) {
+                    throw new JSONException("Unable to write JSONArray value at index: 0", e);
+                }
             } else if (length != 0) {
                 final int newindent = indent + indentFactor;
 
@@ -1397,8 +1401,12 @@ public class JSONArray implements Iterable<Object> {
                         writer.write('\n');
                     }
                     JSONObject.indent(writer, newindent);
-                    JSONObject.writeValue(writer, this.myArrayList.get(i),
-                            indentFactor, newindent);
+                    try {
+                        JSONObject.writeValue(writer, this.myArrayList.get(i),
+                                indentFactor, newindent);
+                    } catch (Exception e) {
+                        throw new JSONException("Unable to write JSONArray value at index: " + i, e);
+                    }
                     commanate = true;
                 }
                 if (indentFactor > 0) {
