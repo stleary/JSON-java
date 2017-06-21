@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 import java.util.Enumeration;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
@@ -61,10 +60,11 @@ public class Property {
     public static Properties toProperties(JSONObject jo)  throws JSONException {
         Properties  properties = new Properties();
         if (jo != null) {
-            for (final Entry<String, ?> entry : jo.entrySet()) {
-                Object value = entry.getValue();
+        	// Don't use the new entrySet API to maintain Android support
+            for (final String key : jo.keySet()) {
+                Object value = jo.opt(key);
                 if (!JSONObject.NULL.equals(value)) {
-                	properties.put(entry.getKey(), value.toString());
+                    properties.put(key, value.toString());
                 }
             }
         }

@@ -297,9 +297,8 @@ public class XMLTokener extends JSONTokener {
      * Skip characters until past the requested string.
      * If it is not found, we are left at the end of the source with a result of false.
      * @param to A string to skip past.
-     * @throws JSONException
      */
-    public boolean skipPast(String to) throws JSONException {
+    public void skipPast(String to) {
         boolean b;
         char c;
         int i;
@@ -316,7 +315,7 @@ public class XMLTokener extends JSONTokener {
         for (i = 0; i < length; i += 1) {
             c = next();
             if (c == 0) {
-                return false;
+                return;
             }
             circle[i] = c;
         }
@@ -343,14 +342,14 @@ public class XMLTokener extends JSONTokener {
             /* If we exit the loop with b intact, then victory is ours. */
 
             if (b) {
-                return true;
+                return;
             }
 
             /* Get the next character. If there isn't one, then defeat is ours. */
 
             c = next();
             if (c == 0) {
-                return false;
+                return;
             }
             /*
              * Shove the character in the circle buffer and advance the
