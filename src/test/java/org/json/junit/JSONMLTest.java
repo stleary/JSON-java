@@ -98,7 +98,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Bad XML at 24 [character 25 line 1]",
+                "Bad XML at 23 [character 24 line 1]",
                 e.getMessage());
         }
     }
@@ -226,7 +226,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Misshaped meta tag at 216 [character 13 line 7]",
+                "Misshaped meta tag at 215 [character 12 line 7]",
                 e.getMessage());
         }
     }
@@ -256,7 +256,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Misshaped meta tag at 215 [character 13 line 7]",
+                "Misshaped meta tag at 214 [character 12 line 7]",
                 e.getMessage());
         }
     }

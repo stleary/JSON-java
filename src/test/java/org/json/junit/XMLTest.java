@@ -103,7 +103,7 @@ public class XMLTest {
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Misshaped meta tag at 215 [character 13 line 7]",
+                    "Misshaped meta tag at 214 [character 12 line 7]",
                     e.getMessage());
         }
     }
@@ -128,7 +128,7 @@ public class XMLTest {
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Misshaped meta tag at 214 [character 13 line 7]",
+                    "Misshaped meta tag at 213 [character 12 line 7]",
                     e.getMessage());
         }
     }

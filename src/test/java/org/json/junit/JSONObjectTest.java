@@ -1853,36 +1853,36 @@ public class JSONObjectTest {
             String str = "abc";
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "A JSONObject text must begin with '{' at 1 [character 2 line 1]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "A JSONObject text must begin with '{' at 1 [character 2 line 1]",
+                    e.getMessage());
         }
         try {
             // does not end with '}'
             String str = "{";
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "A JSONObject text must end with '}' at 2 [character 3 line 1]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "A JSONObject text must end with '}' at 1 [character 2 line 1]",
+                    e.getMessage());
         }
         try {
             // key with no ':'
             String str = "{\"myKey\" = true}";
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "Expected a ':' after a key at 10 [character 11 line 1]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "Expected a ':' after a key at 10 [character 11 line 1]",
+                    e.getMessage());
         }
         try {
             // entries with no ',' separator
             String str = "{\"myKey\":true \"myOtherKey\":false}";
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "Expected a ',' or '}' at 15 [character 16 line 1]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "Expected a ',' or '}' at 15 [character 16 line 1]",
+                    e.getMessage());
         }
         try {
             // append to wrong key
@@ -1891,9 +1891,9 @@ public class JSONObjectTest {
             jsonObject.append("myKey", "hello");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "JSONObject[myKey] is not a JSONArray.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[myKey] is not a JSONArray.",
+                    e.getMessage());
         }
         try {
             // increment wrong key
@@ -1902,9 +1902,9 @@ public class JSONObjectTest {
             jsonObject.increment("myKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "Unable to increment [\"myKey\"].".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Unable to increment [\"myKey\"].",
+                    e.getMessage());
         }
         try {
             // invalid key
@@ -1913,18 +1913,18 @@ public class JSONObjectTest {
             jsonObject.get(null);
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "Null key.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Null key.",
+                    e.getMessage());
         }
         try {
             // invalid numberToString()
             JSONObject.numberToString((Number)null);
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "Null pointer".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "Null pointer",
+                    e.getMessage());
         }
         try {
             // null put key 

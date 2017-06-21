@@ -61,11 +61,11 @@ public class CDLTest {
         String badLine = "Col1, \"Col2\nVal1, Val2";
         try {
             CDL.toJSONArray(badLine);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Missing close quote '\"'. at 12 [character 0 line 2]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Missing close quote '\"'. at 12 [character 0 line 2]",
+                    e.getMessage());
         }
     }
     
@@ -78,11 +78,11 @@ public class CDLTest {
         String badLine = "Col1, Col2\n\"Val1, Val2";
         try {
             CDL.toJSONArray(badLine);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Missing close quote '\"'. at 23 [character 12 line 3]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Missing close quote '\"'. at 22 [character 11 line 3]",
+                    e.getMessage());
             
         }
     }
@@ -96,11 +96,11 @@ public class CDLTest {
         String badLine = "C\0ol1, Col2\nVal1, Val2";
         try {
             CDL.toJSONArray(badLine);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Bad character 'o' (111). at 3 [character 4 line 1]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Bad character 'o' (111). at 2 [character 3 line 1]",
+                    e.getMessage());
             
         }
     }
@@ -114,11 +114,11 @@ public class CDLTest {
     	   String badLine = "Col1, Col2\n\"Val1, \"\"Val2\"\"";
            try {
                CDL.toJSONArray(badLine);
-               assertTrue("Expecting an exception", false);
+               fail("Expecting an exception");
            } catch (JSONException e) {
-               assertTrue("Expecting an exception message",
-                       "Missing close quote '\"'. at 27 [character 16 line 3]".
-                       equals(e.getMessage()));
+               assertEquals("Expecting an exception message",
+                       "Missing close quote '\"'. at 26 [character 15 line 3]",
+                       e.getMessage());
                
            }
     }
@@ -128,7 +128,7 @@ public class CDLTest {
      */
     @Test
     public void singleEscapedQuote(){
-    	       String singleEscape = "Col1, Col2\nVal1, \"\"\"Val2\"";
+               String singleEscape = "Col1, Col2\nVal1, \"\"\"Val2\"";
                JSONArray jsonArray = CDL.toJSONArray(singleEscape);
                
                String cdlStr = CDL.toString(jsonArray);
@@ -136,7 +136,22 @@ public class CDLTest {
                assertTrue(cdlStr.contains("Col2"));
                assertTrue(cdlStr.contains("Val1"));
                assertTrue(cdlStr.contains("\"Val2"));
+    }
+    
+    /**
+     * Assert that there is no error for a single escaped quote within a properly
+     * embedded quote when not the last value.
+     */
+    @Test
+    public void singleEscapedQuoteMiddleString(){
+               String singleEscape = "Col1, Col2\nVal1, \"\"\"Val2\"\nVal 3,Val 4";
+               JSONArray jsonArray = CDL.toJSONArray(singleEscape);
                
+               String cdlStr = CDL.toString(jsonArray);
+               assertTrue(cdlStr.contains("Col1"));
+               assertTrue(cdlStr.contains("Col2"));
+               assertTrue(cdlStr.contains("Val1"));
+               assertTrue(cdlStr.contains("\"Val2"));
     }
     
     /**
@@ -149,12 +164,12 @@ public class CDLTest {
     	       
     	       try {
                    CDL.toJSONArray(badLine);
-                   assertTrue("Expecting an exception", false);
+                   fail("Expecting an exception");
                } catch (JSONException e) {
             	   System.out.println("Message" + e.getMessage());
-                   assertTrue("Expecting an exception message",
-                           "Bad character 'V' (86). at 20 [character 9 line 3]".
-                           equals(e.getMessage()));
+                   assertEquals("Expecting an exception message",
+                           "Bad character 'V' (86). at 20 [character 9 line 3]",
+                           e.getMessage());
                    
                }
                
@@ -186,8 +201,8 @@ public class CDLTest {
     public void onlyColumnNames() {
         String columnNameStr = "col1, col2, col3";
         JSONArray jsonArray = CDL.toJSONArray(columnNameStr);
-        assertTrue("CDL should return null when only 1 row is given",
-                jsonArray == null);
+        assertNull("CDL should return null when only 1 row is given",
+                jsonArray);
     }
 
     /**
@@ -197,8 +212,8 @@ public class CDLTest {
     public void emptyLinesToJSONArray() {
         String str = " , , , \n , , , ";
         JSONArray jsonArray = CDL.toJSONArray(str);
-        assertTrue("JSONArray should be null for no content",
-                jsonArray == null);
+        assertNull("JSONArray should be null for no content",
+                jsonArray);
     }
 
     /**
@@ -208,8 +223,8 @@ public class CDLTest {
     public void emptyJSONArrayToString() {
         JSONArray jsonArray = new JSONArray();
         String str = CDL.toString(jsonArray);
-        assertTrue("CDL should return null for toString(null)",
-                str == null);
+        assertNull("CDL should return null for toString(null)",
+                str);
     }
 
     /**
@@ -218,8 +233,8 @@ public class CDLTest {
     @Test
     public void nullJSONArraysToString() {
         String str = CDL.toString(null, null);
-        assertTrue("CDL should return null for toString(null)",
-                str == null);
+        assertNull("CDL should return null for toString(null)",
+                str);
     }
 
     /**

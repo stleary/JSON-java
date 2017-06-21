@@ -43,11 +43,11 @@ public class CookieTest {
         String cookieStr = "thisCookieHasNoEqualsChar";
         try {
             Cookie.toJSONObject(cookieStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    e.getMessage().startsWith("Expected '=' and instead saw '")
-                    && e.getMessage().endsWith("' at 27 [character 28 line 1]"));
+            assertEquals("Expecting an exception message",
+                    "Expected '=' and instead saw '' at 25 [character 26 line 1]",
+                    e.getMessage());
         }
     }
 
@@ -61,11 +61,11 @@ public class CookieTest {
         String cookieStr = "this=Cookie;myAttribute";
         try {
             Cookie.toJSONObject(cookieStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Missing '=' in cookie parameter. at 25 [character 26 line 1]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Missing '=' in cookie parameter. at 23 [character 24 line 1]",
+                    e.getMessage());
         }
     }
 
@@ -79,11 +79,11 @@ public class CookieTest {
         String cookieStr = "";
         try {
             Cookie.toJSONObject(cookieStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    e.getMessage().startsWith("Expected '=' and instead saw '") &&
-                    e.getMessage().endsWith("' at 2 [character 3 line 1]"));
+            assertEquals("Expecting an exception message",
+                    "Expected '=' and instead saw '' at 0 [character 1 line 1]",
+                    e.getMessage());
         }
     }
 
