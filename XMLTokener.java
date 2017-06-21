@@ -298,6 +298,9 @@ public class XMLTokener extends JSONTokener {
      * If it is not found, we are left at the end of the source with a result of false.
      * @param to A string to skip past.
      */
+    // The Android implementation of JSONTokener has a public method of public void skipPast(String to)
+    // even though ours does not have that method, to have API compatibility, our method in the subclass
+    // should match.
     public void skipPast(String to) {
         boolean b;
         char c;
