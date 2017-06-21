@@ -3,6 +3,7 @@ package org.json.junit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,11 +75,11 @@ public class XMLTest {
             "</addresses>";
         try {
             XML.toJSONObject(xmlStr);
-            assertTrue("Expecting a JSONException", false);
+            fail("Expecting a JSONException");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Misshaped tag at 176 [character 14 line 5]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Misshaped tag at 176 [character 14 line 4]",
+                    e.getMessage());
         }
     }
 
@@ -99,11 +100,11 @@ public class XMLTest {
             "</addresses>";
         try {
             XML.toJSONObject(xmlStr);
-            assertTrue("Expecting a JSONException", false);
+            fail("Expecting a JSONException");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Misshaped meta tag at 215 [character 13 line 8]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Misshaped meta tag at 215 [character 13 line 7]",
+                    e.getMessage());
         }
     }
 
@@ -124,11 +125,11 @@ public class XMLTest {
             "</addresses>";
         try {
             XML.toJSONObject(xmlStr);
-            assertTrue("Expecting a JSONException", false);
+            fail("Expecting a JSONException");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Misshaped meta tag at 214 [character 13 line 8]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Misshaped meta tag at 214 [character 13 line 7]",
+                    e.getMessage());
         }
     }
 
@@ -149,11 +150,11 @@ public class XMLTest {
             "</addresses>";
         try {
             XML.toJSONObject(xmlStr);
-            assertTrue("Expecting a JSONException", false);
+            fail("Expecting a JSONException");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Misplaced '<' at 193 [character 4 line 7]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Misplaced '<' at 193 [character 4 line 6]",
+                    e.getMessage());
         }
     }
 
@@ -174,11 +175,11 @@ public class XMLTest {
             "</addresses>";
         try {
             XML.toJSONObject(xmlStr);
-            assertTrue("Expecting a JSONException", false);
+            fail("Expecting a JSONException");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Expected 'CDATA[' at 204 [character 11 line 6]".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "Expected 'CDATA[' at 204 [character 11 line 5]",
+                    e.getMessage());
         }
     }
 
@@ -397,9 +398,9 @@ public class XMLTest {
 
         final String expected = "<jo></jo>";
         String output1 = XML.toString(jo1,"jo");
-        assertTrue("Expected an empty root tag", expected.equals(output1));
+        assertEquals("Expected an empty root tag", expected, output1);
         String output2 = XML.toString(jo2,"jo");
-        assertTrue("Expected an empty root tag", expected.equals(output2));
+        assertEquals("Expected an empty root tag", expected, output2);
     }
     
     /**
@@ -414,9 +415,9 @@ public class XMLTest {
 
         final String expected = "<jo><arr>One</arr><arr></arr><arr>Four</arr></jo>";
         String output1 = XML.toString(jo1,"jo");
-        assertTrue("Expected a matching array", expected.equals(output1));
+        assertEquals("Expected a matching array", expected, output1);
         String output2 = XML.toString(jo2,"jo");
-        assertTrue("Expected a matching array", expected.equals(output2));
+        assertEquals("Expected a matching array", expected, output2);
     }
    
     /**
@@ -431,9 +432,9 @@ public class XMLTest {
 
         final String expected = "<jo><arr>One</arr><arr>Two</arr><arr>Three</arr></jo>";
         String output1 = XML.toString(jo1,"jo");
-        assertTrue("Expected a non empty root tag", expected.equals(output1));
+        assertEquals("Expected a non empty root tag", expected, output1);
         String output2 = XML.toString(jo2,"jo");
-        assertTrue("Expected a non empty root tag", expected.equals(output2));
+        assertEquals("Expected a non empty root tag", expected, output2);
     }
 
     /**
@@ -448,9 +449,9 @@ public class XMLTest {
 
         final String expected = "<jo><arr>One</arr><arr><array>Two</array><array>Three</array></arr><arr>Four</arr></jo>";
         String output1 = XML.toString(jo1,"jo");
-        assertTrue("Expected a matching array", expected.equals(output1));
+        assertEquals("Expected a matching array", expected, output1);
         String output2 = XML.toString(jo2,"jo");
-        assertTrue("Expected a matching array", expected.equals(output2));
+        assertEquals("Expected a matching array", expected, output2);
     }
 
     /**
