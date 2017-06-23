@@ -1429,7 +1429,15 @@ public class JSONObject {
                         }
                     }
                 }
-            } catch (Exception ignore) {
+            } catch (IllegalAccessException ignore) {
+            } catch (InvocationTargetException ex) {
+                // An exception happened during the construction of one of the sub-beans.
+                // If the underlying target exception is a runtime exception, re-throw it...
+                Throwable targetEx = ex.getTargetException();
+                if (targetEx instanceof RuntimeException) {
+                    throw (RuntimeException)targetEx;
+                }
+                // ...otherwise ignore the (checked) exception
             }
         }
     }
@@ -2164,7 +2172,7 @@ public class JSONObject {
                 return object.toString();
             }
             return new JSONObject(object);
-        } catch (Exception exception) {
+        } catch (JSONException exception) {
             return null;
         }
     }
