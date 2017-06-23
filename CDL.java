@@ -22,7 +22,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 
 /**
  * This provides static methods to convert comma delimited text into a
@@ -70,9 +70,12 @@ public class CDL {
                 c = x.next();
                 if (c == q) {
                     //Handle escaped double-quote
-                    if(x.next() != '\"')
-                    {
-                        x.back();
+                    char nextC = x.next();
+                    if(nextC != '\"') {
+                        // if our quote was the end of the file, don't step
+                        if(nextC > 0) {
+                            x.back();
+                        }
                         break;
                     }
                 }

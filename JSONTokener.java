@@ -29,7 +29,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 
 /**
  * A JSONTokener takes a source string and extracts characters and tokens from
@@ -39,7 +39,7 @@ SOFTWARE.
  * @version 2014-05-03
  */
 public class JSONTokener {
-    /** current read character. */
+    /** current read character position on the current line. */
     private long character;
     /** flag to indicate if the end of the input has been found. */
     private boolean eof;
@@ -47,7 +47,7 @@ public class JSONTokener {
     private long index;
     /** current line of the input. */
     private long line;
-    /** previous index of the input. */
+    /** previous character read from the input. */
     private char previous;
     /** Reader for the input. */
     private final Reader reader;
@@ -62,8 +62,8 @@ public class JSONTokener {
      */
     public JSONTokener(Reader reader) {
         this.reader = reader.markSupported()
-            ? reader
-            : new BufferedReader(reader);
+                ? reader
+                        : new BufferedReader(reader);
         this.eof = false;
         this.usePrevious = false;
         this.previous = 0;
@@ -103,8 +103,8 @@ public class JSONTokener {
         if (this.usePrevious || this.index <= 0) {
             throw new JSONException("Stepping back two steps is not supported");
         }
-        this.index -= 1;
-        this.character -= 1;
+        this.index--;
+        this.character--;
         this.usePrevious = true;
         this.eof = false;
     }
@@ -145,11 +145,23 @@ public class JSONTokener {
      *  or backward while checking for more data.
      */
     public boolean more() throws JSONException {
-        this.next();
-        if (this.end()) {
-            return false;
+        if(this.usePrevious) {
+            return true;
         }
-        this.back();
+        try {
+            this.reader.mark(1);
+        } catch (IOException e) {
+            throw new JSONException("Unable to preserve stream position", e);
+        }
+        try {
+            if(this.reader.read()<0) {
+                this.eof = true;
+                return false;
+            }
+            this.reader.reset();
+        } catch (IOException e) {
+            throw new JSONException("Unable to read the next character from the stream", e);
+        }
         return true;
     }
 
@@ -174,7 +186,7 @@ public class JSONTokener {
 
             if (c <= 0) { // End of stream
                 this.eof = true;
-                c = 0;
+                return 0;
             }
         }
         this.index += 1;
@@ -202,8 +214,11 @@ public class JSONTokener {
     public char next(char c) throws JSONException {
         char n = this.next();
         if (n != c) {
-            throw this.syntaxError("Expected '" + c + "' and instead saw '" +
-                    n + "'");
+            if(n > 0) {
+                throw this.syntaxError("Expected '" + c + "' and instead saw '" +
+                        n + "'");
+            }
+            throw this.syntaxError("Expected '" + c + "' and instead saw ''");
         }
         return n;
     }
@@ -218,23 +233,23 @@ public class JSONTokener {
      *   Substring bounds error if there are not
      *   n characters remaining in the source string.
      */
-     public String next(int n) throws JSONException {
-         if (n == 0) {
-             return "";
-         }
+    public String next(int n) throws JSONException {
+        if (n == 0) {
+            return "";
+        }
 
-         char[] chars = new char[n];
-         int pos = 0;
+        char[] chars = new char[n];
+        int pos = 0;
 
-         while (pos < n) {
-             chars[pos] = this.next();
-             if (this.end()) {
-                 throw this.syntaxError("Substring bounds error");
-             }
-             pos += 1;
-         }
-         return new String(chars);
-     }
+        while (pos < n) {
+            chars[pos] = this.next();
+            if (this.end()) {
+                throw this.syntaxError("Substring bounds error");
+            }
+            pos += 1;
+        }
+        return new String(chars);
+    }
 
 
     /**
@@ -378,15 +393,15 @@ public class JSONTokener {
         String string;
 
         switch (c) {
-            case '"':
-            case '\'':
-                return this.nextString(c);
-            case '{':
-                this.back();
-                return new JSONObject(this);
-            case '[':
-                this.back();
-                return new JSONArray(this);
+        case '"':
+        case '\'':
+            return this.nextString(c);
+        case '{':
+            this.back();
+            return new JSONObject(this);
+        case '[':
+            this.back();
+            return new JSONArray(this);
         }
 
         /*
@@ -476,6 +491,6 @@ public class JSONTokener {
     @Override
     public String toString() {
         return " at " + this.index + " [character " + this.character + " line " +
-            this.line + "]";
+                this.line + "]";
     }
 }
