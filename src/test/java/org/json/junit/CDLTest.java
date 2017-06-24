@@ -81,7 +81,7 @@ public class CDLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Missing close quote '\"'. at 22 [character 11 line 3]",
+                    "Missing close quote '\"'. at 22 [character 11 line 2]",
                     e.getMessage());
             
         }
@@ -117,7 +117,7 @@ public class CDLTest {
                fail("Expecting an exception");
            } catch (JSONException e) {
                assertEquals("Expecting an exception message",
-                       "Missing close quote '\"'. at 26 [character 15 line 3]",
+                       "Missing close quote '\"'. at 26 [character 15 line 2]",
                        e.getMessage());
                
            }
@@ -168,7 +168,7 @@ public class CDLTest {
                } catch (JSONException e) {
             	   System.out.println("Message" + e.getMessage());
                    assertEquals("Expecting an exception message",
-                           "Bad character 'V' (86). at 20 [character 9 line 3]",
+                           "Bad character 'V' (86). at 20 [character 9 line 2]",
                            e.getMessage());
                    
                }

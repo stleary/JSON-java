@@ -1,8 +1,18 @@
 package org.json.junit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import org.json.*;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONPointer;
+import org.json.JSONPointerException;
+import org.json.JSONTokener;
 import org.junit.Test;
 
 public class JSONPointerTest {
@@ -10,8 +20,12 @@ public class JSONPointerTest {
     private static final JSONObject document;
 
     static {
-        document = new JSONObject(new JSONTokener(
-                JSONPointerTest.class.getClassLoader().getResourceAsStream("jsonpointer-testdoc.json")));
+        @SuppressWarnings("resource")
+        InputStream resourceAsStream = JSONPointerTest.class.getClassLoader().getResourceAsStream("jsonpointer-testdoc.json");
+        if(resourceAsStream == null) {
+            throw new ExceptionInInitializerError("Unable to locate test file. Please check your development environment configuration");
+        }
+        document = new JSONObject(new JSONTokener(resourceAsStream));
     }
 
     private Object query(String pointer) {
