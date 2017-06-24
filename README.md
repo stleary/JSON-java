@@ -101,24 +101,26 @@ A unit test has the following stages:
 | CDL.java | 98.8% | Reasonable test cases.  |
 | Cookie.java  | 98.9%   | Reasonable test cases. |
 | CookieList.java |96.5% | Reasonable test cases. |
-| EnumTest.java | n/a | Just documenting how enums are handled. |
-| HTTP.java | 98.7%| Coverage > 90% | 
+| HTTP.java | 98.8%| Coverage > 90% | 
 | HTTPTokener.java |93.2% | No test   | 
-| JSONArray.java |95.9% | Reasonable test cases | 
-| JSONException.java | 26.7% | No test |
-| JSONML.java | 86.8%| In progress | 
-| JSONObject | 94.0% | Reasonable test cases | 
-| JSONObject.Null | 87.5% | No test  | 
+| JSONArray.java |88.3% | Reasonable test cases. Need new tests for newer API functions | 
+| JSONException.java | 100% | No test |
+| JSONML.java | 84.4%| In progress | 
+| JSONObject | 96.7% | Reasonable test cases | 
+| JSONObject.Null | 77.8% | No test  | 
+| JSONPointer | 96.3% | Reasonable test cases  | 
+| JSONPointerException | 100% | No test  | 
 | JSONString.java | | No test  | 
 | JSONStringer.java | 93.8%| Coverage > 90% | 
-| JSONTokener.java | 72.1% | In progress | 
-| JSONWriter.java | 87.5% | No test | 
-| Property.java  | 94.8%  | Coverage > 90% |
-| XML.java | 87.4% | In progress |
-| XMLTokener.java| 82.7%| No test  | 
+| JSONTokener.java | 87.5% | In progress | 
+| JSONWriter.java | 89.15% | No test | 
+| Property.java  | 95.8%  | Coverage > 90% |
+| XML.java | 77.3% | In progress |
+| XMLTokener.java| 82.4%| No test  | 
 
 | Files used in test |
 | ------------- |  
+| EnumTest.java |
 | MyBean.java |
 | MyBigNumberBean.java |
 | MyEnum.java |
