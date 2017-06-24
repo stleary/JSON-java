@@ -53,10 +53,12 @@ public class JSONTokener {
     private final Reader reader;
     /** flag to indicate that a previous character was requested. */
     private boolean usePrevious;
+    /** the number of characters read in the previous line. */
+    private long characterPreviousLine;
 
 
     /**
-     * Construct a JSONTokener from a Reader.
+     * Construct a JSONTokener from a Reader. The caller must close the Reader.
      *
      * @param reader     A reader.
      */
@@ -69,12 +71,13 @@ public class JSONTokener {
         this.previous = 0;
         this.index = 0;
         this.character = 1;
+        this.characterPreviousLine = 0;
         this.line = 1;
     }
 
 
     /**
-     * Construct a JSONTokener from an InputStream.
+     * Construct a JSONTokener from an InputStream. The caller must close the input stream.
      * @param inputStream The source.
      */
     public JSONTokener(InputStream inputStream) {
@@ -103,12 +106,23 @@ public class JSONTokener {
         if (this.usePrevious || this.index <= 0) {
             throw new JSONException("Stepping back two steps is not supported");
         }
-        this.index--;
-        this.character--;
+        this.decrementIndexes();
         this.usePrevious = true;
         this.eof = false;
     }
 
+    /**
+     * Decrements the indexes for the {@link #back()} method based on the previous character read.
+     */
+    private void decrementIndexes() {
+        this.index--;
+        if(this.previous=='\r' || this.previous == '\n') {
+            this.line--;
+            this.character=this.characterPreviousLine ;
+        } else if(this.character > 0){
+            this.character--;
+        }
+    }
 
     /**
      * Get the hex value of a character (base16).
@@ -183,26 +197,39 @@ public class JSONTokener {
             } catch (IOException exception) {
                 throw new JSONException(exception);
             }
-
-            if (c <= 0) { // End of stream
-                this.eof = true;
-                return 0;
-            }
         }
-        this.index += 1;
-        if (this.previous == '\r') {
-            this.line += 1;
-            this.character = c == '\n' ? 0 : 1;
-        } else if (c == '\n') {
-            this.line += 1;
-            this.character = 0;
-        } else {
-            this.character += 1;
+        if (c <= 0) { // End of stream
+            this.eof = true;
+            return 0;
         }
+        this.incrementIndexes(c);
         this.previous = (char) c;
         return this.previous;
     }
 
+    /**
+     * Increments the internal indexes according to the previous character
+     * read and the character passed as the current character.
+     * @param c the current character read.
+     */
+    private void incrementIndexes(int c) {
+        if(c > 0) {
+            this.index++;
+            if(c=='\r') {
+                this.line++;
+                this.characterPreviousLine = this.character;
+                this.character=0;
+            }else if (c=='\n') {
+                if(this.previous != '\r') {
+                    this.line++;
+                    this.characterPreviousLine = this.character;
+                }
+                this.character=0;
+            } else {
+                this.character++;
+            }
+        }
+    }
 
     /**
      * Consume the next character, and check that it matches a specified
@@ -447,20 +474,23 @@ public class JSONTokener {
             do {
                 c = this.next();
                 if (c == 0) {
+                    // in some readers, reset() may throw an exception if
+                    // the remaining portion of the input is greater than
+                    // the mark size (1,000,000 above).
                     this.reader.reset();
                     this.index = startIndex;
                     this.character = startCharacter;
                     this.line = startLine;
-                    return c;
+                    return 0;
                 }
             } while (c != to);
+            this.reader.mark(1);
         } catch (IOException exception) {
             throw new JSONException(exception);
         }
         this.back();
         return c;
     }
-
 
     /**
      * Make a JSONException to signal a syntax error.
