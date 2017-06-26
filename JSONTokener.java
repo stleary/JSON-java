@@ -144,6 +144,8 @@ public class JSONTokener {
     }
 
     /**
+     * Checks if the end of the input has been reached.
+     *  
      * @return true if at the end of the file and we didn't step back
      */
     public boolean end() {
@@ -168,7 +170,8 @@ public class JSONTokener {
             throw new JSONException("Unable to preserve stream position", e);
         }
         try {
-            if(this.reader.read()<0) {
+            // -1 is EOF, but next() can not consume the null character '\0'
+            if(this.reader.read() <= 0) {
                 this.eof = true;
                 return false;
             }
