@@ -42,11 +42,11 @@ public class JSONMLTest {
         String xmlStr = "";
         try {
             JSONML.toJSONArray(xmlStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                "Bad XML at 1 [character 2 line 1]".
-                equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                "Bad XML at 0 [character 1 line 1]",
+                e.getMessage());
         }
     }
 
@@ -95,11 +95,11 @@ public class JSONMLTest {
         String xmlStr = "{ \"this is\": \"not xml\"}";
         try {
             JSONML.toJSONArray(xmlStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                "Bad XML at 25 [character 26 line 1]".
-                equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                "Bad XML at 23 [character 24 line 1]",
+                e.getMessage());
         }
     }
 
@@ -198,11 +198,11 @@ public class JSONMLTest {
             "</addresses>";
         try {
             JSONML.toJSONArray(xmlStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                "Misshaped tag at 176 [character 14 line 7]".
-                equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                "Misshaped tag at 176 [character 14 line 4]",
+                e.getMessage());
         }
     }
 
@@ -223,11 +223,11 @@ public class JSONMLTest {
             "</addresses>";
         try {
             JSONML.toJSONArray(xmlStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                "Misshaped meta tag at 216 [character 13 line 11]".
-                equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                "Misshaped meta tag at 215 [character 12 line 7]",
+                e.getMessage());
         }
     }
 
@@ -253,11 +253,11 @@ public class JSONMLTest {
             "</addresses>";
         try {
             JSONML.toJSONArray(xmlStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                "Misshaped meta tag at 215 [character 13 line 11]".
-                equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                "Misshaped meta tag at 214 [character 12 line 7]",
+                e.getMessage());
         }
     }
 
@@ -283,11 +283,11 @@ public class JSONMLTest {
             "</addresses>";
         try {
             JSONML.toJSONArray(xmlStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                "Misplaced '<' at 194 [character 5 line 10]".
-                equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                "Misplaced '<' at 194 [character 5 line 6]",
+                e.getMessage());
         }
     }
 
@@ -343,11 +343,11 @@ public class JSONMLTest {
             "</addresses>";
         try {
             JSONML.toJSONArray(xmlStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                "Misplaced '<' at 206 [character 1 line 12]".
-                equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                "Misplaced '<' at 206 [character 1 line 7]",
+                e.getMessage());
         }
     }
 
@@ -373,11 +373,11 @@ public class JSONMLTest {
             "</addresses>";
         try {
             JSONML.toJSONArray(xmlStr);
-            assertTrue("Expecting an exception", false);
+            fail("Expecting an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                "Expected 'CDATA[' at 204 [character 11 line 9]".
-                equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                "Expected 'CDATA[' at 204 [character 11 line 5]",
+                e.getMessage());
         }
     }
 

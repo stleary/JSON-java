@@ -47,14 +47,14 @@ public class CookieListTest {
         String cookieStr = "thisCookieHasNoEqualsChar";
         try {
             CookieList.toJSONObject(cookieStr);
-            assertTrue("should throw an exception", false);
+            fail("should throw an exception");
         } catch (JSONException e) {
             /**
              * Not sure of the missing char, but full string compare fails 
              */
-            assertTrue("Expecting an exception message",
-                    e.getMessage().startsWith("Expected '=' and instead saw '") &&
-                            e.getMessage().endsWith("' at 27 [character 28 line 1]"));
+            assertEquals("Expecting an exception message",
+                    "Expected '=' and instead saw '' at 25 [character 26 line 1]",
+                    e.getMessage());
         }
     }
 
