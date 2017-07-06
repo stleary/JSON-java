@@ -64,11 +64,8 @@ public class XMLTokener extends JSONTokener {
         char         c;
         int          i;
         StringBuilder sb = new StringBuilder();
-        for (;;) {
+        while (more()) {
             c = next();
-            if (end()) {
-                throw syntaxError("Unclosed CDATA");
-            }
             sb.append(c);
             i = sb.length() - 3;
             if (i >= 0 && sb.charAt(i) == ']' &&
@@ -77,6 +74,7 @@ public class XMLTokener extends JSONTokener {
                 return sb.toString();
             }
         }
+        throw syntaxError("Unclosed CDATA");
     }
 
 
@@ -103,7 +101,10 @@ public class XMLTokener extends JSONTokener {
         }
         sb = new StringBuilder();
         for (;;) {
-            if (c == '<' || c == 0) {
+            if (c == 0) {
+                return sb.toString().trim();
+            }
+            if (c == '<') {
                 back();
                 return sb.toString().trim();
             }
