@@ -40,7 +40,9 @@ public class Property {
      * @throws JSONException
      */
     public static JSONObject toJSONObject(java.util.Properties properties) throws JSONException {
-        JSONObject jo = new JSONObject(properties == null ? 0 : properties.size());
+        // can't use the new constructor for Android support
+        // JSONObject jo = new JSONObject(properties == null ? 0 : properties.size());
+        JSONObject jo = new JSONObject();
         if (properties != null && !properties.isEmpty()) {
             Enumeration<?> enumProperties = properties.propertyNames();
             while(enumProperties.hasMoreElements()) {
