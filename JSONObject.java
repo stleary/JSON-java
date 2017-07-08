@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
@@ -1397,39 +1398,41 @@ public class JSONObject {
 
         Method[] methods = includeSuperClass ? klass.getMethods() : klass
                 .getDeclaredMethods();
-        for (int i = 0; i < methods.length; i += 1) {
-            try {
-                Method method = methods[i];
-                if (Modifier.isPublic(method.getModifiers())) {
-                    String name = method.getName();
-                    String key = "";
-                    if (name.startsWith("get")) {
-                        if ("getClass".equals(name)
-                                || "getDeclaringClass".equals(name)) {
-                            key = "";
-                        } else {
-                            key = name.substring(3);
-                        }
-                    } else if (name.startsWith("is")) {
-                        key = name.substring(2);
+        for (final Method method : methods) {
+            final int modifiers = method.getModifiers();
+            if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)
+                    && method.getParameterTypes().length == 0 && !method.isBridge()
+                    && method.getReturnType() != Void.TYPE ) {
+                final String name = method.getName();
+                String key;
+                if (name.startsWith("get")) {
+                    if ("getClass".equals(name) || "getDeclaringClass".equals(name)) {
+                        continue;
                     }
-                    if (key.length() > 0
-                            && Character.isUpperCase(key.charAt(0))
-                            && method.getParameterTypes().length == 0) {
-                        if (key.length() == 1) {
-                            key = key.toLowerCase(Locale.ROOT);
-                        } else if (!Character.isUpperCase(key.charAt(1))) {
-                            key = key.substring(0, 1).toLowerCase(Locale.ROOT)
-                                    + key.substring(1);
-                        }
+                    key = name.substring(3);
+                } else if (name.startsWith("is")) {
+                    key = name.substring(2);
+                } else {
+                    continue;
+                }
+                if (key.length() > 0 && Character.isUpperCase(key.charAt(0))) {
+                    if (key.length() == 1) {
+                        key = key.toLowerCase(Locale.ROOT);
+                    } else if (!Character.isUpperCase(key.charAt(1))) {
+                        key = key.substring(0, 1).toLowerCase(Locale.ROOT)
+                                + key.substring(1);
+                    }
 
-                        Object result = method.invoke(bean, (Object[]) null);
+                    try {
+                        final Object result = method.invoke(bean);
                         if (result != null) {
                             this.map.put(key, wrap(result));
                         }
+                    } catch (IllegalAccessException ignore) {
+                    } catch (IllegalArgumentException ignore) {
+                    } catch (InvocationTargetException ignore) {
                     }
                 }
-            } catch (Exception ignore) {
             }
         }
     }
