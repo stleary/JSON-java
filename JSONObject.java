@@ -277,16 +277,19 @@ public class JSONObject {
      * <code>"is"</code> followed by an uppercase letter, the method is invoked,
      * and a key and the value returned from the getter method are put into the
      * new JSONObject.
-     *
+     * <p>
      * The key is formed by removing the <code>"get"</code> or <code>"is"</code>
      * prefix. If the second remaining character is not upper case, then the
      * first character is converted to lower case.
-     *
+     * <p>
      * For example, if an object has a method named <code>"getName"</code>, and
      * if the result of calling <code>object.getName()</code> is
      * <code>"Larry Fine"</code>, then the JSONObject will contain
      * <code>"name": "Larry Fine"</code>.
-     *
+     * <p>
+     * Methods that return <code>void</code> as well as <code>static</code>
+     * methods are ignored.
+     * 
      * @param bean
      *            An object that has getter methods that should be used to make
      *            a JSONObject.
@@ -1389,6 +1392,15 @@ public class JSONObject {
         return NULL.equals(object) ? defaultValue : object.toString();
     }
 
+    /**
+     * Populates the internal map of the JSONObject with the bean properties.
+     * The bean can not be recursive.
+     *
+     * @see JSONObject#JSONObject(Object)
+     *
+     * @param bean
+     *            the bean
+     */
     private void populateMap(Object bean) {
         Class<?> klass = bean.getClass();
 
