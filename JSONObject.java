@@ -1,5 +1,7 @@
 package org.json;
 
+import java.io.Closeable;
+
 /*
  Copyright (c) 2002 JSON.org
 
@@ -1412,8 +1414,10 @@ public class JSONObject {
                 .getDeclaredMethods();
         for (final Method method : methods) {
             final int modifiers = method.getModifiers();
-            if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)
-                    && method.getParameterTypes().length == 0 && !method.isBridge()
+            if (Modifier.isPublic(modifiers)
+                    && !Modifier.isStatic(modifiers)
+                    && method.getParameterTypes().length == 0
+                    && !method.isBridge()
                     && method.getReturnType() != Void.TYPE ) {
                 final String name = method.getName();
                 String key;
@@ -1427,7 +1431,8 @@ public class JSONObject {
                 } else {
                     continue;
                 }
-                if (key.length() > 0 && Character.isUpperCase(key.charAt(0))) {
+                if (key.length() > 0
+                        && Character.isUpperCase(key.charAt(0))) {
                     if (key.length() == 1) {
                         key = key.toLowerCase(Locale.ROOT);
                     } else if (!Character.isUpperCase(key.charAt(1))) {
@@ -1439,6 +1444,14 @@ public class JSONObject {
                         final Object result = method.invoke(bean);
                         if (result != null) {
                             this.map.put(key, wrap(result));
+                            // we don't use the result anywhere outside of wrap
+                            // if it's a resource we should be sure to close it after calling toString
+                            if(result instanceof Closeable) {
+                                try {
+                                    ((Closeable)result).close();
+                                } catch (IOException ignore) {
+                                }
+                            }
                         }
                     } catch (IllegalAccessException ignore) {
                     } catch (IllegalArgumentException ignore) {
