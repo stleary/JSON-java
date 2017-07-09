@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.json.*;
+import org.json.junit.data.MyLocaleBean;
 import org.junit.*;
 
 /**

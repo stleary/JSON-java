@@ -10,6 +10,9 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.junit.data.MyEnum;
+import org.json.junit.data.MyEnumClass;
+import org.json.junit.data.MyEnumField;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -195,7 +198,7 @@ public class EnumTest {
          * However, an enum within another class will not be rendered
          * unless that class overrides default toString() 
          */
-        String expectedStr3 = "\"org.json.junit.MyEnumClass@";
+        String expectedStr3 = "\"org.json.junit.data.MyEnumClass@";
         myEnumClass.setMyEnum(MyEnum.VAL1);
         myEnumClass.setMyEnumField(MyEnumField.VAL1);
         String str3 = JSONObject.valueToString(myEnumClass);

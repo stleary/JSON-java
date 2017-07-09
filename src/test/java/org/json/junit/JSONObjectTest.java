@@ -30,6 +30,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointerException;
 import org.json.XML;
+import org.json.junit.data.BrokenToString;
+import org.json.junit.data.Fraction;
+import org.json.junit.data.MyBean;
+import org.json.junit.data.MyBigNumberBean;
+import org.json.junit.data.MyEnum;
+import org.json.junit.data.MyEnumField;
+import org.json.junit.data.MyJsonString;
+import org.json.junit.data.MyNumber;
+import org.json.junit.data.MyNumberContainer;
+import org.json.junit.data.MyPublicClass;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -484,7 +494,7 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectByResourceBundle() {
         JSONObject jsonObject = new
-                JSONObject("org.json.junit.StringsResourceBundle",
+                JSONObject("org.json.junit.data.StringsResourceBundle",
                         Locale.getDefault());
 
         // validate JSON
@@ -2572,18 +2582,5 @@ public class JSONObjectTest {
         // assert that the new map is mutable
         assertTrue("Removing a key should succeed", map.remove("key3") != null);
         assertTrue("Map should have 2 elements", map.size() == 2);
-
-    }
-    
-    /**
-     * test class for verifying write errors.
-     * @author John Aylward
-     *
-     */
-    private static class BrokenToString {
-        @Override
-        public String toString() {
-            throw new IllegalStateException("Something went horribly wrong!");
-        }
     }
 }
