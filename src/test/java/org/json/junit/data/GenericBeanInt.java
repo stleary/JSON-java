@@ -11,17 +11,24 @@ public class GenericBeanInt extends GenericBean<Integer> {
     /** */
     final char a = 'A';
 
-    /** return the a */
+    /** @return the a */
     public char getA() {
         return a;
     }
-    
-    /** return false. should not be beanable */
+
+    /**
+     * Should not be beanable
+     * 
+     * @return false
+     */
     public boolean getable() {
         return false;
     }
 
-    /** */
+    /**
+     * @param genericValue
+     *            the value to initiate with.
+     */
     public GenericBeanInt(Integer genericValue) {
         super(genericValue);
     }

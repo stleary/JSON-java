@@ -10,6 +10,10 @@ import java.io.StringReader;
  *            generic number value
  */
 public class GenericBean<T extends Number & Comparable<T>> implements MyBean {
+    /**
+     * @param genericValue
+     *            value to initiate with
+     */
     public GenericBean(T genericValue) {
         super();
         this.genericValue = genericValue;
@@ -28,7 +32,10 @@ public class GenericBean<T extends Number & Comparable<T>> implements MyBean {
         return this.genericValue;
     }
 
-    /** sets the generic value */
+    /**
+     * @param genericValue
+     *            generic value to set
+     */
     public void setGenericValue(T genericValue) {
         this.genericSetCounter++;
         this.genericValue = genericValue;

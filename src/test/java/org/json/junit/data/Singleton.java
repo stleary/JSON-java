@@ -36,7 +36,12 @@ public final class Singleton {
         return someInt;
     }
 
-    /** sets someInt */
+    /**
+     * sets someInt.
+     * 
+     * @param someInt
+     *            the someInt to set
+     */
     public void setSomeInt(int someInt) {
         this.someInt = someInt;
     }
@@ -46,7 +51,12 @@ public final class Singleton {
         return someString;
     }
 
-    /** sets someString */
+    /**
+     * sets someString.
+     * 
+     * @param someString
+     *            the someString to set
+     */
     public void setSomeString(String someString) {
         this.someString = someString;
     }

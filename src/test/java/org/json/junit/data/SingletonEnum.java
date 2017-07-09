@@ -7,6 +7,9 @@ package org.json.junit.data;
  *
  */
 public enum SingletonEnum {
+    /**
+     * the singleton instance.
+     */
     INSTANCE;
     /** */
     private int someInt;
@@ -32,7 +35,12 @@ public enum SingletonEnum {
         return someInt;
     }
 
-    /** sets someInt */
+    /**
+     * sets someInt.
+     * 
+     * @param someInt
+     *            the someInt to set
+     */
     public void setSomeInt(int someInt) {
         this.someInt = someInt;
     }
@@ -42,7 +50,12 @@ public enum SingletonEnum {
         return someString;
     }
 
-    /** sets someString */
+    /**
+     * sets someString.
+     * 
+     * @param someString
+     *            the someString to set
+     */
     public void setSomeString(String someString) {
         this.someString = someString;
     }

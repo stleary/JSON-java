@@ -2590,6 +2590,9 @@ public class JSONObjectTest {
         assertTrue("Map should have 2 elements", map.size() == 2);
     }
     
+    /**
+     * test that validates a singleton can be serialized as a bean.
+     */
     @Test
     public void testSingletonBean() {
         final JSONObject jo = new JSONObject(Singleton.getInstance());
@@ -2609,6 +2612,10 @@ public class JSONObjectTest {
         assertEquals(0, jo.get("someInt"));
         assertEquals(null, jo.opt("someString"));
     }
+
+    /**
+     * test that validates a singleton can be serialized as a bean.
+     */
     @Test
     public void testSingletonEnumBean() {
         final JSONObject jo = new JSONObject(SingletonEnum.getInstance());
@@ -2629,6 +2636,9 @@ public class JSONObjectTest {
         assertEquals(null, jo.opt("someString"));
     }
     
+    /**
+     * Test to validate that a generic class can be serialized as a bean.
+     */
     @Test
     public void testGenericBean() {
         GenericBean<Integer> bean = new GenericBean<>(42);
@@ -2640,6 +2650,9 @@ public class JSONObjectTest {
         assertEquals(0, bean.genericSetCounter);
     }
     
+    /**
+     * Test to validate that a generic class can be serialized as a bean.
+     */
     @Test
     public void testGenericIntBean() {
         GenericBeanInt bean = new GenericBeanInt(42);
@@ -2651,6 +2664,9 @@ public class JSONObjectTest {
         assertEquals(0, bean.genericSetCounter);
     }
     
+    /**
+     * Test to verify <code>key</code> limitations in the JSONObject bean serializer.
+     */
     @Test
     public void testWierdListBean() {
         WeirdList bean = new WeirdList(42, 43, 44);
@@ -2660,7 +2676,8 @@ public class JSONObjectTest {
         // getInt(int) should also be ignored based on parameter count
         // add(Integer) should be ignore as it doesn't start with get/is and also has a parameter
         // getALL should be mapped
-        assertEquals("Expected 1 key to mapped "+jo.keySet().toString(), 1, jo.length());
+        assertEquals("Expected 1 key to be mapped. Instead found: "+jo.keySet().toString(),
+                1, jo.length());
         assertNotNull(jo.get("ALL"));
     }
 }
