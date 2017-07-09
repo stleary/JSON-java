@@ -26,4 +26,10 @@ public class GenericBeanInt extends GenericBean<Integer> {
         super(genericValue);
     }
 
+    /** override to generate a bridge method */
+    @Override
+    public Integer getGenericValue() {
+        return super.getGenericValue();
+    }
+
 }
