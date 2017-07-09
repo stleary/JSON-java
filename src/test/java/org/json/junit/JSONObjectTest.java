@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import org.json.JSONPointerException;
 import org.json.XML;
 import org.json.junit.data.BrokenToString;
+import org.json.junit.data.ExceptionalBean;
 import org.json.junit.data.Fraction;
 import org.json.junit.data.GenericBean;
 import org.json.junit.data.GenericBeanInt;
@@ -2679,5 +2680,18 @@ public class JSONObjectTest {
         assertEquals("Expected 1 key to be mapped. Instead found: "+jo.keySet().toString(),
                 1, jo.length());
         assertNotNull(jo.get("ALL"));
+    }
+    
+    /**
+     * Tests the exception portions of populateMap.
+     */
+    @Test
+    public void testExceptionalBean() {
+        ExceptionalBean bean = new ExceptionalBean();
+        final JSONObject jo = new JSONObject(bean);
+        assertEquals("Expected 1 key to be mapped. Instead found: "+jo.keySet().toString(),
+                1, jo.length());
+        assertTrue(jo.get("closeable") instanceof JSONObject);
+        assertTrue(jo.getJSONObject("closeable").has("string"));
     }
 }
