@@ -3,6 +3,7 @@ package org.json.junit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -32,6 +33,8 @@ import org.json.JSONPointerException;
 import org.json.XML;
 import org.json.junit.data.BrokenToString;
 import org.json.junit.data.Fraction;
+import org.json.junit.data.GenericBean;
+import org.json.junit.data.GenericBeanInt;
 import org.json.junit.data.MyBean;
 import org.json.junit.data.MyBigNumberBean;
 import org.json.junit.data.MyEnum;
@@ -40,6 +43,9 @@ import org.json.junit.data.MyJsonString;
 import org.json.junit.data.MyNumber;
 import org.json.junit.data.MyNumberContainer;
 import org.json.junit.data.MyPublicClass;
+import org.json.junit.data.Singleton;
+import org.json.junit.data.SingletonEnum;
+import org.json.junit.data.WeirdList;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -2582,5 +2588,79 @@ public class JSONObjectTest {
         // assert that the new map is mutable
         assertTrue("Removing a key should succeed", map.remove("key3") != null);
         assertTrue("Map should have 2 elements", map.size() == 2);
+    }
+    
+    @Test
+    public void testSingletonBean() {
+        final JSONObject jo = new JSONObject(Singleton.getInstance());
+        assertEquals(jo.keySet().toString(), 1, jo.length());
+        assertEquals(0, jo.get("someInt"));
+        assertEquals(null, jo.opt("someString"));
+        
+        // Update the singleton values
+        Singleton.getInstance().setSomeInt(42);
+        Singleton.getInstance().setSomeString("Something");
+        final JSONObject jo2 = new JSONObject(Singleton.getInstance());
+        assertEquals(2, jo2.length());
+        assertEquals(42, jo2.get("someInt"));
+        assertEquals("Something", jo2.get("someString"));
+
+        // ensure our original jo hasn't changed.
+        assertEquals(0, jo.get("someInt"));
+        assertEquals(null, jo.opt("someString"));
+    }
+    @Test
+    public void testSingletonEnumBean() {
+        final JSONObject jo = new JSONObject(SingletonEnum.getInstance());
+        assertEquals(jo.keySet().toString(), 1, jo.length());
+        assertEquals(0, jo.get("someInt"));
+        assertEquals(null, jo.opt("someString"));
+        
+        // Update the singleton values
+        SingletonEnum.getInstance().setSomeInt(42);
+        SingletonEnum.getInstance().setSomeString("Something");
+        final JSONObject jo2 = new JSONObject(SingletonEnum.getInstance());
+        assertEquals(2, jo2.length());
+        assertEquals(42, jo2.get("someInt"));
+        assertEquals("Something", jo2.get("someString"));
+
+        // ensure our original jo hasn't changed.
+        assertEquals(0, jo.get("someInt"));
+        assertEquals(null, jo.opt("someString"));
+    }
+    
+    @Test
+    public void testGenericBean() {
+        GenericBean<Integer> bean = new GenericBean<>(42);
+        final JSONObject jo = new JSONObject(bean);
+        assertEquals(jo.keySet().toString(), 8, jo.length());
+        assertEquals(42, jo.get("genericValue"));
+        assertEquals("Expected the getter to only be called once",
+                1, bean.genericGetCounter);
+        assertEquals(0, bean.genericSetCounter);
+    }
+    
+    @Test
+    public void testGenericIntBean() {
+        GenericBeanInt bean = new GenericBeanInt(42);
+        final JSONObject jo = new JSONObject(bean);
+        assertEquals(jo.keySet().toString(), 9, jo.length());
+        assertEquals(42, jo.get("genericValue"));
+        assertEquals("Expected the getter to only be called once",
+                1, bean.genericGetCounter);
+        assertEquals(0, bean.genericSetCounter);
+    }
+    
+    @Test
+    public void testWierdListBean() {
+        WeirdList bean = new WeirdList(42, 43, 44);
+        final JSONObject jo = new JSONObject(bean);
+        // get() should have a key of 0 length
+        // get(int) should be ignored base on parameter count
+        // getInt(int) should also be ignored based on parameter count
+        // add(Integer) should be ignore as it doesn't start with get/is and also has a parameter
+        // getALL should be mapped
+        assertEquals("Expected 1 key to mapped "+jo.keySet().toString(), 1, jo.length());
+        assertNotNull(jo.get("ALL"));
     }
 }
