@@ -368,10 +368,63 @@ public class JSONArray implements Iterable<Object> {
      *             If the key is not found or if the value is not a number.
      */
     public int getInt(int index) throws JSONException {
+        return getInt(index, 10);
+    }
+
+    /**
+     * Get the int value associated with an index.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param radix 
+     *            The radix to use when parsing from String
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value is not a number.
+     */
+    public int getInt(int index, int radix) throws JSONException {
         Object object = this.get(index);
         try {
             return object instanceof Number ? ((Number) object).intValue()
-                    : Integer.parseInt((String) object);
+                    : Integer.parseInt((String) object, radix);
+        } catch (Exception e) {
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
+        }
+    }
+
+    /**
+     * Get the int value associated with an index.
+     * <br>This will use {@link java.lang.Integer#parseUnsignedInt(String) Integer.parseUnsignedInt(String)} if the associated
+     * value is of type String.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value is not a number.
+     */
+    public int getIntUnsigned(int index) throws JSONException {
+        return getIntUnsigned(index, 10);
+    }
+
+    /**
+     * Get the int value associated with an index.
+     * <br>This will use {@link java.lang.Integer#parseUnsignedInt(String) Integer.parseUnsignedInt(String)} if the associated
+     * value is of type String.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param radix 
+     *            The radix to use when parsing from String
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value is not a number.
+     */
+    public int getIntUnsigned(int index, int radix) throws JSONException {
+        Object object = this.get(index);
+        try {
+            return object instanceof Number ? ((Number) object).intValue()
+                    : Integer.parseUnsignedInt((String) object, radix);
         } catch (Exception e) {
             throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
@@ -412,7 +465,7 @@ public class JSONArray implements Iterable<Object> {
         }
         throw new JSONException("JSONArray[" + index + "] is not a JSONObject.");
     }
-
+	
     /**
      * Get the long value associated with an index.
      *
@@ -424,10 +477,66 @@ public class JSONArray implements Iterable<Object> {
      *             to a number.
      */
     public long getLong(int index) throws JSONException {
+        return getLong(index, 10);
+    }
+
+    /**
+     * Get the long value associated with an index.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param radix 
+     *            The radix to use when parsing from String
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value cannot be converted
+     *             to a number.
+     */
+    public long getLong(int index, int radix) throws JSONException {
         Object object = this.get(index);
         try {
             return object instanceof Number ? ((Number) object).longValue()
-                    : Long.parseLong((String) object);
+                    : Long.parseLong((String) object, radix);
+        } catch (Exception e) {
+            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
+        }
+    }
+
+    /**
+     * Get the long value associated with an index.
+     * <br>This will use {@link java.lang.Long#parseUnsignedLong(String, int) Long.parseUnsignedLong(String, int)} if the associated
+     * value is of type String.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value cannot be converted
+     *             to a number.
+     */
+    public long getLongUnsigned(int index) throws JSONException {
+        return getLongUnsigned(index, 10);
+    }
+
+    /**
+     * Get the long value associated with an index.
+     * <br>This will use {@link java.lang.Long#parseUnsignedLong(String, int) Long.parseUnsignedLong(String, int)} if the associated
+     * value is of type String.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param radix 
+     *            The radix to use when parsing from String
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value cannot be converted
+     *             to a number.
+     */
+    public long getLongUnsigned(int index, int radix) throws JSONException {
+        Object object = this.get(index);
+        try {
+            return object instanceof Number ? ((Number) object).longValue()
+                    : Long.parseUnsignedLong((String) object, radix);
         } catch (Exception e) {
             throw new JSONException("JSONArray[" + index + "] is not a number.", e);
         }
