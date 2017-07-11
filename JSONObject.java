@@ -659,7 +659,7 @@ public class JSONObject {
                     + "] is not a number.", e);
         }
     }
-
+	
     /**
      * Get the int value associated with a key.
      *
@@ -671,10 +671,67 @@ public class JSONObject {
      *             to an integer.
      */
     public int getInt(String key) throws JSONException {
+        return getInt(key, 10);
+    }
+
+    /**
+     * Get the int value associated with a key.
+     *
+     * @param key
+     *            A key string.
+     * @param radix 
+     *            The radix to use when parsing from String
+     * @return The integer value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to an integer.
+     */
+    public int getInt(String key, int radix) throws JSONException {
         Object object = this.get(key);
         try {
             return object instanceof Number ? ((Number) object).intValue()
                     : Integer.parseInt((String) object);
+        } catch (Exception e) {
+            throw new JSONException("JSONObject[" + quote(key)
+                    + "] is not an int.", e);
+        }
+    }
+	
+    /**
+     * Get the int value associated with a key.
+     * <br>This will use {@link java.lang.Integer#parseUnsignedInt(String) Integer.parseUnsignedInt(String)} if the associated
+     * value is of type String.
+     *
+     * @param key
+     *            A key string.
+     * @return The integer value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to an integer.
+     */
+    public int getIntUnsigned(String key) throws JSONException {
+        return getIntUnsigned(key, 10);
+    }
+	
+    /**
+     * Get the int value associated with a key.
+     * <br>This will use {@link java.lang.Integer#parseUnsignedInt(String) Integer.parseUnsignedInt(String)} if the associated
+     * value is of type String.
+     *
+     * @param key
+     *            A key string.
+     * @param radix 
+     *            The radix to use when parsing from String
+     * @return The integer value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to an integer.
+     */
+    public int getIntUnsigned(String key, int radix) throws JSONException {
+        Object object = this.get(key);
+        try {
+            return object instanceof Number ? ((Number) object).intValue()
+                    : Integer.parseUnsignedInt((String) object, radix);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
                     + "] is not an int.", e);
@@ -728,10 +785,67 @@ public class JSONObject {
      *             to a long.
      */
     public long getLong(String key) throws JSONException {
+        return getLong(key, 10);
+    }
+	
+    /**
+     * Get the long value associated with a key.
+     *
+     * @param key
+     *            A key string.
+     * @param radix
+     *            The radix to use when parsing from a String
+     * @return The long value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to a long.
+     */
+    public long getLong(String key, int radix) throws JSONException {
         Object object = this.get(key);
         try {
             return object instanceof Number ? ((Number) object).longValue()
-                    : Long.parseLong((String) object);
+                    : Long.parseLong((String) object, radix);
+        } catch (Exception e) {
+            throw new JSONException("JSONObject[" + quote(key)
+                    + "] is not a long.", e);
+        }
+    }
+
+    /**
+     * Get the long value associated with a key.
+     * <br>This will use {@link java.lang.Long#parseUnsignedLong(String) Long.parseUnsignedLong(String)} if the associated
+     * value is of type String.
+     *
+     * @param key
+     *            A key string.
+     * @return The long value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to a long.
+     */
+    public long getLongUnsigned(String key) throws JSONException {
+        return getLongUnsigned(key, 10);
+    }
+
+    /**
+     * Get the long value associated with a key.
+     * <br>This will use {@link java.lang.Long#parseUnsignedLong(String, int) Long.parseUnsignedLong(String, int)} if the associated
+     * value is of type String.
+     *
+     * @param key
+     *            A key string.
+     * @param radix
+     *            The radix to use when parsing from a String
+     * @return The long value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to a long.
+     */
+    public long getLongUnsigned(String key, int radix) throws JSONException {
+        Object object = this.get(key);
+        try {
+            return object instanceof Number ? ((Number) object).longValue()
+                    : Long.parseUnsignedLong((String) object, radix);
         } catch (Exception e) {
             throw new JSONException("JSONObject[" + quote(key)
                     + "] is not a long.", e);
