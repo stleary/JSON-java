@@ -1622,10 +1622,13 @@ public class JSONObjectTest {
                 "    ]\n" +
                 "}";
         JSONObject jsonObject = new JSONObject(jsonObject0Str);
-        assertEquals(jsonObject0Str, jsonObject.toString());
-        assertEquals(jsonObject0Str, jsonObject.toString(0));
-        assertEquals(jsonObject1Str, jsonObject.toString(1));
-        assertEquals(jsonObject4Str, jsonObject.toString(4));
+        assertEquals("toString()",jsonObject0Str, jsonObject.toString());
+        assertEquals("toString(0)",jsonObject0Str, jsonObject.toString(0));
+        assertEquals("toString(1)",jsonObject1Str, jsonObject.toString(1));
+        assertEquals("toString(4)",jsonObject4Str, jsonObject.toString(4));
+        
+        JSONObject jo = new JSONObject().put("TABLE", new JSONObject().put("yhoo", new JSONObject()));
+        assertEquals("toString(2)","{\"TABLE\": {\"yhoo\": {}}}", jo.toString(2));
     }
 
     /**
