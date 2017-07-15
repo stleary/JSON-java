@@ -1676,7 +1676,7 @@ public class JSONObject {
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
      * 
-     * @param The JSON pointer
+     * @param jsonPointer The JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
      */
@@ -2002,9 +2002,10 @@ public class JSONObject {
      * Make a JSON text of this JSONObject. For compactness, no whitespace is
      * added. If this would not result in a syntactically correct JSON text,
      * then null will be returned instead.
-     * <p>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
-     *
+     * </b>
+     * 
      * @return a printable, displayable, portable, transmittable representation
      *         of the object, beginning with <code>{</code>&nbsp;<small>(left
      *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
@@ -2021,8 +2022,20 @@ public class JSONObject {
 
     /**
      * Make a pretty-printed JSON text of this JSONObject.
-     * <p>
+     * 
+     * <p>If <code>indentFactor > 0</code> and the {@link JSONObject}
+     * has only one key, then the object will be output on a single line:
+     * <pre>{@code {"key": 1}}</pre>
+     * 
+     * <p>If an object has 2 or more keys, then it will be output across
+     * multiple lines: <code><pre>{
+     *  "key1": 1,
+     *  "key2": "value 2",
+     *  "key3": 3
+     * }</pre></code>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
+     * </b>
      *
      * @param indentFactor
      *            The number of spaces to add to each level of indentation.
@@ -2172,9 +2185,10 @@ public class JSONObject {
     /**
      * Write the contents of the JSONObject as JSON text to a writer. For
      * compactness, no whitespace is added.
-     * <p>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
-     *
+     * </b>
+     * 
      * @return The writer.
      * @throws JSONException
      */
@@ -2238,8 +2252,20 @@ public class JSONObject {
 
     /**
      * Write the contents of the JSONObject as JSON text to a writer.
-     * <p>
+     * 
+     * <p>If <code>indentFactor > 0</code> and the {@link JSONObject}
+     * has only one key, then the object will be output on a single line:
+     * <pre>{@code {"key": 1}}</pre>
+     * 
+     * <p>If an object has 2 or more keys, then it will be output across
+     * multiple lines: <code><pre>{
+     *  "key1": 1,
+     *  "key2": "value 2",
+     *  "key3": 3
+     * }</pre></code>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
+     * </b>
      *
      * @param writer
      *            Writes the serialized JSON
