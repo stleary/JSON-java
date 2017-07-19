@@ -423,7 +423,7 @@ public class XML {
     }
     
     /**
-     * This method is the same as {@link JSONObject.stringToValue(String)}
+     * This method is the same as {@link JSONObject#stringToValue(String)}
      * except that this also tries to unescape String values.
      * 
      * @param string String to convert
