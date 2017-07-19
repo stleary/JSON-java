@@ -1,4 +1,4 @@
-package org.json.junit;
+package org.json.junit.data;
 
 /**
  * Class that holds our MyNumber override as a property.

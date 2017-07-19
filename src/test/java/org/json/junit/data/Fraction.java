@@ -1,4 +1,4 @@
-package org.json.junit;
+package org.json.junit.data;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

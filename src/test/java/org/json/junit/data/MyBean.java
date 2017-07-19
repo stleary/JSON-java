@@ -1,11 +1,11 @@
-package org.json.junit;
+package org.json.junit.data;
 
 import java.io.*;
 
 /**
  * Used in testing when Bean behavior is needed
  */
-interface MyBean {
+public interface MyBean {
     public Integer getIntKey();
     public Double getDoubleKey();
     public String getStringKey();

@@ -1,4 +1,4 @@
-package org.json.junit;
+package org.json.junit.data;
 
 /**
  * this is simply a class that contains some enum instances

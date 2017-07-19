@@ -1,4 +1,4 @@
-package org.json.junit;
+package org.json.junit.data;
 
 /**
  * An enum with no methods or data

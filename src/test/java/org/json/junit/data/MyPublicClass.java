@@ -1,4 +1,4 @@
-package org.json.junit;
+package org.json.junit.data;
 
 /**
  * Need a class with some public data members for testing
