@@ -17,7 +17,8 @@ import org.junit.runners.Suite;
    JSONArrayTest.class,
    EnumTest.class,
    JSONPointerTest.class,
-   JSONStringTest.class
+   JSONStringTest.class,
+   JSONTokenerTest.class
 })
 public class JunitTestSuite {
 }
