@@ -28,7 +28,10 @@ dependencies {
   // testCompile files('./JSON-Java.jar')
 }
 
-test { finalizedBy jacocoTestReport }
+test {
+  include "org/json/junit/JunitTestSuite.class"
+  finalizedBy jacocoTestReport
+}
 jacocoTestReport{
     additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
     reports {
