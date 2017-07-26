@@ -231,8 +231,12 @@ public class JSONObject {
             if (c != ':') {
                 throw x.syntaxError("Expected a ':' after a key");
             }
-            this.putOnce(key, x.nextValue());
-
+            // Catch exception but re-throw using tokenizer syntaxError(...) - provides info about where the error is located
+            try {
+                this.putOnce(key, x.nextValue());
+            } catch (JSONException e) {
+                throw x.syntaxError(e.getMessage());
+            }
             // Pairs are separated by ','.
 
             switch (x.nextClean()) {
