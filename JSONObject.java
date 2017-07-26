@@ -234,8 +234,8 @@ public class JSONObject {
             // Catch exception but re-throw using tokenizer syntaxError(...) - provides info about where the error is located
             try {
                 this.putOnce(key, x.nextValue());
-            } catch (JSONException _e) {
-                throw x.syntaxError(_e.getMessage());
+            } catch (JSONException e) {
+                throw x.syntaxError(e.getMessage());
             }
             // Pairs are separated by ','.
 
