@@ -2138,7 +2138,6 @@ public class JSONObjectTest {
 					    +"        }\n"
 					    +"    }\n"
 						+ "]";
-        	System.out.println(str);
         	new JSONArray(str);
         	fail("Expected an exception");
         } catch (JSONException e) {
