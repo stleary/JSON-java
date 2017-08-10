@@ -22,6 +22,7 @@ dependencies {
   testCompile group: 'junit', name: 'junit', version: '4.+'
   testCompile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.1.0'
   testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+  testCompile group: 'slf4j.org', name: 'slf4j', version: '1.6.1'
   // Uncomment if you are testing against a JSON-Java release
   // testCompile 'org.json:json:20160212'
   // Uncomment if you have copied a local JSON-Java jar file into this project
