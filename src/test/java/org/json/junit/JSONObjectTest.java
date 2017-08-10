@@ -1988,7 +1988,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    "Duplicate key \"attr03\" at 89 [character 12 line 5]",
                     e.getMessage());
         }
         try {
@@ -2007,7 +2007,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    "Duplicate key \"attr03\" at 89 [character 12 line 5]",
                     e.getMessage());
         }
         try {
@@ -2028,7 +2028,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    "Duplicate key \"attr03\" at 89 [character 12 line 5]",
                     e.getMessage());
         }
         try {
@@ -2048,7 +2048,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    "Duplicate key \"attr04-03\" at 214 [character 19 line 9]",
                     e.getMessage());
         }
         try {
@@ -2072,7 +2072,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    "Duplicate key \"attr04-03\" at 214 [character 19 line 9]",
                     e.getMessage());
         }
         try {
@@ -2098,7 +2098,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    "Duplicate key \"attr04-03\" at 214 [character 19 line 9]",
                     e.getMessage());
         }
         try {
@@ -2117,7 +2117,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr01\" at 124 [character 17 line 8]",
+                    "Duplicate key \"attr01\" at 123 [character 16 line 8]",
                     e.getMessage());
         }
         try {
@@ -2142,7 +2142,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr02-01\" at 269 [character 24 line 13]",
+                    "Duplicate key \"attr02-01\" at 268 [character 23 line 13]",
                     e.getMessage());
         }
     }
