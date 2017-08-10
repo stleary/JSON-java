@@ -231,7 +231,21 @@ public class JSONObject {
             if (c != ':') {
                 throw x.syntaxError("Expected a ':' after a key");
             }
-            this.putOnce(key, x.nextValue());
+            
+            // Replace: this.putOnce(key, x.nextValue());
+            // Use syntaxError(..) to include error location
+            
+            if (key != null) {
+                // Check if key exists
+            	if (this.opt(key) != null) {
+                    throw x.syntaxError("Duplicate key \"" + key + "\"");
+            	}
+                // Only add value if non-null
+                Object value = x.nextValue();
+                if (value!=null) {
+                	this.put(key, value);
+                }
+            }
 
             // Pairs are separated by ','.
 
