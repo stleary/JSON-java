@@ -236,15 +236,15 @@ public class JSONObject {
             
             if (key != null) {
                 // Check if key exists
-            	if (this.opt(key) != null) {
-            		// back one token to point to the last key character
-            		x.back();
+                if (this.opt(key) != null) {
+                    // back one token to point to the last key character
+                    x.back();
                     throw x.syntaxError("Duplicate key \"" + key + "\"");
-            	}
+                }
                 // Only add value if non-null
                 Object value = x.nextValue();
                 if (value!=null) {
-                	this.put(key, value);
+                    this.put(key, value);
                 }
             }
 
