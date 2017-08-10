@@ -232,12 +232,13 @@ public class JSONObject {
                 throw x.syntaxError("Expected a ':' after a key");
             }
             
-            // Replace: this.putOnce(key, x.nextValue());
             // Use syntaxError(..) to include error location
             
             if (key != null) {
                 // Check if key exists
             	if (this.opt(key) != null) {
+            		// back one token to point to the last key character
+            		x.back();
                     throw x.syntaxError("Duplicate key \"" + key + "\"");
             	}
                 // Only add value if non-null
