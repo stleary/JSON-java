@@ -237,8 +237,7 @@ public class JSONObject {
             if (key != null) {
                 // Check if key exists
                 if (this.opt(key) != null) {
-                    // back one token to point to the last key character
-                    x.back();
+                    // key already exists
                     throw x.syntaxError("Duplicate key \"" + key + "\"");
                 }
                 // Only add value if non-null
