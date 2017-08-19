@@ -141,7 +141,7 @@ public class XML {
                 if (mustEscape(cp)) {
                     sb.append("&#x");
                     sb.append(Integer.toHexString(cp));
-                    sb.append(";");
+                    sb.append(';');
                 } else {
                     sb.appendCodePoint(cp);
                 }
@@ -191,31 +191,7 @@ public class XML {
                 final int semic = string.indexOf(';', i);
                 if (semic > i) {
                     final String entity = string.substring(i + 1, semic);
-                    if (entity.charAt(0) == '#') {
-                        int cp;
-                        if (entity.charAt(1) == 'x') {
-                            // hex encoded unicode
-                            cp = Integer.parseInt(entity.substring(2), 16);
-                        } else {
-                            // decimal encoded unicode
-                            cp = Integer.parseInt(entity.substring(1));
-                        }
-                        sb.appendCodePoint(cp);
-                    } else {
-                        if ("quot".equalsIgnoreCase(entity)) {
-                            sb.append('"');
-                        } else if ("amp".equalsIgnoreCase(entity)) {
-                            sb.append('&');
-                        } else if ("apos".equalsIgnoreCase(entity)) {
-                            sb.append('\'');
-                        } else if ("lt".equalsIgnoreCase(entity)) {
-                            sb.append('<');
-                        } else if ("gt".equalsIgnoreCase(entity)) {
-                            sb.append('>');
-                        } else {// unsupported xml entity. leave encoded
-                            sb.append('&').append(entity).append(';');
-                        }
-                    }
+                    sb.append(XMLTokener.unescapeEntity(entity));
                     // skip past the entity we just parsed.
                     i += entity.length() + 1;
                 } else {
@@ -364,7 +340,7 @@ public class XML {
                             throw x.syntaxError("Missing value");
                         }
                         jsonobject.accumulate(string,
-                                keepStrings ? unescape((String)token) : stringToValue((String) token));
+                                keepStrings ? ((String)token) : stringToValue((String) token));
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -396,7 +372,7 @@ public class XML {
                             string = (String) token;
                             if (string.length() > 0) {
                                 jsonobject.accumulate("content",
-                                        keepStrings ? unescape(string) : stringToValue(string));
+                                        keepStrings ? string : stringToValue(string));
                             }
 
                         } else if (token == LT) {
@@ -430,11 +406,7 @@ public class XML {
      * @return JSON value of this string or the string
      */
     public static Object stringToValue(String string) {
-        Object ret = JSONObject.stringToValue(string);
-        if(ret instanceof String){
-            return unescape((String)ret);
-        }
-        return ret;
+        return JSONObject.stringToValue(string);
     }
 
     /**
