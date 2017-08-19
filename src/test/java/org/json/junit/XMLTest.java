@@ -764,5 +764,29 @@ public class XMLTest {
 
         assertEquals(expectedReverseXml, reverseXml);
     }
+    
+    /**
+     * test to validate certain conditions of XML unescaping.
+     */
+    @Test
+    public void testUnescape() {
+        assertEquals("{\"xml\":\"Can cope <;\"}",
+                XML.toJSONObject("<xml>Can cope &lt;; </xml>").toString());
+        assertEquals("Can cope <; ", XML.unescape("Can cope &lt;; "));
+
+        assertEquals("{\"xml\":\"Can cope & ;\"}",
+                XML.toJSONObject("<xml>Can cope &amp; ; </xml>").toString());
+        assertEquals("Can cope & ; ", XML.unescape("Can cope &amp; ; "));
+
+        assertEquals("{\"xml\":\"Can cope &;\"}",
+                XML.toJSONObject("<xml>Can cope &amp;; </xml>").toString());
+        assertEquals("Can cope &; ", XML.unescape("Can cope &amp;; "));
+
+        // double escaped
+        assertEquals("{\"xml\":\"Can cope &lt;\"}",
+                XML.toJSONObject("<xml>Can cope &amp;lt; </xml>").toString());
+        assertEquals("Can cope &lt; ", XML.unescape("Can cope &amp;lt; "));
+        
+    }
 
 }
