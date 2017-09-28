@@ -2210,6 +2210,9 @@ public class JSONObject {
                 Map<?, ?> map = (Map<?, ?>) object;
                 return new JSONObject(map);
             }
+            if (object instanceof JSONable) {
+                return ((JSONable) object).toJSONObject();
+            }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage
                     .getName() : "";
