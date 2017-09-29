@@ -1,5 +1,7 @@
 package org.json;
 
 public interface JSONable {
-	public JSONObject toJSONObject();
+	default public JSONObject toJSONObject() {
+		return new JSONObject(JSONObject.createJSONObject(this));
+	}
 }
