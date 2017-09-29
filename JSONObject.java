@@ -287,33 +287,30 @@ public class JSONObject {
     }
 
     /**
-     * Construct a JSONObject from an Object using bean getters. It reflects on
-     * all of the public methods of the object. For each of the methods with no
-     * parameters and a name starting with <code>"get"</code> or
-     * <code>"is"</code> followed by an uppercase letter, the method is invoked,
-     * and a key and the value returned from the getter method are put into the
-     * new JSONObject.
-     * <p>
-     * The key is formed by removing the <code>"get"</code> or <code>"is"</code>
-     * prefix. If the second remaining character is not upper case, then the
-     * first character is converted to lower case.
-     * <p>
-     * For example, if an object has a method named <code>"getName"</code>, and
-     * if the result of calling <code>object.getName()</code> is
-     * <code>"Larry Fine"</code>, then the JSONObject will contain
-     * <code>"name": "Larry Fine"</code>.
-     * <p>
-     * Methods that return <code>void</code> as well as <code>static</code>
-     * methods are ignored.
+     * Construct a JSONObject from an Object using bean getters.
      * 
      * @param bean
      *            An object that has getter methods that should be used to make
      *            a JSONObject.
      */
     public JSONObject(Object bean) {
-        this();
-        this.populateMap(bean);
-    }
+		this();
+        JSONObject jsonObject;
+        if (bean instanceof JSONObject) {
+            jsonObject = (JSONObject) bean;
+        } else if (bean instanceof JSONTokener) {
+            jsonObject = new JSONObject((JSONTokener) bean);
+        } else if (bean instanceof Map) {
+            jsonObject = new JSONObject((Map) bean);
+        } else if (bean instanceof String) {
+            jsonObject = new JSONObject((String) bean);
+        } else if (bean instanceof JSONable) {
+            jsonObject = ((JSONable) bean).toJSONObject();
+        } else
+            throw new JSONException("Object must implement JSONable interface");
+
+        this.map.putAll(jsonObject.toMap());
+	}
 
     /**
      * Construct a JSONObject from an Object, using reflection to find the
@@ -1369,7 +1366,7 @@ public class JSONObject {
         if (val instanceof Number){
             return (Number) val;
         }
-        
+
         if (val instanceof String) {
             try {
                 return stringToNumber((String) val);
@@ -1379,7 +1376,7 @@ public class JSONObject {
         }
         return defaultValue;
     }
-    
+
     /**
      * Get an optional string associated with a key. It returns an empty string
      * if there is no such key. If the value is not a string and is not null,
@@ -1409,7 +1406,25 @@ public class JSONObject {
     }
 
     /**
-     * Populates the internal map of the JSONObject with the bean properties.
+     * It reflects on
+     * all of the public methods of the object. For each of the methods with no
+     * parameters and a name starting with <code>"get"</code> or
+     * <code>"is"</code> followed by an uppercase letter, the method is invoked,
+     * and a key and the value returned from the getter method are put into the
+     * new JSONObject.
+     * <p>
+     * The key is formed by removing the <code>"get"</code> or <code>"is"</code>
+     * prefix. If the second remaining character is not upper case, then the
+     * first character is converted to lower case.
+     * <p>
+     * For example, if an object has a method named <code>"getName"</code>, and
+     * if the result of calling <code>object.getName()</code> is
+     * <code>"Larry Fine"</code>, then the JSONObject will contain
+     * <code>"name": "Larry Fine"</code>.
+     * <p>
+     * Methods that return <code>void</code> as well as <code>static</code>
+     * methods are ignored.
+     *
      * The bean can not be recursive.
      *
      * @see JSONObject#JSONObject(Object)
@@ -1417,10 +1432,11 @@ public class JSONObject {
      * @param bean
      *            the bean
      */
-    private void populateMap(Object bean) {
+    public static JSONObject createJSONObject(Object bean) {
+        JSONObject resultJSONObject = new JSONObject();
         Class<?> klass = bean.getClass();
 
-// If klass is a System class then set includeSuperClass to false.
+        // If class is a System class then set includeSuperClass to false.
 
         boolean includeSuperClass = klass.getClassLoader() != null;
 
@@ -1457,7 +1473,7 @@ public class JSONObject {
                     try {
                         final Object result = method.invoke(bean);
                         if (result != null) {
-                            this.map.put(key, wrap(result));
+                            resultJSONObject.put(key, wrap(result));
                             // we don't use the result anywhere outside of wrap
                             // if it's a resource we should be sure to close it after calling toString
                             if(result instanceof Closeable) {
@@ -1474,6 +1490,7 @@ public class JSONObject {
                 }
             }
         }
+        return resultJSONObject;
     }
 
     /**
@@ -2210,15 +2227,10 @@ public class JSONObject {
                 Map<?, ?> map = (Map<?, ?>) object;
                 return new JSONObject(map);
             }
-            Package objectPackage = object.getClass().getPackage();
-            String objectPackageName = objectPackage != null ? objectPackage
-                    .getName() : "";
-            if (objectPackageName.startsWith("java.")
-                    || objectPackageName.startsWith("javax.")
-                    || object.getClass().getClassLoader() == null) {
-                return object.toString();
+            if (object instanceof JSONable) {
+                return ((JSONable) object).toJSONObject();
             }
-            return new JSONObject(object);
+            return object.toString();
         } catch (Exception exception) {
             return null;
         }
