@@ -90,10 +90,9 @@ invalid number formats (1.2e6.3) will cause errors as such documents can not be 
  
 For those users who require an implementation of of the org.json libraries utilizing a 
 well-recognized open-source license (Apache ver. 2.0), a clean-room implemenation of the
-org.json API was performed and is now available at [https://github.com/openjson].
+org.json API was performed and is now available at https://github.com/openjson.
 This alternative version places the classes into the com.github.openjson package, which prevents 
 class conflicts with implementations utilizing the org.json libraries.
-
 
 Release history:
 20171018    Checkpoint for recent commits.
