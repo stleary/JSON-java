@@ -89,6 +89,8 @@ invalid number formats (1.2e6.3) will cause errors as such documents can not be 
  reliably.
 
 Release history:
+20171018    Checkpoint for recent commits.
+
 20170516    Roll up recent commits.
 
 20160810    Revert code that was breaking opt*() methods.

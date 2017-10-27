@@ -1,5 +1,7 @@
 package org.json;
 
+import java.io.Closeable;
+
 /*
  Copyright (c) 2002 JSON.org
 
@@ -28,6 +30,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
@@ -228,7 +231,21 @@ public class JSONObject {
             if (c != ':') {
                 throw x.syntaxError("Expected a ':' after a key");
             }
-            this.putOnce(key, x.nextValue());
+            
+            // Use syntaxError(..) to include error location
+            
+            if (key != null) {
+                // Check if key exists
+                if (this.opt(key) != null) {
+                    // key already exists
+                    throw x.syntaxError("Duplicate key \"" + key + "\"");
+                }
+                // Only add value if non-null
+                Object value = x.nextValue();
+                if (value!=null) {
+                    this.put(key, value);
+                }
+            }
 
             // Pairs are separated by ','.
 
@@ -276,16 +293,19 @@ public class JSONObject {
      * <code>"is"</code> followed by an uppercase letter, the method is invoked,
      * and a key and the value returned from the getter method are put into the
      * new JSONObject.
-     *
+     * <p>
      * The key is formed by removing the <code>"get"</code> or <code>"is"</code>
      * prefix. If the second remaining character is not upper case, then the
      * first character is converted to lower case.
-     *
+     * <p>
      * For example, if an object has a method named <code>"getName"</code>, and
      * if the result of calling <code>object.getName()</code> is
      * <code>"Larry Fine"</code>, then the JSONObject will contain
      * <code>"name": "Larry Fine"</code>.
-     *
+     * <p>
+     * Methods that return <code>void</code> as well as <code>static</code>
+     * methods are ignored.
+     * 
      * @param bean
      *            An object that has getter methods that should be used to make
      *            a JSONObject.
@@ -1388,6 +1408,15 @@ public class JSONObject {
         return NULL.equals(object) ? defaultValue : object.toString();
     }
 
+    /**
+     * Populates the internal map of the JSONObject with the bean properties.
+     * The bean can not be recursive.
+     *
+     * @see JSONObject#JSONObject(Object)
+     *
+     * @param bean
+     *            the bean
+     */
     private void populateMap(Object bean) {
         Class<?> klass = bean.getClass();
 
@@ -1397,39 +1426,52 @@ public class JSONObject {
 
         Method[] methods = includeSuperClass ? klass.getMethods() : klass
                 .getDeclaredMethods();
-        for (int i = 0; i < methods.length; i += 1) {
-            try {
-                Method method = methods[i];
-                if (Modifier.isPublic(method.getModifiers())) {
-                    String name = method.getName();
-                    String key = "";
-                    if (name.startsWith("get")) {
-                        if ("getClass".equals(name)
-                                || "getDeclaringClass".equals(name)) {
-                            key = "";
-                        } else {
-                            key = name.substring(3);
-                        }
-                    } else if (name.startsWith("is")) {
-                        key = name.substring(2);
+        for (final Method method : methods) {
+            final int modifiers = method.getModifiers();
+            if (Modifier.isPublic(modifiers)
+                    && !Modifier.isStatic(modifiers)
+                    && method.getParameterTypes().length == 0
+                    && !method.isBridge()
+                    && method.getReturnType() != Void.TYPE ) {
+                final String name = method.getName();
+                String key;
+                if (name.startsWith("get")) {
+                    if ("getClass".equals(name) || "getDeclaringClass".equals(name)) {
+                        continue;
                     }
-                    if (key.length() > 0
-                            && Character.isUpperCase(key.charAt(0))
-                            && method.getParameterTypes().length == 0) {
-                        if (key.length() == 1) {
-                            key = key.toLowerCase(Locale.ROOT);
-                        } else if (!Character.isUpperCase(key.charAt(1))) {
-                            key = key.substring(0, 1).toLowerCase(Locale.ROOT)
-                                    + key.substring(1);
-                        }
+                    key = name.substring(3);
+                } else if (name.startsWith("is")) {
+                    key = name.substring(2);
+                } else {
+                    continue;
+                }
+                if (key.length() > 0
+                        && Character.isUpperCase(key.charAt(0))) {
+                    if (key.length() == 1) {
+                        key = key.toLowerCase(Locale.ROOT);
+                    } else if (!Character.isUpperCase(key.charAt(1))) {
+                        key = key.substring(0, 1).toLowerCase(Locale.ROOT)
+                                + key.substring(1);
+                    }
 
-                        Object result = method.invoke(bean, (Object[]) null);
+                    try {
+                        final Object result = method.invoke(bean);
                         if (result != null) {
                             this.map.put(key, wrap(result));
+                            // we don't use the result anywhere outside of wrap
+                            // if it's a resource we should be sure to close it after calling toString
+                            if(result instanceof Closeable) {
+                                try {
+                                    ((Closeable)result).close();
+                                } catch (IOException ignore) {
+                                }
+                            }
                         }
+                    } catch (IllegalAccessException ignore) {
+                    } catch (IllegalArgumentException ignore) {
+                    } catch (InvocationTargetException ignore) {
                     }
                 }
-            } catch (Exception ignore) {
             }
         }
     }
@@ -1676,7 +1718,7 @@ public class JSONObject {
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
      * 
-     * @param The JSON pointer
+     * @param jsonPointer The JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
      */
@@ -2004,9 +2046,10 @@ public class JSONObject {
      * Make a JSON text of this JSONObject. For compactness, no whitespace is
      * added. If this would not result in a syntactically correct JSON text,
      * then null will be returned instead.
-     * <p>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
-     *
+     * </b>
+     * 
      * @return a printable, displayable, portable, transmittable representation
      *         of the object, beginning with <code>{</code>&nbsp;<small>(left
      *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
@@ -2023,8 +2066,20 @@ public class JSONObject {
 
     /**
      * Make a pretty-printed JSON text of this JSONObject.
-     * <p>
+     * 
+     * <p>If <code>indentFactor > 0</code> and the {@link JSONObject}
+     * has only one key, then the object will be output on a single line:
+     * <pre>{@code {"key": 1}}</pre>
+     * 
+     * <p>If an object has 2 or more keys, then it will be output across
+     * multiple lines: <code><pre>{
+     *  "key1": 1,
+     *  "key2": "value 2",
+     *  "key3": 3
+     * }</pre></code>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
+     * </b>
      *
      * @param indentFactor
      *            The number of spaces to add to each level of indentation.
@@ -2130,9 +2185,10 @@ public class JSONObject {
     /**
      * Write the contents of the JSONObject as JSON text to a writer. For
      * compactness, no whitespace is added.
-     * <p>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
-     *
+     * </b>
+     * 
      * @return The writer.
      * @throws JSONException
      */
@@ -2196,8 +2252,20 @@ public class JSONObject {
 
     /**
      * Write the contents of the JSONObject as JSON text to a writer.
-     * <p>
+     * 
+     * <p>If <code>indentFactor > 0</code> and the {@link JSONObject}
+     * has only one key, then the object will be output on a single line:
+     * <pre>{@code {"key": 1}}</pre>
+     * 
+     * <p>If an object has 2 or more keys, then it will be output across
+     * multiple lines: <code><pre>{
+     *  "key1": 1,
+     *  "key2": "value 2",
+     *  "key3": 3
+     * }</pre></code>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
+     * </b>
      *
      * @param writer
      *            Writes the serialized JSON

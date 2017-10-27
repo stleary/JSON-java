@@ -140,7 +140,7 @@ public class XML {
                 if (mustEscape(cp)) {
                     sb.append("&#x");
                     sb.append(Integer.toHexString(cp));
-                    sb.append(";");
+                    sb.append(';');
                 } else {
                     sb.appendCodePoint(cp);
                 }
@@ -190,31 +190,7 @@ public class XML {
                 final int semic = string.indexOf(';', i);
                 if (semic > i) {
                     final String entity = string.substring(i + 1, semic);
-                    if (entity.charAt(0) == '#') {
-                        int cp;
-                        if (entity.charAt(1) == 'x') {
-                            // hex encoded unicode
-                            cp = Integer.parseInt(entity.substring(2), 16);
-                        } else {
-                            // decimal encoded unicode
-                            cp = Integer.parseInt(entity.substring(1));
-                        }
-                        sb.appendCodePoint(cp);
-                    } else {
-                        if ("quot".equalsIgnoreCase(entity)) {
-                            sb.append('"');
-                        } else if ("amp".equalsIgnoreCase(entity)) {
-                            sb.append('&');
-                        } else if ("apos".equalsIgnoreCase(entity)) {
-                            sb.append('\'');
-                        } else if ("lt".equalsIgnoreCase(entity)) {
-                            sb.append('<');
-                        } else if ("gt".equalsIgnoreCase(entity)) {
-                            sb.append('>');
-                        } else {// unsupported xml entity. leave encoded
-                            sb.append('&').append(entity).append(';');
-                        }
-                    }
+                    sb.append(XMLTokener.unescapeEntity(entity));
                     // skip past the entity we just parsed.
                     i += entity.length() + 1;
                 } else {
@@ -363,7 +339,7 @@ public class XML {
                             throw x.syntaxError("Missing value");
                         }
                         jsonobject.accumulate(string,
-                                keepStrings ? unescape((String)token) : stringToValue((String) token));
+                                keepStrings ? ((String)token) : stringToValue((String) token));
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -395,7 +371,7 @@ public class XML {
                             string = (String) token;
                             if (string.length() > 0) {
                                 jsonobject.accumulate("content",
-                                        keepStrings ? unescape(string) : stringToValue(string));
+                                        keepStrings ? string : stringToValue(string));
                             }
 
                         } else if (token == LT) {
@@ -422,14 +398,15 @@ public class XML {
     }
     
     /**
-     * This method is the same as {@link JSONObject.stringToValue(String)}
-     * except that this also tries to unescape String values.
+     * This method is the same as {@link JSONObject#stringToValue(String)}.
      * 
      * @param string String to convert
      * @return JSON value of this string or the string
      */
+    // To maintain compatibility with the Android API, this method is a direct copy of
+    // the one in JSONObject. Changes made here should be reflected there.
     public static Object stringToValue(String string) {
-    	if (string.equals("")) {
+        if (string.equals("")) {
             return string;
         }
         if (string.equalsIgnoreCase("true")) {
@@ -470,8 +447,7 @@ public class XML {
             } catch (Exception ignore) {
             }
         }
-        
-        return unescape(string);
+        return string;
     }
 
     /**

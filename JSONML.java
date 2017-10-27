@@ -172,7 +172,7 @@ public class JSONML {
                             if (!(token instanceof String)) {
                                 throw x.syntaxError("Missing value");
                             }
-                            newjo.accumulate(attribute, keepStrings ? XML.unescape((String)token) :XML.stringToValue((String)token));
+                            newjo.accumulate(attribute, keepStrings ? ((String)token) :XML.stringToValue((String)token));
                             token = null;
                         } else {
                             newjo.accumulate(attribute, "");

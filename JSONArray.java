@@ -1230,7 +1230,7 @@ public class JSONArray implements Iterable<Object> {
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
      * 
-     * @param The JSON pointer
+     * @param jsonPointer The JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
      */
@@ -1323,8 +1323,9 @@ public class JSONArray implements Iterable<Object> {
      * whitespace is added. If it is not possible to produce a syntactically
      * correct JSON text then null will be returned instead. This could occur if
      * the array contains an invalid number.
-     * <p>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
+     * </b>
      *
      * @return a printable, displayable, transmittable representation of the
      *         array.
@@ -1339,9 +1340,24 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Make a pretty-printed JSON text of this JSONArray. Warning: This method
-     * assumes that the data structure is acyclical.
-     *
+     * Make a pretty-printed JSON text of this JSONArray.
+     * 
+     * <p>If <code>indentFactor > 0</code> and the {@link JSONArray} has only
+     * one element, then the array will be output on a single line:
+     * <pre>{@code [1]}</pre>
+     * 
+     * <p>If an array has 2 or more elements, then it will be output across
+     * multiple lines: <pre>{@code
+     * [
+     * 1,
+     * "value 2",
+     * 3
+     * ]
+     * }</pre>
+     * <p><b>
+     * Warning: This method assumes that the data structure is acyclical.
+     * </b>
+     * 
      * @param indentFactor
      *            The number of spaces to add to each level of indentation.
      * @return a printable, displayable, transmittable representation of the
@@ -1360,8 +1376,9 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Write the contents of the JSONArray as JSON text to a writer. For
      * compactness, no whitespace is added.
-     * <p>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
+     *</b>
      *
      * @return The writer.
      * @throws JSONException
@@ -1371,10 +1388,23 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Write the contents of the JSONArray as JSON text to a writer. For
-     * compactness, no whitespace is added.
-     * <p>
+     * Write the contents of the JSONArray as JSON text to a writer.
+     * 
+     * <p>If <code>indentFactor > 0</code> and the {@link JSONArray} has only
+     * one element, then the array will be output on a single line:
+     * <pre>{@code [1]}</pre>
+     * 
+     * <p>If an array has 2 or more elements, then it will be output across
+     * multiple lines: <pre>{@code
+     * [
+     * 1,
+     * "value 2",
+     * 3
+     * ]
+     * }</pre>
+     * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
+     * </b>
      *
      * @param writer
      *            Writes the serialized JSON
