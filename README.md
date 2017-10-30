@@ -81,6 +81,7 @@ When adding a new unit test, don't forget to update <b>JunitTestSuite.java</b>.
 * If you have unit test results along with pull requests, the reviewer has an easier time understanding your code and determining if the it works as intended.
 
 When you start working on a test, add the empty file to the repository and update the readme, so that others will know that test is taken.
+
 **Caveats:**
 JSON-Java is Java 1.6-compatible, but JSON-Java-unit-tests requests Java 1.8. If you see this error, make sure you have 1.8 installed, on your path, and set in JAVA_HOME:
 Execution failed for task ':compileJava'.
