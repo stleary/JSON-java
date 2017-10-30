@@ -84,9 +84,10 @@ When you start working on a test, add the empty file to the repository and updat
 
 **Caveats:**
 JSON-Java is Java 1.6-compatible, but JSON-Java-unit-tests requests Java 1.8. If you see this error, make sure you have 1.8 installed, on your path, and set in JAVA_HOME:
+```
 Execution failed for task ':compileJava'.
 > invalid flag: -parameters
-
+```
 
 A unit test has the following stages:
 
