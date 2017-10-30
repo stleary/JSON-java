@@ -79,6 +79,21 @@ public class JSONArrayTest {
                     e.getMessage());
         }
     }
+    
+    /**
+     * Attempt to create a JSONArray with an unclosed array.
+     * Expects an exception
+     */
+    @Test
+    public void unclosedArray() {
+        try {
+            assertNull("Should throw an exception", new JSONArray("["));
+        } catch (JSONException e) {
+            assertEquals("Expected an exception message", 
+                    "A JSONArray text must start with '[' at 0 [character 1 line 1]",
+                    e.getMessage());
+        }
+    }
 
     /**
      * Attempt to create a JSONArray with a string as object that is
