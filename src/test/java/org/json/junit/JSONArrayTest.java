@@ -90,7 +90,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("["));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "A JSONArray text must start with '[' at 0 [character 1 line 1]",
+                    "Expected a ',' or ']' at 1 [character 2 line 1]",
                     e.getMessage());
         }
     }
