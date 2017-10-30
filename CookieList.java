@@ -1,7 +1,5 @@
 package org.json;
 
-import java.util.Map.Entry;
-
 /*
 Copyright (c) 2002 JSON.org
 
@@ -24,7 +22,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
 
 /**
  * Convert a web browser cookie list string to a JSONObject and back.
@@ -69,17 +67,17 @@ public class CookieList {
      */
     public static String toString(JSONObject jo) throws JSONException {
         boolean             b = false;
-        StringBuilder sb = new StringBuilder();
-        for (final Entry<String,?> entry : jo.entrySet()) {
-        	final String key = entry.getKey();
-        	final Object value = entry.getValue();
+        final StringBuilder sb = new StringBuilder();
+        // Don't use the new entrySet API to maintain Android support
+        for (final String key : jo.keySet()) {
+            final Object value = jo.opt(key);
             if (!JSONObject.NULL.equals(value)) {
                 if (b) {
                     sb.append(';');
                 }
                 sb.append(Cookie.escape(key));
                 sb.append("=");
-				sb.append(Cookie.escape(value.toString()));
+                sb.append(Cookie.escape(value.toString()));
                 b = true;
             }
         }

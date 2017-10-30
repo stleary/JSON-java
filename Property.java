@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 import java.util.Enumeration;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
@@ -41,7 +40,9 @@ public class Property {
      * @throws JSONException
      */
     public static JSONObject toJSONObject(java.util.Properties properties) throws JSONException {
-        JSONObject jo = new JSONObject(properties == null ? 0 : properties.size());
+        // can't use the new constructor for Android support
+        // JSONObject jo = new JSONObject(properties == null ? 0 : properties.size());
+        JSONObject jo = new JSONObject();
         if (properties != null && !properties.isEmpty()) {
             Enumeration<?> enumProperties = properties.propertyNames();
             while(enumProperties.hasMoreElements()) {
@@ -61,10 +62,11 @@ public class Property {
     public static Properties toProperties(JSONObject jo)  throws JSONException {
         Properties  properties = new Properties();
         if (jo != null) {
-            for (final Entry<String, ?> entry : jo.entrySet()) {
-                Object value = entry.getValue();
+        	// Don't use the new entrySet API to maintain Android support
+            for (final String key : jo.keySet()) {
+                Object value = jo.opt(key);
                 if (!JSONObject.NULL.equals(value)) {
-                	properties.put(entry.getKey(), value.toString());
+                    properties.put(key, value.toString());
                 }
             }
         }

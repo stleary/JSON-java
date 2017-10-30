@@ -1,7 +1,5 @@
 package org.json;
 
-import java.util.Map.Entry;
-
 /*
 Copyright (c) 2008 JSON.org
 
@@ -416,10 +414,10 @@ public class JSONML {
 
 // Emit the attributes
 
-            for (final Entry<String, ?> entry : jo.entrySet()) {
-            	final String key = entry.getKey();
+            // Don't use the new entrySet API to maintain Android support
+            for (final String key : jo.keySet()) {
+                final Object value = jo.opt(key);
                 XML.noSpace(key);
-                final Object value = entry.getValue();
                 if (value != null) {
                     sb.append(' ');
                     sb.append(XML.escape(key));
@@ -495,11 +493,11 @@ public class JSONML {
 
 //Emit the attributes
 
-        for (final Entry<String, ?> entry : jo.entrySet()) {
-        	final String key = entry.getKey();
+        // Don't use the new entrySet API to maintain Android support
+        for (final String key : jo.keySet()) {
             if (!"tagName".equals(key) && !"childNodes".equals(key)) {
                 XML.noSpace(key);
-                value = entry.getValue();
+                value = jo.opt(key);
                 if (value != null) {
                     sb.append(' ');
                     sb.append(XML.escape(key));

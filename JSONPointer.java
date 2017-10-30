@@ -5,7 +5,9 @@ import static java.lang.String.format;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /*
 Copyright (c) 2002 JSON.org
@@ -181,7 +183,7 @@ public class JSONPointer {
      * @return the result of the evaluation
      * @throws JSONPointerException if an error occurs during evaluation
      */
-    public Object queryFrom(Object document) {
+    public Object queryFrom(Object document) throws JSONPointerException {
         if (this.refTokens.isEmpty()) {
             return document;
         }
@@ -205,10 +207,9 @@ public class JSONPointer {
      * @param current the JSONArray to be evaluated
      * @param indexToken the array index in string form
      * @return the matched object. If no matching item is found a
-     * JSONPointerException is thrown
+     * @throws JSONPointerException is thrown if the index is out of bounds
      */
-    @SuppressWarnings("boxing")
-    private Object readByIndexToken(Object current, String indexToken) {
+    private Object readByIndexToken(Object current, String indexToken) throws JSONPointerException {
         try {
             int index = Integer.parseInt(indexToken);
             JSONArray currentArr = (JSONArray) current;
@@ -216,7 +217,11 @@ public class JSONPointer {
                 throw new JSONPointerException(format("index %d is out of bounds - the array has %d elements", index,
                         currentArr.length()));
             }
-            return currentArr.get(index);
+            try {
+				return currentArr.get(index);
+			} catch (JSONException e) {
+				throw new JSONPointerException("Error reading value at index position " + index, e);
+			}
         } catch (NumberFormatException e) {
             throw new JSONPointerException(format("%s is not an array index", indexToken), e);
         }
