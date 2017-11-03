@@ -111,7 +111,7 @@ public class JSONArray implements Iterable<Object> {
         char nextChar = x.nextClean();
         if (nextChar == 0) {
             // array is unclosed. No ']' found, instead EOF
-            throw new JSONException(x.syntaxError("Expected a ',' or ']'"));
+            throw x.syntaxError("Expected a ',' or ']'");
         }
         if (nextChar != ']') {
             x.back();
@@ -126,12 +126,12 @@ public class JSONArray implements Iterable<Object> {
                 switch (x.nextClean()) {
                 case 0:
                     // array is unclosed. No ']' found, instead EOF
-                    throw new JSONException(x.syntaxError("Expected a ',' or ']'"));
+                    throw x.syntaxError("Expected a ',' or ']'");
                 case ',':
                     nextChar = x.nextClean();
                     if (nextChar == 0) {
                         // array is unclosed. No ']' found, instead EOF
-                        throw new JSONException(x.syntaxError("Expected a ',' or ']'"));
+                        throw x.syntaxError("Expected a ',' or ']'");
                     }
                     if (nextChar == ']') {
                         return;
