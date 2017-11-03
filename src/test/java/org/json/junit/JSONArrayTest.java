@@ -30,7 +30,7 @@ import com.jayway.jsonpath.JsonPath;
  * Tests for JSON-Java JSONArray.java
  */
 public class JSONArrayTest {
-    String arrayStr = 
+    private final String arrayStr = 
             "["+
                 "true,"+
                 "false,"+
@@ -76,6 +76,51 @@ public class JSONArrayTest {
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
                     "A JSONArray text must start with '[' at 0 [character 1 line 1]",
+                    e.getMessage());
+        }
+    }
+    
+    /**
+     * Attempt to create a JSONArray with an unclosed array.
+     * Expects an exception
+     */
+    @Test
+    public void unclosedArray() {
+        try {
+            assertNull("Should throw an exception", new JSONArray("["));
+        } catch (JSONException e) {
+            assertEquals("Expected an exception message", 
+                    "Expected a ',' or ']' at 1 [character 2 line 1]",
+                    e.getMessage());
+        }
+    }
+    
+    /**
+     * Attempt to create a JSONArray with an unclosed array.
+     * Expects an exception
+     */
+    @Test
+    public void unclosedArray2() {
+        try {
+            assertNull("Should throw an exception", new JSONArray("[\"test\""));
+        } catch (JSONException e) {
+            assertEquals("Expected an exception message", 
+                    "Expected a ',' or ']' at 7 [character 8 line 1]",
+                    e.getMessage());
+        }
+    }
+    
+    /**
+     * Attempt to create a JSONArray with an unclosed array.
+     * Expects an exception
+     */
+    @Test
+    public void unclosedArray3() {
+        try {
+            assertNull("Should throw an exception", new JSONArray("[\"test\","));
+        } catch (JSONException e) {
+            assertEquals("Expected an exception message", 
+                    "Expected a ',' or ']' at 8 [character 9 line 1]",
                     e.getMessage());
         }
     }
@@ -357,7 +402,7 @@ public class JSONArrayTest {
         assertTrue("expected empty JSONArray length 0",
                 new JSONArray().length() == 0);
         JSONArray jsonArray = new JSONArray(this.arrayStr);
-        assertTrue("expected JSONArray length 13", jsonArray.length() == 13);
+        assertTrue("expected JSONArray length 13. instead found "+jsonArray.length(), jsonArray.length() == 13);
         JSONArray nestedJsonArray = jsonArray.getJSONArray(9);
         assertTrue("expected JSONArray length 1", nestedJsonArray.length() == 1);
     }
