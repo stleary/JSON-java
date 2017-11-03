@@ -107,7 +107,13 @@ public class JSONArray implements Iterable<Object> {
         if (x.nextClean() != '[') {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
-        if (x.nextClean() != ']') {
+        
+        char nextChar = x.nextClean();
+        if (nextChar == 0) {
+            // array is unclosed. No ']' found, instead EOF
+            throw new JSONException(x.syntaxError("Expected a ',' or ']'"));
+        }
+        if (nextChar != ']') {
             x.back();
             for (;;) {
                 if (x.nextClean() == ',') {
@@ -118,8 +124,16 @@ public class JSONArray implements Iterable<Object> {
                     this.myArrayList.add(x.nextValue());
                 }
                 switch (x.nextClean()) {
+                case 0:
+                    // array is unclosed. No ']' found, instead EOF
+                    throw new JSONException(x.syntaxError("Expected a ',' or ']'"));
                 case ',':
-                    if (x.nextClean() == ']') {
+                    nextChar = x.nextClean();
+                    if (nextChar == 0) {
+                        // array is unclosed. No ']' found, instead EOF
+                        throw new JSONException(x.syntaxError("Expected a ',' or ']'"));
+                    }
+                    if (nextChar == ']') {
                         return;
                     }
                     x.back();
