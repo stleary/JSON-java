@@ -1950,6 +1950,8 @@ public class JSONObject {
      *            A String.
      * @return A simple JSON value.
      */
+    // Changes to this method must be copied to the corresponding method in
+    // the XML class to keep full support for Android
     public static Object stringToValue(String string) {
         if (string.equals("")) {
             return string;
@@ -2120,55 +2122,11 @@ public class JSONObject {
      *             If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
-        if (value == null || value.equals(null)) {
-            return "null";
-        }
-        if (value instanceof JSONString) {
-            Object object;
-            try {
-                object = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            if (object instanceof String) {
-                return (String) object;
-            }
-            throw new JSONException("Bad value from toJSONString: " + object);
-        }
-        if (value instanceof Number) {
-            // not all Numbers may match actual JSON Numbers. i.e. Fractions or Complex
-            final String numberAsString = numberToString((Number) value);
-            try {
-                // Use the BigDecimal constructor for it's parser to validate the format.
-                @SuppressWarnings("unused")
-                BigDecimal unused = new BigDecimal(numberAsString);
-                // Close enough to a JSON number that we will return it unquoted
-                return numberAsString;
-            } catch (NumberFormatException ex){
-                // The Number value is not a valid JSON number.
-                // Instead we will quote it as a string
-                return quote(numberAsString);
-            }
-        }
-        if (value instanceof Boolean || value instanceof JSONObject
-                || value instanceof JSONArray) {
-            return value.toString();
-        }
-        if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            return new JSONObject(map).toString();
-        }
-        if (value instanceof Collection) {
-            Collection<?> coll = (Collection<?>) value;
-            return new JSONArray(coll).toString();
-        }
-        if (value.getClass().isArray()) {
-            return new JSONArray(value).toString();
-        }
-        if(value instanceof Enum<?>){
-            return quote(((Enum<?>)value).name());
-        }
-        return quote(value.toString());
+    	// moves the implementation to JSONWriter as:
+    	// 1. It makes more sense to be part of the writer class
+    	// 2. For Android support this method is not available. By implementing it in the Writer
+    	//    Android users can use the writer with the built in Android JSONObject implementation.
+        return JSONWriter.valueToString(value);
     }
 
     /**

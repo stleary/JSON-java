@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 import java.util.Locale;
-import java.util.Map.Entry;
 
 /**
  * Convert an HTTP header to a JSONObject and back.
@@ -145,11 +144,12 @@ public class HTTP {
             throw new JSONException("Not enough material for an HTTP header.");
         }
         sb.append(CRLF);
-        for (final Entry<String,?> entry : jo.entrySet()) {
-        	final String key = entry.getKey();
+        // Don't use the new entrySet API to maintain Android support
+        for (final String key : jo.keySet()) {
+            String value = jo.optString(key);
             if (!"HTTP-Version".equals(key)      && !"Status-Code".equals(key) &&
                     !"Reason-Phrase".equals(key) && !"Method".equals(key) &&
-                    !"Request-URI".equals(key)   && !JSONObject.NULL.equals(entry.getValue())) {
+                    !"Request-URI".equals(key)   && !JSONObject.NULL.equals(value)) {
                 sb.append(key);
                 sb.append(": ");
                 sb.append(jo.optString(key));
