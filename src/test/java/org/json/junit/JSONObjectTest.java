@@ -63,7 +63,7 @@ public class JSONObjectTest {
      * Tests that the similar method is working as expected.
      */
     @Test
-    public void aaaVerifySimilar() {
+    public void verifySimilar() {
         final String string1 = "HasSameRef";
         JSONObject obj1 = new JSONObject()
                 .put("key1", "abc")

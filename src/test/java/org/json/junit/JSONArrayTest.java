@@ -59,7 +59,7 @@ public class JSONArrayTest {
      * Tests that the similar method is working as expected.
      */
     @Test
-    public void aaaVerifySimilar() {
+    public void verifySimilar() {
         final String string1 = "HasSameRef";
         JSONArray obj1 = new JSONArray()
                 .put("abc")
