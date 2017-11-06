@@ -1,6 +1,7 @@
 package org.json.junit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -54,6 +55,32 @@ public class JSONArrayTest {
                 "\"-1\""+
             "]";
 
+    /**
+     * Tests that the similar method is working as expected.
+     */
+    @Test
+    public void aaaVerifySimilar() {
+        final String string1 = "HasSameRef";
+        JSONArray obj1 = new JSONArray()
+                .put("abc")
+                .put(string1)
+                .put(2);
+        
+        JSONArray obj2 = new JSONArray()
+                .put("abc")
+                .put(string1)
+                .put(3);
+
+        JSONArray obj3 = new JSONArray()
+                .put("abc")
+                .put(new String(string1))
+                .put(2);
+        
+        assertFalse("Should eval to false", obj1.similar(obj2));
+        
+        assertTrue("Should eval to true", obj1.similar(obj3));
+    }
+        
     /**
      * Attempt to create a JSONArray with a null string.
      * Expects a NullPointerException.
