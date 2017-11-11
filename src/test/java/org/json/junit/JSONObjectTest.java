@@ -58,6 +58,33 @@ import com.jayway.jsonpath.JsonPath;
  * otherwise be impossible.
  */
 public class JSONObjectTest {
+    
+    /**
+     * Tests that the similar method is working as expected.
+     */
+    @Test
+    public void verifySimilar() {
+        final String string1 = "HasSameRef";
+        JSONObject obj1 = new JSONObject()
+                .put("key1", "abc")
+                .put("key2", 2)
+                .put("key3", string1);
+        
+        JSONObject obj2 = new JSONObject()
+                .put("key1", "abc")
+                .put("key2", 3)
+                .put("key3", string1);
+
+        JSONObject obj3 = new JSONObject()
+                .put("key1", "abc")
+                .put("key2", 2)
+                .put("key3", new String(string1));
+        
+        assertFalse("Should eval to false", obj1.similar(obj2));
+        
+        assertTrue("Should eval to true", obj1.similar(obj3));
+        
+    }
 
     /**
      * JSONObject built from a bean, but only using a null value.
