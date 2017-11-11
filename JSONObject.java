@@ -1844,7 +1844,7 @@ public class JSONObject {
                 Object valueThis = entry.getValue();
                 Object valueOther = ((JSONObject)other).get(name);
                 if(valueThis == valueOther) {
-                	return true;
+                	continue;
                 }
                 if(valueThis == null) {
                 	return false;

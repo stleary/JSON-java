@@ -1289,7 +1289,7 @@ public class JSONArray implements Iterable<Object> {
             Object valueThis = this.myArrayList.get(i);
             Object valueOther = ((JSONArray)other).myArrayList.get(i);
             if(valueThis == valueOther) {
-            	return true;
+            	continue;
             }
             if(valueThis == null) {
             	return false;
