@@ -32,7 +32,7 @@ tokens. It can be constructed from a String, Reader, or InputStream.
 JSONException.java: The JSONException is the standard exception type thrown
 by this package.
 
-JSONPointer.java: Implementation of 
+JSONPointer.java: Implementation of
 [JSON Pointer (RFC 6901)](https://tools.ietf.org/html/rfc6901). Supports
 JSON Pointers both in the form of string representation and URI fragment
 representation.
@@ -65,16 +65,16 @@ JSONML.java: JSONML provides support for converting between JSONML and XML.
 
 XMLTokener.java: XMLTokener extends JSONTokener for parsing XML text.
 
-Unit tests are maintained in a separate project. Contributing developers can test 
-JSON-java pull requests with the code in this project: 
+Unit tests are maintained in a separate project. Contributing developers can test
+JSON-java pull requests with the code in this project:
 https://github.com/stleary/JSON-Java-unit-test
 
-Numeric types in this package comply with ECMA-404: The JSON Data Interchange Format 
-(http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and 
-RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format 
-(https://tools.ietf.org/html/rfc7159#section-6). 
-This package fully supports Integer, Long, and Double Java types. Partial support 
-for BigInteger and BigDecimal values in JSONObject and JSONArray objects is provided 
+Numeric types in this package comply with ECMA-404: The JSON Data Interchange Format
+(http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and
+RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format
+(https://tools.ietf.org/html/rfc7159#section-6).
+This package fully supports Integer, Long, and Double Java types. Partial support
+for BigInteger and BigDecimal values in JSONObject and JSONArray objects is provided
 in the form of get(), opt(), and put() API methods.
 
 Although 1.6 compatibility is currently supported, it is not a project goal and may be
@@ -95,10 +95,10 @@ Release history:
 
 20160810    Revert code that was breaking opt*() methods.
 
-20160807    This release contains a bug in the JSONObject.opt*() and JSONArray.opt*() methods, 
+20160807    This release contains a bug in the JSONObject.opt*() and JSONArray.opt*() methods,
 it is not recommended for use.
 Java 1.6 compatability fixed, JSONArray.toList() and JSONObject.toMap(),
-RFC4180 compatibility, JSONPointer, some exception fixes, optional XML type conversion. 
+RFC4180 compatibility, JSONPointer, some exception fixes, optional XML type conversion.
 Contains the latest code as of 7 Aug, 2016
 
 20160212    Java 1.6 compatibility, OSGi bundle. Contains the latest code as of 12 Feb, 2016.
@@ -106,9 +106,9 @@ Contains the latest code as of 7 Aug, 2016
 20151123    JSONObject and JSONArray initialization with generics. Contains the
 latest code as of 23 Nov, 2015.
 
-20150729    Checkpoint for Maven central repository release. Contains the latest code 
-as of 29 July, 2015. 
+20150729    Checkpoint for Maven central repository release. Contains the latest code
+as of 29 July, 2015.
 
-JSON-java releases can be found by searching the Maven repository for groupId "org.json" 
-and artifactId "json". For example: 
+JSON-java releases can be found by searching the Maven repository for groupId "org.json"
+and artifactId "json". For example:
 https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.json%22%20AND%20a%3A%22json%22
