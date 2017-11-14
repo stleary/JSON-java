@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/org.json/json.svg)](https://mvnrepository.com/artifact/org.json/json)
+
 JSON in Java [package org.json]
 
 JSON is a light-weight, language independent, data interchange format.
