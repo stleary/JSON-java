@@ -91,6 +91,8 @@ invalid number formats (1.2e6.3) will cause errors as such documents can not be 
  reliably.
 
 Release history:
+
+~~~
 20171018    Checkpoint for recent commits.
 
 20170516    Roll up recent commits.
@@ -110,6 +112,8 @@ latest code as of 23 Nov, 2015.
 
 20150729    Checkpoint for Maven central repository release. Contains the latest code
 as of 29 July, 2015.
+~~~
+
 
 JSON-java releases can be found by searching the Maven repository for groupId "org.json"
 and artifactId "json". For example:
