@@ -66,7 +66,7 @@ cookie lists.
 
 **JSONML.java**: `JSONML` provides support for converting between JSONML and XML.
 
-**XMLTokener.java**: `XMLTokener` extends JSONTokener for parsing XML text.
+**XMLTokener.java**: `XMLTokener` extends `JSONTokener` for parsing XML text.
 
 Unit tests are maintained in a separate project. Contributing developers can test
 JSON-java pull requests with the code in this project:
@@ -76,9 +76,9 @@ Numeric types in this package comply with ECMA-404: The JSON Data Interchange Fo
 (http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and
 RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format
 (https://tools.ietf.org/html/rfc7159#section-6).
-This package fully supports Integer, Long, and Double Java types. Partial support
-for BigInteger and BigDecimal values in JSONObject and JSONArray objects is provided
-in the form of get(), opt(), and put() API methods.
+This package fully supports `Integer`, `Long`, and `Double` Java types. Partial support
+for `BigInteger` and `BigDecimal` values in `JSONObject` and `JSONArray` objects is provided
+in the form of `get()`, `opt()`, and `put()` API methods.
 
 Although 1.6 compatibility is currently supported, it is not a project goal and may be
 removed in some future release.
