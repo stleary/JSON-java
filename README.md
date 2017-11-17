@@ -72,10 +72,9 @@ Unit tests are maintained in a separate project. Contributing developers can tes
 JSON-java pull requests with the code in this project:
 https://github.com/stleary/JSON-Java-unit-test
 
-Numeric types in this package comply with ECMA-404: The JSON Data Interchange Format
-(http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and
-RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format
-(https://tools.ietf.org/html/rfc7159#section-6).
+Numeric types in this package comply with
+[ECMA-404: The JSON Data Interchange Format](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and
+[RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format](https://tools.ietf.org/html/rfc7159#section-6).
 This package fully supports `Integer`, `Long`, and `Double` Java types. Partial support
 for `BigInteger` and `BigDecimal` values in `JSONObject` and `JSONArray` objects is provided
 in the form of `get()`, `opt()`, and `put()` API methods.
