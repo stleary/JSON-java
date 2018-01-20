@@ -2212,7 +2212,7 @@ public class JSONObject {
             // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
             final String numberAsString = numberToString((Number) value);
             try {
-                // Use the BigDecimal constructor for it's parser to validate the format.
+                // Use the BigDecimal constructor for its parser to validate the format.
                 @SuppressWarnings("unused")
                 BigDecimal testNum = new BigDecimal(numberAsString);
                 // Close enough to a JSON number that we will use it unquoted
