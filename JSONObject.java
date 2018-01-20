@@ -1589,6 +1589,22 @@ public class JSONObject {
     }
 
     /**
+     * Put a key/char pair in the JSONObject.
+     *
+     * @param key
+     *            A key string.
+     * @param value
+     *            A char which is the value.
+     * @return this.
+     * @throws JSONException
+     *             If the key is null.
+     */
+    public JSONObject put(String key, char value) throws JSONException {
+        this.put(key, Character.valueOf(value));
+        return this;
+    }
+
+    /**
      * Put a key/value pair in the JSONObject. If the value is null, then the
      * key will be removed from the JSONObject if it is present.
      *
