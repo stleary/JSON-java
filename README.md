@@ -93,6 +93,8 @@ invalid number formats (1.2e6.3) will cause errors as such documents can not be 
 Release history:
 
 ~~~
+20180130    Recent commits
+
 20171018    Checkpoint for recent commits.
 
 20170516    Roll up recent commits.
