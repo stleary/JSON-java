@@ -266,7 +266,7 @@ public class JSONObjectTest {
         JSONObject jsonObject = new JSONObject(new MyNumberContainer());
         String actual = jsonObject.toString();
         String expected = "{\"myNumber\":{\"number\":42}}";
-        assertEquals("Not Equal", expected , actual);
+        assertEquals("Equal", expected , actual);
         
         /**
          * JSONObject.put() handles objects differently than the 
@@ -280,7 +280,7 @@ public class JSONObjectTest {
         jsonObject.put("myNumber", new MyNumber());
         actual = jsonObject.toString();
         expected = "{\"myNumber\":42}";
-        assertEquals("Not Equal", expected , actual);
+        assertEquals("Equal", expected , actual);
 
         /**
          * Calls the JSONObject(Map) ctor, which calls wrap() for values.
@@ -293,7 +293,7 @@ public class JSONObjectTest {
         jsonObject = new JSONObject(Collections.singletonMap("myNumber", new AtomicInteger(42)));
         actual = jsonObject.toString();
         expected = "{\"myNumber\":\"42\"}";
-        assertEquals("Not Equal", expected , actual);
+        assertEquals("Equal", expected , actual);
 
         /**
          * JSONObject.put() inserts the AtomicInteger directly into the
@@ -305,7 +305,7 @@ public class JSONObjectTest {
         jsonObject.put("myNumber", new AtomicInteger(42));
         actual = jsonObject.toString();
         expected = "{\"myNumber\":42}";
-        assertEquals("Not Equal", expected , actual);
+        assertEquals("Equal", expected , actual);
 
         /**
          * Calls the JSONObject(Map) ctor, which calls wrap() for values.
@@ -332,7 +332,7 @@ public class JSONObjectTest {
         jsonObject.put("myNumber", new Fraction(4,2));
         actual = jsonObject.toString();
         expected = "{\"myNumber\":\"4/2\"}"; // valid JSON, bug fixed
-        assertEquals("Not Equal", expected , actual);
+        assertEquals("Equal", expected , actual);
     }
 
     /**
