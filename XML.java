@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Iterator;
 
 /**
@@ -470,6 +472,56 @@ public class XML {
         return toJSONObject(string, false);
     }
 
+    /**
+     * Convert a well-formed (but not necessarily valid) XML into a
+     * JSONObject. Some information may be lost in this transformation because
+     * JSON is a data format and XML is a document format. XML uses elements,
+     * attributes, and content text, while JSON uses unordered collections of
+     * name/value pairs and arrays of values. JSON does not does not like to
+     * distinguish between elements and attributes. Sequences of similar
+     * elements are represented as JSONArrays. Content text may be placed in a
+     * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code>
+     * are ignored.
+     *
+     * @param reader The XML source reader.
+     * @return A JSONObject containing the structured data from the XML string.
+     * @throws JSONException Thrown if there is an errors while parsing the string
+     */
+    public static JSONObject toJSONObject(Reader reader) throws JSONException {
+        return toJSONObject(reader, false);
+    }
+
+    /**
+     * Convert a well-formed (but not necessarily valid) XML into a
+     * JSONObject. Some information may be lost in this transformation because
+     * JSON is a data format and XML is a document format. XML uses elements,
+     * attributes, and content text, while JSON uses unordered collections of
+     * name/value pairs and arrays of values. JSON does not does not like to
+     * distinguish between elements and attributes. Sequences of similar
+     * elements are represented as JSONArrays. Content text may be placed in a
+     * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code>
+     * are ignored.
+     *
+     * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
+     * numbers but will instead be the exact value as seen in the XML document.
+     *
+     * @param reader The XML source reader.
+     * @param keepStrings If true, then values will not be coerced into boolean
+     *  or numeric values and will instead be left as strings
+     * @return A JSONObject containing the structured data from the XML string.
+     * @throws JSONException Thrown if there is an errors while parsing the string
+     */
+    public static JSONObject toJSONObject(Reader reader, boolean keepStrings) throws JSONException {
+        JSONObject jo = new JSONObject();
+        XMLTokener x = new XMLTokener(reader);
+        while (x.more()) {
+            x.skipPast("<");
+            if(x.more()) {
+                parse(x, jo, null, keepStrings);
+            }
+        }
+        return jo;
+    }
 
     /**
      * Convert a well-formed (but not necessarily valid) XML string into a
@@ -493,16 +545,9 @@ public class XML {
      * @throws JSONException Thrown if there is an errors while parsing the string
      */
     public static JSONObject toJSONObject(String string, boolean keepStrings) throws JSONException {
-        JSONObject jo = new JSONObject();
-        XMLTokener x = new XMLTokener(string);
-        while (x.more()) {
-        	x.skipPast("<");
-        	if(x.more()) {
-        		parse(x, jo, null, keepStrings);
-        	}
-        }
-        return jo;
+        return toJSONObject(new StringReader(string), keepStrings);
     }
+
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
      * 

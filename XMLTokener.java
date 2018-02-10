@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import java.io.Reader;
+
 /**
  * The XMLTokener extends the JSONTokener to provide additional methods
  * for the parsing of XML texts.
@@ -46,6 +48,14 @@ public class XMLTokener extends JSONTokener {
        entity.put("lt",   XML.LT);
        entity.put("quot", XML.QUOT);
    }
+
+    /**
+     * Construct an XMLTokener from a Reader.
+     * @param r A source reader.
+     */
+    public XMLTokener(Reader r) {
+        super(r);
+    }
 
     /**
      * Construct an XMLTokener from a string.
