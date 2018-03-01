@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * A JSONArray is an ordered sequence of values. Its external text form is a
@@ -86,6 +87,17 @@ public class JSONArray implements Iterable<Object> {
      * The arrayList where the JSONArray's properties are kept.
      */
     private final ArrayList<Object> myArrayList;
+
+
+    /**
+     * Returns a stream from this array. This is a stream of objects.
+     * @return a Java 8 stream of objects representing the objects in this array.
+     */
+
+    public Stream<Object> stream()
+    {
+        return myArrayList.stream();
+    }
 
     /**
      * Construct an empty JSONArray.
