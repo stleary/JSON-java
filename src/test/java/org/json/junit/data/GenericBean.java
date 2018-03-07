@@ -20,7 +20,7 @@ public class GenericBean<T extends Number & Comparable<T>> implements MyBean {
     }
 
     /** */
-    private T genericValue;
+    protected T genericValue;
     /** to be used by the calling test to see how often the getter is called */
     public int genericGetCounter;
     /** to be used by the calling test to see how often the setter is called */

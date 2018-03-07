@@ -37,6 +37,8 @@ import org.json.junit.data.Fraction;
 import org.json.junit.data.GenericBean;
 import org.json.junit.data.GenericBeanInt;
 import org.json.junit.data.MyBean;
+import org.json.junit.data.MyBeanCustomName;
+import org.json.junit.data.MyBeanCustomNameSubClass;
 import org.json.junit.data.MyBigNumberBean;
 import org.json.junit.data.MyEnum;
 import org.json.junit.data.MyEnumField;
@@ -371,7 +373,7 @@ public class JSONObjectTest {
 
     
     /**
-     * Verifies that the put Map has backwards compatability with RAW types pre-java5.
+     * Verifies that the put Map has backwards compatibility with RAW types pre-java5.
      */
     @Test
     public void verifyPutMap() {
@@ -467,7 +469,7 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void jsonObjectByBean() {
+    public void jsonObjectByBean1() {
         /**
          * Default access classes have to be mocked since JSONObject, which is
          * not in the same package, cannot call MyBean methods by reflection.
@@ -499,6 +501,73 @@ public class JSONObjectTest {
         assertTrue("expected 2 callbacks items", ((List<?>)(JsonPath.read(doc, "$.callbacks"))).size() == 2);
         assertTrue("expected 0 handler items", ((Map<?,?>)(JsonPath.read(doc, "$.callbacks[0].handler"))).size() == 0);
         assertTrue("expected 0 callbacks[1] items", ((Map<?,?>)(JsonPath.read(doc, "$.callbacks[1]"))).size() == 0);
+    }
+
+    /**
+     * JSONObject built from a bean that has custom field names.
+     */
+    @Test
+    public void jsonObjectByBean2() {
+        JSONObject jsonObject = new JSONObject(new MyBeanCustomName());
+        assertNotNull(jsonObject);
+        assertEquals("Wrong number of keys found:",
+                5,
+                jsonObject.keySet().size());
+        assertFalse("Normal field name (someString) processing did not work",
+                jsonObject.has("someString"));
+        assertFalse("Normal field name (myDouble) processing did not work",
+                jsonObject.has("myDouble"));
+        assertFalse("Normal field name (someFloat) found",
+                jsonObject.has("someFloat"));
+        assertFalse("Ignored field found!",
+                jsonObject.has("ignoredInt"));
+        assertTrue("Normal field name (someInt) processing did not work",
+                jsonObject.has("someInt"));
+        assertTrue("Normal field name (someLong) processing did not work",
+                jsonObject.has("someLong"));
+        assertTrue("Overridden String field name (myStringField) not found",
+                jsonObject.has("myStringField"));
+        assertTrue("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) not found",
+                jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"));
+        assertTrue("Overridden String field name (InterfaceField) not found",
+                jsonObject.has("InterfaceField"));
+    }
+    
+    /**
+     * JSONObject built from a bean that has custom field names inherited from a parent class.
+     */
+    @Test
+    public void jsonObjectByBean3() {
+        JSONObject jsonObject = new JSONObject(new MyBeanCustomNameSubClass());
+        assertNotNull(jsonObject);
+        assertEquals("Wrong number of keys found:",
+                7,
+                jsonObject.keySet().size());
+        assertFalse("Normal int field name (someInt) found, but was overridden",
+                jsonObject.has("someInt"));
+        assertFalse("Normal field name (myDouble) processing did not work",
+                jsonObject.has("myDouble"));
+        assertFalse("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) FOUND!",
+                jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"));
+        assertFalse("Normal field name (someFloat) found",
+                jsonObject.has("someFloat"));
+        assertFalse("Ignored field found!",
+                jsonObject.has("ignoredInt"));
+        assertFalse("Ignored field at the same level as forced name found",
+                jsonObject.has("ShouldBeIgnored"));
+        assertTrue("Overridden int field name (newIntFieldName) not found",
+                jsonObject.has("newIntFieldName"));
+        assertTrue("Normal field name (someLong) processing did not work",
+                jsonObject.has("someLong"));
+        assertTrue("Overridden String field name (myStringField) not found",
+                jsonObject.has("myStringField"));
+        assertTrue(jsonObject.has("AMoreNormalName"));
+        assertTrue("Overridden String field name (InterfaceField) not found",
+                jsonObject.has("InterfaceField"));
+        assertTrue("Forced field not found!",
+                jsonObject.has("forcedInt"));
+        assertTrue("Normally ignored field (getable) with explicit property name not found",
+                jsonObject.has("Getable"));
     }
 
     /**
@@ -541,7 +610,7 @@ public class JSONObjectTest {
         assertTrue("expected \"later\":\"Later, \"", "Later, ".equals(jsonObject.query("/farewells/later")));
         assertTrue("expected \"world\":\"World!\"", "Alligator!".equals(jsonObject.query("/farewells/gator")));
     }
-
+    
     /**
      * Exercise the JSONObject.accumulate() method
      */
@@ -2857,7 +2926,7 @@ public class JSONObjectTest {
     public void testGenericIntBean() {
         GenericBeanInt bean = new GenericBeanInt(42);
         final JSONObject jo = new JSONObject(bean);
-        assertEquals(jo.keySet().toString(), 9, jo.length());
+        assertEquals(jo.keySet().toString(), 10, jo.length());
         assertEquals(42, jo.get("genericValue"));
         assertEquals("Expected the getter to only be called once",
                 1, bean.genericGetCounter);

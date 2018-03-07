@@ -13,7 +13,7 @@ public class GenericBeanInt extends GenericBean<Integer> {
 
     /** @return the a */
     public char getA() {
-        return a;
+        return this.a;
     }
 
     /**
@@ -23,6 +23,33 @@ public class GenericBeanInt extends GenericBean<Integer> {
      */
     public boolean getable() {
         return false;
+    }
+
+    /**
+     * Should not be beanable
+     * 
+     * @return false
+     */
+    public boolean get() {
+        return false;
+    }
+
+    /**
+     * Should not be beanable
+     * 
+     * @return false
+     */
+    public boolean is() {
+        return false;
+    }
+
+    /**
+     * Should be beanable
+     * 
+     * @return false
+     */
+    public boolean isB() {
+        return this.genericValue.equals((Integer.valueOf(this.a+1)));
     }
 
     /**
