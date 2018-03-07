@@ -271,6 +271,10 @@ public class JSONObject {
      * @param m
      *            A map object that can be used to initialize the contents of
      *            the JSONObject.
+     * @throws JSONException
+     *            If a value in the map is non-finite number.
+     * @throws NullPointerException
+     *            If a key in the map is <code>null</code>
      */
     public JSONObject(Map<?, ?> m) {
         if (m == null) {
@@ -278,6 +282,9 @@ public class JSONObject {
         } else {
             this.map = new HashMap<String, Object>(m.size());
         	for (final Entry<?, ?> e : m.entrySet()) {
+        	    if(e.getKey() == null) {
+        	        throw new NullPointerException("Null key.");
+        	    }
                 final Object value = e.getValue();
                 if (value != null) {
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
@@ -428,7 +435,9 @@ public class JSONObject {
      *            An object to be accumulated under the key.
      * @return this.
      * @throws JSONException
-     *             If the value is an invalid number or if the key is null.
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject accumulate(String key, Object value) throws JSONException {
         testValidity(value);
@@ -457,8 +466,10 @@ public class JSONObject {
      *            An object to be accumulated under the key.
      * @return this.
      * @throws JSONException
-     *             If the key is null or if the current value associated with
+     *            If the value is non-finite number or if the current value associated with
      *             the key is not a JSONArray.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject append(String key, Object value) throws JSONException {
         testValidity(value);
@@ -856,13 +867,13 @@ public class JSONObject {
     }
 
     /**
-     * Determine if the value associated with the key is null or if there is no
+     * Determine if the value associated with the key is <code>null</code> or if there is no
      * value.
      *
      * @param key
      *            A key string.
      * @return true if there is no value associated with the key or if the value
-     *         is the JSONObject.NULL object.
+     *        is the JSONObject.NULL object.
      */
     public boolean isNull(String key) {
         return JSONObject.NULL.equals(this.opt(key));
@@ -922,7 +933,7 @@ public class JSONObject {
      * JSONObject.
      *
      * @return A JSONArray containing the key strings, or null if the JSONObject
-     *         is empty.
+     *        is empty.
      */
     public JSONArray names() {
     	if(this.map.isEmpty()) {
@@ -1485,11 +1496,12 @@ public class JSONObject {
      *            A boolean which is the value.
      * @return this.
      * @throws JSONException
-     *             If the key is null.
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject put(String key, boolean value) throws JSONException {
-        this.put(key, value ? Boolean.TRUE : Boolean.FALSE);
-        return this;
+        return this.put(key, value ? Boolean.TRUE : Boolean.FALSE);
     }
 
     /**
@@ -1502,10 +1514,12 @@ public class JSONObject {
      *            A Collection value.
      * @return this.
      * @throws JSONException
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject put(String key, Collection<?> value) throws JSONException {
-        this.put(key, new JSONArray(value));
-        return this;
+        return this.put(key, new JSONArray(value));
     }
 
     /**
@@ -1517,11 +1531,12 @@ public class JSONObject {
      *            A double which is the value.
      * @return this.
      * @throws JSONException
-     *             If the key is null or if the number is invalid.
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject put(String key, double value) throws JSONException {
-        this.put(key, Double.valueOf(value));
-        return this;
+        return this.put(key, Double.valueOf(value));
     }
     
     /**
@@ -1533,11 +1548,12 @@ public class JSONObject {
      *            A float which is the value.
      * @return this.
      * @throws JSONException
-     *             If the key is null or if the number is invalid.
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject put(String key, float value) throws JSONException {
-        this.put(key, Float.valueOf(value));
-        return this;
+        return this.put(key, Float.valueOf(value));
     }
 
     /**
@@ -1549,11 +1565,12 @@ public class JSONObject {
      *            An int which is the value.
      * @return this.
      * @throws JSONException
-     *             If the key is null.
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject put(String key, int value) throws JSONException {
-        this.put(key, Integer.valueOf(value));
-        return this;
+        return this.put(key, Integer.valueOf(value));
     }
 
     /**
@@ -1565,11 +1582,12 @@ public class JSONObject {
      *            A long which is the value.
      * @return this.
      * @throws JSONException
-     *             If the key is null.
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject put(String key, long value) throws JSONException {
-        this.put(key, Long.valueOf(value));
-        return this;
+        return this.put(key, Long.valueOf(value));
     }
 
     /**
@@ -1582,14 +1600,16 @@ public class JSONObject {
      *            A Map value.
      * @return this.
      * @throws JSONException
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject put(String key, Map<?, ?> value) throws JSONException {
-        this.put(key, new JSONObject(value));
-        return this;
+        return this.put(key, new JSONObject(value));
     }
 
     /**
-     * Put a key/value pair in the JSONObject. If the value is null, then the
+     * Put a key/value pair in the JSONObject. If the value is <code>null</code>, then the
      * key will be removed from the JSONObject if it is present.
      *
      * @param key
@@ -1600,7 +1620,9 @@ public class JSONObject {
      *            String, or the JSONObject.NULL object.
      * @return this.
      * @throws JSONException
-     *             If the value is non-finite number or if the key is null.
+     *            If the value is non-finite number.
+     * @throws NullPointerException
+     *            If the key is <code>null</code>.
      */
     public JSONObject put(String key, Object value) throws JSONException {
         if (key == null) {
@@ -1631,7 +1653,7 @@ public class JSONObject {
             if (this.opt(key) != null) {
                 throw new JSONException("Duplicate key \"" + key + "\"");
             }
-            this.put(key, value);
+            return this.put(key, value);
         }
         return this;
     }
@@ -1652,7 +1674,7 @@ public class JSONObject {
      */
     public JSONObject putOpt(String key, Object value) throws JSONException {
         if (key != null && value != null) {
-            this.put(key, value);
+            return this.put(key, value);
         }
         return this;
     }
@@ -2130,7 +2152,7 @@ public class JSONObject {
     }
 
     /**
-     * Wrap an object, if necessary. If the object is null, return the NULL
+     * Wrap an object, if necessary. If the object is <code>null</code>, return the NULL
      * object. If it is an array or collection, wrap it in a JSONArray. If it is
      * a map, wrap it in a JSONObject. If it is a standard property (Double,
      * String, et al) then it is already wrapped. Otherwise, if it comes from
