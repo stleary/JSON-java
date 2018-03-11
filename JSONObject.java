@@ -291,15 +291,16 @@ public class JSONObject {
      * Construct a JSONObject from an Object using bean getters. It reflects on
      * all of the public methods of the object. For each of the methods with no
      * parameters and a name starting with <code>"get"</code> or
-     * <code>"is"</code>, the method is invoked, and a key and the value
-     * returned from the getter method are put into the new JSONObject.
+     * <code>"is"</code> followed by an uppercase letter, the method is invoked,
+     * and a key and the value returned from the getter method are put into the
+     * new JSONObject.
      * <p>
      * The key is formed by removing the <code>"get"</code> or <code>"is"</code>
      * prefix. If the second remaining character is not upper case, then the
      * first character is converted to lower case.
      * <p>
-     * Methods that return <code>void</code> as well as <code>static</code>
-     * methods are ignored.
+     * Methods that are <code>static</code>, return <code>void</code>,
+     * have parameters, or are "bridge" methods, are ignored.
      * <p>
      * For example, if an object has a method named <code>"getName"</code>, and
      * if the result of calling <code>object.getName()</code> is
@@ -312,6 +313,16 @@ public class JSONObject {
      * <pre>
      * &#64;JSONPropertyName("FullName")
      * public String getName() { return this.name; }
+     * </pre>
+     * The resulting JSON object would contain <code>"FullName": "Larry Fine"</code>
+     * <p>
+     * Similarly, the {@link JSONPropertyName} annotation can be used on non-
+     * <code>get</code> and <code>is</code> methods. We can also override key
+     * name used in the JSONObject as seen below even though the field would normally
+     * be ignored:
+     * <pre>
+     * &#64;JSONPropertyName("FullName")
+     * public String fullName() { return this.name; }
      * </pre>
      * The resulting JSON object would contain <code>"FullName": "Larry Fine"</code>
      * <p>
@@ -1483,9 +1494,7 @@ public class JSONObject {
     }
 
     private boolean isValidMethodName(String name) {
-        return (name.startsWith("get") || name.startsWith("is"))
-                && !"getClass".equals(name)
-                && !"getDeclaringClass".equals(name);
+        return !"getClass".equals(name) && !"getDeclaringClass".equals(name);
     }
 
     private String getKeyNameFromMethod(Method method) {
@@ -1504,9 +1513,9 @@ public class JSONObject {
         }
         String key;
         final String name = method.getName();
-        if (name.startsWith("get")) {
+        if (name.startsWith("get") && name.length() > 3) {
             key = name.substring(3);
-        } else if (name.startsWith("is")) {
+        } else if (name.startsWith("is") && name.length() > 2) {
             key = name.substring(2);
         } else {
             return null;
@@ -1514,7 +1523,7 @@ public class JSONObject {
         // if the first letter in the key is not uppercase, then skip.
         // This is to maintain backwards compatibility before PR406
         // (https://github.com/stleary/JSON-java/pull/406/)
-        if(key.isEmpty() || Character.isLowerCase(key.charAt(0))) {
+        if (Character.isLowerCase(key.charAt(0))) {
             return null;
         }
         if (key.length() == 1) {
@@ -1568,8 +1577,8 @@ public class JSONObject {
         }
 
         try {
-            return getAnnotation(m.getDeclaringClass().getSuperclass().getMethod(m.getName(),
-                        m.getParameterTypes()),
+            return getAnnotation(
+                    c.getSuperclass().getMethod(m.getName(), m.getParameterTypes()),
                     annotationClass);
         } catch (final SecurityException ex) {
             return null;
@@ -1626,8 +1635,7 @@ public class JSONObject {
 
         try {
             int d = getAnnotationDepth(
-                    m.getDeclaringClass().getSuperclass().getMethod(m.getName(),
-                            m.getParameterTypes()),
+                    c.getSuperclass().getMethod(m.getName(), m.getParameterTypes()),
                     annotationClass);
             if (d > 0) {
                 // since the annotation was on the superclass, add 1
