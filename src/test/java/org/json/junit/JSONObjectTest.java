@@ -1973,13 +1973,7 @@ public class JSONObjectTest {
                     "Null pointer",
                     e.getMessage());
         }
-        try {
-            // null put key 
-            JSONObject jsonObject = new JSONObject("{}");
-            jsonObject.put(null, 0);
-            fail("Expected an exception");
-        } catch (NullPointerException ignored) { 
-        }
+
         try {
             // multiple putOnce key 
             JSONObject jsonObject = new JSONObject("{}");
@@ -2181,6 +2175,10 @@ public class JSONObjectTest {
     public void jsonObjectPutOnceNull() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.putOnce(null, null);
+        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        jsonObject.putOnce("", null);
+        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        jsonObject.putOnce(null, "");
         assertTrue("jsonObject should be empty", jsonObject.length() == 0);
     }
 
@@ -2453,7 +2451,7 @@ public class JSONObjectTest {
      * Confirms that exceptions thrown when writing values are wrapped properly.
      */
     @Test
-    public void testJSONWriterException() throws IOException {
+    public void testJSONWriterException() {
         final JSONObject jsonObject = new JSONObject();
 
         jsonObject.put("someKey",new BrokenToString());
@@ -2893,4 +2891,62 @@ public class JSONObjectTest {
         assertTrue(jo.get("closeable") instanceof JSONObject);
         assertTrue(jo.getJSONObject("closeable").has("string"));
     }
+    
+    @Test(expected=NullPointerException.class)
+    public void testPutNullBoolean() {
+        // null put key 
+        JSONObject jsonObject = new JSONObject("{}");
+        jsonObject.put(null, false);
+        fail("Expected an exception");
+    }
+    @Test(expected=NullPointerException.class)
+    public void testPutNullCollection() {
+        // null put key 
+        JSONObject jsonObject = new JSONObject("{}");
+        jsonObject.put(null, Collections.emptySet());
+        fail("Expected an exception");
+    }
+    @Test(expected=NullPointerException.class)
+    public void testPutNullDouble() {
+        // null put key 
+        JSONObject jsonObject = new JSONObject("{}");
+        jsonObject.put(null, 0.0d);
+        fail("Expected an exception");
+    }
+    @Test(expected=NullPointerException.class)
+    public void testPutNullFloat() {
+        // null put key 
+        JSONObject jsonObject = new JSONObject("{}");
+        jsonObject.put(null, 0.0f);
+        fail("Expected an exception");
+    }
+    @Test(expected=NullPointerException.class)
+    public void testPutNullInt() {
+        // null put key 
+        JSONObject jsonObject = new JSONObject("{}");
+        jsonObject.put(null, 0);
+        fail("Expected an exception");
+    }
+    @Test(expected=NullPointerException.class)
+    public void testPutNullLong() {
+        // null put key 
+        JSONObject jsonObject = new JSONObject("{}");
+        jsonObject.put(null, 0L);
+        fail("Expected an exception");
+    }
+    @Test(expected=NullPointerException.class)
+    public void testPutNullMap() {
+        // null put key 
+        JSONObject jsonObject = new JSONObject("{}");
+        jsonObject.put(null, Collections.emptyMap());
+        fail("Expected an exception");
+    }
+    @Test(expected=NullPointerException.class)
+    public void testPutNullObject() {
+        // null put key 
+        JSONObject jsonObject = new JSONObject("{}");
+        jsonObject.put(null, new Object());
+        fail("Expected an exception");
+    }
+
 }
