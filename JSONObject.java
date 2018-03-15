@@ -29,6 +29,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -305,13 +306,47 @@ public class JSONObject {
      * prefix. If the second remaining character is not upper case, then the
      * first character is converted to lower case.
      * <p>
+     * Methods that are <code>static</code>, return <code>void</code>,
+     * have parameters, or are "bridge" methods, are ignored.
+     * <p>
      * For example, if an object has a method named <code>"getName"</code>, and
      * if the result of calling <code>object.getName()</code> is
      * <code>"Larry Fine"</code>, then the JSONObject will contain
      * <code>"name": "Larry Fine"</code>.
      * <p>
-     * Methods that return <code>void</code> as well as <code>static</code>
-     * methods are ignored.
+     * The {@link JSONPropertyName} annotation can be used on a bean getter to
+     * override key name used in the JSONObject. For example, using the object
+     * above with the <code>getName</code> method, if we annotated it with:
+     * <pre>
+     * &#64;JSONPropertyName("FullName")
+     * public String getName() { return this.name; }
+     * </pre>
+     * The resulting JSON object would contain <code>"FullName": "Larry Fine"</code>
+     * <p>
+     * Similarly, the {@link JSONPropertyName} annotation can be used on non-
+     * <code>get</code> and <code>is</code> methods. We can also override key
+     * name used in the JSONObject as seen below even though the field would normally
+     * be ignored:
+     * <pre>
+     * &#64;JSONPropertyName("FullName")
+     * public String fullName() { return this.name; }
+     * </pre>
+     * The resulting JSON object would contain <code>"FullName": "Larry Fine"</code>
+     * <p>
+     * The {@link JSONPropertyIgnore} annotation can be used to force the bean property
+     * to not be serialized into JSON. If both {@link JSONPropertyIgnore} and
+     * {@link JSONPropertyName} are defined on the same method, a depth comparison is
+     * performed and the one closest to the concrete class being serialized is used.
+     * If both annotations are at the same level, then the {@link JSONPropertyIgnore}
+     * annotation takes precedent and the field is not serialized.
+     * For example, the following declaration would prevent the <code>getName</code>
+     * method from being serialized:
+     * <pre>
+     * &#64;JSONPropertyName("FullName")
+     * &#64;JSONPropertyIgnore 
+     * public String getName() { return this.name; }
+     * </pre>
+     * <p>
      * 
      * @param bean
      *            An object that has getter methods that should be used to make
@@ -1420,8 +1455,8 @@ public class JSONObject {
     }
 
     /**
-     * Populates the internal map of the JSONObject with the bean properties.
-     * The bean can not be recursive.
+     * Populates the internal map of the JSONObject with the bean properties. The
+     * bean can not be recursive.
      *
      * @see JSONObject#JSONObject(Object)
      *
@@ -1431,49 +1466,31 @@ public class JSONObject {
     private void populateMap(Object bean) {
         Class<?> klass = bean.getClass();
 
-// If klass is a System class then set includeSuperClass to false.
+        // If klass is a System class then set includeSuperClass to false.
 
         boolean includeSuperClass = klass.getClassLoader() != null;
 
-        Method[] methods = includeSuperClass ? klass.getMethods() : klass
-                .getDeclaredMethods();
+        Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
         for (final Method method : methods) {
             final int modifiers = method.getModifiers();
             if (Modifier.isPublic(modifiers)
                     && !Modifier.isStatic(modifiers)
                     && method.getParameterTypes().length == 0
                     && !method.isBridge()
-                    && method.getReturnType() != Void.TYPE ) {
-                final String name = method.getName();
-                String key;
-                if (name.startsWith("get")) {
-                    if ("getClass".equals(name) || "getDeclaringClass".equals(name)) {
-                        continue;
-                    }
-                    key = name.substring(3);
-                } else if (name.startsWith("is")) {
-                    key = name.substring(2);
-                } else {
-                    continue;
-                }
-                if (key.length() > 0
-                        && Character.isUpperCase(key.charAt(0))) {
-                    if (key.length() == 1) {
-                        key = key.toLowerCase(Locale.ROOT);
-                    } else if (!Character.isUpperCase(key.charAt(1))) {
-                        key = key.substring(0, 1).toLowerCase(Locale.ROOT)
-                                + key.substring(1);
-                    }
-
+                    && method.getReturnType() != Void.TYPE
+                    && isValidMethodName(method.getName())) {
+                final String key = getKeyNameFromMethod(method);
+                if (key != null && !key.isEmpty()) {
                     try {
                         final Object result = method.invoke(bean);
                         if (result != null) {
                             this.map.put(key, wrap(result));
                             // we don't use the result anywhere outside of wrap
-                            // if it's a resource we should be sure to close it after calling toString
-                            if(result instanceof Closeable) {
+                            // if it's a resource we should be sure to close it
+                            // after calling toString
+                            if (result instanceof Closeable) {
                                 try {
-                                    ((Closeable)result).close();
+                                    ((Closeable) result).close();
                                 } catch (IOException ignore) {
                                 }
                             }
@@ -1484,6 +1501,162 @@ public class JSONObject {
                     }
                 }
             }
+        }
+    }
+
+    private boolean isValidMethodName(String name) {
+        return !"getClass".equals(name) && !"getDeclaringClass".equals(name);
+    }
+
+    private String getKeyNameFromMethod(Method method) {
+        final int ignoreDepth = getAnnotationDepth(method, JSONPropertyIgnore.class);
+        if (ignoreDepth > 0) {
+            final int forcedNameDepth = getAnnotationDepth(method, JSONPropertyName.class);
+            if (forcedNameDepth < 0 || ignoreDepth <= forcedNameDepth) {
+                // the hierarchy asked to ignore, and the nearest name override
+                // was higher or non-existent
+                return null;
+            }
+        }
+        JSONPropertyName annotation = getAnnotation(method, JSONPropertyName.class);
+        if (annotation != null && annotation.value() != null && !annotation.value().isEmpty()) {
+            return annotation.value();
+        }
+        String key;
+        final String name = method.getName();
+        if (name.startsWith("get") && name.length() > 3) {
+            key = name.substring(3);
+        } else if (name.startsWith("is") && name.length() > 2) {
+            key = name.substring(2);
+        } else {
+            return null;
+        }
+        // if the first letter in the key is not uppercase, then skip.
+        // This is to maintain backwards compatibility before PR406
+        // (https://github.com/stleary/JSON-java/pull/406/)
+        if (Character.isLowerCase(key.charAt(0))) {
+            return null;
+        }
+        if (key.length() == 1) {
+            key = key.toLowerCase(Locale.ROOT);
+        } else if (!Character.isUpperCase(key.charAt(1))) {
+            key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
+        }
+        return key;
+    }
+
+    /**
+     * Searches the class hierarchy to see if the method or it's super
+     * implementations and interfaces has the annotation.
+     *
+     * @param <A>
+     *            type of the annotation
+     *
+     * @param m
+     *            method to check
+     * @param annotationClass
+     *            annotation to look for
+     * @return the {@link Annotation} if the annotation exists on the current method
+     *         or one of it's super class definitions
+     */
+    private static <A extends Annotation> A getAnnotation(final Method m, final Class<A> annotationClass) {
+        // if we have invalid data the result is null
+        if (m == null || annotationClass == null) {
+            return null;
+        }
+
+        if (m.isAnnotationPresent(annotationClass)) {
+            return m.getAnnotation(annotationClass);
+        }
+
+        // if we've already reached the Object class, return null;
+        Class<?> c = m.getDeclaringClass();
+        if (c.getSuperclass() == null) {
+            return null;
+        }
+
+        // check directly implemented interfaces for the method being checked
+        for (Class<?> i : c.getInterfaces()) {
+            try {
+                Method im = i.getMethod(m.getName(), m.getParameterTypes());
+                return getAnnotation(im, annotationClass);
+            } catch (final SecurityException ex) {
+                continue;
+            } catch (final NoSuchMethodException ex) {
+                continue;
+            }
+        }
+
+        try {
+            return getAnnotation(
+                    c.getSuperclass().getMethod(m.getName(), m.getParameterTypes()),
+                    annotationClass);
+        } catch (final SecurityException ex) {
+            return null;
+        } catch (final NoSuchMethodException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Searches the class hierarchy to see if the method or it's super
+     * implementations and interfaces has the annotation. Returns the depth of the
+     * annotation in the hierarchy.
+     *
+     * @param <A>
+     *            type of the annotation
+     *
+     * @param m
+     *            method to check
+     * @param annotationClass
+     *            annotation to look for
+     * @return Depth of the annotation or -1 if the annotation is not on the method.
+     */
+    private static int getAnnotationDepth(final Method m, final Class<? extends Annotation> annotationClass) {
+        // if we have invalid data the result is -1
+        if (m == null || annotationClass == null) {
+            return -1;
+        }
+
+        if (m.isAnnotationPresent(annotationClass)) {
+            return 1;
+        }
+
+        // if we've already reached the Object class, return -1;
+        Class<?> c = m.getDeclaringClass();
+        if (c.getSuperclass() == null) {
+            return -1;
+        }
+
+        // check directly implemented interfaces for the method being checked
+        for (Class<?> i : c.getInterfaces()) {
+            try {
+                Method im = i.getMethod(m.getName(), m.getParameterTypes());
+                int d = getAnnotationDepth(im, annotationClass);
+                if (d > 0) {
+                    // since the annotation was on the interface, add 1
+                    return d + 1;
+                }
+            } catch (final SecurityException ex) {
+                continue;
+            } catch (final NoSuchMethodException ex) {
+                continue;
+            }
+        }
+
+        try {
+            int d = getAnnotationDepth(
+                    c.getSuperclass().getMethod(m.getName(), m.getParameterTypes()),
+                    annotationClass);
+            if (d > 0) {
+                // since the annotation was on the superclass, add 1
+                return d + 1;
+            }
+            return -1;
+        } catch (final SecurityException ex) {
+            return -1;
+        } catch (final NoSuchMethodException ex) {
+            return -1;
         }
     }
 
