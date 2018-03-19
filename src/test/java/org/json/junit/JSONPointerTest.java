@@ -74,6 +74,14 @@ public class JSONPointerTest {
             query("/obj//")
         );
     }
+    
+    @Test
+    public void queryByEmptyKeySubObjectValue() {
+        assertSame(
+            document.getJSONObject("obj").getJSONObject("").get("subKey"),
+            query("/obj//subKey")
+        );
+    }
 
     @Test
     public void slashEscaping() {
