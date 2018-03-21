@@ -667,7 +667,7 @@ public class JSONObjectTest {
         assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
         assertTrue("expected 6 myArray items", ((List<?>)(JsonPath.read(doc, "$.myArray"))).size() == 6);
         assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/myArray/0")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/myArray/1/")));
+        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/myArray/1")));
         assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/myArray/2")));
         assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/myArray/3")));
         assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/myArray/4")));
