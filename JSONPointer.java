@@ -158,9 +158,28 @@ public class JSONPointer {
             throw new IllegalArgumentException("a JSON pointer should start with '/' or '#/'");
         }
         this.refTokens = new ArrayList<String>();
-        for (String token : refs.split("/")) {
-            this.refTokens.add(unescape(token));
-        }
+        int slashIdx = -1;
+        int prevSlashIdx = 0;
+        do {
+            prevSlashIdx = slashIdx + 1;
+            slashIdx = refs.indexOf('/', prevSlashIdx);
+            if(prevSlashIdx == slashIdx || prevSlashIdx == refs.length()) {
+                // found 2 slashes in a row ( obj//next )
+                // or single slash at the end of a string ( obj/test/ )
+                this.refTokens.add("");
+            } else if (slashIdx >= 0) {
+                final String token = refs.substring(prevSlashIdx, slashIdx);
+                this.refTokens.add(unescape(token));
+            } else {
+                // last item after separator, or no separator at all.
+                final String token = refs.substring(prevSlashIdx);
+                this.refTokens.add(unescape(token));
+            }
+        } while (slashIdx >= 0);
+        // using split does not take into account consecutive separators or "ending nulls"
+        //for (String token : refs.split("/")) {
+        //    this.refTokens.add(unescape(token));
+        //}
     }
 
     public JSONPointer(List<String> refTokens) {
