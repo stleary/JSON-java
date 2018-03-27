@@ -19,6 +19,10 @@
 			"another/key" : [
 				"val"
 			]
+		},
+		"" : {
+		    "" : "empty key of an object with an empty key",
+		    "subKey" : "Some other value"
 		}
 	}
 }

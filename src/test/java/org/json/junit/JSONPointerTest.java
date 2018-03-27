@@ -63,6 +63,27 @@ public class JSONPointerTest {
     }
 
     @Test
+    public void queryByEmptyKeySubObject() {
+        assertSame(document.getJSONObject("obj").getJSONObject(""), query("/obj/"));
+    }
+
+    @Test
+    public void queryByEmptyKeySubObjectSubOject() {
+        assertSame(
+            document.getJSONObject("obj").getJSONObject("").get(""),
+            query("/obj//")
+        );
+    }
+    
+    @Test
+    public void queryByEmptyKeySubObjectValue() {
+        assertSame(
+            document.getJSONObject("obj").getJSONObject("").get("subKey"),
+            query("/obj//subKey")
+        );
+    }
+
+    @Test
     public void slashEscaping() {
         assertSame(document.get("a/b"), query("/a~1b"));
     }
