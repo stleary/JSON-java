@@ -964,6 +964,24 @@ public class JSONObject {
     }
 
     /**
+     * Check if JSONObject is empty.
+     *
+     * @return true if JSONObject is empty, otherwise false.
+     */
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    /**
+     * Check if JSONObject is not empty.
+     *
+     * @return true if JSONObject is not empty, otherwise false.
+     */
+    public boolean isNotEmpty() {
+        return !map.isEmpty();
+    }
+
+    /**
      * Produce a JSONArray containing the names of the elements of this
      * JSONObject.
      *
