@@ -65,7 +65,7 @@ public class CookieListTest {
     public void emptyStringCookieList() {
         String cookieStr = "";
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
-        assertTrue(jsonObject.length() == 0);
+        assertTrue(jsonObject.isEmpty());
     }
 
     /**

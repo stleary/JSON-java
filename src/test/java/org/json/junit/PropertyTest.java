@@ -21,7 +21,7 @@ public class PropertyTest {
     public void shouldHandleNullProperties() {
         Properties properties = null;
         JSONObject jsonObject = Property.toJSONObject(properties);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
     /**
@@ -32,7 +32,7 @@ public class PropertyTest {
     public void shouldHandleEmptyProperties() {
         Properties properties = new Properties();
         JSONObject jsonObject = Property.toJSONObject(properties);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
     /**
