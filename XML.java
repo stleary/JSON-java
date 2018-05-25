@@ -277,7 +277,7 @@ public class XML {
                 if ("CDATA".equals(token)) {
                     if (x.next() == '[') {
                         string = x.nextCDATA();
-                        if (!string.isEmpty()) {
+                        if (string.length() > 0) {
                             context.accumulate("content", string);
                         }
                         return false;
@@ -353,7 +353,7 @@ public class XML {
                     if (x.nextToken() != GT) {
                         throw x.syntaxError("Misshaped tag");
                     }
-                    if (!jsonobject.isEmpty()) {
+                    if (jsonobject.length() > 0) {
                         context.accumulate(tagName, jsonobject);
                     } else {
                         context.accumulate(tagName, "");
@@ -371,7 +371,7 @@ public class XML {
                             return false;
                         } else if (token instanceof String) {
                             string = (String) token;
-                            if (!string.isEmpty()) {
+                            if (string.length() > 0) {
                                 jsonobject.accumulate("content",
                                         keepStrings ? string : stringToValue(string));
                             }
@@ -379,7 +379,7 @@ public class XML {
                         } else if (token == LT) {
                             // Nested element
                             if (parse(x, jsonobject, tagName,keepStrings)) {
-                                if (jsonobject.isEmpty()) {
+                                if (jsonobject.length() == 0) {
                                     context.accumulate(tagName, "");
                                 } else if (jsonobject.length() == 1
                                         && jsonobject.opt("content") != null) {
@@ -676,7 +676,7 @@ public class XML {
 
         string = (object == null) ? "null" : escape(object.toString());
         return (tagName == null) ? "\"" + string + "\""
-                : (string.isEmpty()) ? "<" + tagName + "/>" : "<" + tagName
+                : (string.length() == 0) ? "<" + tagName + "/>" : "<" + tagName
                         + ">" + string + "</" + tagName + ">";
 
     }

@@ -178,7 +178,7 @@ public class JSONML {
                             newjo.accumulate(attribute, "");
                         }
                     }
-                    if (arrayForm && !newjo.isEmpty()) {
+                    if (arrayForm && newjo.length() > 0) {
                         newja.put(newjo);
                     }
 
@@ -208,7 +208,7 @@ public class JSONML {
                                         "' and '" + closeTag + "'");
                             }
                             tagName = null;
-                            if (!arrayForm && !newja.isEmpty()) {
+                            if (!arrayForm && newja.length() > 0) {
                                 newjo.put("childNodes", newja);
                             }
                             if (ja == null) {

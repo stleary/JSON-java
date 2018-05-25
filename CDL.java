@@ -224,7 +224,7 @@ public class CDL {
      */
     public static JSONArray toJSONArray(JSONArray names, JSONTokener x)
             throws JSONException {
-        if (names == null || names.isEmpty()) {
+        if (names == null || names.length() == 0) {
             return null;
         }
         JSONArray ja = new JSONArray();
@@ -235,7 +235,7 @@ public class CDL {
             }
             ja.put(jo);
         }
-        if (ja.isEmpty()) {
+        if (ja.length() == 0) {
             return null;
         }
         return ja;
@@ -272,7 +272,7 @@ public class CDL {
      */
     public static String toString(JSONArray names, JSONArray ja)
             throws JSONException {
-        if (names == null || names.isEmpty()) {
+        if (names == null || names.length() == 0) {
             return null;
         }
         StringBuffer sb = new StringBuffer();
