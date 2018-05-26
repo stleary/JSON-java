@@ -810,11 +810,10 @@ public class JSONObject {
      * @return An array of field names, or null if there are no names.
      */
     public static String[] getNames(JSONObject jo) {
-        int length = jo.length();
-        if (length == 0) {
+        if (jo.isEmpty()) {
             return null;
         }
-        return jo.keySet().toArray(new String[length]);
+        return jo.keySet().toArray(new String[jo.length()]);
     }
 
     /**
@@ -961,6 +960,15 @@ public class JSONObject {
      */
     public int length() {
         return this.map.size();
+    }
+
+    /**
+     * Check if JSONObject is empty.
+     *
+     * @return true if JSONObject is empty, otherwise false.
+     */
+    public boolean isEmpty() {
+        return map.isEmpty();
     }
 
     /**
@@ -1948,7 +1956,7 @@ public class JSONObject {
     }
 
     public static Writer quote(String string, Writer w) throws IOException {
-        if (string == null || string.length() == 0) {
+        if (string == null || string.isEmpty()) {
             w.write("\"\"");
             return w;
         }
@@ -2227,7 +2235,7 @@ public class JSONObject {
      *             If any of the values are non-finite numbers.
      */
     public JSONArray toJSONArray(JSONArray names) throws JSONException {
-        if (names == null || names.length() == 0) {
+        if (names == null || names.isEmpty()) {
             return null;
         }
         JSONArray ja = new JSONArray();

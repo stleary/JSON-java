@@ -1352,7 +1352,7 @@ public class JSONArray implements Iterable<Object> {
      *             If any of the names are null.
      */
     public JSONObject toJSONObject(JSONArray names) throws JSONException {
-        if (names == null || names.length() == 0 || this.length() == 0) {
+        if (names == null || names.isEmpty() || this.isEmpty()) {
             return null;
         }
         JSONObject jo = new JSONObject(names.length());
@@ -1528,4 +1528,14 @@ public class JSONArray implements Iterable<Object> {
         }
         return results;
     }
+
+    /**
+     * Check if JSONArray is empty.
+     *
+     * @return true if JSONArray is empty, otherwise false.
+     */
+    public boolean isEmpty() {
+        return myArrayList.isEmpty();
+    }
+
 }
