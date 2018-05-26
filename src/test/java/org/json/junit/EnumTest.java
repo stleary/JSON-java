@@ -35,7 +35,7 @@ public class EnumTest {
         // If there are no getters then the object is empty.
         MyEnum myEnum = MyEnum.VAL2;
         JSONObject jsonObject = new JSONObject(myEnum);
-        assertTrue("simple enum has no getters", jsonObject.length() == 0);
+        assertTrue("simple enum has no getters", jsonObject.isEmpty());
 
          // enum with a getters should create a non-empty object 
         MyEnumField myEnumField = MyEnumField.VAL2;

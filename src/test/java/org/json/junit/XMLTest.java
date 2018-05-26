@@ -34,7 +34,7 @@ public class XMLTest {
     public void shouldHandleNullXML() {
         String xmlStr = null;
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
     /**
@@ -45,7 +45,7 @@ public class XMLTest {
 
         String xmlStr = "";
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
     /**
@@ -55,7 +55,7 @@ public class XMLTest {
     public void shouldHandleNonXML() {
         String xmlStr = "{ \"this is\": \"not xml\"}";
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
-        assertTrue("xml string should be empty", jsonObject.length() == 0);
+        assertTrue("xml string should be empty", jsonObject.isEmpty());
     }
 
     /**
@@ -200,7 +200,7 @@ public class XMLTest {
     public void shouldHandleEmptyJSONXML() {
         JSONObject jsonObject= new JSONObject();
         String xmlStr = XML.toString(jsonObject);
-        assertTrue("xml string should be empty", xmlStr.length() == 0);
+        assertTrue("xml string should be empty", xmlStr.isEmpty());
     }
 
     /**

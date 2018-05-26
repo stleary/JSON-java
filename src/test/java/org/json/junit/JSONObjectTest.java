@@ -141,7 +141,7 @@ public class JSONObjectTest {
     @Test
     public void emptyJsonObject() {
         JSONObject jsonObject = new JSONObject();
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
     /**
@@ -184,7 +184,7 @@ public class JSONObjectTest {
     public void jsonObjectByNullMap() {
         Map<String, Object> map = null;
         JSONObject jsonObject = new JSONObject(map);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
     /**
@@ -1122,7 +1122,7 @@ public class JSONObjectTest {
         BigDecimal bigDecimal = new BigDecimal(
                 "123456789012345678901234567890.12345678901234567890123456789");
         jsonObject = new JSONObject(bigDecimal);
-        assertTrue("large bigDecimal is not stored", jsonObject.length() == 0);
+        assertTrue("large bigDecimal is not stored", jsonObject.isEmpty());
 
         /**
          * JSONObject put(String, Object) method stores and serializes
@@ -2244,11 +2244,11 @@ public class JSONObjectTest {
     public void jsonObjectPutOnceNull() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.putOnce(null, null);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
         jsonObject.putOnce("", null);
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
         jsonObject.putOnce(null, "");
-        assertTrue("jsonObject should be empty", jsonObject.length() == 0);
+        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
     }
 
     /**
@@ -2424,11 +2424,11 @@ public class JSONObjectTest {
         String str = "{\"myKey\": \"myval\"}";
         JSONObject jsonObjectRemove = new JSONObject(str);
         jsonObjectRemove.remove("myKey");
-        assertEquals("jsonObject should be empty",0 ,jsonObjectRemove.length());
+        assertTrue("jsonObject should be empty", jsonObjectRemove.isEmpty());
 
         JSONObject jsonObjectPutNull = new JSONObject(str);
         jsonObjectPutNull.put("myKey", (Object) null);
-        assertEquals("jsonObject should be empty",0 ,jsonObjectPutNull.length());
+        assertTrue("jsonObject should be empty", jsonObjectPutNull.isEmpty());
 
 
     }

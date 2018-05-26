@@ -691,7 +691,7 @@ public class JSONArrayTest {
         JSONArray jsonArray = new JSONArray(arrayStr1);
         jsonArray.remove(0);
         assertTrue("array should be empty", null == jsonArray.remove(5));
-        assertTrue("jsonArray should be empty", jsonArray.length() == 0);
+        assertTrue("jsonArray should be empty", jsonArray.isEmpty());
     }
 
     /**
