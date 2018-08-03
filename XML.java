@@ -120,6 +120,9 @@ public class XML {
      * @return The escaped string.
      */
     public static String escape(String string) {
+        if (string == null) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder(string.length());
         for (final int cp : codePointIterator(string)) {
             switch (cp) {
@@ -400,13 +403,14 @@ public class XML {
     }
     
     /**
-     * This method is the same as {@link JSONObject#stringToValue(String)}.
+     * This method is nearly the same as {@link JSONObject#stringToValue(String)}.
+     * The main difference is that the string literal <code>"null"</code> is
+     * maintained by this method, while the one in JSONObject converts it to
+     * <code>JSONObject.NULL</code>.
      * 
      * @param string String to convert
      * @return JSON value of this string or the string
      */
-    // To maintain compatibility with the Android API, this method is a direct copy of
-    // the one in JSONObject. Changes made here should be reflected there.
     public static Object stringToValue(String string) {
         if (string.equals("")) {
             return string;
@@ -416,9 +420,6 @@ public class XML {
         }
         if (string.equalsIgnoreCase("false")) {
             return Boolean.FALSE;
-        }
-        if (string.equalsIgnoreCase("null")) {
-            return JSONObject.NULL;
         }
 
         /*
@@ -592,13 +593,18 @@ public class XML {
             for (final String key : jo.keySet()) {
                 Object value = jo.opt(key);
                 if (JSONObject.NULL.equals(value)) {
-                    value = "";
+                    value = null;
                 } else if (value.getClass().isArray()) {
                     value = new JSONArray(value);
                 }
 
-                // Emit content in body
-                if ("content".equals(key)) {
+                if (null == value) {
+                    // Emit a new tag <k/> to denote the null value
+                    sb.append('<');
+                    sb.append(key);
+                    sb.append("/>");
+                } else if ("content".equals(key)) {
+                    // Emit content in body
                     if (value instanceof JSONArray) {
                         ja = (JSONArray) value;
                         int jaLength = ja.length();
@@ -615,7 +621,6 @@ public class XML {
                     }
 
                     // Emit an array of similar keys
-
                 } else if (value instanceof JSONArray) {
                     ja = (JSONArray) value;
                     int jaLength = ja.length();
@@ -635,12 +640,12 @@ public class XML {
                         }
                     }
                 } else if ("".equals(value)) {
+                    // Emit a new tag <k></k> to denote the empty string
                     sb.append('<');
                     sb.append(key);
-                    sb.append("/>");
-
-                    // Emit a new tag <k>
-
+                    sb.append("></");
+                    sb.append(key);
+                    sb.append(">");
                 } else {
                     sb.append(toString(value, key));
                 }
