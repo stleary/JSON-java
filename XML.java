@@ -591,7 +591,7 @@ public class XML {
             jo = (JSONObject) object;
             for (final String key : jo.keySet()) {
                 Object value = jo.opt(key);
-                if (value == null) {
+                if (JSONObject.NULL.equals(value)) {
                     value = "";
                 } else if (value.getClass().isArray()) {
                     value = new JSONArray(value);
