@@ -356,7 +356,7 @@ public class XML {
                     if (jsonobject.length() > 0) {
                         context.accumulate(tagName, jsonobject);
                     } else {
-                        context.accumulate(tagName, "");
+                        context.accumulate(tagName, JSONObject.NULL);
                     }
                     return false;
 
