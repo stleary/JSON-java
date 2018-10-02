@@ -345,12 +345,12 @@ public class JSONArray implements Iterable<Object> {
      */
     public BigDecimal getBigDecimal (int index) throws JSONException {
         Object object = this.get(index);
-        try {
-            return new BigDecimal(object.toString());
-        } catch (Exception e) {
+        BigDecimal val = JSONObject.objectToBigDecimal(object, null);
+        if(val == null) {
             throw new JSONException("JSONArray[" + index +
-                    "] could not convert to BigDecimal.", e);
+                    "] could not convert to BigDecimal ("+ object + ").");
         }
+        return val;
     }
 
     /**
@@ -365,12 +365,12 @@ public class JSONArray implements Iterable<Object> {
      */
     public BigInteger getBigInteger (int index) throws JSONException {
         Object object = this.get(index);
-        try {
-            return new BigInteger(object.toString());
-        } catch (Exception e) {
+        BigInteger val = JSONObject.objectToBigInteger(object, null);
+        if(val == null) {
             throw new JSONException("JSONArray[" + index +
-                    "] could not convert to BigInteger.", e);
+                    "] could not convert to BigDecimal ("+ object + ").");
         }
+        return val;
     }
 
     /**
@@ -739,31 +739,7 @@ public class JSONArray implements Iterable<Object> {
      */
     public BigInteger optBigInteger(int index, BigInteger defaultValue) {
         Object val = this.opt(index);
-        if (JSONObject.NULL.equals(val)) {
-            return defaultValue;
-        }
-        if (val instanceof BigInteger){
-            return (BigInteger) val;
-        }
-        if (val instanceof BigDecimal){
-            return ((BigDecimal) val).toBigInteger();
-        }
-        if (val instanceof Double || val instanceof Float){
-            return new BigDecimal(((Number) val).doubleValue()).toBigInteger();
-        }
-        if (val instanceof Long || val instanceof Integer
-                || val instanceof Short || val instanceof Byte){
-            return BigInteger.valueOf(((Number) val).longValue());
-        }
-        try {
-            final String valStr = val.toString();
-            if(JSONObject.isDecimalNotation(valStr)) {
-                return new BigDecimal(valStr).toBigInteger();
-            }
-            return new BigInteger(valStr);
-        } catch (Exception e) {
-            return defaultValue;
-        }
+        return JSONObject.objectToBigInteger(val, defaultValue);
     }
 
     /**
@@ -779,27 +755,7 @@ public class JSONArray implements Iterable<Object> {
      */
     public BigDecimal optBigDecimal(int index, BigDecimal defaultValue) {
         Object val = this.opt(index);
-        if (JSONObject.NULL.equals(val)) {
-            return defaultValue;
-        }
-        if (val instanceof BigDecimal){
-            return (BigDecimal) val;
-        }
-        if (val instanceof BigInteger){
-            return new BigDecimal((BigInteger) val);
-        }
-        if (val instanceof Double || val instanceof Float){
-            return new BigDecimal(((Number) val).doubleValue());
-        }
-        if (val instanceof Long || val instanceof Integer
-                || val instanceof Short || val instanceof Byte){
-            return new BigDecimal(((Number) val).longValue());
-        }
-        try {
-            return new BigDecimal(val.toString());
-        } catch (Exception e) {
-            return defaultValue;
-        }
+        return JSONObject.objectToBigDecimal(val, defaultValue);
     }
 
     /**

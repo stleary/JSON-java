@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -150,6 +151,12 @@ public class JSONObject {
             return "null";
         }
     }
+    
+    /**
+     *  Regular Expression Pattern that matches JSON Numbers. This is primarily used for
+     *  output to guarantee that we are always writing valid JSON. 
+     */
+    static final Pattern NUMBER_PATTERN = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
 
     /**
      * The map where the JSONObject's properties are kept.
@@ -630,16 +637,19 @@ public class JSONObject {
      */
     public BigInteger getBigInteger(String key) throws JSONException {
         Object object = this.get(key);
-        try {
-            return new BigInteger(object.toString());
-        } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] could not be converted to BigInteger.", e);
+        BigInteger ret = objectToBigInteger(object, null);
+        if (ret != null) {
+            return ret;
         }
+        throw new JSONException("JSONObject[" + quote(key)
+                + "] could not be converted to BigInteger (" + object + ").");
     }
 
     /**
-     * Get the BigDecimal value associated with a key.
+     * Get the BigDecimal value associated with a key. If the value is float or
+     * double, the the {@link BigDecimal#BigDecimal(double)} constructor will
+     * be used. See notes on the constructor for conversion issues that may
+     * arise.
      *
      * @param key
      *            A key string.
@@ -650,15 +660,12 @@ public class JSONObject {
      */
     public BigDecimal getBigDecimal(String key) throws JSONException {
         Object object = this.get(key);
-        if (object instanceof BigDecimal) {
-            return (BigDecimal)object;
+        BigDecimal ret = objectToBigDecimal(object, null);
+        if (ret != null) {
+            return ret;
         }
-        try {
-            return new BigDecimal(object.toString());
-        } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] could not be converted to BigDecimal.", e);
-        }
+        throw new JSONException("JSONObject[" + quote(key)
+                + "] could not be converted to BigDecimal (" + object + ").");
     }
 
     /**
@@ -968,7 +975,7 @@ public class JSONObject {
      * @return true if JSONObject is empty, otherwise false.
      */
     public boolean isEmpty() {
-        return map.isEmpty();
+        return this.map.isEmpty();
     }
 
     /**
@@ -1113,7 +1120,10 @@ public class JSONObject {
     /**
      * Get an optional BigDecimal associated with a key, or the defaultValue if
      * there is no such key or if its value is not a number. If the value is a
-     * string, an attempt will be made to evaluate it as a number.
+     * string, an attempt will be made to evaluate it as a number. If the value
+     * is float or double, then the {@link BigDecimal#BigDecimal(double)}
+     * constructor will be used. See notes on the constructor for conversion
+     * issues that may arise.
      *
      * @param key
      *            A key string.
@@ -1123,6 +1133,15 @@ public class JSONObject {
      */
     public BigDecimal optBigDecimal(String key, BigDecimal defaultValue) {
         Object val = this.opt(key);
+        return objectToBigDecimal(val, defaultValue);
+    }
+
+    /**
+     * @param defaultValue
+     * @param val
+     * @return
+     */
+    static BigDecimal objectToBigDecimal(Object val, BigDecimal defaultValue) {
         if (NULL.equals(val)) {
             return defaultValue;
         }
@@ -1133,6 +1152,10 @@ public class JSONObject {
             return new BigDecimal((BigInteger) val);
         }
         if (val instanceof Double || val instanceof Float){
+            final double d = ((Number) val).doubleValue();
+            if(Double.isNaN(d)) {
+                return defaultValue;
+            }
             return new BigDecimal(((Number) val).doubleValue());
         }
         if (val instanceof Long || val instanceof Integer
@@ -1160,6 +1183,15 @@ public class JSONObject {
      */
     public BigInteger optBigInteger(String key, BigInteger defaultValue) {
         Object val = this.opt(key);
+        return objectToBigInteger(val, defaultValue);
+    }
+
+    /**
+     * @param defaultValue
+     * @param val
+     * @return
+     */
+    static BigInteger objectToBigInteger(Object val, BigInteger defaultValue) {
         if (NULL.equals(val)) {
             return defaultValue;
         }
@@ -1170,7 +1202,11 @@ public class JSONObject {
             return ((BigDecimal) val).toBigInteger();
         }
         if (val instanceof Double || val instanceof Float){
-            return new BigDecimal(((Number) val).doubleValue()).toBigInteger();
+            final double d = ((Number) val).doubleValue();
+            if(Double.isNaN(d)) {
+                return defaultValue;
+            }
+            return new BigDecimal(d).toBigInteger();
         }
         if (val instanceof Long || val instanceof Integer
                 || val instanceof Short || val instanceof Byte){
@@ -2414,13 +2450,9 @@ public class JSONObject {
         } else if (value instanceof Number) {
             // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
             final String numberAsString = numberToString((Number) value);
-            try {
-                // Use the BigDecimal constructor for its parser to validate the format.
-                @SuppressWarnings("unused")
-                BigDecimal testNum = new BigDecimal(numberAsString);
-                // Close enough to a JSON number that we will use it unquoted
+            if(NUMBER_PATTERN.matcher(numberAsString).matches()) {
                 writer.write(numberAsString);
-            } catch (NumberFormatException ex){
+            } else {
                 // The Number value is not a valid JSON number.
                 // Instead we will quote it as a string
                 quote(numberAsString, writer);

@@ -340,17 +340,13 @@ public class JSONWriter {
         if (value instanceof Number) {
             // not all Numbers may match actual JSON Numbers. i.e. Fractions or Complex
             final String numberAsString = JSONObject.numberToString((Number) value);
-            try {
-                // Use the BigDecimal constructor for it's parser to validate the format.
-                @SuppressWarnings("unused")
-                BigDecimal unused = new BigDecimal(numberAsString);
+            if(JSONObject.NUMBER_PATTERN.matcher(numberAsString).matches()) {
                 // Close enough to a JSON number that we will return it unquoted
                 return numberAsString;
-            } catch (NumberFormatException ex){
-                // The Number value is not a valid JSON number.
-                // Instead we will quote it as a string
-                return JSONObject.quote(numberAsString);
             }
+            // The Number value is not a valid JSON number.
+            // Instead we will quote it as a string
+            return JSONObject.quote(numberAsString);
         }
         if (value instanceof Boolean || value instanceof JSONObject
                 || value instanceof JSONArray) {
