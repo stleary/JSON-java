@@ -325,14 +325,14 @@ public class JSONWriter {
             return "null";
         }
         if (value instanceof JSONString) {
-            Object object;
+            String object;
             try {
                 object = ((JSONString) value).toJSONString();
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            if (object instanceof String) {
-                return (String) object;
+            if (object != null) {
+                return object;
             }
             throw new JSONException("Bad value from toJSONString: " + object);
         }
