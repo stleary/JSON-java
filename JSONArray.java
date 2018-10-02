@@ -1491,7 +1491,7 @@ public class JSONArray implements Iterable<Object> {
      * @return true if JSONArray is empty, otherwise false.
      */
     public boolean isEmpty() {
-        return myArrayList.isEmpty();
+        return this.myArrayList.isEmpty();
     }
 
 }

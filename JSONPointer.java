@@ -233,8 +233,8 @@ public class JSONPointer {
             int index = Integer.parseInt(indexToken);
             JSONArray currentArr = (JSONArray) current;
             if (index >= currentArr.length()) {
-                throw new JSONPointerException(format("index %d is out of bounds - the array has %d elements", index,
-                        currentArr.length()));
+                throw new JSONPointerException(format("index %s is out of bounds - the array has %d elements", indexToken,
+                        Integer.valueOf(currentArr.length())));
             }
             try {
 				return currentArr.get(index);
