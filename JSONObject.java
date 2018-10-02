@@ -2186,6 +2186,13 @@ public class JSONObject {
                     }
                 } else {
                     Long myLong = Long.valueOf(string);
+
+                    // If the value is equal to 0 then the prefix of negative should be removed.
+                    if (myLong.equals(0) && string.equals("-0"))
+                    {
+                        return Integer.valueOf(myLong.intValue());
+                    }
+
                     if (string.equals(myLong.toString())) {
                         if (myLong.longValue() == myLong.intValue()) {
                             return Integer.valueOf(myLong.intValue());
