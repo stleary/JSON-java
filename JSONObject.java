@@ -576,17 +576,19 @@ public class JSONObject {
     }
 
     /**
-    * Get the enum value associated with a key.
-    * 
-    * @param clazz
-    *           The type of enum to retrieve.
-    * @param key
-    *           A key string.
-    * @return The enum value associated with the key
-    * @throws JSONException
-    *             if the key is not found or if the value cannot be converted
-    *             to an enum.
-    */
+     * Get the enum value associated with a key.
+     * 
+     * @param <E>
+     *            Enum Type
+     * @param clazz
+     *           The type of enum to retrieve.
+     * @param key
+     *           A key string.
+     * @return The enum value associated with the key
+     * @throws JSONException
+     *             if the key is not found or if the value cannot be converted
+     *             to an enum.
+     */
     public <E extends Enum<E>> E getEnum(Class<E> clazz, String key) throws JSONException {
         E val = optEnum(clazz, key);
         if(val==null) {
@@ -814,6 +816,8 @@ public class JSONObject {
     /**
      * Get an array of field names from a JSONObject.
      *
+     * @param jo
+     *            JSON object
      * @return An array of field names, or null if there are no names.
      */
     public static String[] getNames(JSONObject jo) {
@@ -824,8 +828,10 @@ public class JSONObject {
     }
 
     /**
-     * Get an array of field names from an Object.
+     * Get an array of public field names from an Object.
      *
+     * @param object
+     *            object to read
      * @return An array of field names, or null if there are no names.
      */
     public static String[] getNames(Object object) {
@@ -1036,6 +1042,8 @@ public class JSONObject {
     /**
      * Get the enum value associated with a key.
      * 
+     * @param <E>
+     *            Enum Type
      * @param clazz
      *            The type of enum to retrieve.
      * @param key
@@ -1049,6 +1057,8 @@ public class JSONObject {
     /**
      * Get the enum value associated with a key.
      * 
+     * @param <E>
+     *            Enum Type
      * @param clazz
      *            The type of enum to retrieve.
      * @param key
@@ -1137,9 +1147,10 @@ public class JSONObject {
     }
 
     /**
-     * @param defaultValue
-     * @param val
-     * @return
+     * @param val value to convert
+     * @param defaultValue default value to return is the conversion doesn't work or is null.
+     * @return BigDecimal conversion of the original value, or the defaultValue if unable
+     *          to convert. 
      */
     static BigDecimal objectToBigDecimal(Object val, BigDecimal defaultValue) {
         if (NULL.equals(val)) {
@@ -1187,9 +1198,10 @@ public class JSONObject {
     }
 
     /**
-     * @param defaultValue
-     * @param val
-     * @return
+     * @param val value to convert
+     * @param defaultValue default value to return is the conversion doesn't work or is null.
+     * @return BigInteger conversion of the original value, or the defaultValue if unable
+     *          to convert. 
      */
     static BigInteger objectToBigInteger(Object val, BigInteger defaultValue) {
         if (NULL.equals(val)) {
@@ -1859,8 +1871,10 @@ public class JSONObject {
      * are both non-null, and only if there is not already a member with that
      * name.
      *
-     * @param key string
-     * @param value object
+     * @param key
+     *            key to insert into
+     * @param value
+     *            value to insert
      * @return this.
      * @throws JSONException
      *             if the key is a duplicate
@@ -1971,9 +1985,10 @@ public class JSONObject {
 
     /**
      * Produce a string in double quotes with backslash sequences in all the
-     * right places. A backslash will be inserted within </, producing <\/,
-     * allowing JSON text to be delivered in HTML. In JSON text, a string cannot
-     * contain a control character or an unescaped quote or backslash.
+     * right places. A backslash will be inserted within &lt;/, producing
+     * &lt;\/, allowing JSON text to be delivered in HTML. In JSON text, a
+     * string cannot contain a control character or an unescaped quote or
+     * backslash.
      *
      * @param string
      *            A String

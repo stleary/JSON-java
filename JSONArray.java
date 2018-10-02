@@ -180,10 +180,16 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Construct a JSONArray from an array
+     * Construct a JSONArray from an array.
+     *
+     * @param array
+     *            Array. If the parameter passed is null, or not an array, an
+     *            exception will be thrown.
      *
      * @throws JSONException
-     *             If not an array or if an array value is non-finite number.
+     *            If not an array or if an array value is non-finite number.
+     * @throws NullPointerException
+     *            Thrown if the array parameter is null.
      */
     public JSONArray(Object array) throws JSONException {
         this();
@@ -310,17 +316,19 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-    * Get the enum value associated with an index.
-    * 
-    * @param clazz
-    *            The type of enum to retrieve.
-    * @param index
-    *            The index must be between 0 and length() - 1.
-    * @return The enum value at the index location
-    * @throws JSONException
-    *            if the key is not found or if the value cannot be converted
-    *            to an enum.
-    */
+     * Get the enum value associated with an index.
+     * 
+     * @param <E>
+     *            Enum Type
+     * @param clazz
+     *            The type of enum to retrieve.
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @return The enum value at the index location
+     * @throws JSONException
+     *            if the key is not found or if the value cannot be converted
+     *            to an enum.
+     */
     public <E extends Enum<E>> E getEnum(Class<E> clazz, int index) throws JSONException {
         E val = optEnum(clazz, index);
         if(val==null) {
@@ -334,7 +342,10 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the BigDecimal value associated with an index.
+     * Get the BigDecimal value associated with an index. If the value is float
+     * or double, the the {@link BigDecimal#BigDecimal(double)} constructor
+     * will be used. See notes on the constructor for conversion issues that
+     * may arise.
      *
      * @param index
      *            The index must be between 0 and length() - 1.
@@ -683,6 +694,8 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Get the enum value associated with a key.
      * 
+     * @param <E>
+     *            Enum Type
      * @param clazz
      *            The type of enum to retrieve.
      * @param index
@@ -696,6 +709,8 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Get the enum value associated with a key.
      * 
+     * @param <E>
+     *            Enum Type
      * @param clazz
      *            The type of enum to retrieve.
      * @param index
@@ -725,7 +740,6 @@ public class JSONArray implements Iterable<Object> {
         }
     }
 
-
     /**
      * Get the optional BigInteger value associated with an index. The 
      * defaultValue is returned if there is no value for the index, or if the 
@@ -745,7 +759,10 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Get the optional BigDecimal value associated with an index. The 
      * defaultValue is returned if there is no value for the index, or if the 
-     * value is not a number and cannot be converted to a number.
+     * value is not a number and cannot be converted to a number. If the value
+     * is float or double, the the {@link BigDecimal#BigDecimal(double)}
+     * constructor will be used. See notes on the constructor for conversion
+     * issues that may arise.
      *
      * @param index
      *            The index must be between 0 and length() - 1.
@@ -1192,8 +1209,8 @@ public class JSONArray implements Iterable<Object> {
     }
     
     /**
-     * Uses a uaer initialized JSONPointer  and tries to 
-     * match it to an item whithin this JSONArray. For example, given a
+     * Uses a user initialized JSONPointer  and tries to 
+     * match it to an item within this JSONArray. For example, given a
      * JSONArray initialized with this document:
      * <pre>
      * [
