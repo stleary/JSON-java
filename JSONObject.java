@@ -681,14 +681,7 @@ public class JSONObject {
      *             object and cannot be converted to a number.
      */
     public double getDouble(String key) throws JSONException {
-        Object object = this.get(key);
-        try {
-            return object instanceof Number ? ((Number) object).doubleValue()
-                    : Double.parseDouble(object.toString());
-        } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a number.", e);
-        }
+        return this.getNumber(key).doubleValue();
     }
 
     /**
@@ -702,14 +695,7 @@ public class JSONObject {
      *             object and cannot be converted to a number.
      */
     public float getFloat(String key) throws JSONException {
-        Object object = this.get(key);
-        try {
-            return object instanceof Number ? ((Number) object).floatValue()
-                    : Float.parseFloat(object.toString());
-        } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a number.", e);
-        }
+        return this.getNumber(key).floatValue();
     }
 
     /**
@@ -746,14 +732,7 @@ public class JSONObject {
      *             to an integer.
      */
     public int getInt(String key) throws JSONException {
-        Object object = this.get(key);
-        try {
-            return object instanceof Number ? ((Number) object).intValue()
-                    : Integer.parseInt((String) object);
-        } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not an int.", e);
-        }
+        return this.getNumber(key).intValue();
     }
 
     /**
@@ -803,14 +782,7 @@ public class JSONObject {
      *             to a long.
      */
     public long getLong(String key) throws JSONException {
-        Object object = this.get(key);
-        try {
-            return object instanceof Number ? ((Number) object).longValue()
-                    : Long.parseLong((String) object);
-        } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key)
-                    + "] is not a long.", e);
-        }
+        return this.getNumber(key).longValue();
     }
 
     /**
@@ -1266,21 +1238,15 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public double optDouble(String key, double defaultValue) {
-        Object val = this.opt(key);
-        if (NULL.equals(val)) {
+        Number val = this.optNumber(key);
+        if (val == null) {
             return defaultValue;
         }
-        if (val instanceof Number){
-            return ((Number) val).doubleValue();
-        }
-        if (val instanceof String) {
-            try {
-                return Double.parseDouble((String) val);
-            } catch (Exception e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
+        final double doubleValue = val.doubleValue();
+        // if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue)) {
+        // return defaultValue;
+        // }
+        return doubleValue;
     }
 
     /**
@@ -1308,21 +1274,15 @@ public class JSONObject {
      * @return The value.
      */
     public float optFloat(String key, float defaultValue) {
-        Object val = this.opt(key);
-        if (JSONObject.NULL.equals(val)) {
+        Number val = this.optNumber(key);
+        if (val == null) {
             return defaultValue;
         }
-        if (val instanceof Number){
-            return ((Number) val).floatValue();
-        }
-        if (val instanceof String) {
-            try {
-                return Float.parseFloat((String) val);
-            } catch (Exception e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
+        final float floatValue = val.floatValue();
+        // if (Float.isNaN(floatValue) || Float.isInfinite(floatValue)) {
+        // return defaultValue;
+        // }
+        return floatValue;
     }
 
     /**
@@ -1350,22 +1310,11 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public int optInt(String key, int defaultValue) {
-        Object val = this.opt(key);
-        if (NULL.equals(val)) {
+        final Number val = this.optNumber(key, null);
+        if (val == null) {
             return defaultValue;
         }
-        if (val instanceof Number){
-            return ((Number) val).intValue();
-        }
-        
-        if (val instanceof String) {
-            try {
-                return new BigDecimal((String) val).intValue();
-            } catch (Exception e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
+        return val.intValue();
     }
 
     /**
@@ -1419,22 +1368,12 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public long optLong(String key, long defaultValue) {
-        Object val = this.opt(key);
-        if (NULL.equals(val)) {
+        final Number val = this.optNumber(key, null);
+        if (val == null) {
             return defaultValue;
         }
-        if (val instanceof Number){
-            return ((Number) val).longValue();
-        }
         
-        if (val instanceof String) {
-            try {
-                return new BigDecimal((String) val).longValue();
-            } catch (Exception e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
+        return val.longValue();
     }
     
     /**
@@ -1472,14 +1411,11 @@ public class JSONObject {
             return (Number) val;
         }
         
-        if (val instanceof String) {
-            try {
-                return stringToNumber((String) val);
-            } catch (Exception e) {
-                return defaultValue;
-            }
+        try {
+            return stringToNumber(val.toString());
+        } catch (Exception e) {
+            return defaultValue;
         }
-        return defaultValue;
     }
     
     /**
@@ -2201,22 +2137,26 @@ public class JSONObject {
      * can't be converted, return the string.
      *
      * @param string
-     *            A String.
+     *            A String. can not be null.
      * @return A simple JSON value.
+     * @throws NullPointerException
+     *             Thrown if the string is null.
      */
     // Changes to this method must be copied to the corresponding method in
     // the XML class to keep full support for Android
     public static Object stringToValue(String string) {
-        if (string.equals("")) {
+        if ("".equals(string)) {
             return string;
         }
-        if (string.equalsIgnoreCase("true")) {
+
+        // check JSON key words true/false/null
+        if ("true".equalsIgnoreCase(string)) {
             return Boolean.TRUE;
         }
-        if (string.equalsIgnoreCase("false")) {
+        if ("false".equalsIgnoreCase(string)) {
             return Boolean.FALSE;
         }
-        if (string.equalsIgnoreCase("null")) {
+        if ("null".equalsIgnoreCase(string)) {
             return JSONObject.NULL;
         }
 
@@ -2228,7 +2168,8 @@ public class JSONObject {
         char initial = string.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
-                // if we want full Big Number support this block can be replaced with:
+                // if we want full Big Number support the contents of this
+                // `try` block can be replaced with:
                 // return stringToNumber(string);
                 if (isDecimalNotation(string)) {
                     Double d = Double.valueOf(string);

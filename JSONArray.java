@@ -263,13 +263,7 @@ public class JSONArray implements Iterable<Object> {
      *             to a number.
      */
     public double getDouble(int index) throws JSONException {
-        Object object = this.get(index);
-        try {
-            return object instanceof Number ? ((Number) object).doubleValue()
-                    : Double.parseDouble((String) object);
-        } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
-        }
+        return this.getNumber(index).doubleValue();
     }
 
     /**
@@ -283,14 +277,7 @@ public class JSONArray implements Iterable<Object> {
      *             object and cannot be converted to a number.
      */
     public float getFloat(int index) throws JSONException {
-        Object object = this.get(index);
-        try {
-            return object instanceof Number ? ((Number) object).floatValue()
-                    : Float.parseFloat(object.toString());
-        } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index
-                    + "] is not a number.", e);
-        }
+        return this.getNumber(index).floatValue();
     }
 
     /**
@@ -394,13 +381,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the key is not found or if the value is not a number.
      */
     public int getInt(int index) throws JSONException {
-        Object object = this.get(index);
-        try {
-            return object instanceof Number ? ((Number) object).intValue()
-                    : Integer.parseInt((String) object);
-        } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
-        }
+        return this.getNumber(index).intValue();
     }
 
     /**
@@ -450,13 +431,7 @@ public class JSONArray implements Iterable<Object> {
      *             to a number.
      */
     public long getLong(int index) throws JSONException {
-        Object object = this.get(index);
-        try {
-            return object instanceof Number ? ((Number) object).longValue()
-                    : Long.parseLong((String) object);
-        } catch (Exception e) {
-            throw new JSONException("JSONArray[" + index + "] is not a number.", e);
-        }
+        return this.getNumber(index).longValue();
     }
 
     /**
@@ -500,13 +475,16 @@ public class JSONArray implements Iterable<Object> {
      */
     public String join(String separator) throws JSONException {
         int len = this.length();
-        StringBuilder sb = new StringBuilder();
+        if (len == 0) {
+            return "";
+        }
+        
+        StringBuilder sb = new StringBuilder(
+                   JSONObject.valueToString(this.myArrayList.get(0)));
 
-        for (int i = 0; i < len; i += 1) {
-            if (i > 0) {
-                sb.append(separator);
-            }
-            sb.append(JSONObject.valueToString(this.myArrayList.get(i)));
+        for (int i = 1; i < len; i++) {
+            sb.append(separator)
+              .append(JSONObject.valueToString(this.myArrayList.get(i)));
         }
         return sb.toString();
     }
@@ -589,21 +567,15 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public double optDouble(int index, double defaultValue) {
-        Object val = this.opt(index);
-        if (JSONObject.NULL.equals(val)) {
+        final Number val = this.optNumber(index, null);
+        if (val == null) {
             return defaultValue;
         }
-        if (val instanceof Number){
-            return ((Number) val).doubleValue();
-        }
-        if (val instanceof String) {
-            try {
-                return Double.parseDouble((String) val);
-            } catch (Exception e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
+        final double doubleValue = val.doubleValue();
+        // if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue)) {
+        // return defaultValue;
+        // }
+        return doubleValue;
     }
 
     /**
@@ -631,21 +603,15 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public float optFloat(int index, float defaultValue) {
-        Object val = this.opt(index);
-        if (JSONObject.NULL.equals(val)) {
+        final Number val = this.optNumber(index, null);
+        if (val == null) {
             return defaultValue;
         }
-        if (val instanceof Number){
-            return ((Number) val).floatValue();
-        }
-        if (val instanceof String) {
-            try {
-                return Float.parseFloat((String) val);
-            } catch (Exception e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
+        final float floatValue = val.floatValue();
+        // if (Float.isNaN(floatValue) || Float.isInfinite(floatValue)) {
+        // return floatValue;
+        // }
+        return floatValue;
     }
 
     /**
@@ -673,22 +639,11 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public int optInt(int index, int defaultValue) {
-        Object val = this.opt(index);
-        if (JSONObject.NULL.equals(val)) {
+        final Number val = this.optNumber(index, null);
+        if (val == null) {
             return defaultValue;
         }
-        if (val instanceof Number){
-            return ((Number) val).intValue();
-        }
-        
-        if (val instanceof String) {
-            try {
-                return new BigDecimal(val.toString()).intValue();
-            } catch (Exception e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
+        return val.intValue();
     }
 
     /**
@@ -827,22 +782,11 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public long optLong(int index, long defaultValue) {
-        Object val = this.opt(index);
-        if (JSONObject.NULL.equals(val)) {
+        final Number val = this.optNumber(index, null);
+        if (val == null) {
             return defaultValue;
         }
-        if (val instanceof Number){
-            return ((Number) val).longValue();
-        }
-        
-        if (val instanceof String) {
-            try {
-                return new BigDecimal(val.toString()).longValue();
-            } catch (Exception e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
+        return val.longValue();
     }
 
     /**
