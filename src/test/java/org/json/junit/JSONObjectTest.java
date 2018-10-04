@@ -1013,128 +1013,128 @@ public class JSONObjectTest {
             jsonObject.getBoolean("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".equals(e.getMessage()));
+            assertEquals("expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.", e.getMessage());
         }
         try {
             jsonObject.getBoolean("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a Boolean.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a Boolean.",
+                    e.getMessage());
         }
         try {
             jsonObject.getString("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getString("trueKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"trueKey\"] not a string.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"trueKey\"] not a string.",
+                    e.getMessage());
         }
         try {
             jsonObject.getDouble("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getDouble("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a number.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"stringKey\"] is not a number.",
+                    e.getMessage());
         }
         try {
             jsonObject.getFloat("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getFloat("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a number.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"stringKey\"] is not a number.",
+                    e.getMessage());
         }
         try {
             jsonObject.getInt("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getInt("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not an int.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a number.",
+                    e.getMessage());
         }
         try {
             jsonObject.getLong("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getLong("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a long.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a number.",
+                    e.getMessage());
         }
         try {
             jsonObject.getJSONArray("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getJSONArray("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a JSONArray.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a JSONArray.",
+                    e.getMessage());
         }
         try {
             jsonObject.getJSONObject("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getJSONObject("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a JSONObject.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a JSONObject.",
+                    e.getMessage());
         }
     }
 
