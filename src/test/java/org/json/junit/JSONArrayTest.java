@@ -331,57 +331,57 @@ public class JSONArrayTest {
             jsonArray.getBoolean(4);
             assertTrue("expected getBoolean to fail", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "JSONArray[4] is not a boolean.".equals(e.getMessage()));
+            assertEquals("Expected an exception message",
+                    "JSONArray[4] is not a boolean.",e.getMessage());
         }
         try {
             jsonArray.get(-1);
             assertTrue("expected get to fail", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "JSONArray[-1] not found.".equals(e.getMessage()));
+            assertEquals("Expected an exception message",
+                    "JSONArray[-1] not found.",e.getMessage());
         }
         try {
             jsonArray.getDouble(4);
             assertTrue("expected getDouble to fail", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "JSONArray[4] is not a number.".equals(e.getMessage()));
+            assertEquals("Expected an exception message",
+                    "JSONArray[4] is not a number.",e.getMessage());
         }
         try {
             jsonArray.getInt(4);
             assertTrue("expected getInt to fail", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "JSONArray[4] is not a number.".equals(e.getMessage()));
+            assertEquals("Expected an exception message",
+                    "JSONArray[4] is not a number.",e.getMessage());
         }
         try {
             jsonArray.getJSONArray(4);
             assertTrue("expected getJSONArray to fail", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "JSONArray[4] is not a JSONArray.".equals(e.getMessage()));
+            assertEquals("Expected an exception message",
+                    "JSONArray[4] is not a JSONArray.",e.getMessage());
         }
         try {
             jsonArray.getJSONObject(4);
             assertTrue("expected getJSONObject to fail", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "JSONArray[4] is not a JSONObject.".equals(e.getMessage()));
+            assertEquals("Expected an exception message",
+                    "JSONArray[4] is not a JSONObject.",e.getMessage());
         }
         try {
             jsonArray.getLong(4);
             assertTrue("expected getLong to fail", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "JSONArray[4] is not a number.".equals(e.getMessage()));
+            assertEquals("Expected an exception message",
+                    "JSONArray[4] is not a number.",e.getMessage());
         }
         try {
             jsonArray.getString(5);
             assertTrue("expected getString to fail", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "JSONArray[5] not a string.".equals(e.getMessage()));
+            assertEquals("Expected an exception message",
+                    "JSONArray[5] not a string.",e.getMessage());
         }
     }
 

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import org.json.CDL;
 import org.json.JSONArray;
@@ -60,7 +61,13 @@ import com.jayway.jsonpath.JsonPath;
  * otherwise be impossible.
  */
 public class JSONObjectTest {
-    
+
+    /**
+     *  Regular Expression Pattern that matches JSON Numbers. This is primarily used for
+     *  output to guarantee that we are always writing valid JSON. 
+     */
+    static final Pattern NUMBER_PATTERN = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
+
     /**
      * Tests that the similar method is working as expected.
      */
@@ -87,6 +94,67 @@ public class JSONObjectTest {
         assertTrue("Should eval to true", obj1.similar(obj3));
         
     }
+    
+    @Test
+    public void timeNumberParsing() {
+        // test data to use
+        final String[] testData = new String[] {
+                null,
+                "",
+                "100",
+                "-100",
+                "abc123",
+                "012345",
+                "100.5e199",
+                "-100.5e199",
+                "DEADBEEF",
+                "0xDEADBEEF",
+                "1234567890.1234567890",
+                "-1234567890.1234567890",
+                "adloghakuidghauiehgauioehgdkjfb nsruoh aeu noerty384 nkljfgh "
+                    + "395h tdfn kdz8yt3 4hkls gn.ey85 4hzfhnz.o8y5a84 onvklt "
+                    + "yh389thub nkz8y49lihv al4itlaithknty8hnbl"
+                // long (in length) number sequences with invalid data at the end of the
+                // string offer very poor performance for the REGEX.
+                ,"123467890123467890123467890123467890123467890123467890123467"
+                    + "8901234678901234678901234678901234678901234678901234678"
+                    + "9012346789012346789012346789012346789012346789012346789"
+                    + "0a"
+        };
+        final int testDataLength = testData.length;
+        final int iterations = 1000000;
+
+        // 10 million iterations 1,000,000 * 10
+        long startTime = System.nanoTime();
+        for(int i = 0; i < iterations; i++) {
+            for(int j = 0; j < testDataLength; j++) {
+                try {
+                BigDecimal v1 = new BigDecimal(testData[j]);
+                v1.signum();
+                } catch(Exception ignore) {
+                    //do nothing
+                }
+            }
+        }
+        final long elapsedNano1 = System.nanoTime() - startTime;
+        System.out.println("new BigDecimal(testData[]) : " + elapsedNano1 / 1000000 + " ms");
+
+        startTime = System.nanoTime();
+        for(int i = 0; i < iterations; i++) {
+            for(int j = 0; j < testDataLength; j++) {
+                try {
+                boolean v2 = NUMBER_PATTERN.matcher(testData[j]).matches();
+                assert v2 == !!v2;
+                } catch(Exception ignore) {
+                    //do nothing
+                }
+            }
+        }
+        final long elapsedNano2 = System.nanoTime() - startTime;
+        System.out.println("NUMBER_PATTERN.matcher(testData[]).matches() : " + elapsedNano2 / 1000000 + " ms");
+        // don't assert normally as the testing is machine dependent.
+        // assertTrue("Expected Pattern matching to be faster than BigDecimal constructor",elapsedNano2<elapsedNano1);
+   }
 
     /**
      * JSONObject built from a bean, but only using a null value.
@@ -736,14 +804,18 @@ public class JSONObjectTest {
                 jsonObject.optDouble("doubleKey") == -23.45e7);
         assertTrue("opt doubleKey with Default should be double", 
                 jsonObject.optDouble("doubleStrKey", Double.NaN) == 1);
-        assertTrue("opt negZeroKey should be double", 
-                Double.compare(jsonObject.optDouble("negZeroKey"), -0.0d) == 0);
-        assertTrue("opt negZeroStrKey with Default should be double", 
-                Double.compare(jsonObject.optDouble("negZeroStrKey"), -0.0d) == 0);
+        assertTrue("opt negZeroKey should be a Double", 
+                jsonObject.opt("negZeroKey") instanceof Double);
+        assertTrue("get negZeroKey should be a Double", 
+                jsonObject.get("negZeroKey") instanceof Double);
         assertTrue("optNumber negZeroKey should return Double",
                 jsonObject.optNumber("negZeroKey") instanceof Double);
         assertTrue("optNumber negZeroStrKey should return Double",
                 jsonObject.optNumber("negZeroStrKey") instanceof Double);
+        assertTrue("opt negZeroKey should be double", 
+                Double.compare(jsonObject.optDouble("negZeroKey"), -0.0d) == 0);
+        assertTrue("opt negZeroStrKey with Default should be double", 
+                Double.compare(jsonObject.optDouble("negZeroStrKey"), -0.0d) == 0);
         assertTrue("optNumber negZeroKey should be -0.0", 
                 Double.compare(jsonObject.optNumber("negZeroKey").doubleValue(), -0.0d) == 0);
         assertTrue("optNumber negZeroStrKey should be -0.0", 
@@ -941,128 +1013,128 @@ public class JSONObjectTest {
             jsonObject.getBoolean("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".equals(e.getMessage()));
+            assertEquals("expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.", e.getMessage());
         }
         try {
             jsonObject.getBoolean("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a Boolean.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a Boolean.",
+                    e.getMessage());
         }
         try {
             jsonObject.getString("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getString("trueKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"trueKey\"] not a string.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"trueKey\"] not a string.",
+                    e.getMessage());
         }
         try {
             jsonObject.getDouble("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getDouble("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a number.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"stringKey\"] is not a number.",
+                    e.getMessage());
         }
         try {
             jsonObject.getFloat("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getFloat("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a number.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"stringKey\"] is not a number.",
+                    e.getMessage());
         }
         try {
             jsonObject.getInt("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getInt("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not an int.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a number.",
+                    e.getMessage());
         }
         try {
             jsonObject.getLong("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getLong("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a long.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a number.",
+                    e.getMessage());
         }
         try {
             jsonObject.getJSONArray("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getJSONArray("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a JSONArray.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a JSONArray.",
+                    e.getMessage());
         }
         try {
             jsonObject.getJSONObject("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"nonKey\"] not found.",
+                    e.getMessage());
         }
         try {
             jsonObject.getJSONObject("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a JSONObject.".
-                    equals(e.getMessage()));
+            assertEquals("Expecting an exception message", 
+                    "JSONObject[\"stringKey\"] is not a JSONObject.",
+                    e.getMessage());
         }
     }
 
@@ -1138,6 +1210,10 @@ public class JSONObjectTest {
                 jsonObject.optBigInteger("bigInt", BigInteger.ONE).equals(bigInteger));
         assertTrue("jsonObject serializes bigInt correctly",
                 jsonObject.toString().equals("{\"bigInt\":123456789012345678901234567890}"));
+        assertTrue("BigInteger as BigDecimal",
+                jsonObject.getBigDecimal("bigInt").equals(new BigDecimal(bigInteger)));
+
+        
         jsonObject = new JSONObject();
         jsonObject.put("bigDec", bigDecimal);
         assertTrue("jsonObject.put() handles bigDec correctly",
@@ -1150,19 +1226,18 @@ public class JSONObjectTest {
                 jsonObject.toString().equals(
                 "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
 
+        assertTrue("BigDecimal as BigInteger",
+                jsonObject.getBigInteger("bigDec").equals(bigDecimal.toBigInteger()));
         /**
          * exercise some exceptions
          */
         try {
+            // bigInt key does not exist
             jsonObject.getBigDecimal("bigInt");
             fail("expected an exeption");
         } catch (JSONException ignored) {}
         obj = jsonObject.optBigDecimal("bigInt", BigDecimal.ONE);
         assertTrue("expected BigDecimal", obj.equals(BigDecimal.ONE));
-        try {
-            jsonObject.getBigInteger("bigDec");
-            fail("expected an exeption");
-        } catch (JSONException ignored) {}
         jsonObject.put("stringKey",  "abc");
         try {
             jsonObject.getBigDecimal("stringKey");
@@ -2392,6 +2467,8 @@ public class JSONObjectTest {
         assertEquals(new BigDecimal("1234"),jo.optBigDecimal("bigInteger", null));
         assertEquals(new BigDecimal("1234.56789"),jo.optBigDecimal("bigDecimal", null));
         assertNull(jo.optBigDecimal("nullVal", null));
+        assertEquals(jo.optBigDecimal("float", null),jo.getBigDecimal("float"));
+        assertEquals(jo.optBigDecimal("double", null),jo.getBigDecimal("double"));
     }
     
     /**
