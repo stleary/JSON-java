@@ -444,11 +444,13 @@ public class JSONTokener {
          */
 
         StringBuilder sb = new StringBuilder();
-        while (c >= ' ' && ",:]}/\\\"[{;=#".indexOf(c) < 0) {
+        while (c > ' ' && ",:]}/\\\"[{;=#".indexOf(c) < 0) {
             sb.append(c);
             c = this.next();
         }
-        this.back();
+        if( false == this.eof ) {
+            this.back();
+        }
 
         string = sb.toString().trim();
         if ("".equals(string)) {
