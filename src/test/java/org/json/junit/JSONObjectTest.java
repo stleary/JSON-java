@@ -122,9 +122,13 @@ public class JSONObjectTest {
                     + "0a"
         };
         final int testDataLength = testData.length;
-        final int iterations = 1000000;
+        /**
+         * Changed to 1000 for faster test runs
+         */
+        // final int iterations = 1000000;
+        final int iterations = 1000;
 
-        // 10 million iterations 1,000,000 * 10
+        // 10 million iterations 1,000,000 * 10 (currently 100,000)
         long startTime = System.nanoTime();
         for(int i = 0; i < iterations; i++) {
             for(int j = 0; j < testDataLength; j++) {
