@@ -1,6 +1,7 @@
 package org.json.junit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -263,6 +264,63 @@ public class XMLTest {
         compareStringToJSONObject(xmlStr, expectedStr);
         compareReaderToJSONObject(xmlStr, expectedStr);
         compareFileToJSONObject(xmlStr, expectedStr);
+    }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testXmlEscapeToJson(){
+        String xmlStr = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<root>"+
+            "<rawQuote>\"</rawQuote>"+
+            "<euro>A &#8364;33</euro>"+
+            "<euroX>A &#x20ac;22&#x20AC;</euroX>"+
+            "<unknown>some text &copy;</unknown>"+
+            "<known>&#x0022; &quot; &amp; &apos; &lt; &gt;</known>"+
+            "<high>&#x1D122; &#x10165;</high>" +
+            "</root>";
+        String expectedStr = 
+            "{\"root\":{" +
+            "\"rawQuote\":\"\\\"\"," +
+            "\"euro\":\"A €33\"," +
+            "\"euroX\":\"A €22€\"," +
+            "\"unknown\":\"some text &copy;\"," +
+            "\"known\":\"\\\" \\\" & ' < >\"," +
+            "\"high\":\"𝄢 𐅥\""+
+            "}}";
+        
+        compareStringToJSONObject(xmlStr, expectedStr);
+        compareReaderToJSONObject(xmlStr, expectedStr);
+        compareFileToJSONObject(xmlStr, expectedStr);
+    }
+    
+    /**
+     * Tests that control characters are escaped.
+     */
+    @Test
+    public void testJsonToXmlEscape(){
+        final String jsonSrc = "{\"amount\":\"10,00 €\","
+                + "\"description\":\"Ação Válida\u0085\","
+                + "\"xmlEntities\":\"\\\" ' & < >\""
+                + "}";
+        JSONObject json = new JSONObject(jsonSrc);
+        String xml = XML.toString(json);
+        //test control character not existing
+        assertFalse("Escaping \u0085 failed. Found in XML output.", xml.contains("\u0085"));
+        assertTrue("Escaping \u0085 failed. Entity not found in XML output.", xml.contains("&#x85;"));
+        // test normal unicode existing
+        assertTrue("Escaping € failed. Not found in XML output.", xml.contains("€"));
+        assertTrue("Escaping ç failed. Not found in XML output.", xml.contains("ç"));
+        assertTrue("Escaping ã failed. Not found in XML output.", xml.contains("ã"));
+        assertTrue("Escaping á failed. Not found in XML output.", xml.contains("á"));
+        // test XML Entities converted
+        assertTrue("Escaping \" failed. Not found in XML output.", xml.contains("&quot;"));
+        assertTrue("Escaping ' failed. Not found in XML output.", xml.contains("&apos;"));
+        assertTrue("Escaping & failed. Not found in XML output.", xml.contains("&amp;"));
+        assertTrue("Escaping < failed. Not found in XML output.", xml.contains("&lt;"));
+        assertTrue("Escaping > failed. Not found in XML output.", xml.contains("&gt;"));
     }
 
     /**
@@ -673,8 +731,8 @@ public class XMLTest {
      * @param expectedStr the expected JSON string
      */
     private void compareStringToJSONObject(String xmlStr, String expectedStr) {
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
         JSONObject jsonObject = XML.toJSONObject(xmlStr);
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
     }
 
