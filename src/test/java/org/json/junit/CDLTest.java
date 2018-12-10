@@ -30,7 +30,7 @@ public class CDLTest {
     );
 
     /**
-     * CDL.toJSONArray() adds all values asstrings, with no filtering or 
+     * CDL.toJSONArray() adds all values as strings, with no filtering or 
      * conversions. For testing, this means that the expected JSONObject 
      * values all must be quoted in the cases where the JSONObject parsing 
      * might normally convert the value into a non-string. 
@@ -264,8 +264,8 @@ public class CDLTest {
      */
     @Test
     public void textToJSONArray() {
-        JSONArray jsonArray = CDL.toJSONArray(lines);
-        JSONArray expectedJsonArray = new JSONArray(expectedLines);
+        JSONArray jsonArray = CDL.toJSONArray(this.lines);
+        JSONArray expectedJsonArray = new JSONArray(this.expectedLines);
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 
@@ -289,10 +289,10 @@ public class CDLTest {
      */
     @Test
     public void textToJSONArrayAndBackToString() {
-        JSONArray jsonArray = CDL.toJSONArray(lines);
+        JSONArray jsonArray = CDL.toJSONArray(this.lines);
         String jsonStr = CDL.toString(jsonArray);
         JSONArray finalJsonArray = CDL.toJSONArray(jsonStr);
-        JSONArray expectedJsonArray = new JSONArray(expectedLines);
+        JSONArray expectedJsonArray = new JSONArray(this.expectedLines);
         Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
     }
     
