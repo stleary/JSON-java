@@ -29,7 +29,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.json.JSONArray;
@@ -61,6 +60,7 @@ public class JSONPointerTest {
         assertSame(document, query(""));
     }
 
+    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void nullPointer() {
         new JSONPointer((String) null);
@@ -150,6 +150,7 @@ public class JSONPointerTest {
         assertSame(document.get("m~n"), query("#/m~0n"));
     }
 
+    @SuppressWarnings("unused")
     @Test(expected = IllegalArgumentException.class)
     public void syntaxError() {
         new JSONPointer("key");

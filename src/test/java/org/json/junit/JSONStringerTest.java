@@ -26,6 +26,7 @@ SOFTWARE.
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import org.json.*;
@@ -269,7 +270,7 @@ public class JSONStringerTest {
         assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/stringValue")));
         assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/complexStringValue")));
         assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/intValue")));
-        assertTrue("expected -23.45e67", Double.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
+        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
     }
 
     /**
@@ -298,7 +299,7 @@ public class JSONStringerTest {
         assertTrue("expected null", JSONObject.NULL.equals(jsonArray.query("/2")));
         assertTrue("expected hello world!", "hello world!".equals(jsonArray.query("/3")));
         assertTrue("expected 42", Integer.valueOf(42).equals(jsonArray.query("/4")));
-        assertTrue("expected -23.45e67", Double.valueOf(-23.45e67).equals(jsonArray.query("/5")));
+        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonArray.query("/5")));
     }
 
     /**
@@ -355,7 +356,7 @@ public class JSONStringerTest {
         assertTrue("expected null", JSONObject.NULL.equals(jsonObject.query("/nullValue")));
         assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/stringValue")));
         assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/intValue")));
-        assertTrue("expected -23.45e67", Double.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
+        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
         assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/complexStringValue")));
         assertTrue("expected v1", "v1".equals(jsonObject.query("/object2/k1")));
         assertTrue("expected v2", "v2".equals(jsonObject.query("/object2/k2")));
