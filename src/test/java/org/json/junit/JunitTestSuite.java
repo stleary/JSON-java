@@ -18,7 +18,8 @@ import org.junit.runners.Suite;
    EnumTest.class,
    JSONPointerTest.class,
    JSONStringTest.class,
-   JSONTokenerTest.class
+   JSONTokenerTest.class,
+   XMLConfigurationTest.class
 })
 public class JunitTestSuite {
 }
