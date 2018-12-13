@@ -448,7 +448,9 @@ public class JSONTokener {
             sb.append(c);
             c = this.next();
         }
-        this.back();
+        if (!this.eof) {
+            this.back();
+        }
 
         string = sb.toString().trim();
         if ("".equals(string)) {
