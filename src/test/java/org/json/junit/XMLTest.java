@@ -6,6 +6,13 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -743,14 +750,10 @@ public class XMLTest {
      * @param expectedStr the expected JSON string
      */
     private void compareReaderToJSONObject(String xmlStr, String expectedStr) {
-        /*
-         * Commenting out this method until the JSON-java code is updated
-         * to support XML.toJSONObject(reader)
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Reader reader = new StringReader(xmlStr);
         JSONObject jsonObject = XML.toJSONObject(reader);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
-        */
     }
 
     /**
@@ -764,22 +767,19 @@ public class XMLTest {
      * @throws IOException
      */
     private void compareFileToJSONObject(String xmlStr, String expectedStr) {
-        /*
-         * Commenting out this method until the JSON-java code is updated
-         * to support XML.toJSONObject(reader)
         try {
             JSONObject expectedJsonObject = new JSONObject(expectedStr);
-            File tempFile = testFolder.newFile("fileToJSONObject.xml");
-            FileWriter fileWriter = new FileWriter(tempFile);
-            fileWriter.write(xmlStr);
-            fileWriter.close();
-            Reader reader = new FileReader(tempFile);
-            JSONObject jsonObject = XML.toJSONObject(reader);
-            Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+            File tempFile = this.testFolder.newFile("fileToJSONObject.xml");
+            try(FileWriter fileWriter = new FileWriter(tempFile);){
+                fileWriter.write(xmlStr);
+            }
+            try(Reader reader = new FileReader(tempFile);){
+                JSONObject jsonObject = XML.toJSONObject(reader);
+                Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+            }
         } catch (IOException e) {
-            assertTrue("file writer error: " +e.getMessage(), false);
+            fail("file writer error: " +e.getMessage());
         }
-        */
     }
 
     /**

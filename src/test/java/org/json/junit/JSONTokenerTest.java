@@ -12,7 +12,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
 
@@ -64,7 +66,99 @@ public class JSONTokenerTest {
             }
        }
     }
+    
+    @Test
+    public void testValid() {
+        checkValid("0",Number.class);
+        checkValid(" 0  ",Number.class);
+        checkValid("23",Number.class);
+        checkValid("23.5",Number.class);
+        checkValid(" 23.5  ",Number.class);
+        checkValid("null",null);
+        checkValid(" null  ",null);
+        checkValid("true",Boolean.class);
+        checkValid(" true\n",Boolean.class);
+        checkValid("false",Boolean.class);
+        checkValid("\nfalse  ",Boolean.class);
+        checkValid("{}",JSONObject.class);
+        checkValid(" {}  ",JSONObject.class);
+        checkValid("{\"a\":1}",JSONObject.class);
+        checkValid(" {\"a\":1}  ",JSONObject.class);
+        checkValid("[]",JSONArray.class);
+        checkValid(" []  ",JSONArray.class);
+        checkValid("[1,2]",JSONArray.class);
+        checkValid("\n\n[1,2]\n\n",JSONArray.class);
+        checkValid("1 2", String.class);
+    }
+    
+    @Test
+    public void testErrors() {
+        // Check that stream can detect that a value is found after
+        // the first one
+        checkError(" { \"a\":1 }  4 ");
+        checkError("null \"a\"");
+        checkError("{} true");
+    }
+    
+    private Object checkValid(String testStr, Class<?> aClass)  {
+        Object result = nextValue(testStr);
 
+        // Check class of object returned
+        if( null == aClass ) {
+            if(JSONObject.NULL.equals(result)) {
+                // OK
+            } else {
+                throw new JSONException("Unexpected class: "+result.getClass().getSimpleName());
+            }
+        } else {
+            if( null == result ) {
+                throw new JSONException("Unexpected null result");
+            } else if(!aClass.isAssignableFrom(result.getClass()) ) {
+                throw new JSONException("Unexpected class: "+result.getClass().getSimpleName());
+            }
+        }
+        
+        return result;
+    }
+
+    private void checkError(String testStr) {
+        try {
+            nextValue(testStr);
+            
+            fail("Error should be triggered: (\""+testStr+"\")");
+        } catch (JSONException e) {
+            // OK
+        }
+    }
+    
+    /**
+     * Verifies that JSONTokener can read a stream that contains a value. After
+     * the reading is done, check that the stream is left in the correct state
+     * by reading the characters after. All valid cases should reach end of stream.
+     * @param testStr
+     * @return
+     * @throws Exception
+     */
+    private Object nextValue(String testStr) throws JSONException {
+        try(StringReader sr = new StringReader(testStr);){
+            JSONTokener tokener = new JSONTokener(sr);
+    
+            Object result = tokener.nextValue();
+    
+            if( result == null ) {
+                throw new JSONException("Unable to find value token in JSON stream: ("+tokener+"): "+testStr);
+            }
+            
+            char c = tokener.nextClean();
+            if( 0 != c ) {
+                throw new JSONException("Unexpected character found at end of JSON stream: "+c+ " ("+tokener+"): "+testStr);
+            }
+    
+            return result;
+        }
+
+    }
+    
     /**
      * Tests the failure of the skipTo method with a buffered reader. Preferably
      * we'd like this not to fail but at this time we don't have a good recovery.
