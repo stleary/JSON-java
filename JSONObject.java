@@ -2475,9 +2475,12 @@ public class JSONObject {
             writer.write('{');
 
             if (length == 1) {
-                final int newindent = indent + indentFactor;
-                writer.write('\n');
-                indent(writer, newindent);
+                int newindent = indent;
+                if (indentFactor > 0) {
+                    newindent += indentFactor;
+                    writer.write('\n');
+                    indent(writer, newindent);
+                }
                 final Entry<String,?> entry = this.entrySet().iterator().next();
                 final String key = entry.getKey();
                 writer.write(quote(key));
@@ -2490,8 +2493,10 @@ public class JSONObject {
                 } catch (Exception e) {
                     throw new JSONException("Unable to write JSONObject value for key: " + key, e);
                 }
-                writer.write('\n');
-                indent(writer, indent);
+                if (indentFactor > 0) {
+                    writer.write('\n');
+                    indent(writer, indent);
+                }
             } else if (length != 0) {
                 final int newindent = indent + indentFactor;
                 for (final Entry<String,?> entry : this.entrySet()) {
