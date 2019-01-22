@@ -161,7 +161,7 @@ public class JSONObject {
     /**
      * The map where the JSONObject's properties are kept.
      */
-    private final Map<String, Object> map;
+    protected final Map<String, Object> map;
 
     /**
      * It is sometimes more convenient and less ambiguous to have a
@@ -181,7 +181,7 @@ public class JSONObject {
         // implementations to rearrange their items for a faster element 
         // retrieval based on associative access.
         // Therefore, an implementation mustn't rely on the order of the item.
-        this.map = new HashMap<String, Object>();
+        this.map = new LinkedHashMap<String, Object>();
     }
 
     /**
