@@ -31,7 +31,7 @@ import java.util.Iterator;
 /**
  * This provides static methods to convert an XML text into a JSONObject, and to
  * covert a JSONObject into an XML text.
- * 
+ *
  * @author JSON.org
  * @version 2016-08-10
  */
@@ -64,7 +64,12 @@ public class XML {
 
     /** The Character '/'. */
     public static final Character SLASH = '/';
-    
+
+    /**
+     * Null attrubute name
+     */
+    public static final String NULL_ATTR = "xsi:nil";
+
     /**
      * Creates an iterator for navigating Code Points in a string instead of
      * characters. Once Java7 support is dropped, this can be replaced with
@@ -72,7 +77,7 @@ public class XML {
      * string.codePoints()
      * </code>
      * which is available in Java8 and above.
-     * 
+     *
      * @see <a href=
      *      "http://stackoverflow.com/a/21791059/6030888">http://stackoverflow.com/a/21791059/6030888</a>
      */
@@ -107,7 +112,7 @@ public class XML {
 
     /**
      * Replace special characters with XML escapes:
-     * 
+     *
      * <pre>
      * &amp; <small>(ampersand)</small> is replaced by &amp;amp;
      * &lt; <small>(less than)</small> is replaced by &amp;lt;
@@ -115,7 +120,7 @@ public class XML {
      * &quot; <small>(double quote)</small> is replaced by &amp;quot;
      * &apos; <small>(single quote / apostrophe)</small> is replaced by &amp;apos;
      * </pre>
-     * 
+     *
      * @param string
      *            The string to be escaped.
      * @return The escaped string.
@@ -151,17 +156,17 @@ public class XML {
         }
         return sb.toString();
     }
-    
+
     /**
      * @param cp code point to test
      * @return true if the code point is not valid for an XML
      */
     private static boolean mustEscape(int cp) {
         /* Valid range from https://www.w3.org/TR/REC-xml/#charsets
-         * 
-         * #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF] 
-         * 
-         * any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. 
+         *
+         * #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+         *
+         * any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.
          */
         // isISOControl is true when (cp >= 0 && cp <= 0x1F) || (cp >= 0x7F && cp <= 0x9F)
         // all ISO control characters are out of range except tabs and new lines
@@ -180,7 +185,7 @@ public class XML {
 
     /**
      * Removes XML escapes from the string.
-     * 
+     *
      * @param string
      *            string to remove escapes from
      * @return string with converted entities
@@ -212,7 +217,7 @@ public class XML {
     /**
      * Throw an exception if the string contains whitespace. Whitespace is not
      * allowed in tagNames and attributes.
-     * 
+     *
      * @param string
      *            A string.
      * @throws JSONException Thrown if the string contains whitespace or is empty.
@@ -232,7 +237,7 @@ public class XML {
 
     /**
      * Scan the content following the named tag, attaching it to the context.
-     * 
+     *
      * @param x
      *            The XMLTokener containing the source string.
      * @param context
@@ -328,6 +333,7 @@ public class XML {
             tagName = (String) token;
             token = null;
             jsonobject = new JSONObject();
+            boolean nilAttributeFound = false;
             for (;;) {
                 if (token == null) {
                     token = x.nextToken();
@@ -341,8 +347,17 @@ public class XML {
                         if (!(token instanceof String)) {
                             throw x.syntaxError("Missing value");
                         }
-                        jsonobject.accumulate(string,
-                                config.keepStrings ? ((String)token) : stringToValue((String) token));
+
+                        if (config.convertNilAttributeToNull
+                                && NULL_ATTR.equals(string)
+                                && Boolean.parseBoolean((String) token)) {
+                            nilAttributeFound = true;
+                        } else if (!nilAttributeFound) {
+                            jsonobject.accumulate(string,
+                                    config.keepStrings
+                                            ? ((String) token)
+                                            : stringToValue((String) token));
+                        }
                         token = null;
                     } else {
                         jsonobject.accumulate(string, "");
@@ -354,7 +369,9 @@ public class XML {
                     if (x.nextToken() != GT) {
                         throw x.syntaxError("Misshaped tag");
                     }
-                    if (jsonobject.length() > 0) {
+                    if (nilAttributeFound) {
+                        context.accumulate(tagName, JSONObject.NULL);
+                    } else if (jsonobject.length() > 0) {
                         context.accumulate(tagName, jsonobject);
                     } else {
                         context.accumulate(tagName, "");
@@ -399,10 +416,10 @@ public class XML {
             }
         }
     }
-    
+
     /**
      * This method is the same as {@link JSONObject#stringToValue(String)}.
-     * 
+     *
      * @param string String to convert
      * @return JSON value of this string or the string
      */
@@ -463,7 +480,7 @@ public class XML {
      * elements are represented as JSONArrays. Content text may be placed in a
      * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code>
      * are ignored.
-     * 
+     *
      * @param string
      *            The source string.
      * @return A JSONObject containing the structured data from the XML string.
@@ -518,7 +535,7 @@ public class XML {
         }
         return toJSONObject(reader, XMLParserConfiguration.ORIGINAL);
     }
-    
+
     /**
      * Convert a well-formed (but not necessarily valid) XML into a
      * JSONObject. Some information may be lost in this transformation because
@@ -560,10 +577,10 @@ public class XML {
      * elements are represented as JSONArrays. Content text may be placed in a
      * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code>
      * are ignored.
-     * 
+     *
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
      * numbers but will instead be the exact value as seen in the XML document.
-     * 
+     *
      * @param string
      *            The source string.
      * @param keepStrings If true, then values will not be coerced into boolean
@@ -585,10 +602,10 @@ public class XML {
      * elements are represented as JSONArrays. Content text may be placed in a
      * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code>
      * are ignored.
-     * 
+     *
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
      * numbers but will instead be the exact value as seen in the XML document.
-     * 
+     *
      * @param string
      *            The source string.
      * @param config Configuration options for the parser.
@@ -601,7 +618,7 @@ public class XML {
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
-     * 
+     *
      * @param object
      *            A JSONObject.
      * @return A string.
@@ -610,10 +627,10 @@ public class XML {
     public static String toString(Object object) throws JSONException {
         return toString(object, null, XMLParserConfiguration.ORIGINAL);
     }
-    
+
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
-     * 
+     *
      * @param object
      *            A JSONObject.
      * @param tagName
@@ -627,7 +644,7 @@ public class XML {
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
-     * 
+     *
      * @param object
      *            A JSONObject.
      * @param tagName

@@ -32,7 +32,7 @@ public class XMLParserConfiguration {
     /** Original Configuration of the XML Parser. */
     public static final XMLParserConfiguration ORIGINAL = new XMLParserConfiguration();
     /** Original configuration of the XML Parser except that values are kept as strings. */
-    public static final XMLParserConfiguration KEEP_STRINGS = new XMLParserConfiguration(true); 
+    public static final XMLParserConfiguration KEEP_STRINGS = new XMLParserConfiguration(true);
     /**
      * When parsing the XML into JSON, specifies if values should be kept as strings (true), or if
      * they should try to be guessed into JSON values (numeric, boolean, string)
@@ -44,12 +44,17 @@ public class XMLParserConfiguration {
      * processing.
      */
     public final String cDataTagName;
+    /**
+     * When parsing the XML into JSON, specifies if values with attribute xsi:nil="true"
+     * should be kept as attribute(false), or they should be converted to null(true)
+     */
+    public final boolean convertNilAttributeToNull;
 
     /**
      * Default parser configuration. Does not keep strings, and the CDATA Tag Name is "content".
      */
     public XMLParserConfiguration () {
-          this(false, "content");
+        this(false, "content", false);
     }
 
     /**
@@ -58,7 +63,7 @@ public class XMLParserConfiguration {
      *      <code>false</code> to try and convert XML string values into a JSON value.
      */
     public XMLParserConfiguration (final boolean keepStrings) {
-          this(keepStrings, "content");
+        this(keepStrings, "content", false);
     }
 
     /**
@@ -69,7 +74,7 @@ public class XMLParserConfiguration {
      *      to use that value as the JSONObject key name to process as CDATA.
      */
     public XMLParserConfiguration (final String cDataTagName) {
-          this(false, cDataTagName);
+        this(false, cDataTagName, false);
     }
 
     /**
@@ -80,7 +85,23 @@ public class XMLParserConfiguration {
      *      to use that value as the JSONObject key name to process as CDATA.
      */
     public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName) {
-          this.keepStrings = keepStrings;
-          this.cDataTagName = cDataTagName;
+        this.keepStrings = keepStrings;
+        this.cDataTagName = cDataTagName;
+        this.convertNilAttributeToNull = false;
+    }
+
+    /**
+     * Configure the parser to use custom settings.
+     * @param keepStrings <code>true</code> to parse all values as string.
+     *      <code>false</code> to try and convert XML string values into a JSON value.
+     * @param cDataTagName <code>null</code> to disable CDATA processing. Any other value
+     *      to use that value as the JSONObject key name to process as CDATA.
+     * @param convertNilAttributeToNull <code>true</code> to parse values with attribute xsi:nil="true" as null.
+     *                                  <code>false</code> to parse values with attribute xsi:nil="true" as {"xsi:nil":true}.
+     */
+    public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName, final boolean convertNilAttributeToNull) {
+        this.keepStrings = keepStrings;
+        this.cDataTagName = cDataTagName;
+        this.convertNilAttributeToNull = convertNilAttributeToNull;
     }
 }
