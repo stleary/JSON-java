@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
+import org.json.XMLParserConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -856,4 +857,15 @@ public class XMLTest {
 
    }
 
+    /**
+     * test passes when xsi:nil="true" converting to null (JSON specification-like conversion)
+     */
+    @Test
+    public void testToJsonWithNull() {
+        final String originalXml = "<root><id xsi:nil=\"true\"/></root>";
+        final String expectedJsonString = "{\"root\":{\"id\":null}}";
+
+        final JSONObject json = XML.toJSONObject(originalXml,new XMLParserConfiguration(false, "content", true));
+        assertEquals(expectedJsonString, json.toString());
+    }
 }
