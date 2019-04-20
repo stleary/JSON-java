@@ -858,14 +858,26 @@ public class XMLTest {
    }
 
     /**
-     * test passes when xsi:nil="true" converting to null (JSON specification-like conversion)
+     * test passes when xsi:nil="true" converting to null (JSON specification-like nil conversion enabled)
      */
     @Test
-    public void testToJsonWithNull() {
+    public void testToJsonWithNullWhenNilConversionEnabled() {
         final String originalXml = "<root><id xsi:nil=\"true\"/></root>";
         final String expectedJsonString = "{\"root\":{\"id\":null}}";
 
-        final JSONObject json = XML.toJSONObject(originalXml,new XMLParserConfiguration(false, "content", true));
+        final JSONObject json = XML.toJSONObject(originalXml, new XMLParserConfiguration(false, "content", true));
+        assertEquals(expectedJsonString, json.toString());
+    }
+
+    /**
+     * test passes when xsi:nil="true" not converting to null (JSON specification-like nil conversion disabled)
+     */
+    @Test
+    public void testToJsonWithNullWhenNilConversionDisabled() {
+        final String originalXml = "<root><id xsi:nil=\"true\"/></root>";
+        final String expectedJsonString = "{\"root\":{\"id\":{\"xsi:nil\":true}}}";
+
+        final JSONObject json = XML.toJSONObject(originalXml, new XMLParserConfiguration());
         assertEquals(expectedJsonString, json.toString());
     }
 }
