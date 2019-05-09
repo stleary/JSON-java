@@ -3,7 +3,7 @@ JSON in Java [package org.json]
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.json/json.svg)](https://mvnrepository.com/artifact/org.json/json)
 
-**[Click here if you just want the jar file.](http://central.maven.org/maven2/org/json/json/20180813/json-20180813.jar)**
+**[Click here if you just want the latest release jar file.](http://central.maven.org/maven2/org/json/json/20180813/json-20180813.jar)**
 
 JSON is a light-weight, language independent, data interchange format.
 See http://www.JSON.org/
@@ -88,7 +88,7 @@ https://github.com/stleary/JSON-Java-unit-test
 
 Numeric types in this package comply with
 [ECMA-404: The JSON Data Interchange Format](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and
-[RFC 7159: The JavaScript Object Notation (JSON) Data Interchange Format](https://tools.ietf.org/html/rfc7159#section-6).
+[RFC 8259: The JavaScript Object Notation (JSON) Data Interchange Format](https://tools.ietf.org/html/rfc8259#section-6).
 This package fully supports `Integer`, `Long`, and `Double` Java types. Partial support
 for `BigInteger` and `BigDecimal` values in `JSONObject` and `JSONArray` objects is provided
 in the form of `get()`, `opt()`, and `put()` API methods.
@@ -96,7 +96,7 @@ in the form of `get()`, `opt()`, and `put()` API methods.
 Although 1.6 compatibility is currently supported, it is not a project goal and may be
 removed in some future release.
 
-In compliance with RFC7159 page 10 section 9, the parser is more lax with what is valid
+In compliance with RFC8259 page 10 section 9, the parser is more lax with what is valid
 JSON than the Generator. For Example, the tab character (U+0009) is allowed when reading
 JSON Text strings, but when output by the Generator, tab is properly converted to \t in
 the string. Other instances may occur where reading invalid JSON text does not cause an
