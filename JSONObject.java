@@ -98,7 +98,7 @@ import java.util.regex.Pattern;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-08-15
+ * @version 2019-07-01
  */
 public class JSONObject {
     /**
@@ -182,6 +182,21 @@ public class JSONObject {
         // retrieval based on associative access.
         // Therefore, an implementation mustn't rely on the order of the item.
         this.map = new HashMap<String, Object>();
+    }
+    
+    /**
+     * Construct an emtpy JSONObject with a user-defined factory function for the object's property map.
+     * The caller can choose the map implementation by passing a map supplier which should always create a new, empty map. 
+     * This may be used especially to influence the iteration order of {@link #keySet()} or {@link #toString(int)}'s output:
+     * By choosing a sorted map, the output will be ordered by key.
+     * By choosing a linked map, the output will be in insertion order (oder of put calls).
+     * <p>Example call with Java 8 function reference syntax:
+     * <code>JSONObject o = new JSONObject(LinkedHashMap::new);</code>
+     * <p>In Java 6 and 7 you'll need to create a class implementing the MapSupplier interface instead (which may be an anonymous inner class).</p>
+     * @param mapSupplier Supplier for a new map, typically a method reference to a constructor or factory method.
+     */
+    public JSONObject(MapSupplier mapSupplier) {
+        this.map = mapSupplier.get();
     }
 
     /**
