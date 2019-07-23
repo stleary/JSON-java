@@ -107,6 +107,8 @@ invalid number formats (1.2e6.3) will cause errors as such documents can not be 
 Release history:
 
 ~~~
+20190722    Recent commits
+
 20180813    POM change to include Automatic-Module-Name (#431)
 
 20180130    Recent commits
