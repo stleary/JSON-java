@@ -1496,11 +1496,11 @@ public class JSONObject {
         }
     }
 
-    private boolean isValidMethodName(String name) {
+    private static boolean isValidMethodName(String name) {
         return !"getClass".equals(name) && !"getDeclaringClass".equals(name);
     }
 
-    private String getKeyNameFromMethod(Method method) {
+    private static String getKeyNameFromMethod(Method method) {
         final int ignoreDepth = getAnnotationDepth(method, JSONPropertyIgnore.class);
         if (ignoreDepth > 0) {
             final int forcedNameDepth = getAnnotationDepth(method, JSONPropertyName.class);
