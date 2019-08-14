@@ -102,7 +102,13 @@ JSON Text strings, but when output by the Generator, tab is properly converted t
 the string. Other instances may occur where reading invalid JSON text does not cause an
 error to be generated. Malformed JSON Texts such as missing end " (quote) on strings or
 invalid number formats (1.2e6.3) will cause errors as such documents can not be read
- reliably.
+reliably.
+
+Some notible exceptions that the JSON Parser in this library accepts are:
+* Unquoted keys `{ key: "value" }`
+* Unquoted values `{ "key": value }`
+* Unescaped literals like "tab" in string values `{ "key": "value   with an unescaped tab" }`
+* Numbers out of range for `Double` or `Long` are parsed as strings
 
 Release history:
 
