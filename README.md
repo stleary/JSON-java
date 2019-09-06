@@ -3,7 +3,7 @@ JSON in Java [package org.json]
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.json/json.svg)](https://mvnrepository.com/artifact/org.json/json)
 
-**[Click here if you just want the latest release jar file.](http://central.maven.org/maven2/org/json/json/20180813/json-20180813.jar)**
+**[Click here if you just want the latest release jar file.](https://repo1.maven.org/maven2/org/json/json/20190722/json-20190722.jar)**
 
 JSON is a light-weight, language independent, data interchange format.
 See http://www.JSON.org/
