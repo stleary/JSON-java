@@ -2,8 +2,6 @@ package org.json.junit;
 
 import static org.junit.Assert.*;
 
-import java.util.Base64;
-
 import org.json.*;
 import org.junit.Test;
 
