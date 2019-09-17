@@ -346,14 +346,14 @@ public class JSONArrayTest {
             assertTrue("expected getDouble to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a number.",e.getMessage());
+                    "JSONArray[4] is not a double.",e.getMessage());
         }
         try {
             jsonArray.getInt(4);
             assertTrue("expected getInt to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a number.",e.getMessage());
+                    "JSONArray[4] is not a int.",e.getMessage());
         }
         try {
             jsonArray.getJSONArray(4);
@@ -374,14 +374,14 @@ public class JSONArrayTest {
             assertTrue("expected getLong to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a number.",e.getMessage());
+                    "JSONArray[4] is not a long.",e.getMessage());
         }
         try {
             jsonArray.getString(5);
             assertTrue("expected getString to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[5] not a string.",e.getMessage());
+                    "JSONArray[5] is not a String.",e.getMessage());
         }
     }
 

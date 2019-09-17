@@ -1041,7 +1041,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"trueKey\"] not a string.",
+                    "JSONObject[\"trueKey\"] is not a string.",
                     e.getMessage());
         }
         try {
@@ -1057,7 +1057,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a number.",
+                    "JSONObject[\"stringKey\"] is not a double.",
                     e.getMessage());
         }
         try {
@@ -1073,7 +1073,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a number.",
+                    "JSONObject[\"stringKey\"] is not a float.",
                     e.getMessage());
         }
         try {
@@ -1089,7 +1089,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a number.",
+                    "JSONObject[\"stringKey\"] is not a int.",
                     e.getMessage());
         }
         try {
@@ -1105,7 +1105,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a number.",
+                    "JSONObject[\"stringKey\"] is not a long.",
                     e.getMessage());
         }
         try {
@@ -2087,7 +2087,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message",
-                    "JSONObject[myKey] is not a JSONArray.",
+                    "JSONObject[\"myKey\"] is not a JSONArray (null).",
                     e.getMessage());
         }
         try {
