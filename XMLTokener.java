@@ -232,6 +232,7 @@ public class XMLTokener extends JSONTokener {
                 }
                 switch (c) {
                 case 0:
+                    throw syntaxError("Unterminated string");
                 case '<':
                 case '>':
                 case '/':
