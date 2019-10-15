@@ -47,6 +47,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.hpe.officeconnect.yang.JsonYang;
+
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
  * form is a string wrapped in curly braces with colons between the names and
@@ -2037,6 +2039,33 @@ public class JSONObject {
      */
     public Object remove(String key) {
         return this.map.remove(key);
+    }
+
+    /**
+     * Remove a name and its value, based on the given key Path.
+     *
+     * @param keyPath
+     *            The keyPath to be removed ex: group/person/address/city.
+     * @return The value that was associated with the keyPath, or null if there was
+     *         no value or keyPath does not exist.
+     */
+    public Object removeByQuary(String keyPath) {
+        if (keyPath == null || keyPath.isEmpty()) {
+            throw new IllegalArgumentException("a keyPath cannot be null or empty");
+        }
+        if (keyPath.startsWith("/")) {
+            throw new IllegalArgumentException("a keyPath should not start with '/'");
+        }
+        if (!keyPath.contains("/")) {
+            return this.remove(keyPath);
+        }
+
+        int idx = keyPath.indexOf("/");
+        String firstKey = keyPath.substring(0, idx);
+        if (this.optJSONObject(firstKey) != null) {
+            return this.getJSONObject(firstKey).removeByQuary(keyPath.substring(idx+1));
+        }
+        return null;
     }
 
     /**
