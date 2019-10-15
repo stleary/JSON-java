@@ -2049,7 +2049,7 @@ public class JSONObject {
      * @return The value that was associated with the keyPath, or null if there was
      *         no value or keyPath does not exist.
      */
-    public Object removeByQuary(String keyPath) {
+    public Object removeByQuery(String keyPath) {
         if (keyPath == null || keyPath.isEmpty()) {
             throw new IllegalArgumentException("a keyPath cannot be null or empty");
         }
@@ -2063,7 +2063,7 @@ public class JSONObject {
         int idx = keyPath.indexOf("/");
         String firstKey = keyPath.substring(0, idx);
         if (this.optJSONObject(firstKey) != null) {
-            return this.getJSONObject(firstKey).removeByQuary(keyPath.substring(idx+1));
+            return this.getJSONObject(firstKey).removeByQuery(keyPath.substring(idx+1));
         }
         return null;
     }
