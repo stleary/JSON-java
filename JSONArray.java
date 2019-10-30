@@ -1454,7 +1454,7 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Returns a java.util.List containing all of the elements in this array.
      * If an element in the array is a JSONArray or JSONObject it will also
-     * be converted.
+     * be converted to a List and a Map respectively.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
