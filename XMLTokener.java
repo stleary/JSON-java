@@ -152,7 +152,7 @@ public class XMLTokener extends JSONTokener {
     }
     
     /**
-     * Unescapes an XML entity encoding;
+     * Unescape an XML entity encoding;
      * @param e entity (only the actual entity value, not the preceding & or ending ;
      * @return
      */
