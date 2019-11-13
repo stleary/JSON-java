@@ -2496,7 +2496,7 @@ public class JSONObject {
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
         try {
-            boolean hasComma = false;
+            boolean needsComma = false;
             final int length = this.length();
             writer.write('{');
 
@@ -2516,7 +2516,7 @@ public class JSONObject {
             } else if (length != 0) {
                 final int newIndent = indent + indentFactor;
                 for (final Entry<String,?> entry : this.entrySet()) {
-                    if (hasComma) {
+                    if (needsComma) {
                         writer.write(',');
                     }
                     if (indentFactor > 0) {
@@ -2534,7 +2534,7 @@ public class JSONObject {
                     } catch (Exception e) {
                         throw new JSONException("Unable to write JSONObject value for key: " + key, e);
                     }
-                    hasComma = true;
+                    needsComma = true;
                 }
                 if (indentFactor > 0) {
                     writer.write('\n');

@@ -1409,7 +1409,7 @@ public class JSONArray implements Iterable<Object> {
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
         try {
-            boolean hasComma = false;
+            boolean needsComma = false;
             int length = this.length();
             writer.write('[');
 
@@ -1424,7 +1424,7 @@ public class JSONArray implements Iterable<Object> {
                 final int newIndent = indent + indentFactor;
 
                 for (int i = 0; i < length; i += 1) {
-                    if (hasComma) {
+                    if (needsComma) {
                         writer.write(',');
                     }
                     if (indentFactor > 0) {
@@ -1437,7 +1437,7 @@ public class JSONArray implements Iterable<Object> {
                     } catch (Exception e) {
                         throw new JSONException("Unable to write JSONArray value at index: " + i, e);
                     }
-                    hasComma = true;
+                    needsComma = true;
                 }
                 if (indentFactor > 0) {
                     writer.write('\n');
