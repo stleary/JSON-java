@@ -66,7 +66,7 @@ public class XML {
     public static final Character SLASH = '/';
 
     /**
-     * Null attrubute name
+     * Null attribute name
      */
     public static final String NULL_ATTR = "xsi:nil";
 
@@ -251,7 +251,7 @@ public class XML {
             throws JSONException {
         char c;
         int i;
-        JSONObject jsonobject = null;
+        JSONObject jsonObject = null;
         String string;
         String tagName;
         Object token;
@@ -332,7 +332,7 @@ public class XML {
         } else {
             tagName = (String) token;
             token = null;
-            jsonobject = new JSONObject();
+            jsonObject = new JSONObject();
             boolean nilAttributeFound = false;
             for (;;) {
                 if (token == null) {
@@ -353,14 +353,14 @@ public class XML {
                                 && Boolean.parseBoolean((String) token)) {
                             nilAttributeFound = true;
                         } else if (!nilAttributeFound) {
-                            jsonobject.accumulate(string,
+                            jsonObject.accumulate(string,
                                     config.keepStrings
                                             ? ((String) token)
                                             : stringToValue((String) token));
                         }
                         token = null;
                     } else {
-                        jsonobject.accumulate(string, "");
+                        jsonObject.accumulate(string, "");
                     }
 
 
@@ -371,8 +371,8 @@ public class XML {
                     }
                     if (nilAttributeFound) {
                         context.accumulate(tagName, JSONObject.NULL);
-                    } else if (jsonobject.length() > 0) {
-                        context.accumulate(tagName, jsonobject);
+                    } else if (jsonObject.length() > 0) {
+                        context.accumulate(tagName, jsonObject);
                     } else {
                         context.accumulate(tagName, "");
                     }
@@ -390,21 +390,20 @@ public class XML {
                         } else if (token instanceof String) {
                             string = (String) token;
                             if (string.length() > 0) {
-                                jsonobject.accumulate(config.cDataTagName,
+                                jsonObject.accumulate(config.cDataTagName,
                                         config.keepStrings ? string : stringToValue(string));
                             }
 
                         } else if (token == LT) {
                             // Nested element
-                            if (parse(x, jsonobject, tagName, config)) {
-                                if (jsonobject.length() == 0) {
+                            if (parse(x, jsonObject, tagName, config)) {
+                                if (jsonObject.length() == 0) {
                                     context.accumulate(tagName, "");
-                                } else if (jsonobject.length() == 1
-                                        && jsonobject.opt(config.cDataTagName) != null) {
-                                    context.accumulate(tagName,
-                                            jsonobject.opt(config.cDataTagName));
+                                } else if (jsonObject.length() == 1
+                                        && jsonObject.opt(config.cDataTagName) != null) {
+                                    context.accumulate(tagName, jsonObject.opt(config.cDataTagName));
                                 } else {
-                                    context.accumulate(tagName, jsonobject);
+                                    context.accumulate(tagName, jsonObject);
                                 }
                                 return false;
                             }
@@ -731,7 +730,7 @@ public class XML {
             }
             if (tagName != null) {
 
-                // Emit the </tagname> close tag
+                // Emit the </tagName> close tag
                 sb.append("</");
                 sb.append(tagName);
                 sb.append('>');

@@ -2141,7 +2141,7 @@ public class JSONObject {
             //}
             //return new BigInteger(val);
             
-            // BigInteger version: We use a similar bitLenth compare as
+            // BigInteger version: We use a similar bitLength compare as
             // BigInteger#intValueExact uses. Increases GC, but objects hold
             // only what they need. i.e. Less runtime overhead if the value is
             // long lived. Which is the better tradeoff? This is closer to what's
@@ -2496,7 +2496,7 @@ public class JSONObject {
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
         try {
-            boolean commanate = false;
+            boolean needsComma = false;
             final int length = this.length();
             writer.write('{');
 
@@ -2514,15 +2514,15 @@ public class JSONObject {
                     throw new JSONException("Unable to write JSONObject value for key: " + key, e);
                 }
             } else if (length != 0) {
-                final int newindent = indent + indentFactor;
+                final int newIndent = indent + indentFactor;
                 for (final Entry<String,?> entry : this.entrySet()) {
-                    if (commanate) {
+                    if (needsComma) {
                         writer.write(',');
                     }
                     if (indentFactor > 0) {
                         writer.write('\n');
                     }
-                    indent(writer, newindent);
+                    indent(writer, newIndent);
                     final String key = entry.getKey();
                     writer.write(quote(key));
                     writer.write(':');
@@ -2530,11 +2530,11 @@ public class JSONObject {
                         writer.write(' ');
                     }
                     try {
-                        writeValue(writer, entry.getValue(), indentFactor, newindent);
+                        writeValue(writer, entry.getValue(), indentFactor, newIndent);
                     } catch (Exception e) {
                         throw new JSONException("Unable to write JSONObject value for key: " + key, e);
                     }
-                    commanate = true;
+                    needsComma = true;
                 }
                 if (indentFactor > 0) {
                     writer.write('\n');
