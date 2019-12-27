@@ -32,7 +32,9 @@ to produce a vector-like object. The object provides methods for manipulating
 its contents, and for producing a JSON compliant array serialization.
 
 **JSONTokener.java**: The `JSONTokener` breaks a text into a sequence of individual
-tokens. It can be constructed from a `String`, `Reader`, or `InputStream`.
+tokens. It can be constructed from a `String`, `Reader`, or `InputStream`. It also can 
+parse text from a `String`, `Number`, `Boolean` or `null` like `"hello"`, `42`, `true`, 
+`null` to produce a simple json object.
 
 **JSONException.java**: The `JSONException` is the standard exception type thrown
 by this package.
