@@ -589,19 +589,19 @@ public class JSONObjectTest {
                 jsonObject.has("someString"));
         assertFalse("Normal field name (myDouble) processing did not work",
                 jsonObject.has("myDouble"));
-        assertFalse("Normal field name (someFloat) found",
+        assertFalse("Normal field name (someFloat) processing did not work",
                 jsonObject.has("someFloat"));
-        assertFalse("Ignored field found!",
+        assertFalse("Ignored field not found!",
                 jsonObject.has("ignoredInt"));
-        assertTrue("Normal field name (someInt) processing did not work",
+        assertTrue("Normal field name (someInt) found",
                 jsonObject.has("someInt"));
-        assertTrue("Normal field name (someLong) processing did not work",
+        assertTrue("Normal field name (someLong) found",
                 jsonObject.has("someLong"));
-        assertTrue("Overridden String field name (myStringField) not found",
+        assertTrue("Overridden String field name (myStringField) found",
                 jsonObject.has("myStringField"));
-        assertTrue("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) not found",
+        assertTrue("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) found",
                 jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"));
-        assertTrue("Overridden String field name (InterfaceField) not found",
+        assertTrue("Overridden String field name (InterfaceField) found",
                 jsonObject.has("InterfaceField"));
     }
     
@@ -619,26 +619,29 @@ public class JSONObjectTest {
                 jsonObject.has("someInt"));
         assertFalse("Normal field name (myDouble) processing did not work",
                 jsonObject.has("myDouble"));
-        assertFalse("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) FOUND!",
+        assertFalse("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) not FOUND!",
                 jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"));
-        assertFalse("Normal field name (someFloat) found",
+        assertFalse("Normal field name (someFloat) found, but was overridden",
                 jsonObject.has("someFloat"));
-        assertFalse("Ignored field found!",
+        assertFalse("Ignored field found! but was overridden",
                 jsonObject.has("ignoredInt"));
-        assertFalse("Ignored field at the same level as forced name found",
+        assertFalse("Ignored field at the same level as forced name not found",
                 jsonObject.has("ShouldBeIgnored"));
-        assertTrue("Overridden int field name (newIntFieldName) not found",
+        assertFalse("Normally ignored field (able) with explicit property name not found",
+                jsonObject.has("able"));
+        assertTrue("Overridden int field name (newIntFieldName) found",
                 jsonObject.has("newIntFieldName"));
-        assertTrue("Normal field name (someLong) processing did not work",
+        assertTrue("Normal field name (someLong) found",
                 jsonObject.has("someLong"));
-        assertTrue("Overridden String field name (myStringField) not found",
+        assertTrue("Overridden String field name (myStringField) found",
                 jsonObject.has("myStringField"));
-        assertTrue(jsonObject.has("AMoreNormalName"));
-        assertTrue("Overridden String field name (InterfaceField) not found",
+        assertTrue("Overridden double field name (AMoreNormalName) found",
+                jsonObject.has("AMoreNormalName"));
+        assertTrue("Overridden String field name (InterfaceField) found",
                 jsonObject.has("InterfaceField"));
-        assertTrue("Forced field not found!",
+        assertTrue("Forced field found!",
                 jsonObject.has("forcedInt"));
-        assertTrue("Normally ignored field (getable) with explicit property name not found",
+        assertTrue("Overridden boolean field name (Getable) found",
                 jsonObject.has("Getable"));
     }
 
