@@ -589,19 +589,24 @@ public class JSONObjectTest {
                 jsonObject.has("someString"));
         assertFalse("Normal field name (myDouble) processing did not work",
                 jsonObject.has("myDouble"));
-        assertFalse("Normal field name (someFloat) found",
+        assertFalse("Normal field name (someFloat) processing did not work",
                 jsonObject.has("someFloat"));
-        assertFalse("Ignored field found!",
+        assertFalse("Ignored field not found!",
                 jsonObject.has("ignoredInt"));
-        assertTrue("Normal field name (someInt) processing did not work",
+        // getSomeInt() has no user-defined annotation
+        assertTrue("Normal field name (someInt) should have been found",
                 jsonObject.has("someInt"));
-        assertTrue("Normal field name (someLong) processing did not work",
+        // the user-defined annotation does not replace any value, so someLong should be found
+        assertTrue("Normal field name (someLong) should have been found",
                 jsonObject.has("someLong"));
-        assertTrue("Overridden String field name (myStringField) not found",
+        // myStringField replaces someString property name via user-defined annotation
+        assertTrue("Overridden String field name (myStringField) should have been found",
                 jsonObject.has("myStringField"));
-        assertTrue("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) not found",
+        // weird name replaces myDouble property name via user-defined annotation
+        assertTrue("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) should have been found",
                 jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"));
-        assertTrue("Overridden String field name (InterfaceField) not found",
+        // InterfaceField replaces someFloat property name via user-defined annotation
+        assertTrue("Overridden String field name (InterfaceField) should have been found",
                 jsonObject.has("InterfaceField"));
     }
     
@@ -619,26 +624,39 @@ public class JSONObjectTest {
                 jsonObject.has("someInt"));
         assertFalse("Normal field name (myDouble) processing did not work",
                 jsonObject.has("myDouble"));
-        assertFalse("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) FOUND!",
+        // myDouble was replaced by weird name, and then replaced again by AMoreNormalName via user-defined annotation
+        assertFalse("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) should not be FOUND!",
                 jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"));
-        assertFalse("Normal field name (someFloat) found",
+        assertFalse("Normal field name (someFloat) found, but was overridden",
                 jsonObject.has("someFloat"));
-        assertFalse("Ignored field found!",
+        assertFalse("Ignored field found! but was overridden",
                 jsonObject.has("ignoredInt"));
-        assertFalse("Ignored field at the same level as forced name found",
+        // shouldNotBeJSON property name was first ignored, then replaced by ShouldBeIgnored via user-defined annotations
+        assertFalse("Ignored field at the same level as forced name should not have been found",
                 jsonObject.has("ShouldBeIgnored"));
-        assertTrue("Overridden int field name (newIntFieldName) not found",
+        // able property name was replaced by Getable via user-defined annotation
+        assertFalse("Normally ignored field (able) with explicit property name should not have been found",
+                jsonObject.has("able"));
+        // property name someInt was replaced by newIntFieldName via user-defined annotation
+        assertTrue("Overridden int field name (newIntFieldName) should have been found",
                 jsonObject.has("newIntFieldName"));
-        assertTrue("Normal field name (someLong) processing did not work",
+        // property name someLong was not replaced via user-defined annotation
+        assertTrue("Normal field name (someLong) should have been found",
                 jsonObject.has("someLong"));
-        assertTrue("Overridden String field name (myStringField) not found",
+        // property name someString was replaced by myStringField via user-defined annotation
+        assertTrue("Overridden String field name (myStringField) should have been found",
                 jsonObject.has("myStringField"));
-        assertTrue(jsonObject.has("AMoreNormalName"));
-        assertTrue("Overridden String field name (InterfaceField) not found",
+        // property name myDouble was replaced by a weird name, followed by AMoreNormalName via user-defined annotations
+        assertTrue("Overridden double field name (AMoreNormalName) should have been found",
+                jsonObject.has("AMoreNormalName"));
+        // property name someFloat was replaced by InterfaceField via user-defined annotation
+        assertTrue("Overridden String field name (InterfaceField) should have been found",
                 jsonObject.has("InterfaceField"));
-        assertTrue("Forced field not found!",
+        // property name ignoredInt was replaced by none, followed by forcedInt via user-defined annotations
+        assertTrue("Forced field should have been found!",
                 jsonObject.has("forcedInt"));
-        assertTrue("Normally ignored field (getable) with explicit property name not found",
+        // property name able was replaced by Getable via user-defined annotation
+        assertTrue("Overridden boolean field name (Getable) should have been found",
                 jsonObject.has("Getable"));
     }
 
