@@ -35,6 +35,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -208,6 +210,10 @@ public class JSONArray implements Iterable<Object> {
     @Override
     public Iterator<Object> iterator() {
         return this.myArrayList.iterator();
+    }
+
+    public final Stream<Object> stream() {
+        return StreamSupport.stream(this.spliterator(), false);
     }
 
     /**
