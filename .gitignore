@@ -5,3 +5,12 @@
 .idea
 *.iml
 /target/
+
+/bin/
+build
+.settings/
+/.gradle/
+/gradle/
+/gradlew
+/gradlew.bat
+.gitmodules
