@@ -4,3 +4,4 @@
 # ignore Intellij Idea project files
 .idea
 *.iml
+/target/
