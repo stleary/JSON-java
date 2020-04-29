@@ -197,4 +197,12 @@ Execution failed for task ':compileJava'.
 | TestRunner.java | 
 | Util.java | 
 
+## How to release
+- Adapt the version number in the pom file
+- Run
+``` 
+mvn clean deploy
+```
+
+You will need permissions for the org.json library given by the sonatype maven central team. 
 
