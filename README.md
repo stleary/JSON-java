@@ -115,6 +115,8 @@ Some notible exceptions that the JSON Parser in this library accepts are:
 Release history:
 
 ~~~
+20200518    Recent commits and snapshot before project structure change
+
 20190722    Recent commits
 
 20180813    POM change to include Automatic-Module-Name (#431)
