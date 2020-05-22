@@ -79,16 +79,12 @@ public class CookieTest {
      * Expects a JSONException.
      */
     @Test
-    public void malFormedAttributeException() {
+    public void booleanAttribute() {
         String cookieStr = "this=Cookie;myAttribute";
-        try {
-            Cookie.toJSONObject(cookieStr);
-            fail("Expecting an exception");
-        } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "Missing '=' in cookie parameter. at 23 [character 24 line 1]",
-                    e.getMessage());
-        }
+            JSONObject jo = Cookie.toJSONObject(cookieStr);
+            assertTrue("has key 'name'", jo.has("name"));
+            assertTrue("has key 'value'", jo.has("value"));
+            assertTrue("has key 'myAttribute'", jo.has("myAttribute"));
     }
 
     /**
@@ -104,7 +100,25 @@ public class CookieTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Expected '=' and instead saw '' at 0 [character 1 line 1]",
+                    "Cookies must have a 'name'",
+                    e.getMessage());
+        }
+    }
+    /**
+     * 
+     * Attempts to create a JSONObject from an cookie string where the name is blank.<br>
+     * Note: Cookie throws an exception, but CookieList does not.<br>
+     * Expects a JSONException
+     */
+    @Test
+    public void emptyNameCookieException() {
+        String cookieStr = " = value ";
+        try {
+            Cookie.toJSONObject(cookieStr);
+            fail("Expecting an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "Cookies must have a 'name'",
                     e.getMessage());
         }
     }
@@ -149,8 +163,8 @@ public class CookieTest {
     }
 
     /**
-     * Cookie.toString() will omit the non-standard "thiswont=beIncluded"
-     * attribute, but the attribute is still stored in the JSONObject.
+     * Cookie.toString() will emit the non-standard "thiswont=beIncluded"
+     * attribute, and the attribute is still stored in the JSONObject.
      * This test confirms both behaviors.
      */
     @Test
@@ -163,15 +177,15 @@ public class CookieTest {
             "thisWont=beIncluded;"+
             "secure";
         String expectedCookieStr = 
-            "{\"path\":\"/\","+
+            "{\"thisWont\":\"beIncluded\","+
+            "\"path\":\"/\","+
             "\"expires\":\"Wed, 19-Mar-2014 17:53:53 GMT\","+
             "\"domain\":\".yahoo.com\","+
             "\"name\":\"PH\","+
             "\"secure\":true,"+
             "\"value\":\"deleted\"}";
         // Add the nonstandard attribute to the expected cookie string
-        String expectedDirectCompareCookieStr = 
-            expectedCookieStr.replaceAll("\\{", "\\{\"thisWont\":\"beIncluded\",");
+        String expectedDirectCompareCookieStr = expectedCookieStr;
         // convert all strings into JSONObjects
         JSONObject jsonObject = Cookie.toJSONObject(cookieStr);
         JSONObject expectedJsonObject = new JSONObject(expectedCookieStr);
