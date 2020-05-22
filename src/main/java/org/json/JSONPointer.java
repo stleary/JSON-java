@@ -68,6 +68,7 @@ public class JSONPointer {
         /**
          * Creates a {@code JSONPointer} instance using the tokens previously set using the
          * {@link #append(String)} method calls.
+         * @return a JSONPointer object
          */
         public JSONPointer build() {
             return new JSONPointer(this.refTokens);
@@ -277,6 +278,7 @@ public class JSONPointer {
     /**
      * Returns a string representing the JSONPointer path value using URI
      * fragment identifier representation
+     * @return a uri fragment string
      */
     public String toURIFragment() {
         try {

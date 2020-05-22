@@ -42,7 +42,7 @@ public class CookieList {
      *     cookieJSONObject.getString("value"));
      * @param string  A cookie list string
      * @return A JSONObject
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
         JSONObject jo = new JSONObject();
@@ -63,7 +63,7 @@ public class CookieList {
      * in the names and values are replaced by "%hh".
      * @param jo A JSONObject
      * @return A cookie list string
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static String toString(JSONObject jo) throws JSONException {
         boolean             b = false;

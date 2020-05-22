@@ -51,12 +51,12 @@ public class HTTP {
      *    "Reason-Phrase": "OK" (for example)
      * }</pre>
      * In addition, the other parameters in the header will be captured, using
-     * the HTTP field names as JSON names, so that <pre>
+     * the HTTP field names as JSON names, so that <pre>{@code
      *    Date: Sun, 26 May 2002 18:06:04 GMT
      *    Cookie: Q=q2=PPEAsg--; B=677gi6ouf29bn&b=2&f=s
-     *    Cache-Control: no-cache</pre>
+     *    Cache-Control: no-cache}</pre>
      * become
-     * <pre>{...
+     * <pre>{@code
      *    Date: "Sun, 26 May 2002 18:06:04 GMT",
      *    Cookie: "Q=q2=PPEAsg--; B=677gi6ouf29bn&b=2&f=s",
      *    "Cache-Control": "no-cache",
@@ -66,7 +66,7 @@ public class HTTP {
      * @param string An HTTP header string.
      * @return A JSONObject containing the elements and attributes
      * of the XML string.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
         JSONObject     jo = new JSONObject();

@@ -1333,7 +1333,7 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Make a pretty-printed JSON text of this JSONArray.
      * 
-     * <p>If <code>indentFactor > 0</code> and the {@link JSONArray} has only
+     * <p>If <pre> {@code indentFactor > 0}</pre> and the {@link JSONArray} has only
      * one element, then the array will be output on a single line:
      * <pre>{@code [1]}</pre>
      * 
@@ -1355,7 +1355,7 @@ public class JSONArray implements Iterable<Object> {
      *         object, beginning with <code>[</code>&nbsp;<small>(left
      *         bracket)</small> and ending with <code>]</code>
      *         &nbsp;<small>(right bracket)</small>.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public String toString(int indentFactor) throws JSONException {
         StringWriter sw = new StringWriter();
@@ -1370,9 +1370,9 @@ public class JSONArray implements Iterable<Object> {
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      *</b>
-     *
+     * @param writer the writer object
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException if a called function fails
      */
     public Writer write(Writer writer) throws JSONException {
         return this.write(writer, 0, 0);
@@ -1381,7 +1381,7 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Write the contents of the JSONArray as JSON text to a writer.
      * 
-     * <p>If <code>indentFactor > 0</code> and the {@link JSONArray} has only
+     * <p>If <pre>{@code indentFactor > 0}</pre> and the {@link JSONArray} has only
      * one element, then the array will be output on a single line:
      * <pre>{@code [1]}</pre>
      * 
@@ -1404,7 +1404,7 @@ public class JSONArray implements Iterable<Object> {
      * @param indent
      *            The indentation of the top level.
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException if a called function fails or unable to write
      */
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
