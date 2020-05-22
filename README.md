@@ -84,8 +84,7 @@ cookie lists.
 
 **XMLTokener.java**: `XMLTokener` extends `JSONTokener` for parsing XML text.
 
-Unit tests are maintained in a separate project. Contributing developers can test
-JSON-java pull requests with the code in this project:
+Unit tests are now maintained in this project as of 2020-05-22. For releases before the merge into this project, see
 https://github.com/stleary/JSON-Java-unit-test
 
 Numeric types in this package comply with
