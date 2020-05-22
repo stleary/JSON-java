@@ -148,3 +148,63 @@ as of 29 July, 2015.
 JSON-java releases can be found by searching the Maven repository for groupId "org.json"
 and artifactId "json". For example:
 https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav
+
+# Unit tests
+The test suite can be run by calling
+```
+mvn test
+```
+
+
+
+## Conventions
+Test filenames should consist of the name of the module being tested, with the suffix "Test". 
+For example, <b>Cookie.java</b> is tested by <b>CookieTest.java</b>.
+
+<b>The fundamental issues with JSON-Java testing are:</b><br>
+* <b>JSONObjects</b> are unordered, making simple string comparison ineffective. 
+* Comparisons via **equals()** is not currently supported. Neither <b>JSONArray</b> nor <b>JSONObject</b> override <b>hashCode()</b> or <b>equals()</b>, so comparison defaults to the <b>Object</b> equals(), which is not useful.
+* Access to the <b>JSONArray</b> and <b>JSONObject</b> internal containers for comparison is not currently available.
+
+<b>General issues with unit testing are:</b><br>
+* Just writing tests to make coverage goals tends to result in poor tests. 
+* Unit tests are a form of documentation - how a given method actually works is demonstrated by the test. So for a code reviewer or future developer looking at code a good test helps explain how a function is supposed to work according to the original author. This can be difficult if you are not the original developer.
+*	It is difficult to evaluate unit tests in a vacuum. You also need to see the code being tested to understand if a test is good. 
+* Without unit tests it is hard to feel confident about the quality of the code, especially when fixing bugs or refactoring. Good tests prevents regressions and keeps the intent of the code correct.
+* If you have unit test results along with pull requests, the reviewer has an easier time understanding your code and determining if the it works as intended.
+
+When you start working on a test, add the empty file to the repository and update the readme, so that others will know that test is taken.
+
+**Caveats:**
+JSON-Java is Java 1.6-compatible, but JSON-Java-unit-tests requires Java 1.8. If you see this error when building JSON-Java-unit-test, make sure you have 1.8 installed, on your path, and set in JAVA_HOME:
+```
+Execution failed for task ':compileJava'.
+> invalid flag: -parameters
+```
+
+
+| Resource files used in test |
+| ------------- |  
+| EnumTest.java |
+| MyBean.java |
+| MyBigNumberBean.java |
+| MyEnum.java |
+| MyEnumClass.java |
+| MyEnumField.java |
+| MyJsonString.java |
+| MyPublicClass.java |
+| PropertyTest.java |
+| JunitTestSuite.java | 
+| StringsResourceBundle.java | 
+| TestRunner.java | 
+| Util.java | 
+
+## How to release
+- Adapt the version number in the pom file
+- Run
+``` 
+mvn clean deploy
+```
+
+You will need permissions for the org.json library given by the sonatype maven central team. 
+
