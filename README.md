@@ -22,6 +22,9 @@ package.
 
 The package compiles on Java 1.6-1.8.
 
+# With commit [#515 Merge tests and pom and code](https://github.com/stleary/JSON-java/pull/515), the structure of the project has changed from a flat directory containing all of the Java files to a directory structure that includes unit tests. If you have difficulty using the new structure, please open an issue so we can work through it.
+
+
 
 **JSONObject.java**: The `JSONObject` can parse text from a `String` or a `JSONTokener`
 to produce a map-like object. The object provides methods for manipulating its
@@ -199,12 +202,5 @@ Execution failed for task ':compileJava'.
 | TestRunner.java | 
 | Util.java | 
 
-## How to release
-- Adapt the version number in the pom file
-- Run
-``` 
-mvn clean deploy
-```
 
-You will need permissions for the org.json library given by the sonatype maven central team. 
 
