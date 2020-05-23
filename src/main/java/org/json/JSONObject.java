@@ -2288,16 +2288,16 @@ public class JSONObject {
     /**
      * Make a pretty-printed JSON text of this JSONObject.
      * 
-     * <p>If <code>indentFactor > 0</code> and the {@link JSONObject}
+     * <p>If <pre>{@code indentFactor > 0}</pre> and the {@link JSONObject}
      * has only one key, then the object will be output on a single line:
      * <pre>{@code {"key": 1}}</pre>
      * 
      * <p>If an object has 2 or more keys, then it will be output across
-     * multiple lines: <code><pre>{
+     * multiple lines: <pre>{@code {
      *  "key1": 1,
      *  "key2": "value 2",
      *  "key3": 3
-     * }</pre></code>
+     * }}</pre>
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      * </b>
@@ -2409,9 +2409,9 @@ public class JSONObject {
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      * </b>
-     * 
+     * @param writer the writer object
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException if a called function has an error
      */
     public Writer write(Writer writer) throws JSONException {
         return this.write(writer, 0, 0);
@@ -2470,16 +2470,16 @@ public class JSONObject {
     /**
      * Write the contents of the JSONObject as JSON text to a writer.
      * 
-     * <p>If <code>indentFactor > 0</code> and the {@link JSONObject}
+     * <p>If <pre>{@code indentFactor > 0}</pre> and the {@link JSONObject}
      * has only one key, then the object will be output on a single line:
      * <pre>{@code {"key": 1}}</pre>
      * 
      * <p>If an object has 2 or more keys, then it will be output across
-     * multiple lines: <code><pre>{
+     * multiple lines: <pre>{@code {
      *  "key1": 1,
      *  "key2": "value 2",
      *  "key3": 3
-     * }</pre></code>
+     * }}</pre>
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      * </b>
@@ -2491,7 +2491,8 @@ public class JSONObject {
      * @param indent
      *            The indentation of the top level.
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException if a called function has an error or a write error
+     * occurs
      */
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {

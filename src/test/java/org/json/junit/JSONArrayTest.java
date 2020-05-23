@@ -1,5 +1,29 @@
 package org.json.junit;
 
+/*
+Copyright (c) 2020 JSON.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+The Software shall be used for Good, not Evil.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -9,13 +33,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -753,49 +771,74 @@ public class JSONArrayTest {
                     "]" +
                 "]";
 
-        String jsonArray1Str =
-                "[\n" +
-                " [\n" +
-                "  1,\n" +
-                "  2,\n" +
-                "  {\"key3\": true}\n" +
-                " ],\n" +
-                " {\n" +
-                "  \"key1\": \"val1\",\n" +
-                "  \"key2\": {\"key2\": \"val2\"}\n" +
-                " },\n" +
-                " [\n" +
-                "  [\n" +
-                "   1,\n" +
-                "   2.1\n" +
-                "  ],\n" +
-                "  [null]\n" +
-                " ]\n" +
-                "]";
-        String jsonArray4Str =
-                "[\n" +
-                "    [\n" +
-                "        1,\n" +
-                "        2,\n" +
-                "        {\"key3\": true}\n" +
-                "    ],\n" +
-                "    {\n" +
-                "        \"key1\": \"val1\",\n" +
-                "        \"key2\": {\"key2\": \"val2\"}\n" +
-                "    },\n" +
-                "    [\n" +
-                "        [\n" +
-                "            1,\n" +
-                "            2.1\n" +
-                "        ],\n" +
-                "        [null]\n" +
-                "    ]\n" +
-                "]";
+        String jsonArray1Strs [] = 
+            {
+                "[",
+                " [",
+                "  1,",
+                "  2,",
+                "  {\"key3\": true}",
+                " ],",
+                " {",
+                "  \"key1\": \"val1\",",
+                "  \"key2\": {\"key2\": \"val2\"}",
+                " },",
+                " [",
+                "  [",
+                "   1,",
+                "   2.1",
+                "  ],",
+                "  [null]",
+                " ]",
+                "]"
+            };
+        String jsonArray4Strs [] =
+            {
+                "[",
+                "    [",
+                "        1,",
+                "        2,",
+                "        {\"key3\": true}",
+                "    ],",
+                "    {",
+                "        \"key1\": \"val1\",",
+                "        \"key2\": {\"key2\": \"val2\"}",
+                "    },",
+                "    [",
+                "        [",
+                "            1,",
+                "            2.1",
+                "        ],",
+                "        [null]",
+                "    ]",
+                "]"
+            };
         JSONArray jsonArray = new JSONArray(jsonArray0Str);
-        assertEquals(jsonArray0Str, jsonArray.toString());
-        assertEquals(jsonArray0Str, jsonArray.toString(0));
-        assertEquals(jsonArray1Str, jsonArray.toString(1));
-        assertEquals(jsonArray4Str, jsonArray.toString(4));
+        String [] actualStrArray = jsonArray.toString().split("\\r?\\n");
+        assertEquals("Expected 1 line", 1, actualStrArray.length);
+        actualStrArray = jsonArray.toString(0).split("\\r?\\n");
+        assertEquals("Expected 1 line", 1, actualStrArray.length);
+
+        actualStrArray = jsonArray.toString(1).split("\\r?\\n");
+        assertEquals("Expected lines", jsonArray1Strs.length, actualStrArray.length);
+        List<String> list = Arrays.asList(actualStrArray);
+        for (String s : jsonArray1Strs) {
+            list.contains(s);
+        }
+        
+        actualStrArray = jsonArray.toString(4).split("\\r?\\n");
+        assertEquals("Expected lines", jsonArray1Strs.length, actualStrArray.length);
+        list = Arrays.asList(actualStrArray);
+        for (String s : jsonArray4Strs) {
+            list.contains(s);
+        }
+
+        //        assertEquals("Expected same number of lines", actualStrArray.length, 
+//                jsonArray0Strs.length);
+//        assertEquals(jsonArray0Str, jsonArray.toString());
+//        assertEquals(jsonArray0Str, jsonArray.toString(0));
+//        assertEquals(jsonArray1Str, jsonArray.toString(1));
+//        assertEquals(jsonArray4Str, jsonArray.toString(4));
     }
 
     /**
@@ -900,9 +943,18 @@ public class JSONArrayTest {
         try {
             jsonArray.write(stringWriter);
             String actualStr = stringWriter.toString();
+            JSONArray finalArray = new JSONArray(actualStr);
+            Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
             assertTrue("write() expected " + expectedStr +
                             " but found " + actualStr,
-                    expectedStr.equals(actualStr));
+                    actualStr.contains("value1") &&
+                    actualStr.contains("value2") &&
+                    actualStr.contains("key1") &&
+                    actualStr.contains("1") &&
+                    actualStr.contains("key2") &&
+                    actualStr.contains("2") &&
+                    actualStr.contains("key3") &&
+                    actualStr.contains("3"));
         } finally {
             stringWriter.close();
         }
@@ -932,30 +984,41 @@ public class JSONArrayTest {
     @Test
     public void write3Param() throws IOException {
         String str0 = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":false,\"key3\":3.14}]";
-        String str2 =
-                "[\n" +
-                "   \"value1\",\n" +
-                "   \"value2\",\n" +
-                "   {\n" +
-                "     \"key1\": 1,\n" +
-                "     \"key2\": false,\n" +
-                "     \"key3\": 3.14\n" +
-                "   }\n" +
-                " ]";
         JSONArray jsonArray = new JSONArray(str0);
         String expectedStr = str0;
         StringWriter stringWriter = new StringWriter();
         try {
             String actualStr = jsonArray.write(stringWriter, 0, 0).toString();
-            assertEquals(expectedStr, actualStr);
+            JSONArray finalArray = new JSONArray(actualStr);
+            Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
+            assertTrue("write() expected " + expectedStr +
+                            " but found " + actualStr,
+                    actualStr.contains("value1") &&
+                    actualStr.contains("value2") &&
+                    actualStr.contains("key1") &&
+                    actualStr.contains("1") &&
+                    actualStr.contains("key2") &&
+                    actualStr.contains("false") &&
+                    actualStr.contains("key3") &&
+                    actualStr.contains("3.14"));
         } finally {
             stringWriter.close();
         }
         stringWriter = new StringWriter();
         try {
-            expectedStr = str2;
             String actualStr = jsonArray.write(stringWriter, 2, 1).toString();
-            assertEquals(expectedStr, actualStr);
+            JSONArray finalArray = new JSONArray(actualStr);
+            Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
+            assertTrue("write() expected " + expectedStr +
+                            " but found " + actualStr,
+                    actualStr.contains("value1") &&
+                    actualStr.contains("value2") &&
+                    actualStr.contains("key1") &&
+                    actualStr.contains("1") &&
+                    actualStr.contains("key2") &&
+                    actualStr.contains("false") &&
+                    actualStr.contains("key3") &&
+                    actualStr.contains("3.14"));
         } finally {
             stringWriter.close();
         }

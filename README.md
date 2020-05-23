@@ -87,9 +87,7 @@ cookie lists.
 
 **XMLTokener.java**: `XMLTokener` extends `JSONTokener` for parsing XML text.
 
-Unit tests are maintained in a separate project. Contributing developers can test
-JSON-java pull requests with the code in this project:
-https://github.com/stleary/JSON-Java-unit-test
+Unit tests are now included in the project, but require Java 1.8 at the present time. This will be fixed in a forthcoming commit.
 
 Numeric types in this package comply with
 [ECMA-404: The JSON Data Interchange Format](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf) and
@@ -153,9 +151,13 @@ and artifactId "json". For example:
 https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav
 
 # Unit tests
-The test suite can be run by calling
+The test suite can be executed with Maven by running:
 ```
 mvn test
+```
+The test suite can be executed with Gradle (6.4 or greater) by running:
+```
+gradle clean build test
 ```
 
 
@@ -176,7 +178,6 @@ For example, <b>Cookie.java</b> is tested by <b>CookieTest.java</b>.
 * Without unit tests it is hard to feel confident about the quality of the code, especially when fixing bugs or refactoring. Good tests prevents regressions and keeps the intent of the code correct.
 * If you have unit test results along with pull requests, the reviewer has an easier time understanding your code and determining if the it works as intended.
 
-When you start working on a test, add the empty file to the repository and update the readme, so that others will know that test is taken.
 
 **Caveats:**
 JSON-Java is Java 1.6-compatible, but JSON-Java-unit-tests requires Java 1.8. If you see this error when building JSON-Java-unit-test, make sure you have 1.8 installed, on your path, and set in JAVA_HOME:
