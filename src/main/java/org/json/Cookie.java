@@ -1,5 +1,7 @@
 package org.json;
 
+import java.util.Locale;
+
 /*
 Copyright (c) 2002 JSON.org
 
@@ -74,7 +76,9 @@ public class Cookie {
      * The name will be stored under the key "name", and the value will be
      * stored under the key "value". This method does not do checking or
      * validation of the parameters. It only converts the cookie string into
-     * a JSONObject.
+     * a JSONObject. All attribute names are converted to lower case keys in the
+     * JSONObject (HttpOnly =&gt; httponly). If an attribute is specified more than
+     * once, only the value found closer to the end of the cookie-string is kept.
      * @param string The cookie specification string.
      * @return A JSONObject containing "name", "value", and possibly other
      *  members.
@@ -104,7 +108,7 @@ public class Cookie {
         x.next();
         // parse the remaining cookie attributes
         while (x.more()) {
-            name = unescape(x.nextTo("=;")).trim();
+            name = unescape(x.nextTo("=;")).trim().toLowerCase(Locale.ROOT);
             // don't allow a cookies attributes to overwrite it's name or value.
             if("name".equalsIgnoreCase(name)) {
                 throw new JSONException("Illegal attribute name: 'name'");

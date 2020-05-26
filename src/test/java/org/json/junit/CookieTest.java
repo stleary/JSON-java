@@ -84,7 +84,7 @@ public class CookieTest {
             JSONObject jo = Cookie.toJSONObject(cookieStr);
             assertTrue("has key 'name'", jo.has("name"));
             assertTrue("has key 'value'", jo.has("value"));
-            assertTrue("has key 'myAttribute'", jo.has("myAttribute"));
+            assertTrue("has key 'myAttribute'", jo.has("myattribute"));
     }
 
     /**
@@ -177,7 +177,7 @@ public class CookieTest {
             "thisWont=beIncluded;"+
             "secure";
         String expectedCookieStr = 
-            "{\"thisWont\":\"beIncluded\","+
+            "{\"thiswont\":\"beIncluded\","+
             "\"path\":\"/\","+
             "\"expires\":\"Wed, 19-Mar-2014 17:53:53 GMT\","+
             "\"domain\":\".yahoo.com\","+
