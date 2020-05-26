@@ -130,21 +130,42 @@ public class Cookie {
 
     /**
      * Convert a JSONObject into a cookie specification string. The JSONObject
-     * must contain "name" and "value" members.
+     * must contain "name" and "value" members (case insensitive).
      * If the JSONObject contains other members, they will be appended to the cookie
      * specification string. User-Agents are instructed to ignore unknown attributes,
      * so ensure your JSONObject is using only known attributes.
      * See also: <a href="https://tools.ietf.org/html/rfc6265">https://tools.ietf.org/html/rfc6265</a>
      * @param jo A JSONObject
      * @return A cookie specification string
-     * @throws JSONException if a called function fails
+     * @throws JSONException thrown if the cookie has no name.
      */
     public static String toString(JSONObject jo) throws JSONException {
         StringBuilder sb = new StringBuilder();
-
-        sb.append(escape(jo.getString("name")));
+        
+        String name = null;
+        Object value = null;
+        for(String key : jo.keySet()){
+            if("name".equalsIgnoreCase(key)) {
+                name = jo.getString(key).trim();
+            }
+            if("value".equalsIgnoreCase(key)) {
+                value=jo.getString(key).trim();
+            }
+            if(name != null && value != null) {
+                break;
+            }
+        }
+        
+        if(name == null || "".equals(name.trim())) {
+            throw new JSONException("Cookie does not have a name");
+        }
+        if(value == null) {
+            value = "";
+        }
+        
+        sb.append(escape(name));
         sb.append("=");
-        sb.append(escape(jo.getString("value")));
+        sb.append(escape((String)value));
         
         for(String key : jo.keySet()){
             if("name".equalsIgnoreCase(key)
@@ -152,11 +173,17 @@ public class Cookie {
                 // already processed above
                 continue;
             }
-            Object value = jo.opt(key);
+            value = jo.opt(key);
             if(value instanceof Boolean) {
-                sb.append(';').append(key);
+                if(Boolean.TRUE.equals(value)) {
+                    sb.append(';').append(escape(key));
+                }
+                // don't emit false values
             } else {
-                sb.append(';').append(key).append('=').append(escape(value.toString()));
+                sb.append(';')
+                    .append(escape(key))
+                    .append('=')
+                    .append(escape(value.toString()));
             }
         }
         
