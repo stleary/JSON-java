@@ -4,9 +4,9 @@ public class MyLocaleBean {
     private final String id = "beanId";
     private final String i = "beanI";
     public String getId() {
-        return id;
+        return this.id;
     }
     public String getI() {
-        return i;
+        return this.i;
     }
 }

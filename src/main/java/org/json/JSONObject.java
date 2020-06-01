@@ -2109,48 +2109,54 @@ public class JSONObject {
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             // decimal representation
             if (isDecimalNotation(val)) {
-                // quick dirty way to see if we need a BigDecimal instead of a Double
-                // this only handles some cases of overflow or underflow
-                if (val.length()>14) {
-                    return new BigDecimal(val);
+                // Use a BigDecimal all the time so we keep the original
+                // representation. BigDecimal doesn't support -0.0, ensure we
+                // keep that by forcing a decimal.
+                try {
+                    BigDecimal bd = new BigDecimal(val);
+                    if(initial == '-' && BigDecimal.ZERO.compareTo(bd)==0) {
+                        return Double.valueOf(-0.0);
+                    }
+                    return bd;
+                } catch (NumberFormatException retryAsDouble) {
+                    // this is to support "Hex Floats" like this: 0x1.0P-1074
+                    try {
+                        Double d = Double.valueOf(val);
+                        if(d.isNaN() || d.isInfinite()) {
+                            throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                        }
+                        return d;
+                    } catch (NumberFormatException ignore) {
+                        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                    }
                 }
-                final Double d = Double.valueOf(val);
-                if (d.isInfinite() || d.isNaN()) {
-                    // if we can't parse it as a double, go up to BigDecimal
-                    // this is probably due to underflow like 4.32e-678
-                    // or overflow like 4.65e5324. The size of the string is small
-                    // but can't be held in a Double.
-                    return new BigDecimal(val);
+            }
+            // block items like 00 01 etc. Java number parsers treat these as Octal.
+            if(initial == '0' && val.length() > 1) {
+                char at1 = val.charAt(1);
+                if(at1 >= '0' && at1 <= '9') {
+                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
                 }
-                return d;
+            } else if (initial == '-' && val.length() > 2) {
+                char at1 = val.charAt(1);
+                char at2 = val.charAt(2);
+                if(at1 == '0' && at2 >= '0' && at2 <= '9') {
+                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                }
             }
             // integer representation.
             // This will narrow any values to the smallest reasonable Object representation
             // (Integer, Long, or BigInteger)
             
-            // string version
-            // The compare string length method reduces GC,
-            // but leads to smaller integers being placed in larger wrappers even though not
-            // needed. i.e. 1,000,000,000 -> Long even though it's an Integer
-            // 1,000,000,000,000,000,000 -> BigInteger even though it's a Long
-            //if(val.length()<=9){
-            //    return Integer.valueOf(val);
-            //}
-            //if(val.length()<=18){
-            //    return Long.valueOf(val);
-            //}
-            //return new BigInteger(val);
-            
-            // BigInteger version: We use a similar bitLength compare as
+            // BigInteger down conversion: We use a similar bitLenth compare as
             // BigInteger#intValueExact uses. Increases GC, but objects hold
             // only what they need. i.e. Less runtime overhead if the value is
-            // long lived. Which is the better tradeoff? This is closer to what's
-            // in stringToValue.
+            // long lived.
             BigInteger bi = new BigInteger(val);
-            if(bi.bitLength()<=31){
+            if(bi.bitLength() <= 31){
                 return Integer.valueOf(bi.intValue());
             }
-            if(bi.bitLength()<=63){
+            if(bi.bitLength() <= 63){
                 return Long.valueOf(bi.longValue());
             }
             return bi;
@@ -2194,23 +2200,7 @@ public class JSONObject {
         char initial = string.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
-                // if we want full Big Number support the contents of this
-                // `try` block can be replaced with:
-                // return stringToNumber(string);
-                if (isDecimalNotation(string)) {
-                    Double d = Double.valueOf(string);
-                    if (!d.isInfinite() && !d.isNaN()) {
-                        return d;
-                    }
-                } else {
-                    Long myLong = Long.valueOf(string);
-                    if (string.equals(myLong.toString())) {
-                        if (myLong.longValue() == myLong.intValue()) {
-                            return Integer.valueOf(myLong.intValue());
-                        }
-                        return myLong;
-                    }
-                }
+                return stringToNumber(string);
             } catch (Exception ignore) {
             }
         }

@@ -33,7 +33,7 @@ public final class Singleton {
 
     /** @return someInt */
     public int getSomeInt() {
-        return someInt;
+        return this.someInt;
     }
 
     /**
@@ -48,7 +48,7 @@ public final class Singleton {
 
     /** @return someString */
     public String getSomeString() {
-        return someString;
+        return this.someString;
     }
 
     /**
@@ -65,8 +65,8 @@ public final class Singleton {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + someInt;
-        result = prime * result + ((someString == null) ? 0 : someString.hashCode());
+        result = prime * result + this.someInt;
+        result = prime * result + ((this.someString == null) ? 0 : this.someString.hashCode());
         return result;
     }
 
@@ -79,12 +79,12 @@ public final class Singleton {
         if (getClass() != obj.getClass())
             return false;
         Singleton other = (Singleton) obj;
-        if (someInt != other.someInt)
+        if (this.someInt != other.someInt)
             return false;
-        if (someString == null) {
+        if (this.someString == null) {
             if (other.someString != null)
                 return false;
-        } else if (!someString.equals(other.someString))
+        } else if (!this.someString.equals(other.someString))
             return false;
         return true;
     }

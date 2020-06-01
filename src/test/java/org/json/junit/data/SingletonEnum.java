@@ -19,7 +19,7 @@ public enum SingletonEnum {
     /** single instance. */
 
     /**
-     * @return the singleton instance. I a real application, I'd hope no one did
+     * @return the singleton instance. In a real application, I'd hope no one did
      *         this to an enum singleton.
      */
     public static final SingletonEnum getInstance() {
@@ -32,7 +32,7 @@ public enum SingletonEnum {
 
     /** @return someInt */
     public int getSomeInt() {
-        return someInt;
+        return this.someInt;
     }
 
     /**
@@ -47,7 +47,7 @@ public enum SingletonEnum {
 
     /** @return someString */
     public String getSomeString() {
-        return someString;
+        return this.someString;
     }
 
     /**

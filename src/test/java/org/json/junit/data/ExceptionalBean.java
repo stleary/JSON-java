@@ -7,8 +7,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import org.json.JSONObject;
-
 /**
  * Object for testing the exception handling in {@link JSONObject#populateMap}.
  * 
@@ -56,7 +54,6 @@ public class ExceptionalBean {
         /**
          * @return a string
          */
-        @SuppressWarnings("unused")
         public String getString() {
             return "Yup, it's closeable";
         }
