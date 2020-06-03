@@ -29,6 +29,13 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -369,16 +376,11 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleContentNoArraytoString() {
         String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\",\""+
-            "altContent\":\">\"},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
+            "{\"addresses\":{\"altContent\":\">\"}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         XMLParserConfiguration config = new XMLParserConfiguration("altContent");
         String finalStr = XML.toString(expectedJsonObject, null, config);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>&gt;"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
+        String expectedFinalStr = "<addresses>&gt;</addresses>";
         assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
                 finalStr+"]", expectedFinalStr.equals(finalStr));
     }
@@ -391,17 +393,13 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleContentArraytoString() {
         String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\",\""+
-            "altContent\":[1, 2, 3]},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
+            "{\"addresses\":{\"altContent\":[1, 2, 3]}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         XMLParserConfiguration config = new XMLParserConfiguration("altContent");
         String finalStr = XML.toString(expectedJsonObject, null, config);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>"+
+        String expectedFinalStr = "<addresses>"+
                 "1\n2\n3"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
+                "</addresses>";
         assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
                 finalStr+"]", expectedFinalStr.equals(finalStr));
     }
@@ -413,17 +411,14 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleArraytoString() {
         String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\","+
-            "\"something\":[1, 2, 3]},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
+                "{\"addresses\":{"+
+                        "\"something\":[1, 2, 3]}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         String finalStr = XML.toString(expectedJsonObject, null,
                 XMLParserConfiguration.KEEP_STRINGS);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>"+
+        String expectedFinalStr = "<addresses>"+
                 "<something>1</something><something>2</something><something>3</something>"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
+                "</addresses>";
         assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
                 finalStr+"]", expectedFinalStr.equals(finalStr));
     }
@@ -555,7 +550,9 @@ public class XMLConfigurationTest {
          */
         String expected = "<123IllegalNode>someValue1</123IllegalNode><Illegal@node>someValue2</Illegal@node>";
 
-        assertEquals(expected, result);
+        assertEquals("Length", expected.length(), result.length());
+        assertTrue("123IllegalNode", result.contains("<123IllegalNode>someValue1</123IllegalNode>"));
+        assertTrue("Illegal@node", result.contains("<Illegal@node>someValue2</Illegal@node>"));
     }
 
     /**
@@ -740,10 +737,10 @@ public class XMLConfigurationTest {
     @Test
     public void testToJSONArray_jsonOutput() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final String expectedJsonString = "{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}");
         final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, 
                 new XMLParserConfiguration(false));
-        assertEquals(expectedJsonString, actualJsonOutput.toString());
+        Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
     }
 
     /**
@@ -765,17 +762,20 @@ public class XMLConfigurationTest {
     @Test
     public void testToJsonXML() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final String expectedJsonString = "{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"True\"}}";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"True\"}}");
 
         final JSONObject json = XML.toJSONObject(originalXml,
                 new XMLParserConfiguration(true));
-        assertEquals(expectedJsonString, json.toString());
+        Util.compareActualVsExpectedJsonObjects(json, expected);
         
         final String reverseXml = XML.toString(json);
         // this reversal isn't exactly the same. use JSONML for an exact reversal
         final String expectedReverseXml = "<root><item><id>01</id></item><id>01</id><id>1</id><id>00</id><id>0</id><title>True</title></root>";
 
-        assertEquals(expectedReverseXml, reverseXml);
+        assertEquals("length",expectedReverseXml.length(), reverseXml.length());
+        assertTrue("array contents", reverseXml.contains("<id>01</id><id>1</id><id>00</id><id>0</id>"));
+        assertTrue("item contents", reverseXml.contains("<item><id>01</id></item>"));
+        assertTrue("title contents", reverseXml.contains("<title>True</title>"));
     }
     
     /**
@@ -916,11 +916,14 @@ public class XMLConfigurationTest {
         /*
          * Commenting out this method until the JSON-java code is updated
          * to support XML.toJSONObject(reader)
+         */
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        Reader reader = new StringReader(xmlStr);
-        JSONObject jsonObject = XML.toJSONObject(reader);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
-        */
+        try(Reader reader = new StringReader(xmlStr);) {
+            JSONObject jsonObject = XML.toJSONObject(reader, config);
+            Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+        } catch (IOException e) {
+            assertTrue("IO Reader error: " +e.getMessage(), false);
+        }
     }
 
     /**
@@ -937,18 +940,19 @@ public class XMLConfigurationTest {
         /*
          * Commenting out this method until the JSON-java code is updated
          * to support XML.toJSONObject(reader)
+         */
         try {
             JSONObject expectedJsonObject = new JSONObject(expectedStr);
-            File tempFile = testFolder.newFile("fileToJSONObject.xml");
-            FileWriter fileWriter = new FileWriter(tempFile);
-            fileWriter.write(xmlStr);
-            fileWriter.close();
-            Reader reader = new FileReader(tempFile);
-            JSONObject jsonObject = XML.toJSONObject(reader);
-            Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+            File tempFile = this.testFolder.newFile("fileToJSONObject.xml");
+            try(FileWriter fileWriter = new FileWriter(tempFile);){
+                fileWriter.write(xmlStr);
+            }
+            try(Reader reader = new FileReader(tempFile);){
+                JSONObject jsonObject = XML.toJSONObject(reader);
+                Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+            }
         } catch (IOException e) {
             assertTrue("file writer error: " +e.getMessage(), false);
         }
-        */
     }
 }

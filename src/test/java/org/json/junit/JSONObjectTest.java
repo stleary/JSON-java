@@ -1856,10 +1856,12 @@ public class JSONObjectTest {
                 "    ]\n" +
                 "}";
         JSONObject jsonObject = new JSONObject(jsonObject0Str);
-        assertEquals("toString()",jsonObject0Str, jsonObject.toString());
-        assertEquals("toString(0)",jsonObject0Str, jsonObject.toString(0));
-        assertEquals("toString(1)",jsonObject1Str, jsonObject.toString(1));
-        assertEquals("toString(4)",jsonObject4Str, jsonObject.toString(4));
+        // contents are tested in other methods, in this case just validate the spacing by
+        // checking length
+        assertEquals("toString() length",jsonObject0Str.length(), jsonObject.toString().length());
+        assertEquals("toString(0) length",jsonObject0Str.length(), jsonObject.toString(0).length());
+        assertEquals("toString(1) length",jsonObject1Str.length(), jsonObject.toString(1).length());
+        assertEquals("toString(4) length",jsonObject4Str.length(), jsonObject.toString(4).length());
         
         JSONObject jo = new JSONObject().put("TABLE", new JSONObject().put("yhoo", new JSONObject()));
         assertEquals("toString(2)","{\"TABLE\": {\"yhoo\": {}}}", jo.toString(2));
@@ -2630,9 +2632,10 @@ public class JSONObjectTest {
         JSONObject jsonObject = new JSONObject(str);
         try (StringWriter stringWriter = new StringWriter()) {
             String actualStr = jsonObject.write(stringWriter).toString();
-            assertTrue("write() expected " +expectedStr+
-                    " but found " +actualStr,
-                    expectedStr.equals(actualStr));
+            // key order may change. verify length and individual key content
+            assertEquals("length", expectedStr.length(), actualStr.length());
+            assertTrue("key1", actualStr.contains("\"key1\":\"value1\""));
+            assertTrue("key2", actualStr.contains("\"key2\":[1,2,3]"));
         }
     }
     
@@ -2734,16 +2737,25 @@ public class JSONObjectTest {
                 "   ]\n" +
                 " }";
         JSONObject jsonObject = new JSONObject(str0);
-        String expectedStr = str0;
         try (StringWriter stringWriter = new StringWriter();) {
             String actualStr = jsonObject.write(stringWriter,0,0).toString();
-            assertEquals(expectedStr, actualStr);
+            
+            assertEquals("length", str0.length(), actualStr.length());
+            assertTrue("key1", actualStr.contains("\"key1\":\"value1\""));
+            assertTrue("key2", actualStr.contains("\"key2\":[1,false,3.14]"));
         }
-
-        expectedStr = str2;
+        
         try (StringWriter stringWriter = new StringWriter();) {
             String actualStr = jsonObject.write(stringWriter,2,1).toString();
-            assertEquals(expectedStr, actualStr);
+
+            assertEquals("length", str2.length(), actualStr.length());
+            assertTrue("key1", actualStr.contains("   \"key1\": \"value1\""));
+            assertTrue("key2", actualStr.contains("   \"key2\": [\n" +
+                            "     1,\n" +
+                            "     false,\n" +
+                            "     3.14\n" +
+                            "   ]")
+            );
         }
     }
 
@@ -2978,9 +2990,9 @@ public class JSONObjectTest {
     @Test
     public void testSingletonBean() {
         final JSONObject jo = new JSONObject(Singleton.getInstance());
-//        assertEquals(jo.keySet().toString(), 1, jo.length());
-//        assertEquals(0, jo.get("someInt"));
-//        assertEquals(null, jo.opt("someString"));
+        assertEquals(jo.keySet().toString(), 1, jo.length());
+        assertEquals(0, jo.get("someInt"));
+        assertEquals(null, jo.opt("someString"));
         
         // Update the singleton values
         Singleton.getInstance().setSomeInt(42);
@@ -2991,8 +3003,8 @@ public class JSONObjectTest {
         assertEquals("Something", jo2.get("someString"));
 
         // ensure our original jo hasn't changed.
-//        assertEquals(0, jo.get("someInt"));
-//        assertEquals(null, jo.opt("someString"));
+        assertEquals(0, jo.get("someInt"));
+        assertEquals(null, jo.opt("someString"));
     }
 
     /**
@@ -3002,9 +3014,9 @@ public class JSONObjectTest {
     @Test
     public void testSingletonEnumBean() {
         final JSONObject jo = new JSONObject(SingletonEnum.getInstance());
-//        assertEquals(jo.keySet().toString(), 1, jo.length());
-//        assertEquals(0, jo.get("someInt"));
-//        assertEquals(null, jo.opt("someString"));
+        assertEquals(jo.keySet().toString(), 1, jo.length());
+        assertEquals(0, jo.get("someInt"));
+        assertEquals(null, jo.opt("someString"));
         
         // Update the singleton values
         SingletonEnum.getInstance().setSomeInt(42);
@@ -3015,8 +3027,8 @@ public class JSONObjectTest {
         assertEquals("Something", jo2.get("someString"));
 
         // ensure our original jo hasn't changed.
-//        assertEquals(0, jo.get("someInt"));
-//        assertEquals(null, jo.opt("someString"));
+        assertEquals(0, jo.get("someInt"));
+        assertEquals(null, jo.opt("someString"));
     }
     
     /**
