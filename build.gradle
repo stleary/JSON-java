@@ -40,10 +40,10 @@ sourceCompatibility = '1.7'
 configurations.all {
 }
 
-//java {
-    //withSourcesJar()
-    //withJavadocJar()
-//}
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
 
 publishing {
     publications {
