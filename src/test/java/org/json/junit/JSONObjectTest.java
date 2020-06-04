@@ -946,7 +946,7 @@ public class JSONObjectTest {
         assertTrue( "Integer.MAX_VALUE should still be an Integer!",
                 JSONObject.stringToValue( new Integer( Integer.MAX_VALUE ).toString() ) instanceof Integer );
         assertTrue( "Large integers should be a Long!",
-                JSONObject.stringToValue( new Long( Long.sum( Integer.MAX_VALUE, 1 ) ).toString() ) instanceof Long );
+                JSONObject.stringToValue( Long.valueOf(((long)Integer.MAX_VALUE) + 1 ) .toString() ) instanceof Long );
         assertTrue( "Long.MAX_VALUE should still be an Integer!",
                 JSONObject.stringToValue( new Long( Long.MAX_VALUE ).toString() ) instanceof Long );
 
