@@ -419,18 +419,12 @@ public class XMLTest {
      */
     @Test
     public void shouldHandleContentNoArraytoString() {
-        String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\",\""+
-            "content\":\">\"},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
+        String expectedStr = "{\"addresses\":{\"content\":\">\"}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         String finalStr = XML.toString(expectedJsonObject);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>&gt;"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
+        String expectedFinalStr = "<addresses>&gt;</addresses>";
+        assertEquals("Should handle expectedFinal: ["+expectedStr+"] final: ["+
+                finalStr+"]", expectedFinalStr, finalStr);
     }
 
     /**
@@ -441,18 +435,14 @@ public class XMLTest {
     @Test
     public void shouldHandleContentArraytoString() {
         String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\",\""+
-            "content\":[1, 2, 3]},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
+            "{\"addresses\":{" +
+            "\"content\":[1, 2, 3]}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         String finalStr = XML.toString(expectedJsonObject);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>"+
-                "1\n2\n3"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
+        String expectedFinalStr = "<addresses>"+
+                "1\n2\n3</addresses>";
+        assertEquals("Should handle expectedFinal: ["+expectedStr+"] final: ["+
+                finalStr+"]", expectedFinalStr, finalStr);
     }
 
     /**
@@ -462,18 +452,15 @@ public class XMLTest {
     @Test
     public void shouldHandleArraytoString() {
         String expectedStr = 
-            "{\"addresses\":{\"address\":{\"name\":\"\",\"nocontent\":\"\","+
-            "\"something\":[1, 2, 3]},\"xsi:noNamespaceSchemaLocation\":\"test.xsd\",\""+
-            "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
+            "{\"addresses\":{"+
+            "\"something\":[1, 2, 3]}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         String finalStr = XML.toString(expectedJsonObject);
-        String expectedFinalStr = "<addresses><address><name/><nocontent/>"+
+        String expectedFinalStr = "<addresses>"+
                 "<something>1</something><something>2</something><something>3</something>"+
-                "</address><xsi:noNamespaceSchemaLocation>test.xsd</xsi:noName"+
-                "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
-                "ma-instance</xmlns:xsi></addresses>";
-        assertTrue("Should handle expectedFinal: ["+expectedStr+"] final: ["+
-                finalStr+"]", expectedFinalStr.equals(finalStr));
+                "</addresses>";
+        assertEquals("Should handle expectedFinal: ["+expectedStr+"] final: ["+
+                finalStr+"]", expectedFinalStr, finalStr);
     }
     
     /**
@@ -591,7 +578,9 @@ public class XMLTest {
          */
         String expected = "<123IllegalNode>someValue1</123IllegalNode><Illegal@node>someValue2</Illegal@node>";
 
-        assertEquals(expected, result);
+        assertEquals("length",expected.length(), result.length());
+        assertTrue("123IllegalNode",result.contains("<123IllegalNode>someValue1</123IllegalNode>"));
+        assertTrue("Illegal@node",result.contains("<Illegal@node>someValue2</Illegal@node>"));
     }
 
     /**
@@ -813,10 +802,10 @@ public class XMLTest {
     @Test
     public void testToJSONArray_jsonOutput() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final String expectedJsonString = "{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}";
+        final JSONObject expectedJson = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}");
         final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, false);
 
-        assertEquals(expectedJsonString, actualJsonOutput.toString());
+        Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expectedJson);
     }
 
     /**
@@ -836,16 +825,21 @@ public class XMLTest {
     @Test
     public void testToJsonXML() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final String expectedJsonString = "{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"True\"}}";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"True\"}}");
 
-        final JSONObject json = XML.toJSONObject(originalXml,true);
-        assertEquals(expectedJsonString, json.toString());
+        final JSONObject actual = XML.toJSONObject(originalXml,true);
         
-        final String reverseXml = XML.toString(json);
+        Util.compareActualVsExpectedJsonObjects(actual, expected);
+        
+        final String reverseXml = XML.toString(actual);
         // this reversal isn't exactly the same. use JSONML for an exact reversal
+        // the order of the elements may be differnet as well.
         final String expectedReverseXml = "<root><item><id>01</id></item><id>01</id><id>1</id><id>00</id><id>0</id><title>True</title></root>";
 
-        assertEquals(expectedReverseXml, reverseXml);
+        assertEquals("length",expectedReverseXml.length(), reverseXml.length());
+        assertTrue("array contents", reverseXml.contains("<id>01</id><id>1</id><id>00</id><id>0</id>"));
+        assertTrue("item contents", reverseXml.contains("<item><id>01</id></item>"));
+        assertTrue("title contents", reverseXml.contains("<title>True</title>"));
     }
     
     /**
