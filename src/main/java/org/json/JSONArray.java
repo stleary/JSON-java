@@ -205,6 +205,22 @@ public class JSONArray implements Iterable<Object> {
         }
     }
 
+    /**
+     * Construct a JSONArray with the specified initial capacity.
+     *
+     * @param initialCapacity
+     *            the initial capacity of the JSONArray.
+     * @throws JSONException
+     *             If the initial capacity is negative.
+     */
+    public JSONArray(int initialCapacity) throws JSONException {
+    	if (initialCapacity < 0) {
+            throw new JSONException(
+                    "JSONArray initial capacity cannot be negative.");
+    	}
+    	this.myArrayList = new ArrayList<Object>(initialCapacity);
+    }
+
     @Override
     public Iterator<Object> iterator() {
         return this.myArrayList.iterator();
