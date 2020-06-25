@@ -35,6 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -55,6 +56,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointerException;
+import org.json.JSONTokener;
 import org.json.XML;
 import org.json.junit.data.BrokenToString;
 import org.json.junit.data.ExceptionalBean;
@@ -3078,6 +3080,19 @@ public class JSONObjectTest {
                 1, jo.length());
         assertNotNull(jo.get("ALL"));
     }
+    
+    public void testObjectToBigDecimal() {  
+        double value = 1412078745.01074;  
+        Reader reader = new StringReader("[{\"value\": " + value + "}]");
+        JSONTokener tokener = new JSONTokener(reader);
+        JSONArray array = new JSONArray(tokener);
+        JSONObject jsonObject = array.getJSONObject(0);
+
+        BigDecimal current = jsonObject.getBigDecimal("value");
+        BigDecimal wantedValue = BigDecimal.valueOf(value);
+
+        assertEquals(current, wantedValue);
+     }
     
     /**
      * Tests the exception portions of populateMap.
