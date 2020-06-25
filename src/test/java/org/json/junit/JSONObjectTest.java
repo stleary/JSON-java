@@ -3081,6 +3081,10 @@ public class JSONObjectTest {
         assertNotNull(jo.get("ALL"));
     }
     
+    /**
+     * Sample test case from https://github.com/stleary/JSON-java/issues/531
+     * which verifies that no regression in double/BigDecimal support is present.
+     */
     public void testObjectToBigDecimal() {  
         double value = 1412078745.01074;  
         Reader reader = new StringReader("[{\"value\": " + value + "}]");
