@@ -22,28 +22,28 @@ package.
 
 The package compiles on Java 1.6-1.8.
 
-** Recently [#515 Merge tests and pom and code](https://github.com/stleary/JSON-java/pull/515), the structure of the project changed from a flat directory containing all of the Java files to a directory structure that includes unit tests and several build tools to build the project jar and run the unit tests. If you have difficulty using the new structure, please open an issue so we can work through it.
+**Recently [#515 Merge tests and pom and code](https://github.com/stleary/JSON-java/pull/515), the structure of the project changed from a flat directory containing all of the Java files to a directory structure that includes unit tests and several build tools to build the project jar and run the unit tests. If you have difficulty using the new structure, please open an issue so we can work through it.
 
-** Building from the command line
+**Building from the command line
 
 * Build the class files from the package root directory src/main/java
 
 * * javac org\json\*.java
 
-* Build the jar file
+*Build the jar file
 
 * * jar cf json-java.jar org/json/*.class
 
-* Compile a program that uses the jar (see below example code)
+*Compile a program that uses the jar (see below example code)
 
 * * javac -cp .;json-java.jar Test.java 
  
-* Excecute the Test file
+*Excecute the Test file
  
 * * java -cp .;json-java.jar Test
  
  
-* Test file contents 
+*Test file contents 
 
 ````
 import org.json.JSONObject;
@@ -62,11 +62,15 @@ public class Test {
 ````
 
  
-You can only run the unit tests with Maven or Gradlew.
+*You can only run the unit tests with Maven or Gradlew.
+
+* * mvn clean test
+
+* * gradlew clean test
 
 
 
-
+**Files
 
 **JSONObject.java**: The `JSONObject` can parse text from a `String` or a `JSONTokener`
 to produce a map-like object. The object provides methods for manipulating its
