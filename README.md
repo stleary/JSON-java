@@ -36,17 +36,11 @@ javac org\json\*.java
 jar cf json-java.jar org/json/*.class
 ````
 
-*Compile a program that uses the jar (see below example code)*
+*Compile a program that uses the jar (see example code below)*
 ````
 javac -cp .;json-java.jar Test.java 
 ````
- 
-*Excecute the Test file*
-```` 
-java -cp .;json-java.jar Test
-````
- 
- 
+
 *Test file contents*
 
 ````
@@ -59,6 +53,11 @@ public class Test {
 }
 ````
 
+*Excecute the Test file*
+```` 
+java -cp .;json-java.jar Test
+````
+
 *Expected output*
 
 ````
@@ -69,7 +68,7 @@ public class Test {
 *You can only run the unit tests with Maven or Gradlew.*
 
 
-#Files#
+# Files
 
 **JSONObject.java**: The `JSONObject` can parse text from a `String` or a `JSONTokener`
 to produce a map-like object. The object provides methods for manipulating its
