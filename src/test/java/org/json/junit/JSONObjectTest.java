@@ -1879,7 +1879,7 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectToStringSuppressWarningOnCastToMap() {
         JSONObject jsonObject = new JSONObject();
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap();
         map.put("abc", "def");
         jsonObject.put("key", map);
 
@@ -2632,12 +2632,15 @@ public class JSONObjectTest {
         String str = "{\"key1\":\"value1\",\"key2\":[1,2,3]}";
         String expectedStr = str;
         JSONObject jsonObject = new JSONObject(str);
-        try (StringWriter stringWriter = new StringWriter()) {
+        StringWriter stringWriter = new StringWriter();
+        try {
             String actualStr = jsonObject.write(stringWriter).toString();
             // key order may change. verify length and individual key content
             assertEquals("length", expectedStr.length(), actualStr.length());
             assertTrue("key1", actualStr.contains("\"key1\":\"value1\""));
             assertTrue("key2", actualStr.contains("\"key2\":[1,2,3]"));
+        } finally {
+            stringWriter.close();
         }
     }
     
@@ -2651,29 +2654,40 @@ public class JSONObjectTest {
         jsonObject.put("someKey",new BrokenToString());
 
         // test single element JSONObject
-        try(StringWriter writer = new StringWriter();) {
+        StringWriter writer = new StringWriter();
+        try {
             jsonObject.write(writer).toString();
             fail("Expected an exception, got a String value");
         } catch (JSONException e) {
             assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
         } catch(Exception e) {
             fail("Expected JSONException");
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e) {}
         }
 
         //test multiElement
         jsonObject.put("somethingElse", "a value");
         
-        try (StringWriter writer = new StringWriter()) {
+        writer = new StringWriter();
+        try {
             jsonObject.write(writer).toString();
             fail("Expected an exception, got a String value");
         } catch (JSONException e) {
             assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
         } catch(Exception e) {
             fail("Expected JSONException");
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e) {}
         }
         
         // test a more complex object
-        try (StringWriter writer = new StringWriter()) {
+        writer = new StringWriter();
+        try {
             new JSONObject()
                 .put("somethingElse", "a value")
                 .put("someKey", new JSONArray()
@@ -2684,10 +2698,15 @@ public class JSONObjectTest {
             assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
         } catch(Exception e) {
             fail("Expected JSONException");
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e) {}
         }
        
         // test a more slightly complex object
-        try (StringWriter writer = new StringWriter()) {
+        writer = new StringWriter();
+        try {
             new JSONObject()
                 .put("somethingElse", "a value")
                 .put("someKey", new JSONArray()
@@ -2700,6 +2719,10 @@ public class JSONObjectTest {
             assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
         } catch(Exception e) {
             fail("Expected JSONException");
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e) {}
         }
        
     }
@@ -2739,15 +2762,21 @@ public class JSONObjectTest {
                 "   ]\n" +
                 " }";
         JSONObject jsonObject = new JSONObject(str0);
-        try (StringWriter stringWriter = new StringWriter();) {
+        StringWriter stringWriter = new StringWriter();
+        try {
             String actualStr = jsonObject.write(stringWriter,0,0).toString();
             
             assertEquals("length", str0.length(), actualStr.length());
             assertTrue("key1", actualStr.contains("\"key1\":\"value1\""));
             assertTrue("key2", actualStr.contains("\"key2\":[1,false,3.14]"));
+        } finally {
+            try {
+                stringWriter.close();
+            } catch (Exception e) {}
         }
         
-        try (StringWriter stringWriter = new StringWriter();) {
+        stringWriter = new StringWriter();
+        try {
             String actualStr = jsonObject.write(stringWriter,2,1).toString();
 
             assertEquals("length", str2.length(), actualStr.length());
@@ -2758,6 +2787,10 @@ public class JSONObjectTest {
                             "     3.14\n" +
                             "   ]")
             );
+        } finally {
+            try {
+                stringWriter.close();
+            } catch (Exception e) {}
         }
     }
 
@@ -3039,7 +3072,7 @@ public class JSONObjectTest {
     @SuppressWarnings("boxing")
     @Test
     public void testGenericBean() {
-        GenericBean<Integer> bean = new GenericBean<>(42);
+        GenericBean<Integer> bean = new GenericBean(42);
         final JSONObject jo = new JSONObject(bean);
         assertEquals(jo.keySet().toString(), 8, jo.length());
         assertEquals(42, jo.get("genericValue"));

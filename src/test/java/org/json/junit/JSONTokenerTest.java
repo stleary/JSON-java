@@ -55,7 +55,8 @@ public class JSONTokenerTest {
      */
     @Test
     public void verifyBackFailureZeroIndex() throws IOException {
-        try(Reader reader = new StringReader("some test string")) {
+        Reader reader = new StringReader("some test string"); 
+        try {
             final JSONTokener tokener = new JSONTokener(reader);
             try {
                 // this should fail since the index is 0;
@@ -67,6 +68,8 @@ public class JSONTokenerTest {
                 fail("Unknown Exception type " + e.getClass().getCanonicalName()+" with message "+e.getMessage());
             }
             
+        } finally {
+            reader.close();
         }
     }
     /**
@@ -75,7 +78,8 @@ public class JSONTokenerTest {
      */
     @Test
     public void verifyBackFailureDoubleBack() throws IOException {
-        try(Reader reader = new StringReader("some test string")) {
+        Reader reader = new StringReader("some test string");
+        try {
             final JSONTokener tokener = new JSONTokener(reader);
             tokener.next();
             tokener.back();
@@ -88,6 +92,8 @@ public class JSONTokenerTest {
             } catch (Exception e) {
                 fail("Unknown Exception type " + e.getClass().getCanonicalName()+" with message "+e.getMessage());
             }
+       } finally {
+           reader.close();
        }
     }
     
@@ -164,7 +170,8 @@ public class JSONTokenerTest {
      * @throws Exception
      */
     private Object nextValue(String testStr) throws JSONException {
-        try(StringReader sr = new StringReader(testStr);){
+        StringReader sr = new StringReader(testStr);
+        try {
             JSONTokener tokener = new JSONTokener(sr);
     
             Object result = tokener.nextValue();
@@ -179,6 +186,8 @@ public class JSONTokenerTest {
             }
     
             return result;
+        } finally {
+            sr.close();
         }
 
     }
@@ -196,7 +205,10 @@ public class JSONTokenerTest {
         for(int i=0;i<superLongBuffer.length;i++) {
             superLongBuffer[i] = 'A';
         }
-        try(Reader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(superLongBuffer)))) {
+        
+        Reader reader = new BufferedReader(new InputStreamReader(
+                new ByteArrayInputStream(superLongBuffer)));
+        try {
             final JSONTokener tokener = new JSONTokener(reader);
             try {
                 // this should fail since the internal markAhead buffer is only 1,000,000
@@ -208,6 +220,8 @@ public class JSONTokenerTest {
             } catch (Exception e) {
                 fail("Unknown Exception type " + e.getClass().getCanonicalName()+" with message "+e.getMessage());
             }
+        } finally {
+            reader.close();
         }
     }
 
@@ -223,7 +237,8 @@ public class JSONTokenerTest {
         for(int i=0;i<superLongBuffer.length();i++) {
             superLongBuffer.append('A');
         }
-        try(Reader reader = new StringReader(superLongBuffer.toString())) {
+        Reader reader = new StringReader(superLongBuffer.toString());
+        try {
             final JSONTokener tokener = new JSONTokener(reader);
             try {
                 // this should not fail since the internal markAhead is ignored for StringReaders
@@ -231,6 +246,8 @@ public class JSONTokenerTest {
             } catch (Exception e) {
                 fail("Unknown Exception type " + e.getClass().getCanonicalName()+" with message "+e.getMessage());
             }
+        } finally {
+            reader.close();
         }
     }
 
