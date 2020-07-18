@@ -27,20 +27,24 @@ Recently [#515 Merge tests and pom and code](https://github.com/stleary/JSON-jav
 **Building from the command line**
 
 *Build the class files from the package root directory src/main/java*
-
-* * javac org\json\*.java
+````
+javac org\json\*.java
+````
 
 *Build the jar file*
-
-* * jar cf json-java.jar org/json/*.class
+````
+jar cf json-java.jar org/json/*.class
+````
 
 *Compile a program that uses the jar (see below example code)*
-
-* * javac -cp .;json-java.jar Test.java 
+````
+javac -cp .;json-java.jar Test.java 
+````
  
 *Excecute the Test file*
- 
-* * java -cp .;json-java.jar Test
+```` 
+java -cp .;json-java.jar Test
+````
  
  
 *Test file contents*
@@ -65,7 +69,7 @@ public class Test {
 *You can only run the unit tests with Maven or Gradlew.*
 
 
-#Files
+#Files#
 
 **JSONObject.java**: The `JSONObject` can parse text from a `String` or a `JSONTokener`
 to produce a map-like object. The object provides methods for manipulating its
@@ -148,7 +152,7 @@ error to be generated. Malformed JSON Texts such as missing end " (quote) on str
 invalid number formats (1.2e6.3) will cause errors as such documents can not be read
 reliably.
 
-Some notible exceptions that the JSON Parser in this library accepts are:
+Some notable exceptions that the JSON Parser in this library accepts are:
 * Unquoted keys `{ key: "value" }`
 * Unquoted values `{ "key": value }`
 * Unescaped literals like "tab" in string values `{ "key": "value   with an unescaped tab" }`
