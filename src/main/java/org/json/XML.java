@@ -26,9 +26,11 @@ SOFTWARE.
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
+
 
 /**
  * This provides static methods to convert an XML text into a JSONObject, and to
@@ -71,6 +73,8 @@ public class XML {
      * Null attribute name
      */
     public static final String NULL_ATTR = "xsi:nil";
+
+    public static final String TYPE_ATTR = "xsi:type";
 
     /**
      * Creates an iterator for navigating Code Points in a string instead of
@@ -257,6 +261,7 @@ public class XML {
         String string;
         String tagName;
         Object token;
+        String typeCastClass;
 
         // Test for and skip past these forms:
         // <!-- ... -->
@@ -336,6 +341,7 @@ public class XML {
             token = null;
             jsonObject = new JSONObject();
             boolean nilAttributeFound = false;
+            typeCastClass = null;
             for (;;) {
                 if (token == null) {
                     token = x.nextToken();
@@ -354,6 +360,9 @@ public class XML {
                                 && NULL_ATTR.equals(string)
                                 && Boolean.parseBoolean((String) token)) {
                             nilAttributeFound = true;
+                        } else if(config.useValueTypeCast
+                                && TYPE_ATTR.equals(string)) {
+                            typeCastClass = (String) token;
                         } else if (!nilAttributeFound) {
                             jsonObject.accumulate(string,
                                     config.isKeepStrings()
@@ -392,8 +401,13 @@ public class XML {
                         } else if (token instanceof String) {
                             string = (String) token;
                             if (string.length() > 0) {
-                                jsonObject.accumulate(config.getcDataTagName(),
-                                        config.isKeepStrings() ? string : stringToValue(string));
+                                if(typeCastClass != null) {
+                                    jsonObject.accumulate(config.getcDataTagName(),
+                                            stringToValue(string, typeCastClass));
+                                } else {
+                                    jsonObject.accumulate(config.getcDataTagName(),
+                                            config.isKeepStrings() ? string : stringToValue(string));
+                                }
                             }
 
                         } else if (token == LT) {
@@ -416,6 +430,24 @@ public class XML {
                 }
             }
         }
+    }
+
+    /**
+     * This method tries to convert the given string value to the target object
+     * @param string String to convert
+     * @param className target class name
+     * @return JSON value of this string or the string
+     */
+    public static Object stringToValue(String string, String className) {
+        try {
+            if(className.equals(String.class.getName())) return string;
+            Class<?> clazz = Class.forName(className);
+            Method method = clazz.getMethod("valueOf", String.class);
+            return method.invoke(null, string);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return stringToValue(string);
     }
 
     /**

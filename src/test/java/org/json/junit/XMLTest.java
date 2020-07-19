@@ -972,5 +972,32 @@ public class XMLTest {
         
         assertEquals("Case insensitive Entity unescape",  expectedStr, actualStr);
     }
-    
+
+    /**
+     * test passes when xsi:type="java.lang.String" not converting to string
+     */
+    @Test
+    public void testToJsonWithTypeWhenTypeConversionDisabled() {
+        final String originalXml = "<root><id xsi:type=\"java.lang.String\">1234</id></root>";
+        final String expectedJsonString = "{\"root\":{\"id\":{\"xsi:type\":\"java.lang.String\",\"content\":1234}}}";
+        final JSONObject expectedJson = new JSONObject(expectedJsonString);
+        final JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration());
+
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    /**
+     * test passes when xsi:type="java.lang.String" converting to String
+     */
+    @Test
+    public void testToJsonWithTypeWhenTypeConversionEnabled() {
+        final String originalXml = "<root><id1 xsi:type=\"java.lang.String\">1234</id1>"
+                + "<id2 xsi:type=\"java.lang.Integer\">1234</id2></root>";
+        final String expectedJsonString = "{\"root\":{\"id2\":1234,\"id1\":\"1234\"}}";
+        final JSONObject expectedJson = new JSONObject(expectedJsonString);
+        final JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration(false,
+                "content", false, true));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
 }

@@ -57,6 +57,12 @@ public class XMLParserConfiguration {
     private boolean convertNilAttributeToNull;
 
     /**
+     * When parsing the XML into JSON, specifies if values with attribute xsi:type="java.lang.Integer"
+     * should be kept as attribute(false), or they should be converted to the given type
+     */
+    public boolean useValueTypeCast;
+
+    /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert
      * values), and the CDATA Tag Name is "content".
      */
@@ -106,9 +112,7 @@ public class XMLParserConfiguration {
      */
     @Deprecated
     public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName) {
-        this.keepStrings = keepStrings;
-        this.cDataTagName = cDataTagName;
-        this.convertNilAttributeToNull = false;
+        this(keepStrings, cDataTagName, false);
     }
 
     /**
@@ -125,9 +129,27 @@ public class XMLParserConfiguration {
      */
     @Deprecated
     public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName, final boolean convertNilAttributeToNull) {
+        this(keepStrings, cDataTagName, convertNilAttributeToNull, false);
+    }
+
+    /**
+     * Configure the parser to use custom settings.
+     * @param keepStrings <code>true</code> to parse all values as string.
+     *      <code>false</code> to try and convert XML string values into a JSON value.
+     * @param cDataTagName <code>null</code> to disable CDATA processing. Any other value
+     *      to use that value as the JSONObject key name to process as CDATA.
+     * @param convertNilAttributeToNull <code>true</code> to parse values with attribute xsi:nil="true" as null.
+     *                                  <code>false</code> to parse values with attribute xsi:nil="true" as {"xsi:nil":true}.
+     * @param useValueTypeCast  <code>true</code> to parse values with attribute xsi:type="java.lang.Integer" as
+     *                          integer,  xsi:type="java.lang.String" as string
+     *                          <code>false</code> to parse values with attribute xsi:type="java.lang.Integer" as {"xsi:type":"java.lang.Integer"}.
+     */
+    public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
+            final boolean convertNilAttributeToNull, final boolean useValueTypeCast ) {
         this.keepStrings = keepStrings;
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
+        this.useValueTypeCast = useValueTypeCast;
     }
     
     /**
