@@ -939,4 +939,19 @@ public class XMLTest {
             fail("file writer error: " +e.getMessage());
         }
     }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testIssue537CaseSensitiveHexUnEscapeDirect(){
+        String origStr = 
+            "Neutrophils.Hypersegmented &#X7C; Bld-Ser-Plas";
+        String expectedStr = 
+            "Neutrophils.Hypersegmented | Bld-Ser-Plas";
+        String actualStr = XML.unescape(origStr);
+        
+        assertEquals("Case insensitive Entity unescape",  expectedStr, actualStr);
+    }
+    
 }
