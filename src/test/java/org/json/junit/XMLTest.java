@@ -883,7 +883,10 @@ public class XMLTest {
         final String originalXml = "<root><id xsi:nil=\"true\"/></root>";
         final String expectedJsonString = "{\"root\":{\"id\":null}}";
 
-        final JSONObject json = XML.toJSONObject(originalXml, new XMLParserConfiguration(false, "content", true));
+        final JSONObject json = XML.toJSONObject(originalXml,
+                new XMLParserConfiguration()
+                    .withKeepStrings(false).withcDataTagName("content")
+                    .withConvertNilAttributeToNull(true));
         assertEquals(expectedJsonString, json.toString());
     }
 
