@@ -885,7 +885,8 @@ public class XMLTest {
 
         final JSONObject json = XML.toJSONObject(originalXml,
                 new XMLParserConfiguration()
-                    .withKeepStrings(false).withcDataTagName("content")
+                    .withKeepStrings(false)
+                    .withcDataTagName("content")
                     .withConvertNilAttributeToNull(true));
         assertEquals(expectedJsonString, json.toString());
     }
