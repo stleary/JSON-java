@@ -1528,6 +1528,7 @@ public class JSONArray implements Iterable<Object> {
      *            A Collection.
      */
     private void addAll(Collection<?> collection) {
+        this.myArrayList.ensureCapacity(this.myArrayList.size() + collection.size());
         for (Object o: collection){
             this.myArrayList.add(JSONObject.wrap(o));
         }
