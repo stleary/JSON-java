@@ -1548,7 +1548,7 @@ public class JSONArray implements Iterable<Object> {
     private void addAll(Object array) throws JSONException {
         if (array.getClass().isArray()) {
             int length = Array.getLength(array);
-            this.myArrayList.ensureCapacity(length);
+            this.myArrayList.ensureCapacity(this.myArrayList.size() + length);
             for (int i = 0; i < length; i += 1) {
                 this.put(JSONObject.wrap(Array.get(array, i)));
             }
