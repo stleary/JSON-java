@@ -226,6 +226,44 @@ public class JSONArrayTest {
     }
 
     /**
+     * Tests consecutive calls to putAll with array and collection.
+     */
+    @Test
+    public void verifyPutAll() {
+        final JSONArray jsonArray = new JSONArray();
+
+        // array
+        int[] myInts = { 1, 2, 3, 4, 5 };
+        jsonArray.putAll(myInts);
+
+        assertEquals("int arrays lengths should be equal",
+                     jsonArray.length(),
+                     myInts.length);
+
+        for (int i = 0; i < myInts.length; i++) {
+            assertEquals("int arrays elements should be equal",
+                         myInts[i],
+                         jsonArray.getInt(i));
+        }
+
+        // collection
+        List<String> myList = Arrays.asList("one", "two", "three", "four", "five");
+        jsonArray.putAll(myList);
+
+        int len = myInts.length + myList.size();
+
+        assertEquals("arrays lengths should be equal",
+                     jsonArray.length(),
+                     len);
+
+        for (int i = 0; i < myList.size(); i++) {
+            assertEquals("collection elements should be equal",
+                         myList.get(i),
+                         jsonArray.getString(myInts.length + i));
+        }
+    }
+
+    /**
      * Verifies that the put Collection has backwards compatibility with RAW types pre-java5.
      */
     @Test
