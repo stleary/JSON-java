@@ -34,12 +34,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.json.XML;
 import org.json.XMLParserConfiguration;
 import org.junit.Rule;
@@ -898,4 +901,57 @@ public class XMLTest {
         final JSONObject json = XML.toJSONObject(originalXml, new XMLParserConfiguration());
         assertEquals(expectedJsonString, json.toString());
     }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testIssue537CaseSensitiveHexEscapeMinimal(){
+        String xmlStr = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<root>Neutrophils.Hypersegmented &#X7C; Bld-Ser-Plas</root>";
+        String expectedStr = 
+            "{\"root\":\"Neutrophils.Hypersegmented | Bld-Ser-Plas\"}";
+        JSONObject xmlJSONObj = XML.toJSONObject(xmlStr, true);
+        JSONObject expected = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(xmlJSONObj, expected);
+    }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testIssue537CaseSensitiveHexEscapeFullFile(){
+        try {
+            try(
+                    InputStream xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.xml");
+                    Reader xmlReader = new InputStreamReader(xmlStream);
+                ){
+                JSONObject actual = XML.toJSONObject(xmlReader, true);
+                try(
+                        InputStream jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.json");
+                    ){
+                    final JSONObject expected = new JSONObject(new JSONTokener(jsonStream));
+                    Util.compareActualVsExpectedJsonObjects(actual,expected);
+                }
+            }
+        } catch (IOException e) {
+            fail("file writer error: " +e.getMessage());
+        }
+    }
+
+    /**
+     * Tests to verify that supported escapes in XML are converted to actual values.
+     */
+    @Test
+    public void testIssue537CaseSensitiveHexUnEscapeDirect(){
+        String origStr = 
+            "Neutrophils.Hypersegmented &#X7C; Bld-Ser-Plas";
+        String expectedStr = 
+            "Neutrophils.Hypersegmented | Bld-Ser-Plas";
+        String actualStr = XML.unescape(origStr);
+        
+        assertEquals("Case insensitive Entity unescape",  expectedStr, actualStr);
+    }
+    
 }

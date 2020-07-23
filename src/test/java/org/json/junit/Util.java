@@ -103,20 +103,18 @@ public class Util {
              */
             if (!(value instanceof Number && expectedValue instanceof Number)) {
                 // Non-Number and non-matching types
-                assertTrue("object types should be equal for actual: "+
-                    value.toString()+" ("+
-                    value.getClass().toString()+") expected: "+
-                    expectedValue.toString()+" ("+
-                    expectedValue.getClass().toString()+")",
-                    value.getClass().toString().equals(
-                            expectedValue.getClass().toString()));
+                assertEquals("object types should be equal ",
+                    expectedValue.getClass().toString(),
+                    value.getClass().toString()
+                );
             }
             /**
              * Same types or both Numbers, compare by toString()
              */
-            assertTrue("string values should be equal for actual: "+
-                value.toString()+" expected: "+expectedValue.toString(),
-                value.toString().equals(expectedValue.toString()));
+            assertEquals("values should be equal",
+                expectedValue.toString(),
+                value.toString()
+            );
         }
     }
 }

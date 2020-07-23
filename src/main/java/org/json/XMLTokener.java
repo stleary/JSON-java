@@ -167,7 +167,7 @@ public class XMLTokener extends JSONTokener {
         // if our entity is an encoded unicode point, parse it.
         if (e.charAt(0) == '#') {
             int cp;
-            if (e.charAt(1) == 'x') {
+            if (e.charAt(1) == 'x' || e.charAt(1) == 'X') {
                 // hex encoded unicode
                 cp = Integer.parseInt(e.substring(2), 16);
             } else {
