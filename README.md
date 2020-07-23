@@ -12,7 +12,7 @@ The files in this package implement JSON encoders/decoders in Java.
 It also includes the capability to convert between JSON and XML, HTTP
 headers, Cookies, and CDL.
 
-This is a reference implementation. There is a large number of JSON packages
+This is a reference implementation. There are a large number of JSON packages
 in Java. Perhaps someday the Java community will standardize on one. Until
 then, choose carefully.
 
@@ -22,9 +22,53 @@ package.
 
 The package compiles on Java 1.6-1.8.
 
-# With commit [#515 Merge tests and pom and code](https://github.com/stleary/JSON-java/pull/515), the structure of the project has changed from a flat directory containing all of the Java files to a directory structure that includes unit tests. If you have difficulty using the new structure, please open an issue so we can work through it.
+Recently [#515 Merge tests and pom and code](https://github.com/stleary/JSON-java/pull/515), the structure of the project changed from a flat directory containing all of the Java files to a directory structure that includes unit tests and several build tools to build the project jar and run the unit tests. If you have difficulty using the new structure, please open an issue so we can work through it.
+
+**Building from the command line**
+
+*Build the class files from the package root directory src/main/java*
+````
+javac org\json\*.java
+````
+
+*Build the jar file*
+````
+jar cf json-java.jar org/json/*.class
+````
+
+*Compile a program that uses the jar (see example code below)*
+````
+javac -cp .;json-java.jar Test.java 
+````
+
+*Test file contents*
+
+````
+import org.json.JSONObject;
+public class Test {
+    public static void main(String args[]){
+       JSONObject jo = new JSONObject("{ \"abc\" : \"def\" }");
+       System.out.println(jo.toString());
+    }
+}
+````
+
+*Excecute the Test file*
+```` 
+java -cp .;json-java.jar Test
+````
+
+*Expected output*
+
+````
+{"abc":"def"}
+````
+
+ 
+*You can only run the unit tests with Maven or Gradlew.*
 
 
+# Files
 
 **JSONObject.java**: The `JSONObject` can parse text from a `String` or a `JSONTokener`
 to produce a map-like object. The object provides methods for manipulating its
@@ -107,7 +151,7 @@ error to be generated. Malformed JSON Texts such as missing end " (quote) on str
 invalid number formats (1.2e6.3) will cause errors as such documents can not be read
 reliably.
 
-Some notible exceptions that the JSON Parser in this library accepts are:
+Some notable exceptions that the JSON Parser in this library accepts are:
 * Unquoted keys `{ key: "value" }`
 * Unquoted values `{ "key": value }`
 * Unescaped literals like "tab" in string values `{ "key": "value   with an unescaped tab" }`
@@ -153,11 +197,11 @@ https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav
 # Unit tests
 The test suite can be executed with Maven by running:
 ```
-mvn test
+mvn clean test
 ```
-The test suite can be executed with Gradle (6.4 or greater) by running:
+The test suite can be executed with Gradlew by running:
 ```
-gradle clean build test
+gradlew clean build test
 ```
 
 
