@@ -940,18 +940,21 @@ public class JSONArrayTest {
         String str = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":2,\"key3\":3}]";
         JSONArray jsonArray = new JSONArray(str);
         String expectedStr = str;
-        try (StringWriter stringWriter = new StringWriter();) {
-            jsonArray.write(stringWriter);
-            String actualStr = stringWriter.toString();
+        StringWriter stringWriter = new StringWriter();
+        jsonArray.write(stringWriter);
+        String actualStr = stringWriter.toString();
+        try {
             JSONArray finalArray = new JSONArray(actualStr);
             Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
             assertTrue("write() expected " + expectedStr +
-                " but found " + actualStr,
-                actualStr.startsWith("[\"value1\",\"value2\",{")
-                && actualStr.contains("\"key1\":1")
-                && actualStr.contains("\"key2\":2")
-                && actualStr.contains("\"key3\":3")
-                );
+                    " but found " + actualStr,
+                    actualStr.startsWith("[\"value1\",\"value2\",{")
+                    && actualStr.contains("\"key1\":1")
+                    && actualStr.contains("\"key2\":2")
+                    && actualStr.contains("\"key3\":3")
+                    );
+        } finally {
+            stringWriter.close();
         }
     }
 
@@ -981,7 +984,8 @@ public class JSONArrayTest {
         String str0 = "[\"value1\",\"value2\",{\"key1\":1,\"key2\":false,\"key3\":3.14}]";
         JSONArray jsonArray = new JSONArray(str0);
         String expectedStr = str0;
-        try (StringWriter stringWriter = new StringWriter();) {
+        StringWriter stringWriter = new StringWriter();
+        try {
             String actualStr = jsonArray.write(stringWriter, 0, 0).toString();
             JSONArray finalArray = new JSONArray(actualStr);
             Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
@@ -992,9 +996,12 @@ public class JSONArrayTest {
                 && actualStr.contains("\"key2\":false")
                 && actualStr.contains("\"key3\":3.14")
             );
+        } finally {
+            stringWriter.close();
         }
         
-        try (StringWriter stringWriter = new StringWriter();) {
+        stringWriter = new StringWriter();
+        try {
             String actualStr = jsonArray.write(stringWriter, 2, 1).toString();
             JSONArray finalArray = new JSONArray(actualStr);
             Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
@@ -1008,6 +1015,8 @@ public class JSONArrayTest {
                 && actualStr.contains("\"key2\": false")
                 && actualStr.contains("\"key3\": 3.14")
             );
+        } finally {
+            stringWriter.close();
         }
     }
 

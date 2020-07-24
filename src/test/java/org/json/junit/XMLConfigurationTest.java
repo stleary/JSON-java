@@ -918,11 +918,16 @@ public class XMLConfigurationTest {
          * to support XML.toJSONObject(reader)
          */
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        try(Reader reader = new StringReader(xmlStr);) {
+        Reader reader = new StringReader(xmlStr);
+        try {
             JSONObject jsonObject = XML.toJSONObject(reader, config);
             Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
-        } catch (IOException e) {
-            assertTrue("IO Reader error: " +e.getMessage(), false);
+        } catch (Exception e) {
+            assertTrue("Reader error: " +e.getMessage(), false);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {}
         }
     }
 
@@ -944,15 +949,22 @@ public class XMLConfigurationTest {
         try {
             JSONObject expectedJsonObject = new JSONObject(expectedStr);
             File tempFile = this.testFolder.newFile("fileToJSONObject.xml");
-            try(FileWriter fileWriter = new FileWriter(tempFile);){
+            FileWriter fileWriter = new FileWriter(tempFile);
+            try {
                 fileWriter.write(xmlStr);
+            } finally {
+                fileWriter.close();
             }
-            try(Reader reader = new FileReader(tempFile);){
+
+            Reader reader = new FileReader(tempFile);
+            try {
                 JSONObject jsonObject = XML.toJSONObject(reader);
                 Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+            } finally {
+                reader.close();
             }
         } catch (IOException e) {
-            assertTrue("file writer error: " +e.getMessage(), false);
+            assertTrue("Error: " +e.getMessage(), false);
         }
     }
 }

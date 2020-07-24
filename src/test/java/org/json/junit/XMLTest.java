@@ -787,15 +787,22 @@ public class XMLTest {
         try {
             JSONObject expectedJsonObject = new JSONObject(expectedStr);
             File tempFile = this.testFolder.newFile("fileToJSONObject.xml");
-            try(FileWriter fileWriter = new FileWriter(tempFile);){
+            FileWriter fileWriter = new FileWriter(tempFile);
+            try {
                 fileWriter.write(xmlStr);
+            } finally {
+                fileWriter.close();
             }
-            try(Reader reader = new FileReader(tempFile);){
+
+            Reader reader = new FileReader(tempFile);
+            try {
                 JSONObject jsonObject = XML.toJSONObject(reader);
                 Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+            } finally {
+                reader.close();
             }
         } catch (IOException e) {
-            fail("file writer error: " +e.getMessage());
+            fail("Error: " +e.getMessage());
         }
     }
 
