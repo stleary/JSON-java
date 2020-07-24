@@ -286,7 +286,7 @@ public class XML {
                     if (x.next() == '[') {
                         string = x.nextCDATA();
                         if (string.length() > 0) {
-                            context.accumulate(config.cDataTagName, string);
+                            context.accumulate(config.getcDataTagName(), string);
                         }
                         return false;
                     }
@@ -350,13 +350,13 @@ public class XML {
                             throw x.syntaxError("Missing value");
                         }
 
-                        if (config.convertNilAttributeToNull
+                        if (config.isConvertNilAttributeToNull()
                                 && NULL_ATTR.equals(string)
                                 && Boolean.parseBoolean((String) token)) {
                             nilAttributeFound = true;
                         } else if (!nilAttributeFound) {
                             jsonObject.accumulate(string,
-                                    config.keepStrings
+                                    config.isKeepStrings()
                                             ? ((String) token)
                                             : stringToValue((String) token));
                         }
@@ -392,8 +392,8 @@ public class XML {
                         } else if (token instanceof String) {
                             string = (String) token;
                             if (string.length() > 0) {
-                                jsonObject.accumulate(config.cDataTagName,
-                                        config.keepStrings ? string : stringToValue(string));
+                                jsonObject.accumulate(config.getcDataTagName(),
+                                        config.isKeepStrings() ? string : stringToValue(string));
                             }
 
                         } else if (token == LT) {
@@ -402,8 +402,8 @@ public class XML {
                                 if (jsonObject.length() == 0) {
                                     context.accumulate(tagName, "");
                                 } else if (jsonObject.length() == 1
-                                        && jsonObject.opt(config.cDataTagName) != null) {
-                                    context.accumulate(tagName, jsonObject.opt(config.cDataTagName));
+                                        && jsonObject.opt(config.getcDataTagName()) != null) {
+                                    context.accumulate(tagName, jsonObject.opt(config.getcDataTagName()));
                                 } else {
                                     context.accumulate(tagName, jsonObject);
                                 }
@@ -748,7 +748,7 @@ public class XML {
                 }
 
                 // Emit content in body
-                if (key.equals(config.cDataTagName)) {
+                if (key.equals(config.getcDataTagName())) {
                     if (value instanceof JSONArray) {
                         ja = (JSONArray) value;
                         int jaLength = ja.length();

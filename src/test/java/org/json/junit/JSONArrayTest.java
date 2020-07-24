@@ -1140,7 +1140,7 @@ public class JSONArrayTest {
     	assertNotNull(new JSONArray(5));
     	// Check Size -> Even though the capacity of the JSONArray can be specified using a positive
     	// integer but the length of JSONArray always reflects upon the items added into it.
-    	assertEquals(0l, (long)new JSONArray(10).length());
+    	assertEquals(0l, new JSONArray(10).length());
         try {
         	assertNotNull("Should throw an exception", new JSONArray(-1));
         } catch (JSONException e) {
