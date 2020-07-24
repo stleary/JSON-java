@@ -934,16 +934,24 @@ public class XMLTest {
     @Test
     public void testIssue537CaseSensitiveHexEscapeFullFile(){
         try {
-            try(
-                    InputStream xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.xml");
-                    Reader xmlReader = new InputStreamReader(xmlStream);
-                ){
+            InputStream xmlStream = null;
+            try {
+                xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.xml");
+                Reader xmlReader = new InputStreamReader(xmlStream);
                 JSONObject actual = XML.toJSONObject(xmlReader, true);
-                try(
-                        InputStream jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.json");
-                    ){
+                InputStream jsonStream = null;
+                try {
+                    jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.json");
                     final JSONObject expected = new JSONObject(new JSONTokener(jsonStream));
                     Util.compareActualVsExpectedJsonObjects(actual,expected);
+                } finally {
+                    if (jsonStream != null) {
+                        jsonStream.close();
+                    }
+                }
+            } finally {
+                if (xmlStream != null) {
+                    xmlStream.close();
                 }
             }
         } catch (IOException e) {
