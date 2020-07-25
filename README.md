@@ -69,7 +69,7 @@ java -cp .;json-java.jar Test
 ````
 
  
-**Unit tests**
+**Build tools for building the package and executing the unit tests**
 
 The test suite can be executed with Maven by running:
 ```
