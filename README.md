@@ -9,16 +9,16 @@ JSON in Java [package org.json]
 
 [JSON](http://www.JSON.org/) is a light-weight, language independent, data interchange format.
 
-The JSON-Java package is a reference implementation that demonstrates how to parse JSON documents into Java objects, and generate new JSON documents from the Java classes.
+The JSON-Java package is a reference implementation that demonstrates how to parse JSON documents into Java objects and how to generate new JSON documents from the Java classes.
 
 Project goals include:
 * Reliable and consistent results
-* Adhere to the JSON specification 
+* Adherence to the JSON specification 
 * Easy to build, use, and include in other projects
 * No external dependencies
-* Fast execution, low memory footprint
+* Fast execution and low memory footprint
 * Maintain backwards compatibility
-* Designed and tested to use on Java 1.6 - 1.11
+* Designed and tested to use on Java versions 1.6 - 1.11
 
 The files in this package implement JSON encoders and decoders. The package can also convert between JSON and XML, HTTP headers, Cookies, and CDL.
 
