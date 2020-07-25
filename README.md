@@ -115,6 +115,7 @@ Some notable exceptions that the JSON Parser in this library accepts are:
 * Numbers out of range for `Double` or `Long` are parsed as strings
 
 **Unit Test Conventions**
+
 Test filenames should consist of the name of the module being tested, with the suffix "Test". 
 For example, <b>Cookie.java</b> is tested by <b>CookieTest.java</b>.
 
@@ -199,7 +200,7 @@ cookie lists.
 
 JSON-java releases can be found by searching the Maven repository for groupId "org.json"
 and artifactId "json". For example:
-https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav
+[https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
 
 ~~~
 20200518    Recent commits and snapshot before project structure change
