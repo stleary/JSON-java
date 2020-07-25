@@ -7,7 +7,7 @@ JSON in Java [package org.json]
 
 # Overview
 
-[JSON](http://www.JSON.org/) is a light-weight, language independent, data interchange format.
+[JSON](http://www.JSON.org/) is a light-weight language independent data interchange format.
 
 The JSON-Java package is a reference implementation that demonstrates how to parse JSON documents into Java objects and how to generate new JSON documents from the Java classes.
 
