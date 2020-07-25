@@ -69,20 +69,18 @@ java -cp .;json-java.jar Test
 ````
 
  
-*You can only run the unit tests with Maven or Gradlew.*
-# Unit tests
+**Unit tests**
+
 The test suite can be executed with Maven by running:
 ```
 mvn clean test
 ```
+
 The test suite can be executed with Gradlew by running:
+
 ```
 gradlew clean build test
 ```
-
-
-
-
 
 # Notes
 
