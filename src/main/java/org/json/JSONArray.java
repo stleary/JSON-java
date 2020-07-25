@@ -173,9 +173,7 @@ public class JSONArray implements Iterable<Object> {
             this.myArrayList = new ArrayList<Object>();
         } else {
             this.myArrayList = new ArrayList<Object>(collection.size());
-        	for (Object o: collection){
-        		this.myArrayList.add(JSONObject.wrap(o));
-        	}
+            this.addAll(collection);
         }
     }
 
@@ -193,16 +191,7 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(Object array) throws JSONException {
         this();
-        if (array.getClass().isArray()) {
-            int length = Array.getLength(array);
-            this.myArrayList.ensureCapacity(length);
-            for (int i = 0; i < length; i += 1) {
-                this.put(JSONObject.wrap(Array.get(array, i)));
-            }
-        } else {
-            throw new JSONException(
-                    "JSONArray initial value should be a string or collection or array.");
-        }
+        this.addAll(array);
     }
 
     /**
@@ -1174,6 +1163,36 @@ public class JSONArray implements Iterable<Object> {
         }
         return this.put(value);
     }
+
+    /**
+     * Put or replace a collection's elements in the JSONArray.
+     *
+     * @param collection
+     *            A Collection.
+     * @return this. 
+     */
+    public JSONArray putAll(Collection<?> collection) {
+        this.addAll(collection);
+        return this;
+    }
+
+    /**
+     * Put or replace an array's elements in the JSONArray.
+     *
+     * @param array
+     *            Array. If the parameter passed is null, or not an array, an
+     *            exception will be thrown.
+     * @return this. 
+     *
+     * @throws JSONException
+     *            If not an array or if an array value is non-finite number.
+     * @throws NullPointerException
+     *            Thrown if the array parameter is null.
+     */
+    public JSONArray putAll(Object array) throws JSONException {
+        this.addAll(array);
+        return this;
+    }
     
     /**
      * Creates a JSONPointer using an initialization string and tries to 
@@ -1499,6 +1518,45 @@ public class JSONArray implements Iterable<Object> {
      */
     public boolean isEmpty() {
         return this.myArrayList.isEmpty();
+    }
+
+
+    /**
+     * Add a collection's elements to the JSONArray.
+     *
+     * @param collection
+     *            A Collection.
+     */
+    private void addAll(Collection<?> collection) {
+        this.myArrayList.ensureCapacity(this.myArrayList.size() + collection.size());
+        for (Object o: collection){
+            this.myArrayList.add(JSONObject.wrap(o));
+        }
+    }
+
+    /**
+     * Add an array's elements to the JSONArray.
+     *
+     * @param array
+     *            Array. If the parameter passed is null, or not an array, an
+     *            exception will be thrown.
+     *
+     * @throws JSONException
+     *            If not an array or if an array value is non-finite number.
+     * @throws NullPointerException
+     *            Thrown if the array parameter is null.
+     */
+    private void addAll(Object array) throws JSONException {
+        if (array.getClass().isArray()) {
+            int length = Array.getLength(array);
+            this.myArrayList.ensureCapacity(this.myArrayList.size() + length);
+            for (int i = 0; i < length; i += 1) {
+                this.put(JSONObject.wrap(Array.get(array, i)));
+            }
+        } else {
+            throw new JSONException(
+                    "JSONArray initial value should be a string or collection or array.");
+        }
     }
     
     /**
