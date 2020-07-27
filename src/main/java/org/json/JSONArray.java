@@ -178,6 +178,35 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
+     * Construct a JSONArray from an Iterable. This is a shallow copy.
+     *
+     * @param iter
+     *            A Iterable collection.
+     */
+    public JSONArray(Iterable<?> iter) {
+        this();
+        if (iter == null) {
+            return;
+        }
+        this.addAll(iter);
+    }
+
+    /**
+     * Construct a JSONArray from another JSONArray. This is a shallow copy.
+     *
+     * @param collection
+     *            A Collection.
+     */
+    public JSONArray(JSONArray array) {
+        if (array == null) {
+            this.myArrayList = new ArrayList<Object>();
+        } else {
+            this.myArrayList = new ArrayList<Object>(array.length());
+            this.addAll(array.myArrayList);
+        }
+    }
+
+    /**
      * Construct a JSONArray from an array.
      *
      * @param array
@@ -191,6 +220,10 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(Object array) throws JSONException {
         this();
+        if (!array.getClass().isArray()) {
+            throw new JSONException(
+                    "JSONArray initial value should be a string or collection or array.");
+        }
         this.addAll(array);
     }
 
@@ -208,6 +241,11 @@ public class JSONArray implements Iterable<Object> {
                     "JSONArray initial capacity cannot be negative.");
     	}
     	this.myArrayList = new ArrayList<Object>(initialCapacity);
+    }
+
+    @Override
+    protected Object clone() {
+        return new JSONArray(this.myArrayList);
     }
 
     @Override
@@ -1165,7 +1203,7 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Put or replace a collection's elements in the JSONArray.
+     * Put a collection's elements in to the JSONArray.
      *
      * @param collection
      *            A Collection.
@@ -1175,9 +1213,33 @@ public class JSONArray implements Iterable<Object> {
         this.addAll(collection);
         return this;
     }
+    
+    /**
+     * Put an Iterable's elements in to the JSONArray.
+     *
+     * @param iter
+     *            A Collection.
+     * @return this. 
+     */
+    public JSONArray putAll(Iterable<?> iter) {
+        this.addAll(iter);
+        return this;
+    }
 
     /**
-     * Put or replace an array's elements in the JSONArray.
+     * Put a JSONArray's elements in to the JSONArray.
+     *
+     * @param array
+     *            A JSONArray.
+     * @return this. 
+     */
+    public JSONArray putAll(JSONArray array) {
+        this.addAll(array.myArrayList);
+        return this;
+    }
+
+    /**
+     * Put an array's elements in to the JSONArray.
      *
      * @param array
      *            Array. If the parameter passed is null, or not an array, an
@@ -1520,7 +1582,6 @@ public class JSONArray implements Iterable<Object> {
         return this.myArrayList.isEmpty();
     }
 
-
     /**
      * Add a collection's elements to the JSONArray.
      *
@@ -1534,6 +1595,18 @@ public class JSONArray implements Iterable<Object> {
         }
     }
 
+    /**
+     * Add an Iterable's elements to the JSONArray.
+     *
+     * @param iter
+     *            An Iterable.
+     */
+    private void addAll(Iterable<?> iter) {
+        for (Object o: iter){
+            this.myArrayList.add(JSONObject.wrap(o));
+        }
+    }
+    
     /**
      * Add an array's elements to the JSONArray.
      *
@@ -1553,6 +1626,12 @@ public class JSONArray implements Iterable<Object> {
             for (int i = 0; i < length; i += 1) {
                 this.put(JSONObject.wrap(Array.get(array, i)));
             }
+        } else if (array instanceof JSONArray) {
+            this.addAll(((JSONArray)array).myArrayList);
+        } else if (array instanceof Collection) {
+            this.addAll((Collection<?>)array);
+        } else if (array instanceof Iterable) {
+            this.addAll((Iterable<?>)array);
         } else {
             throw new JSONException(
                     "JSONArray initial value should be a string or collection or array.");

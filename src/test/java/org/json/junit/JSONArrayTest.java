@@ -979,9 +979,9 @@ public class JSONArrayTest {
         JSONArray jsonArray = new JSONArray(str);
         String expectedStr = str;
         StringWriter stringWriter = new StringWriter();
-        jsonArray.write(stringWriter);
-        String actualStr = stringWriter.toString();
         try {
+            jsonArray.write(stringWriter);
+            String actualStr = stringWriter.toString();
             JSONArray finalArray = new JSONArray(actualStr);
             Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
             assertTrue("write() expected " + expectedStr +
@@ -1185,6 +1185,73 @@ public class JSONArrayTest {
             assertEquals("Expected an exception message", 
                     "JSONArray initial capacity cannot be negative.",
                     e.getMessage());
+        }
+    }
+    
+    /**
+     * Verifies that the object constructor can properly handle any supported collection object.
+     */
+    @Test
+    @SuppressWarnings({ "unchecked", "boxing" })
+    public void testObjectConstructor() {
+        // should copy the array
+        Object o = new Object[] {2, "test2", true};
+        JSONArray a = new JSONArray(o);
+        assertNotNull("Should not error", a);
+        assertEquals("length", 3, a.length());
+        
+        // should NOT copy the collection
+        // this is required for backwards compatibility
+        o = new ArrayList<Object>();
+        ((Collection<Object>)o).add(1);
+        ((Collection<Object>)o).add("test");
+        ((Collection<Object>)o).add(false);
+        try {
+            a = new JSONArray(o);
+            assertNull("Should error", a);
+        } catch (JSONException ex) {
+        }
+
+        // should NOT copy the JSONArray
+        // this is required for backwards compatibility
+        o = a;
+        try {
+            a = new JSONArray(o);
+            assertNull("Should error", a);
+        } catch (JSONException ex) {
+        }
+    }
+    
+    /**
+     * Verifies that the JSONArray constructor properly copies the original.
+     */
+    @Test
+    public void testJSONArrayConstructor() {
+        // should copy the array
+        JSONArray a1 = new JSONArray("[2, \"test2\", true]");
+        JSONArray a2 = new JSONArray(a1);
+        assertNotNull("Should not error", a2);
+        assertEquals("length", a1.length(), a2.length());
+        
+        for(int i = 0; i < a1.length(); i++) {
+            assertEquals("index " + i + " are equal", a1.get(i), a2.get(i));
+        }
+    }
+    
+    /**
+     * Verifies that the object constructor can properly handle any supported collection object.
+     */
+    @Test
+    public void testJSONArrayPutAll() {
+        // should copy the array
+        JSONArray a1 = new JSONArray("[2, \"test2\", true]");
+        JSONArray a2 = new JSONArray();
+        a2.putAll(a1);
+        assertNotNull("Should not error", a2);
+        assertEquals("length", a1.length(), a2.length());
+        
+        for(int i = 0; i < a1.length(); i++) {
+            assertEquals("index " + i + " are equal", a1.get(i), a2.get(i));
         }
     }
 }

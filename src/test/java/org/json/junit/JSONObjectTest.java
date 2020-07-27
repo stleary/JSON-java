@@ -3201,4 +3201,11 @@ public class JSONObjectTest {
         fail("Expected an exception");
     }
 
+    @Test
+    public void testIssue548ObjectWithEmptyJsonArray() {
+        JSONObject jsonObject = new JSONObject("{\"empty_json_array\": []}");
+        assertTrue("missing expected key 'empty_json_array'", jsonObject.has("empty_json_array"));
+        assertNotNull("'empty_json_array' should be an array", jsonObject.getJSONArray("empty_json_array"));
+        assertEquals("'empty_json_array' should have a length of 0", 0, jsonObject.getJSONArray("empty_json_array").length());
+    }
 }
