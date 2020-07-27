@@ -1242,12 +1242,12 @@ public class JSONArray implements Iterable<Object> {
      * Put an array's elements in to the JSONArray.
      *
      * @param array
-     *            Array. If the parameter passed is null, or not an array, an
+     *            Array. If the parameter passed is null, or not an array or Iterable, an
      *            exception will be thrown.
      * @return this. 
      *
      * @throws JSONException
-     *            If not an array or if an array value is non-finite number.
+     *            If not an array, JSONArray, Iterable or if an value is non-finite number.
      * @throws NullPointerException
      *            Thrown if the array parameter is null.
      */
