@@ -244,11 +244,6 @@ public class JSONArray implements Iterable<Object> {
     }
 
     @Override
-    protected Object clone() {
-        return new JSONArray(this.myArrayList);
-    }
-
-    @Override
     public Iterator<Object> iterator() {
         return this.myArrayList.iterator();
     }
