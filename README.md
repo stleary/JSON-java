@@ -118,6 +118,45 @@ Some notable exceptions that the JSON Parser in this library accepts are:
 * Unescaped literals like "tab" in string values `{ "key": "value   with an unescaped tab" }`
 * Numbers out of range for `Double` or `Long` are parsed as strings
 
+Recent pull requests added a new method `putAll` on the JSONArray. The `putAll` method
+works similarly as other `put` mehtods in that it does not call `JSONObject.wrap` for items
+added. This can lead to inconsistent object representation in JSONArray structures.
+
+For example, code like this will create a mixed JSONArray, some items wrapped, others
+not:
+
+```java
+SomeBean[] myArr = new SomeBean[]{ new SomeBean(1), new SomeBean(2) };
+// these will be wrapped
+JSONArray jArr = new JSONArray(myArr);
+// these will not be wrapped
+jArr.putAll(new SomeBean[]{ new SomeBean(3), new SomeBean(4) });
+```
+
+For structure consistency, it would be recommended that the above code is changed
+to look like 1 of 2 ways.
+
+Option 1:
+```Java
+SomeBean[] myArr = new SomeBean[]{ new SomeBean(1), new SomeBean(2) };
+JSONArray jArr = new JSONArray();
+// these will not be wrapped
+jArr.putAll(myArr);
+// these will not be wrapped
+jArr.putAll(new SomeBean[]{ new SomeBean(3), new SomeBean(4) });
+// our jArr is now consistent.
+```
+
+Option 2:
+```Java
+SomeBean[] myArr = new SomeBean[]{ new SomeBean(1), new SomeBean(2) };
+// these will be wrapped
+JSONArray jArr = new JSONArray(myArr);
+// these will be wrapped
+jArr.putAll(new JSONArray(new SomeBean[]{ new SomeBean(3), new SomeBean(4) }));
+// our jArr is now consistent.
+```
+
 **Unit Test Conventions**
 
 Test filenames should consist of the name of the module being tested, with the suffix "Test". 
