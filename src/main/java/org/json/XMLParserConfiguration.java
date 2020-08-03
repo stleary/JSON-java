@@ -23,6 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import java.util.Map;
+
+
 /**
  * Configuration object for the XML parser. The configuration is immutable.
  * @author AylwardJ
@@ -57,10 +60,9 @@ public class XMLParserConfiguration {
     private boolean convertNilAttributeToNull;
 
     /**
-     * When parsing the XML into JSON, specifies if values with attribute xsi:type="java.lang.Integer"
-     * should be kept as attribute(false), or they should be converted to the given type
+     * This will allow type conversion for values in XML if xsi:type attribute is defined
      */
-    public boolean useValueTypeCast;
+    public Map<String, XMLXsiTypeConverter<?>> xsiTypeMap;
 
     /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert
@@ -129,7 +131,7 @@ public class XMLParserConfiguration {
      */
     @Deprecated
     public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName, final boolean convertNilAttributeToNull) {
-        this(keepStrings, cDataTagName, convertNilAttributeToNull, false);
+        this(keepStrings, cDataTagName, convertNilAttributeToNull, null);
     }
 
     /**
@@ -140,16 +142,16 @@ public class XMLParserConfiguration {
      *      to use that value as the JSONObject key name to process as CDATA.
      * @param convertNilAttributeToNull <code>true</code> to parse values with attribute xsi:nil="true" as null.
      *                                  <code>false</code> to parse values with attribute xsi:nil="true" as {"xsi:nil":true}.
-     * @param useValueTypeCast  <code>true</code> to parse values with attribute xsi:type="java.lang.Integer" as
-     *                          integer,  xsi:type="java.lang.String" as string
-     *                          <code>false</code> to parse values with attribute xsi:type="java.lang.Integer" as {"xsi:type":"java.lang.Integer"}.
+     * @param xsiTypeMap  <code>new HashMap<String, XMLXsiTypeConverter<?>>()</code> to parse values with attribute
+     *                   xsi:type="integer" as integer,  xsi:type="string" as string
+     *                    <code>null</code> to use default behaviour.
      */
     public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
-            final boolean convertNilAttributeToNull, final boolean useValueTypeCast ) {
+            final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap ) {
         this.keepStrings = keepStrings;
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
-        this.useValueTypeCast = useValueTypeCast;
+        this.xsiTypeMap = xsiTypeMap;
     }
     
     /**

@@ -261,7 +261,7 @@ public class XML {
         String string;
         String tagName;
         Object token;
-        String typeCastClass;
+        XMLXsiTypeConverter<?> xmlXsiTypeConverter;
 
         // Test for and skip past these forms:
         // <!-- ... -->
@@ -341,7 +341,7 @@ public class XML {
             token = null;
             jsonObject = new JSONObject();
             boolean nilAttributeFound = false;
-            typeCastClass = null;
+            xmlXsiTypeConverter = null;
             for (;;) {
                 if (token == null) {
                     token = x.nextToken();
@@ -360,9 +360,9 @@ public class XML {
                                 && NULL_ATTR.equals(string)
                                 && Boolean.parseBoolean((String) token)) {
                             nilAttributeFound = true;
-                        } else if(config.useValueTypeCast
+                        } else if(config.xsiTypeMap != null
                                 && TYPE_ATTR.equals(string)) {
-                            typeCastClass = (String) token;
+                            xmlXsiTypeConverter = config.xsiTypeMap.get(token);
                         } else if (!nilAttributeFound) {
                             jsonObject.accumulate(string,
                                     config.isKeepStrings()
@@ -401,9 +401,9 @@ public class XML {
                         } else if (token instanceof String) {
                             string = (String) token;
                             if (string.length() > 0) {
-                                if(typeCastClass != null) {
+                                if(xmlXsiTypeConverter != null) {
                                     jsonObject.accumulate(config.getcDataTagName(),
-                                            stringToValue(string, typeCastClass));
+                                            stringToValue(string, xmlXsiTypeConverter));
                                 } else {
                                     jsonObject.accumulate(config.getcDataTagName(),
                                             config.isKeepStrings() ? string : stringToValue(string));
@@ -435,17 +435,12 @@ public class XML {
     /**
      * This method tries to convert the given string value to the target object
      * @param string String to convert
-     * @param className target class name
+     * @param typeConverter value converter to convert string to integer, boolean e.t.c
      * @return JSON value of this string or the string
      */
-    public static Object stringToValue(String string, String className) {
-        try {
-            if(className.equals(String.class.getName())) return string;
-            Class<?> clazz = Class.forName(className);
-            Method method = clazz.getMethod("valueOf", String.class);
-            return method.invoke(null, string);
-        } catch (Exception e){
-            e.printStackTrace();
+    public static Object stringToValue(String string, XMLXsiTypeConverter<?> typeConverter) {
+        if(typeConverter != null) {
+            return typeConverter.convert(string);
         }
         return stringToValue(string);
     }

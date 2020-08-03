@@ -38,6 +38,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,6 +47,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.json.XML;
 import org.json.XMLParserConfiguration;
+import org.json.XMLXsiTypeConverter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -978,11 +981,10 @@ public class XMLTest {
      */
     @Test
     public void testToJsonWithTypeWhenTypeConversionDisabled() {
-        final String originalXml = "<root><id xsi:type=\"java.lang.String\">1234</id></root>";
-        final String expectedJsonString = "{\"root\":{\"id\":{\"xsi:type\":\"java.lang.String\",\"content\":1234}}}";
-        final JSONObject expectedJson = new JSONObject(expectedJsonString);
-        final JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration());
-
+        String originalXml = "<root><id xsi:type=\"string\">1234</id></root>";
+        String expectedJsonString = "{\"root\":{\"id\":{\"xsi:type\":\"string\",\"content\":1234}}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration());
         Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
     }
 
@@ -991,12 +993,23 @@ public class XMLTest {
      */
     @Test
     public void testToJsonWithTypeWhenTypeConversionEnabled() {
-        final String originalXml = "<root><id1 xsi:type=\"java.lang.String\">1234</id1>"
-                + "<id2 xsi:type=\"java.lang.Integer\">1234</id2></root>";
-        final String expectedJsonString = "{\"root\":{\"id2\":1234,\"id1\":\"1234\"}}";
-        final JSONObject expectedJson = new JSONObject(expectedJsonString);
-        final JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration(false,
-                "content", false, true));
+        String originalXml = "<root><id1 xsi:type=\"string\">1234</id1>"
+                + "<id2 xsi:type=\"integer\">1234</id2></root>";
+        String expectedJsonString = "{\"root\":{\"id2\":1234,\"id1\":\"1234\"}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        xsiTypeMap.put("integer", new XMLXsiTypeConverter<Integer>() {
+            @Override public Integer convert(final String value) {
+                return Integer.valueOf(value);
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration(false,
+                "content", false, xsiTypeMap));
         Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
     }
 
