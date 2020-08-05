@@ -1013,4 +1013,26 @@ public class XMLTest {
         Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
     }
 
+    @Test
+    public void testToJsonWithXSITypeWhenTypeConversionEnabled() {
+        String originalXml = "<root><asString xsi:type=\"string\">12345</asString><asInt "
+                + "xsi:type=\"integer\">54321</asInt></root>";
+        String expectedJsonString = "{\"root\":{\"asString\":\"12345\",\"asInt\":54321}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        xsiTypeMap.put("integer", new XMLXsiTypeConverter<Integer>() {
+            @Override public Integer convert(final String value) {
+                return Integer.valueOf(value);
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration(false,
+                "content", false, xsiTypeMap));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
 }
