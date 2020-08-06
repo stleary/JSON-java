@@ -114,7 +114,9 @@ public class XMLParserConfiguration {
      */
     @Deprecated
     public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName) {
-        this(keepStrings, cDataTagName, false);
+        this.keepStrings = keepStrings;
+        this.cDataTagName = cDataTagName;
+        this.convertNilAttributeToNull = false;
     }
 
     /**
@@ -131,7 +133,9 @@ public class XMLParserConfiguration {
      */
     @Deprecated
     public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName, final boolean convertNilAttributeToNull) {
-        this(keepStrings, cDataTagName, convertNilAttributeToNull, null);
+        this.keepStrings = keepStrings;
+        this.cDataTagName = cDataTagName;
+        this.convertNilAttributeToNull = convertNilAttributeToNull;
     }
 
     /**
