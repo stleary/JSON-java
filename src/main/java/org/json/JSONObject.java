@@ -128,8 +128,13 @@ public class JSONObject {
          *         null.
          */
         @Override
-        public boolean equals(Object object) {
-            return object == null || object == this;
+        public static boolean equals(Object object) {
+            if(object == null) return false;
+            if(this.getClass().equals(object.getClass()))
+                 if(this.toString().equals(object.toString())) 
+                     return true;
+
+            return false;
         }
         /**
          * A Null object is equal to the null value and to itself.
