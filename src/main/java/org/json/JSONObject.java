@@ -128,7 +128,7 @@ public class JSONObject {
          *         null.
          */
         @Override
-        public static boolean equals(Object object) {
+        public boolean equals(Object object) {
             if(object == null) return false;
             if(this.getClass().equals(object.getClass()))
                  if(this.toString().equals(object.toString())) 
