@@ -1008,8 +1008,7 @@ public class XMLTest {
                 return Integer.valueOf(value);
             }
         });
-        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration(false,
-                "content", false, xsiTypeMap));
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
         Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
     }
 
@@ -1030,8 +1029,7 @@ public class XMLTest {
                 return Integer.valueOf(value);
             }
         });
-        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration(false,
-                "content", false, xsiTypeMap));
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
         Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
     }
 
