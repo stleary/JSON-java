@@ -1,3 +1,3 @@
 module hjson {
-    exports org.json
+    exports org.json;
 }
