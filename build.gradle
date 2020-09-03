@@ -18,7 +18,7 @@ repositories {
     }
 
     maven {
-        url = uri('http://repo.maven.apache.org/maven2')
+        url = uri('https://repo.maven.apache.org/maven2')
     }
 }
 
@@ -35,7 +35,7 @@ subprojects {
 group = 'org.json'
 version = 'v20200429-SNAPSHOT'
 description = 'JSON in Java'
-sourceCompatibility = '1.7'
+sourceCompatibility = '9'
 
 configurations.all {
 }
