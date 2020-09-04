@@ -26,14 +26,14 @@ SOFTWARE.
 /**
  * Type conversion configuration interface to be used with xsi:type attributes.
  * <pre>
- * <h1>XML Sample</h1>
+ * <b>XML Sample</b>
  * {@code
  *      <root>
  *          <asString xsi:type="string">12345</asString>
  *          <asInt xsi:type="integer">54321</asInt>
  *      </root>
  * }
- * <h1>JSON Output</h1>
+ * <b>JSON Output</b>
  * {@code
  *     {
  *         "root" : {
@@ -43,23 +43,23 @@ SOFTWARE.
  *     }
  * }
  *
- * <h1>Usage</h1>
+ * <b>Usage</b>
  * {@code
  *      Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
  *      xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
- *          @Override public String convert(final String value) {
+ *          &#64;Override public String convert(final String value) {
  *              return value;
  *          }
  *      });
  *      xsiTypeMap.put("integer", new XMLXsiTypeConverter<Integer>() {
- *          @Override public Integer convert(final String value) {
+ *          &#64;Override public Integer convert(final String value) {
  *              return Integer.valueOf(value);
  *          }
  *      });
  * }
  * </pre>
  * @author kumar529
- * @param <T>
+ * @param <T> return type of convert method
  */
 public interface XMLXsiTypeConverter<T> {
     T convert(String value);

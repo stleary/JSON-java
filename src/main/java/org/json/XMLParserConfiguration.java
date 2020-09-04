@@ -259,7 +259,7 @@ public class XMLParserConfiguration {
     /**
      * When parsing the XML into JSON, specifies that the values with attribute xsi:type
      * will be converted to target type defined to client in this configuration
-     * <code>Map<String, XMLXsiTypeConverter<?>></code> to parse values with attribute
+     * {@code Map<String, XMLXsiTypeConverter<?>>} to parse values with attribute
      * xsi:type="integer" as integer,  xsi:type="string" as string
      * @return {@link #xsiTypeMap} unmodifiable configuration map.
      */
@@ -270,9 +270,9 @@ public class XMLParserConfiguration {
     /**
      * When parsing the XML into JSON, specifies that the values with attribute xsi:type
      * will be converted to target type defined to client in this configuration
-     * <code>Map<String, XMLXsiTypeConverter<?>></code> to parse values with attribute
+     * {@code Map<String, XMLXsiTypeConverter<?>>} to parse values with attribute
      * xsi:type="integer" as integer,  xsi:type="string" as string
-     * @param xsiTypeMap  <code>new HashMap<String, XMLXsiTypeConverter<?>>()</code> to parse values with attribute
+     * @param xsiTypeMap  {@code new HashMap<String, XMLXsiTypeConverter<?>>()} to parse values with attribute
      *                   xsi:type="integer" as integer,  xsi:type="string" as string
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
