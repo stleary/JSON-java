@@ -1033,4 +1033,39 @@ public class XMLTest {
         Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
     }
 
+    @Test
+    public void testToJsonWithXSITypeWhenTypeConversionNotEnabledOnOne() {
+        String originalXml = "<root><asString xsi:type=\"string\">12345</asString><asInt>54321</asInt></root>";
+        String expectedJsonString = "{\"root\":{\"asString\":\"12345\",\"asInt\":54321}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void testXSITypeMapNotModifiable() {
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        XMLParserConfiguration config = new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap);
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        assertEquals("Config Conversion Map size is expected to be 0", 0, config.getXsiTypeMap().size());
+
+        try {
+            config.getXsiTypeMap().put("boolean", new XMLXsiTypeConverter<Boolean>() {
+                @Override public Boolean convert(final String value) {
+                    return Boolean.valueOf(value);
+                }
+            });
+            fail("Expected to be unable to modify the config");
+        } catch (Exception ignored) { }
+    }
 }

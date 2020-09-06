@@ -24,6 +24,7 @@ SOFTWARE.
 */
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -278,7 +279,8 @@ public class XMLParserConfiguration {
      */
     public XMLParserConfiguration withXsiTypeMap(final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap) {
         XMLParserConfiguration newConfig = this.clone();
-        newConfig.xsiTypeMap = Collections.unmodifiableMap(xsiTypeMap);
+        Map<String, XMLXsiTypeConverter<?>> cloneXsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>(xsiTypeMap);
+        newConfig.xsiTypeMap = Collections.unmodifiableMap(cloneXsiTypeMap);
         return newConfig;
     }
 }
