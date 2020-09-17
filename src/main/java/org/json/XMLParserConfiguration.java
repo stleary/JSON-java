@@ -23,6 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+
 /**
  * Configuration object for the XML parser. The configuration is immutable.
  * @author AylwardJ
@@ -57,6 +62,11 @@ public class XMLParserConfiguration {
     private boolean convertNilAttributeToNull;
 
     /**
+     * This will allow type conversion for values in XML if xsi:type attribute is defined
+     */
+    private Map<String, XMLXsiTypeConverter<?>> xsiTypeMap;
+
+    /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert
      * values), and the CDATA Tag Name is "content".
      */
@@ -64,6 +74,7 @@ public class XMLParserConfiguration {
         this.keepStrings = false;
         this.cDataTagName = "content";
         this.convertNilAttributeToNull = false;
+        this.xsiTypeMap = Collections.emptyMap();
     }
 
     /**
@@ -129,7 +140,26 @@ public class XMLParserConfiguration {
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
     }
-    
+
+    /**
+     * Configure the parser to use custom settings.
+     * @param keepStrings <code>true</code> to parse all values as string.
+     *      <code>false</code> to try and convert XML string values into a JSON value.
+     * @param cDataTagName <code>null</code> to disable CDATA processing. Any other value
+     *      to use that value as the JSONObject key name to process as CDATA.
+     * @param convertNilAttributeToNull <code>true</code> to parse values with attribute xsi:nil="true" as null.
+     *                                  <code>false</code> to parse values with attribute xsi:nil="true" as {"xsi:nil":true}.
+     * @param xsiTypeMap  <code>new HashMap<String, XMLXsiTypeConverter<?>>()</code> to parse values with attribute
+     *                   xsi:type="integer" as integer,  xsi:type="string" as string
+     */
+    private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
+            final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap ) {
+        this.keepStrings = keepStrings;
+        this.cDataTagName = cDataTagName;
+        this.convertNilAttributeToNull = convertNilAttributeToNull;
+        this.xsiTypeMap = Collections.unmodifiableMap(xsiTypeMap);
+    }
+
     /**
      * Provides a new instance of the same configuration.
      */
@@ -143,7 +173,8 @@ public class XMLParserConfiguration {
         return new XMLParserConfiguration(
                 this.keepStrings,
                 this.cDataTagName,
-                this.convertNilAttributeToNull
+                this.convertNilAttributeToNull,
+                this.xsiTypeMap
         );
     }
     
@@ -223,6 +254,33 @@ public class XMLParserConfiguration {
     public XMLParserConfiguration withConvertNilAttributeToNull(final boolean newVal) {
         XMLParserConfiguration newConfig = this.clone();
         newConfig.convertNilAttributeToNull = newVal;
+        return newConfig;
+    }
+
+    /**
+     * When parsing the XML into JSON, specifies that the values with attribute xsi:type
+     * will be converted to target type defined to client in this configuration
+     * {@code Map<String, XMLXsiTypeConverter<?>>} to parse values with attribute
+     * xsi:type="integer" as integer,  xsi:type="string" as string
+     * @return {@link #xsiTypeMap} unmodifiable configuration map.
+     */
+    public Map<String, XMLXsiTypeConverter<?>> getXsiTypeMap() {
+        return this.xsiTypeMap;
+    }
+
+    /**
+     * When parsing the XML into JSON, specifies that the values with attribute xsi:type
+     * will be converted to target type defined to client in this configuration
+     * {@code Map<String, XMLXsiTypeConverter<?>>} to parse values with attribute
+     * xsi:type="integer" as integer,  xsi:type="string" as string
+     * @param xsiTypeMap  {@code new HashMap<String, XMLXsiTypeConverter<?>>()} to parse values with attribute
+     *                   xsi:type="integer" as integer,  xsi:type="string" as string
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    public XMLParserConfiguration withXsiTypeMap(final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap) {
+        XMLParserConfiguration newConfig = this.clone();
+        Map<String, XMLXsiTypeConverter<?>> cloneXsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>(xsiTypeMap);
+        newConfig.xsiTypeMap = Collections.unmodifiableMap(cloneXsiTypeMap);
         return newConfig;
     }
 }

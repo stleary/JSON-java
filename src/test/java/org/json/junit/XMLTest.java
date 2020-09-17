@@ -38,6 +38,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,6 +47,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.json.XML;
 import org.json.XMLParserConfiguration;
+import org.json.XMLXsiTypeConverter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -972,5 +975,97 @@ public class XMLTest {
         
         assertEquals("Case insensitive Entity unescape",  expectedStr, actualStr);
     }
-    
+
+    /**
+     * test passes when xsi:type="java.lang.String" not converting to string
+     */
+    @Test
+    public void testToJsonWithTypeWhenTypeConversionDisabled() {
+        String originalXml = "<root><id xsi:type=\"string\">1234</id></root>";
+        String expectedJsonString = "{\"root\":{\"id\":{\"xsi:type\":\"string\",\"content\":1234}}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration());
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    /**
+     * test passes when xsi:type="java.lang.String" converting to String
+     */
+    @Test
+    public void testToJsonWithTypeWhenTypeConversionEnabled() {
+        String originalXml = "<root><id1 xsi:type=\"string\">1234</id1>"
+                + "<id2 xsi:type=\"integer\">1234</id2></root>";
+        String expectedJsonString = "{\"root\":{\"id2\":1234,\"id1\":\"1234\"}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        xsiTypeMap.put("integer", new XMLXsiTypeConverter<Integer>() {
+            @Override public Integer convert(final String value) {
+                return Integer.valueOf(value);
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void testToJsonWithXSITypeWhenTypeConversionEnabled() {
+        String originalXml = "<root><asString xsi:type=\"string\">12345</asString><asInt "
+                + "xsi:type=\"integer\">54321</asInt></root>";
+        String expectedJsonString = "{\"root\":{\"asString\":\"12345\",\"asInt\":54321}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        xsiTypeMap.put("integer", new XMLXsiTypeConverter<Integer>() {
+            @Override public Integer convert(final String value) {
+                return Integer.valueOf(value);
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void testToJsonWithXSITypeWhenTypeConversionNotEnabledOnOne() {
+        String originalXml = "<root><asString xsi:type=\"string\">12345</asString><asInt>54321</asInt></root>";
+        String expectedJsonString = "{\"root\":{\"asString\":\"12345\",\"asInt\":54321}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap));
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void testXSITypeMapNotModifiable() {
+        Map<String, XMLXsiTypeConverter<?>> xsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>();
+        XMLParserConfiguration config = new XMLParserConfiguration().withXsiTypeMap(xsiTypeMap);
+        xsiTypeMap.put("string", new XMLXsiTypeConverter<String>() {
+            @Override public String convert(final String value) {
+                return value;
+            }
+        });
+        assertEquals("Config Conversion Map size is expected to be 0", 0, config.getXsiTypeMap().size());
+
+        try {
+            config.getXsiTypeMap().put("boolean", new XMLXsiTypeConverter<Boolean>() {
+                @Override public Boolean convert(final String value) {
+                    return Boolean.valueOf(value);
+                }
+            });
+            fail("Expected to be unable to modify the config");
+        } catch (Exception ignored) { }
+    }
 }

@@ -26,9 +26,11 @@ SOFTWARE.
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
+
 
 /**
  * This provides static methods to convert an XML text into a JSONObject, and to
@@ -71,6 +73,8 @@ public class XML {
      * Null attribute name
      */
     public static final String NULL_ATTR = "xsi:nil";
+
+    public static final String TYPE_ATTR = "xsi:type";
 
     /**
      * Creates an iterator for navigating Code Points in a string instead of
@@ -257,6 +261,7 @@ public class XML {
         String string;
         String tagName;
         Object token;
+        XMLXsiTypeConverter<?> xmlXsiTypeConverter;
 
         // Test for and skip past these forms:
         // <!-- ... -->
@@ -336,6 +341,7 @@ public class XML {
             token = null;
             jsonObject = new JSONObject();
             boolean nilAttributeFound = false;
+            xmlXsiTypeConverter = null;
             for (;;) {
                 if (token == null) {
                     token = x.nextToken();
@@ -354,6 +360,9 @@ public class XML {
                                 && NULL_ATTR.equals(string)
                                 && Boolean.parseBoolean((String) token)) {
                             nilAttributeFound = true;
+                        } else if(config.getXsiTypeMap() != null && !config.getXsiTypeMap().isEmpty()
+                                && TYPE_ATTR.equals(string)) {
+                            xmlXsiTypeConverter = config.getXsiTypeMap().get(token);
                         } else if (!nilAttributeFound) {
                             jsonObject.accumulate(string,
                                     config.isKeepStrings()
@@ -392,8 +401,13 @@ public class XML {
                         } else if (token instanceof String) {
                             string = (String) token;
                             if (string.length() > 0) {
-                                jsonObject.accumulate(config.getcDataTagName(),
-                                        config.isKeepStrings() ? string : stringToValue(string));
+                                if(xmlXsiTypeConverter != null) {
+                                    jsonObject.accumulate(config.getcDataTagName(),
+                                            stringToValue(string, xmlXsiTypeConverter));
+                                } else {
+                                    jsonObject.accumulate(config.getcDataTagName(),
+                                            config.isKeepStrings() ? string : stringToValue(string));
+                                }
                             }
 
                         } else if (token == LT) {
@@ -416,6 +430,19 @@ public class XML {
                 }
             }
         }
+    }
+
+    /**
+     * This method tries to convert the given string value to the target object
+     * @param string String to convert
+     * @param typeConverter value converter to convert string to integer, boolean e.t.c
+     * @return JSON value of this string or the string
+     */
+    public static Object stringToValue(String string, XMLXsiTypeConverter<?> typeConverter) {
+        if(typeConverter != null) {
+            return typeConverter.convert(string);
+        }
+        return stringToValue(string);
     }
 
     /**
