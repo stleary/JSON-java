@@ -1,4 +1,4 @@
-JSON in Java [package org.json]
+Amazing Project On JSON in Java [package org.json]
 ===============================
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.json/json.svg)](https://mvnrepository.com/artifact/org.json/json)
@@ -73,7 +73,7 @@ java -cp .;json-java.jar Test
 ````
 
  
-**Build tools for building the package and executing the unit tests**
+**Build tools for building the package and for executing the unit tests**
 
 The test suite can be executed with Maven by running:
 ```
