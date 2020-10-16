@@ -7,7 +7,7 @@ JSON in Java [package org.json]
 
 # Overview
 
-[JSON](http://www.JSON.org/) is a light-weight language independent data interchange format.
+[JSON](http://www.JSON.org/) is a light-weight language-independent data interchange format.
 
 The JSON-Java package is a reference implementation that demonstrates how to parse JSON documents into Java objects and how to generate new JSON documents from the Java classes.
 
@@ -17,7 +17,7 @@ Project goals include:
 * Easy to build, use, and include in other projects
 * No external dependencies
 * Fast execution and low memory footprint
-* Maintain backwards compatibility
+* Maintain backward compatibility
 * Designed and tested to use on Java versions 1.6 - 1.11
 
 The files in this package implement JSON encoders and decoders. The package can also convert between JSON and XML, HTTP headers, Cookies, and CDL.
@@ -26,7 +26,7 @@ The license includes this restriction: ["The software shall be used for good, no
 
 **If you would like to contribute to this project**
 
-Bug fixes, code improvements, and unit test coverage changes are welcome! Because this project is currrently in maintenance phase, the kinds of changes that can be accepted are limited. For more information, please read the [FAQ](https://github.com/stleary/JSON-java/wiki/FAQ).
+Bug fixes, code improvements, and unit test coverage changes are welcome! Because this project is currently in the maintenance phase, the kinds of changes that can be accepted are limited. For more information, please read the [FAQ](https://github.com/stleary/JSON-java/wiki/FAQ).
 
 # Build Instructions
 
@@ -61,7 +61,7 @@ public class Test {
 }
 ````
 
-*Excecute the Test file*
+*Execute the Test file*
 ```` 
 java -cp .;json-java.jar Test
 ````
@@ -73,14 +73,14 @@ java -cp .;json-java.jar Test
 ````
 
  
-**Build tools for building the package and executing the unit tests**
+**Tools to build the package and execute the unit tests**
 
-The test suite can be executed with Maven by running:
+Execute the test suite with Maven:
 ```
 mvn clean test
 ```
 
-The test suite can be executed with Gradlew by running:
+Execute the test suite with Gradlew:
 
 ```
 gradlew clean build test
@@ -101,12 +101,12 @@ This package fully supports `Integer`, `Long`, and `Double` Java types. Partial 
 for `BigInteger` and `BigDecimal` values in `JSONObject` and `JSONArray` objects is provided
 in the form of `get()`, `opt()`, and `put()` API methods.
 
-Although 1.6 compatibility is currently supported, it is not a project goal and may be
+Although 1.6 compatibility is currently supported, it is not a project goal and might be
 removed in some future release.
 
 In compliance with RFC8259 page 10 section 9, the parser is more lax with what is valid
-JSON than the Generator. For Example, the tab character (U+0009) is allowed when reading
-JSON Text strings, but when output by the Generator, tab is properly converted to \t in
+JSON then the Generator. For Example, the tab character (U+0009) is allowed when reading
+JSON Text strings, but when output by the Generator, the tab is properly converted to \t in
 the string. Other instances may occur where reading invalid JSON text does not cause an
 error to be generated. Malformed JSON Texts such as missing end " (quote) on strings or
 invalid number formats (1.2e6.3) will cause errors as such documents can not be read
@@ -119,7 +119,7 @@ Some notable exceptions that the JSON Parser in this library accepts are:
 * Numbers out of range for `Double` or `Long` are parsed as strings
 
 Recent pull requests added a new method `putAll` on the JSONArray. The `putAll` method
-works similarly as other `put` mehtods in that it does not call `JSONObject.wrap` for items
+works similarly to other `put` methods in that it does not call `JSONObject.wrap` for items
 added. This can lead to inconsistent object representation in JSONArray structures.
 
 For example, code like this will create a mixed JSONArray, some items wrapped, others
@@ -169,10 +169,10 @@ For example, <b>Cookie.java</b> is tested by <b>CookieTest.java</b>.
 
 <b>General issues with unit testing are:</b><br>
 * Just writing tests to make coverage goals tends to result in poor tests. 
-* Unit tests are a form of documentation - how a given method actually works is demonstrated by the test. So for a code reviewer or future developer looking at code a good test helps explain how a function is supposed to work according to the original author. This can be difficult if you are not the original developer.
+* Unit tests are a form of documentation - how a given method works is demonstrated by the test. So for a code reviewer or future developer looking at code a good test helps explain how a function is supposed to work according to the original author. This can be difficult if you are not the original developer.
 *   It is difficult to evaluate unit tests in a vacuum. You also need to see the code being tested to understand if a test is good. 
-* Without unit tests it is hard to feel confident about the quality of the code, especially when fixing bugs or refactoring. Good tests prevents regressions and keeps the intent of the code correct.
-* If you have unit test results along with pull requests, the reviewer has an easier time understanding your code and determining if the it works as intended.
+* Without unit tests, it is hard to feel confident about the quality of the code, especially when fixing bugs or refactoring. Good tests prevent regressions and keep the intent of the code correct.
+* If you have unit test results along with pull requests, the reviewer has an easier time understanding your code and determining if it works as intended.
 
 
 # Files
@@ -264,16 +264,12 @@ and artifactId "json". For example:
 it is not recommended for use.
 Java 1.6 compatability fixed, JSONArray.toList() and JSONObject.toMap(),
 RFC4180 compatibility, JSONPointer, some exception fixes, optional XML type conversion.
-Contains the latest code as of 7 Aug, 2016
+Contains the latest code as of 7 Aug 2016
 
-20160212    Java 1.6 compatibility, OSGi bundle. Contains the latest code as of 12 Feb, 2016.
+20160212    Java 1.6 compatibility, OSGi bundle. Contains the latest code as of 12 Feb 2016.
 
-20151123    JSONObject and JSONArray initialization with generics. Contains the
-latest code as of 23 Nov, 2015.
+20151123    JSONObject and JSONArray initialization with generics. Contains the latest code as of 23 Nov 2015.
 
 20150729    Checkpoint for Maven central repository release. Contains the latest code
-as of 29 July, 2015.
+as of 29 July 2015.
 ~~~
-
-
-
