@@ -246,6 +246,8 @@ and artifactId "json". For example:
 [https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
 
 ~~~
+20201115    Recent commits and first release after project structure change
+
 20200518    Recent commits and snapshot before project structure change
 
 20190722    Recent commits
