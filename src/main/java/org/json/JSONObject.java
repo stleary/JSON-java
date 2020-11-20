@@ -1161,8 +1161,7 @@ public class JSONObject {
             return new BigDecimal((BigInteger) val);
         }
         if (val instanceof Double || val instanceof Float){
-            final double d = ((Number) val).doubleValue();
-            if(Double.isNaN(d)) {
+            if (!numberIsFinite((Number)val)) {
                 return defaultValue;
             }
             return new BigDecimal(((Number) val).doubleValue());
@@ -1212,11 +1211,10 @@ public class JSONObject {
             return ((BigDecimal) val).toBigInteger();
         }
         if (val instanceof Double || val instanceof Float){
-            final double d = ((Number) val).doubleValue();
-            if(Double.isNaN(d)) {
+            if (!numberIsFinite((Number)val)) {
                 return defaultValue;
             }
-            return new BigDecimal(d).toBigInteger();
+            return new BigDecimal(((Number) val).doubleValue()).toBigInteger();
         }
         if (val instanceof Long || val instanceof Integer
                 || val instanceof Short || val instanceof Byte){
@@ -2267,18 +2265,8 @@ public class JSONObject {
      *             If o is a non-finite number.
      */
     public static void testValidity(Object o) throws JSONException {
-        if (o != null) {
-            if (o instanceof Double) {
-                if (((Double) o).isInfinite() || ((Double) o).isNaN()) {
-                    throw new JSONException(
-                            "JSON does not allow non-finite numbers.");
-                }
-            } else if (o instanceof Float) {
-                if (((Float) o).isInfinite() || ((Float) o).isNaN()) {
-                    throw new JSONException(
-                            "JSON does not allow non-finite numbers.");
-                }
-            }
+        if (o instanceof Number && !numberIsFinite((Number) o)) {
+            throw new JSONException("JSON does not allow non-finite numbers.");
         }
     }
 
