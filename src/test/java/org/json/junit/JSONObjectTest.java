@@ -115,9 +115,16 @@ public class JSONObjectTest {
                 .put("key2", 2)
                 .put("key3", new String(string1));
         
-        assertFalse("Should eval to false", obj1.similar(obj2));
+        JSONObject obj4 = new JSONObject()
+                .put("key1", "abc")
+                .put("key2", 2.0)
+                .put("key3", new String(string1));
         
+        assertFalse("Should eval to false", obj1.similar(obj2));
+
         assertTrue("Should eval to true", obj1.similar(obj3));
+        
+        assertTrue("Should eval to true", obj1.similar(obj4));
         
     }
     

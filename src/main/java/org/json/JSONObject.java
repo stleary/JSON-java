@@ -1161,8 +1161,7 @@ public class JSONObject {
             return new BigDecimal((BigInteger) val);
         }
         if (val instanceof Double || val instanceof Float){
-            final double d = ((Number) val).doubleValue();
-            if(Double.isNaN(d)) {
+            if (!numberIsFinite((Number)val)) {
                 return defaultValue;
             }
             return new BigDecimal(((Number) val).doubleValue());
@@ -1212,11 +1211,10 @@ public class JSONObject {
             return ((BigDecimal) val).toBigInteger();
         }
         if (val instanceof Double || val instanceof Float){
-            final double d = ((Number) val).doubleValue();
-            if(Double.isNaN(d)) {
+            if (!numberIsFinite((Number)val)) {
                 return defaultValue;
             }
-            return new BigDecimal(d).toBigInteger();
+            return new BigDecimal(((Number) val).doubleValue()).toBigInteger();
         }
         if (val instanceof Long || val instanceof Integer
                 || val instanceof Short || val instanceof Byte){
@@ -2073,6 +2071,8 @@ public class JSONObject {
                     if (!((JSONArray)valueThis).similar(valueOther)) {
                         return false;
                     }
+                } else if (valueThis instanceof Number && valueOther instanceof Number) {
+                    return isNumberSimilar((Number)valueThis, (Number)valueOther);
                 } else if (!valueThis.equals(valueOther)) {
                     return false;
                 }
@@ -2081,6 +2081,55 @@ public class JSONObject {
         } catch (Throwable exception) {
             return false;
         }
+    }
+    
+    /**
+     * Compares two numbers to see if they are similar.
+     * 
+     * If either of the numbers are Double or Float instances, then they are checked to have
+     * a finite value. If either value is not finite (NaN or &#177;infinity), then this
+     * function will always return false. If both numbers are finite, they are first checked
+     * to be the same type and implement {@link Comparable}. If they do, then the actual
+     * {@link Comparable#compareTo(Object)} is called. If they are not the same type, or don't
+     * implement Comparable, then they are converted to {@link BigDecimal}s. Finally the 
+     * BigDecimal values are compared using {@link BigDecimal#compareTo(BigDecimal)}.
+     * 
+     * @param l the Left value to compare. Can not be <code>null</code>.
+     * @param r the right value to compare. Can not be <code>null</code>.
+     * @return true if the numbers are similar, false otherwise.
+     */
+    static boolean isNumberSimilar(Number l, Number r) {
+        if (!numberIsFinite(l) || !numberIsFinite(r)) {
+            // non-finite numbers are never similar
+            return false;
+        }
+        
+        // if the classes are the same and implement Comparable
+        // then use the built in compare first.
+        if(l.getClass().equals(r.getClass()) && l instanceof Comparable) {
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            int compareTo = ((Comparable)l).compareTo(r);
+            return compareTo==0;
+        }
+        
+        // BigDecimal should be able to handle all of our number types that we support through
+        // documentation. Convert to BigDecimal first, then use the Compare method to
+        // decide equality.
+        final BigDecimal lBigDecimal = objectToBigDecimal(l, null);
+        final BigDecimal rBigDecimal = objectToBigDecimal(r, null);
+        if (lBigDecimal == null || rBigDecimal == null) {
+            return false;
+        }
+        return lBigDecimal.compareTo(rBigDecimal) == 0;
+    }
+    
+    private static boolean numberIsFinite(Number n) {
+        if (n instanceof Double && (((Double) n).isInfinite() || ((Double) n).isNaN())) {
+            return false;
+        } else if (n instanceof Float && (((Float) n).isInfinite() || ((Float) n).isNaN())) {
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -2216,18 +2265,8 @@ public class JSONObject {
      *             If o is a non-finite number.
      */
     public static void testValidity(Object o) throws JSONException {
-        if (o != null) {
-            if (o instanceof Double) {
-                if (((Double) o).isInfinite() || ((Double) o).isNaN()) {
-                    throw new JSONException(
-                            "JSON does not allow non-finite numbers.");
-                }
-            } else if (o instanceof Float) {
-                if (((Float) o).isInfinite() || ((Float) o).isNaN()) {
-                    throw new JSONException(
-                            "JSON does not allow non-finite numbers.");
-                }
-            }
+        if (o instanceof Number && !numberIsFinite((Number) o)) {
+            throw new JSONException("JSON does not allow non-finite numbers.");
         }
     }
 
@@ -2354,7 +2393,7 @@ public class JSONObject {
      */
     public static Object wrap(Object object) {
         try {
-            if (object == null) {
+            if (NULL.equals(object)) {
                 return NULL;
             }
             if (object instanceof JSONObject || object instanceof JSONArray
