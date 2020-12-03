@@ -568,6 +568,14 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
+     * Removes all of the elements from this JSONArray.
+     * The JSONArray will be empty after this call returns.
+     */
+    public void clear() {
+        return this.map.clear();
+    }
+
+    /**
      * Get the optional object value associated with an index.
      *
      * @param index
