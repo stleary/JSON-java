@@ -978,7 +978,7 @@ public class JSONObject {
      * The JSONObject will be empty after this call returns.
      */
     public void clear() {
-        return this.map.clear();
+        this.map.clear();
     }
 
     /**
