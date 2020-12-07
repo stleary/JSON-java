@@ -3215,4 +3215,19 @@ public class JSONObjectTest {
         assertNotNull("'empty_json_array' should be an array", jsonObject.getJSONArray("empty_json_array"));
         assertEquals("'empty_json_array' should have a length of 0", 0, jsonObject.getJSONArray("empty_json_array").length());
     }
+
+    /**
+    * Tests if calling JSONObject clear() method actually makes the JSONObject empty
+    */
+    @Test(expected = JSONException.class)
+    public void jsonObjectClearMethodTest() {
+        //Adds random stuff to the JSONObject
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("key1", 123);
+        jsonObject.put("key2", "456");
+        jsonObject.put("key3", new JSONObject());
+        jsonObject.clear(); //Clears the JSONObject
+        assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
+        jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
+    }
 }

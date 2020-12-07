@@ -974,6 +974,14 @@ public class JSONObject {
     }
 
     /**
+     * Removes all of the elements from this JSONObject.
+     * The JSONObject will be empty after this call returns.
+     */
+    public void clear() {
+        this.map.clear();
+    }
+
+    /**
      * Check if JSONObject is empty.
      *
      * @return true if JSONObject is empty, otherwise false.
