@@ -1254,4 +1254,19 @@ public class JSONArrayTest {
             assertEquals("index " + i + " are equal", a1.get(i), a2.get(i));
         }
     }
+
+    /**
+	 * Tests if calling JSONArray clear() method actually makes the JSONArray empty
+	 */
+	@Test(expected = JSONException.class)
+	public void jsonArrayClearMethodTest() {
+		//Adds random stuff to the JSONArray
+		JSONArray jsonArray = new JSONArray();
+		jsonArray.put(123);
+		jsonArray.put("456");
+		jsonArray.put(new JSONArray());
+		jsonArray.clear(); //Clears the JSONArray
+		assertTrue("expected jsonArray.length() == 0", jsonArray.length() == 0); //Check if its length is 0
+		jsonArray.getInt(0); //Should throws org.json.JSONException: JSONArray[0] not found
+	}
 }

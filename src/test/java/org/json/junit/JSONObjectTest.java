@@ -115,9 +115,16 @@ public class JSONObjectTest {
                 .put("key2", 2)
                 .put("key3", new String(string1));
         
-        assertFalse("Should eval to false", obj1.similar(obj2));
+        JSONObject obj4 = new JSONObject()
+                .put("key1", "abc")
+                .put("key2", 2.0)
+                .put("key3", new String(string1));
         
+        assertFalse("Should eval to false", obj1.similar(obj2));
+
         assertTrue("Should eval to true", obj1.similar(obj3));
+        
+        assertTrue("Should eval to true", obj1.similar(obj4));
         
     }
     
@@ -3207,5 +3214,20 @@ public class JSONObjectTest {
         assertTrue("missing expected key 'empty_json_array'", jsonObject.has("empty_json_array"));
         assertNotNull("'empty_json_array' should be an array", jsonObject.getJSONArray("empty_json_array"));
         assertEquals("'empty_json_array' should have a length of 0", 0, jsonObject.getJSONArray("empty_json_array").length());
+    }
+
+    /**
+    * Tests if calling JSONObject clear() method actually makes the JSONObject empty
+    */
+    @Test(expected = JSONException.class)
+    public void jsonObjectClearMethodTest() {
+        //Adds random stuff to the JSONObject
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("key1", 123);
+        jsonObject.put("key2", "456");
+        jsonObject.put("key3", new JSONObject());
+        jsonObject.clear(); //Clears the JSONObject
+        assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
+        jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
     }
 }
