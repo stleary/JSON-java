@@ -1558,7 +1558,7 @@ public class JSONObject {
         // if the first letter in the key is not uppercase, then skip.
         // This is to maintain backwards compatibility before PR406
         // (https://github.com/stleary/JSON-java/pull/406/)
-        if (Character.isLowerCase(key.charAt(0))) {
+        if (key.length() > 0 && Character.isLowerCase(key.charAt(0))) {
             return null;
         }
         if (key.length() == 1) {
