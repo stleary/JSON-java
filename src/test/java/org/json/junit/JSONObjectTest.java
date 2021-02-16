@@ -35,6 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -3230,4 +3231,90 @@ public class JSONObjectTest {
         assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
     }
+
+	/**
+	 * Test method for
+	 * {@link org.json.JSONObject#expand()}.
+	 */
+	@Test
+	public void testGetExpandedJSON() {
+		InputStream jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestIn1.json");
+		JSONObject originalJSON = new JSONObject(new JSONTokener(jsonStream));
+
+		List<JSONObject> expandedJSONList = originalJSON.expand();
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut1.json");
+		JSONObject expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(0)));
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut2.json");
+		expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(1)));
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut3.json");
+		expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(2)));
+	}
+	
+	/**
+	 * Ensuring {@link org.json.JSONObject#expand()}
+	 * preserves order obj1_1, obj1_2...obj1_x, obj2_1, obj3_1, obj3_2...obj3_
+	 * when operating over a List&lt;JSONObject&gt;
+	 */
+	@Test
+	public void testGetExpandedJSONList() {
+		List<JSONObject> originalJSONList = new ArrayList<JSONObject>();
+		List<JSONObject> expandedJSONList = new ArrayList<JSONObject>();
+		
+		InputStream jsonStream;
+		JSONObject originalJSON;
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestIn2_1.json");
+		originalJSON = new JSONObject(new JSONTokener(jsonStream));
+		originalJSONList.add(originalJSON);
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestIn2_2.json");
+		originalJSON = new JSONObject(new JSONTokener(jsonStream));
+		originalJSONList.add(originalJSON);
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestIn2_3.json");
+		originalJSON = new JSONObject(new JSONTokener(jsonStream));
+		originalJSONList.add(originalJSON);
+
+
+		for(JSONObject jsonObj: originalJSONList) {
+			expandedJSONList.addAll(jsonObj.expand());
+		}
+
+		// JSONObjWithArraysTestIn2_1
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut2_1_1.json");
+		JSONObject expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(0)));
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut2_1_2.json");
+		expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(1)));
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut2_1_3.json");
+		expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(2)));
+
+		// JSONObjWithArraysTestIn2_2
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut2_2_1.json");
+		expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(3)));
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut2_2_2.json");
+		expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(4)));
+
+		// JSONObjWithArraysTestIn2_3
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut2_3_1.json");
+		expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(5)));
+
+		jsonStream = JSONObject.class.getClassLoader().getResourceAsStream("JSONObjWithArraysTestOut2_3_2.json");
+		expandedJSON = new JSONObject(new JSONTokener(jsonStream));
+		assertTrue(expandedJSON.similar(expandedJSONList.get(6)));
+	}
 }

@@ -36,10 +36,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -2299,6 +2303,114 @@ public class JSONObject {
         }
         return ja;
     }
+    
+	/**
+	 * Use this method to expand(<i>split</i> or <i>explode</i>) a single
+	 * JSONObject with JSONArrays inside it into a List of multiple
+	 * JSONObjects where each entry is a simple JSON
+	 * <p>
+	 * If the original JSON contains a JSONArray for its <i>value</i>, in the
+	 * expanded version, the i<sup>th</sup> JSONObject holds the element from
+	 * i<sup>th</sup> position of original array
+	 * </p>
+	 * <p>
+	 * If the original JSON contains an array but does not have a value at
+	 * i<sup>th</sup> position, a <i>null</i> is placed causing the key-value
+	 * pair to be dropped
+	 * </p>
+	 * <p>
+	 * If the original JSON does not contain an array, simply the original
+	 * <i>scalar</i> is copied
+	 * </p>
+	 * 
+	 * For example,
+	 *
+	 * <pre>
+	 * {
+	 *   a: b,
+	 *   c: [d1, d2, d3],
+	 *   e: [f1, f2]
+	 * }
+	 * </pre>
+	 *
+	 * results in the List of JSONObjects
+	 * 
+	 * <pre>
+	 * {		{		{
+	 *   a: b,	  a: b,	  	  a: b,
+	 *   c: d1,	  c: d2,  	  c: d3,
+	 *   e: f1	  e: f2	  	  e: null
+	 * }		}		}
+	 * </pre>
+	 */
+	public List<JSONObject> expand() {
+		List<JSONObject> outgoingJSONObjectList = new ArrayList<JSONObject>();
+
+		List<Integer> arrayLengthCounts = new ArrayList<Integer>();
+		List<String> arrayKeyNames = new ArrayList<String>();
+
+		arrayLengthCounts.add(0);
+
+		determineArrayDetails(arrayLengthCounts, arrayKeyNames);
+
+		int entryReplicationFactor = Collections.max(arrayLengthCounts);
+
+		if (entryReplicationFactor == 0) {
+			// Add once
+			outgoingJSONObjectList.add(this);
+		} else {
+			Set<String> allKeys = new HashSet<String>(this.keySet());
+			allKeys.removeAll(arrayKeyNames);
+
+			String[] keysToCopy = allKeys.toArray(new String[0]);
+
+			replicateAndFill(outgoingJSONObjectList, arrayKeyNames, entryReplicationFactor, keysToCopy);
+		}
+
+		return outgoingJSONObjectList;
+	}
+	
+	/**
+	 * Evaluate specifics of JSONArray entries such as their names and lengths
+	 * 
+	 * @param incomingJSON
+	 * @param arrayLengthCounts
+	 * @param arrayKeyNames
+	 */
+	private void determineArrayDetails(List<Integer> arrayLengthCounts,
+			List<String> arrayKeyNames) {
+		Iterator<String> keyIterator = this.keys();
+
+		while (keyIterator.hasNext()) {
+			String key = keyIterator.next();
+			if (this.optJSONArray(key) != null) {
+				arrayKeyNames.add(key);
+				arrayLengthCounts.add(this.getJSONArray(key).length());
+			}
+		}
+	}
+	
+	/**
+	 * Fill the given list with entries replicated as required
+	 * 
+	 * @param outgoingJSONObjectList
+	 * @param arrayKeyNames
+	 * @param entryReplicationFactor
+	 * @param keysToCopy
+	 */
+	private void replicateAndFill(List<JSONObject> outgoingJSONObjectList,
+			List<String> arrayKeyNames, int entryReplicationFactor, String[] keysToCopy) {
+		for (int i = 0; i < entryReplicationFactor; i++) {
+			JSONObject outgoingJSONObject = new JSONObject(this, keysToCopy);
+
+			for (String key : arrayKeyNames) {
+				outgoingJSONObject.put(key, this.getJSONArray(key).opt(i));
+			}
+
+			outgoingJSONObjectList.add(outgoingJSONObject);
+		}
+
+	}
 
     /**
      * Make a JSON text of this JSONObject. For compactness, no whitespace is
