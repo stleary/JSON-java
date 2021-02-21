@@ -333,4 +333,22 @@ public class JSONTokenerTest {
         assertEquals(0, t2.next());
         assertFalse(t2.more());
    }
+
+    @Test
+    public void testClose() throws IOException {
+        Reader reader = new StringReader("some test string");
+        JSONTokener tokener = null;
+        try {
+            tokener = new JSONTokener(reader);
+        } finally {
+            tokener.close();
+        }
+
+        try {
+            reader.read();
+            fail("Expected exception");
+        } catch (Exception e) {
+            assertTrue(e instanceof IOException);
+        }
+    }
 }
