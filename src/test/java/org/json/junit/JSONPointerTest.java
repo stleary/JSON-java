@@ -117,14 +117,24 @@ public class JSONPointerTest {
         assertSame(document.get("m~n"), query("/m~0n"));
     }
 
+    /**
+     * We pass backslashes as-is
+     * 
+     * @see https://tools.ietf.org/html/rfc6901#section-3
+     */
     @Test
-    public void backslashEscaping() {
-        assertSame(document.get("i\\j"), query("/i\\\\j"));
+    public void backslashHandling() {
+        assertSame(document.get("i\\j"), query("/i\\j"));
     }
 
+    /**
+     * We pass quotations as-is
+     * 
+     * @see https://tools.ietf.org/html/rfc6901#section-3
+     */
     @Test
-    public void quotationEscaping() {
-        assertSame(document.get("k\"l"), query("/k\\\\\\\"l"));
+    public void quotationHandling() {
+        assertSame(document.get("k\"l"), query("/k\"l"));
     }
 
     @Test
@@ -189,7 +199,7 @@ public class JSONPointerTest {
                 .append("\"")
                 .append(0)
                 .build();
-        assertEquals("/obj/other~0key/another~1key/\\\"/0", pointer.toString());
+        assertEquals("/obj/other~0key/another~1key/\"/0", pointer.toString());
     }
     
     @Test
