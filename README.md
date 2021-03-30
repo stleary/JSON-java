@@ -63,7 +63,7 @@ public class Test {
 
 *Execute the Test file*
 ```` 
-java -cp .;json-java.jar Test
+java -cp .;json-java.jar Test.java
 ````
 
 *Expected output*
