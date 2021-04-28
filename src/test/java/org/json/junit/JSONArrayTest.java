@@ -364,6 +364,8 @@ public class JSONArrayTest {
                 new Double(23.45e-4).equals(jsonArray.getDouble(5)));
         assertTrue("Array string double",
                 new Double(23.45).equals(jsonArray.getDouble(6)));
+        assertTrue("Array double can be float",
+                new Float(23.45e-4f).equals(jsonArray.getFloat(5)));
         // ints
         assertTrue("Array value int",
                 new Integer(42).equals(jsonArray.getInt(7)));
