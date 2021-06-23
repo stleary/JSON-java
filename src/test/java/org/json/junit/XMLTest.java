@@ -65,6 +65,15 @@ public class XMLTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Test
+    public void what() {
+    	String s = "<example><value attribute=\"value\"><![CDATA[some treatment <b>plant</b> with bio chemicals]]></value></example>";
+    	JSONObject jo = XML.toJSONObject(s);
+    	System.out.println(jo.toString());
+    }
+    
+    
+    
     /**
      * JSONObject from a null XML string.
      * Expects a NullPointerException
