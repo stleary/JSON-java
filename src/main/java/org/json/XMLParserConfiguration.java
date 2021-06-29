@@ -94,7 +94,7 @@ public class XMLParserConfiguration {
      * Configure the parser string processing to try and convert XML values to JSON values and
      * use the passed CDATA Tag Name the processing value. Pass <code>null</code> to
      * disable CDATA processing
-     * @param cDataTagName<code>null</code> to disable CDATA processing. Any other value
+     * @param cDataTagName <code>null</code> to disable CDATA processing. Any other value
      *      to use that value as the JSONObject key name to process as CDATA.
      * @deprecated This constructor has been deprecated in favor of using the new builder
      *      pattern for the configuration.
@@ -109,7 +109,7 @@ public class XMLParserConfiguration {
      * Configure the parser to use custom settings.
      * @param keepStrings <code>true</code> to parse all values as string.
      *      <code>false</code> to try and convert XML string values into a JSON value.
-     * @param cDataTagName<code>null</code> to disable CDATA processing. Any other value
+     * @param cDataTagName <code>null</code> to disable CDATA processing. Any other value
      *      to use that value as the JSONObject key name to process as CDATA.
      * @deprecated This constructor has been deprecated in favor of using the new builder
      *      pattern for the configuration.

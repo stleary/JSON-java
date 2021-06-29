@@ -128,6 +128,7 @@ public class JSONObject {
          *         null.
          */
         @Override
+        @SuppressWarnings("lgtm[java/unchecked-cast-in-equals]")
         public boolean equals(Object object) {
             return object == null || object == this;
         }
@@ -1638,9 +1639,6 @@ public class JSONObject {
      * Searches the class hierarchy to see if the method or it's super
      * implementations and interfaces has the annotation. Returns the depth of the
      * annotation in the hierarchy.
-     *
-     * @param <A>
-     *            type of the annotation
      *
      * @param m
      *            method to check
