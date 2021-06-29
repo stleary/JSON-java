@@ -1370,9 +1370,21 @@ public class JSONObject {
      *            A key string.
      * @return A JSONObject which is the value.
      */
-    public JSONObject optJSONObject(String key) {
+    public JSONObject optJSONObject(String key) { return this.optJSONObject(key, null); }
+
+    /**
+     * Get an optional JSONObject associated with a key, or the default if there
+     * is no such key or if the value is not a JSONObject.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An JSONObject which is the value.
+     */
+    public JSONObject optJSONObject(String key, JSONObject defaultValue) {
         Object object = this.opt(key);
-        return object instanceof JSONObject ? (JSONObject) object : null;
+        return object instanceof JSONObject ? (JSONObject) object : defaultValue;
     }
 
     /**
