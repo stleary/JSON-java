@@ -100,6 +100,7 @@ public class JSONObjectTest {
     @Test
     public void verifySimilar() {
         final String string1 = "HasSameRef";
+        final String string2 = "HasDifferentRef";
         JSONObject obj1 = new JSONObject()
                 .put("key1", "abc")
                 .put("key2", 2)
@@ -119,12 +120,16 @@ public class JSONObjectTest {
                 .put("key1", "abc")
                 .put("key2", 2.0)
                 .put("key3", new String(string1));
-        
-        assertFalse("Should eval to false", obj1.similar(obj2));
 
-        assertTrue("Should eval to true", obj1.similar(obj3));
+        JSONObject obj5 = new JSONObject()
+                .put("key1", "abc")
+                .put("key2", 2.0)
+                .put("key3", new String(string2));
         
-        assertTrue("Should eval to true", obj1.similar(obj4));
+        assertFalse("obj1-obj2 Should eval to false", obj1.similar(obj2));
+        assertTrue("obj1-obj3 Should eval to true", obj1.similar(obj3));
+        assertTrue("obj1-obj4 Should eval to true", obj1.similar(obj4));
+        assertFalse("obj1-obj5 Should eval to false", obj1.similar(obj5));
         
     }
     
