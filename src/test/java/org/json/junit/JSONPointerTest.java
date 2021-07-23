@@ -120,7 +120,7 @@ public class JSONPointerTest {
     /**
      * We pass backslashes as-is
      * 
-     * @see https://tools.ietf.org/html/rfc6901#section-3
+     * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
      */
     @Test
     public void backslashHandling() {
@@ -130,7 +130,7 @@ public class JSONPointerTest {
     /**
      * We pass quotations as-is
      * 
-     * @see https://tools.ietf.org/html/rfc6901#section-3
+     * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
      */
     @Test
     public void quotationHandling() {
