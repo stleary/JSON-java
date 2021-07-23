@@ -126,6 +126,8 @@ public class JSONObjectTest {
         
         assertTrue("Should eval to true", obj1.similar(obj4));
         
+        assertTrue("should eval to true",new JSONObject().put("a",1.1d).similar(new JSONObject("{\"a\":1.1}")));
+        
     }
     
     @Test
