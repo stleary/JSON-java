@@ -94,7 +94,7 @@ public class XMLParserConfiguration {
      * Configure the parser string processing to try and convert XML values to JSON values and
      * use the passed CDATA Tag Name the processing value. Pass <code>null</code> to
      * disable CDATA processing
-     * @param cDataTagName<code>null</code> to disable CDATA processing. Any other value
+     * @param cDataTagName <code>null</code> to disable CDATA processing. Any other value
      *      to use that value as the JSONObject key name to process as CDATA.
      * @deprecated This constructor has been deprecated in favor of using the new builder
      *      pattern for the configuration.
@@ -109,7 +109,7 @@ public class XMLParserConfiguration {
      * Configure the parser to use custom settings.
      * @param keepStrings <code>true</code> to parse all values as string.
      *      <code>false</code> to try and convert XML string values into a JSON value.
-     * @param cDataTagName<code>null</code> to disable CDATA processing. Any other value
+     * @param cDataTagName <code>null</code> to disable CDATA processing. Any other value
      *      to use that value as the JSONObject key name to process as CDATA.
      * @deprecated This constructor has been deprecated in favor of using the new builder
      *      pattern for the configuration.
@@ -182,7 +182,7 @@ public class XMLParserConfiguration {
      * When parsing the XML into JSON, specifies if values should be kept as strings (<code>true</code>), or if
      * they should try to be guessed into JSON values (numeric, boolean, string)
      * 
-     * @return The {@link #keepStrings} configuration value.
+     * @return The <code>keepStrings</code> configuration value.
      */
     public boolean isKeepStrings() {
         return this.keepStrings;
@@ -193,7 +193,7 @@ public class XMLParserConfiguration {
      * they should try to be guessed into JSON values (numeric, boolean, string)
      * 
      * @param newVal
-     *      new value to use for the {@link #keepStrings} configuration option.
+     *      new value to use for the <code>keepStrings</code> configuration option.
      * 
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
@@ -208,7 +208,7 @@ public class XMLParserConfiguration {
      * been the value "content" but can be changed. Use <code>null</code> to indicate no CDATA
      * processing.
      * 
-     * @return The {@link #cDataTagName} configuration value.
+     * @return The <code>cDataTagName</code> configuration value.
      */
     public String getcDataTagName() {
         return this.cDataTagName;
@@ -220,7 +220,7 @@ public class XMLParserConfiguration {
      * processing.
      * 
      * @param newVal
-     *      new value to use for the {@link #cDataTagName} configuration option.
+     *      new value to use for the <code>cDataTagName</code> configuration option.
      * 
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
@@ -235,7 +235,7 @@ public class XMLParserConfiguration {
      * should be kept as attribute(<code>false</code>), or they should be converted to
      * <code>null</code>(<code>true</code>)
      * 
-     * @return The {@link #convertNilAttributeToNull} configuration value.
+     * @return The <code>convertNilAttributeToNull</code> configuration value.
      */
     public boolean isConvertNilAttributeToNull() {
         return this.convertNilAttributeToNull;
@@ -247,7 +247,7 @@ public class XMLParserConfiguration {
      * <code>null</code>(<code>true</code>)
      * 
      * @param newVal
-     *      new value to use for the {@link #convertNilAttributeToNull} configuration option.
+     *      new value to use for the <code>convertNilAttributeToNull</code> configuration option.
      * 
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
@@ -262,7 +262,7 @@ public class XMLParserConfiguration {
      * will be converted to target type defined to client in this configuration
      * {@code Map<String, XMLXsiTypeConverter<?>>} to parse values with attribute
      * xsi:type="integer" as integer,  xsi:type="string" as string
-     * @return {@link #xsiTypeMap} unmodifiable configuration map.
+     * @return <code>xsiTypeMap</code> unmodifiable configuration map.
      */
     public Map<String, XMLXsiTypeConverter<?>> getXsiTypeMap() {
         return this.xsiTypeMap;

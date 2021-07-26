@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Object for testing the exception handling in {@link JSONObject#populateMap}.
+ * Object for testing the exception handling in {@link org.json.JSONObject#populateMap}.
  * 
  * @author John Aylward
  */

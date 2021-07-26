@@ -1159,6 +1159,18 @@ public class JSONObject {
      *          to convert.
      */
     static BigDecimal objectToBigDecimal(Object val, BigDecimal defaultValue) {
+        return objectToBigDecimal(val, defaultValue, true);
+    }
+    
+    /**
+     * @param val value to convert
+     * @param defaultValue default value to return is the conversion doesn't work or is null.
+     * @param exact When <code>true</code>, then {@link Double} and {@link Float} values will be converted exactly.
+     *      When <code>false</code>, they will be converted to {@link String} values before converting to {@link BigDecimal}.
+     * @return BigDecimal conversion of the original value, or the defaultValue if unable
+     *          to convert.
+     */
+    static BigDecimal objectToBigDecimal(Object val, BigDecimal defaultValue, boolean exact) {
         if (NULL.equals(val)) {
             return defaultValue;
         }
@@ -1172,7 +1184,14 @@ public class JSONObject {
             if (!numberIsFinite((Number)val)) {
                 return defaultValue;
             }
-            return new BigDecimal(((Number) val).doubleValue());
+            if (exact) {
+                return new BigDecimal(((Number)val).doubleValue());
+            }else {
+                // use the string constructor so that we maintain "nice" values for doubles and floats
+                // the double constructor will translate doubles to "exact" values instead of the likely
+                // intended representation
+                return new BigDecimal(val.toString());
+            }
         }
         if (val instanceof Long || val instanceof Integer
                 || val instanceof Short || val instanceof Byte){
@@ -1638,9 +1657,6 @@ public class JSONObject {
      * Searches the class hierarchy to see if the method or it's super
      * implementations and interfaces has the annotation. Returns the depth of the
      * annotation in the hierarchy.
-     *
-     * @param <A>
-     *            type of the annotation
      *
      * @param m
      *            method to check
@@ -2137,8 +2153,8 @@ public class JSONObject {
         // BigDecimal should be able to handle all of our number types that we support through
         // documentation. Convert to BigDecimal first, then use the Compare method to
         // decide equality.
-        final BigDecimal lBigDecimal = objectToBigDecimal(l, null);
-        final BigDecimal rBigDecimal = objectToBigDecimal(r, null);
+        final BigDecimal lBigDecimal = objectToBigDecimal(l, null, false);
+        final BigDecimal rBigDecimal = objectToBigDecimal(r, null, false);
         if (lBigDecimal == null || rBigDecimal == null) {
             return false;
         }
