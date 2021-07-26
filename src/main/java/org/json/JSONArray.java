@@ -1383,7 +1383,9 @@ public class JSONArray implements Iterable<Object> {
                     return false;
                 }
             } else if (valueThis instanceof Number && valueOther instanceof Number) {
-                return JSONObject.isNumberSimilar((Number)valueThis, (Number)valueOther);
+                if (!JSONObject.isNumberSimilar((Number)valueThis, (Number)valueOther)) {
+                	return false;
+                }
             } else if (!valueThis.equals(valueOther)) {
                 return false;
             }

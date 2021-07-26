@@ -2108,7 +2108,9 @@ public class JSONObject {
                         return false;
                     }
                 } else if (valueThis instanceof Number && valueOther instanceof Number) {
-                    return isNumberSimilar((Number)valueThis, (Number)valueOther);
+                    if (!isNumberSimilar((Number)valueThis, (Number)valueOther)) {
+                    	return false;
+                    };
                 } else if (!valueThis.equals(valueOther)) {
                     return false;
                 }

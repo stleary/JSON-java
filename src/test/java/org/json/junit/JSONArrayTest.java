@@ -87,6 +87,7 @@ public class JSONArrayTest {
     @Test
     public void verifySimilar() {
         final String string1 = "HasSameRef";
+        final String string2 = "HasDifferentRef";
         JSONArray obj1 = new JSONArray()
                 .put("abc")
                 .put(string1)
@@ -101,10 +102,20 @@ public class JSONArrayTest {
                 .put("abc")
                 .put(new String(string1))
                 .put(2);
+
+        JSONArray obj4 = new JSONArray()
+                .put("abc")
+                .put(2.0)
+        		.put(new String(string1));
+
+        JSONArray obj5 = new JSONArray()
+                .put("abc")
+                .put(2.0)
+        		.put(new String(string2));
         
-        assertFalse("Should eval to false", obj1.similar(obj2));
-        
-        assertTrue("Should eval to true", obj1.similar(obj3));
+        assertFalse("obj1-obj2 Should eval to false", obj1.similar(obj2));
+        assertTrue("obj1-obj3 Should eval to true", obj1.similar(obj3));
+        assertFalse("obj4-obj5 Should eval to false", obj4.similar(obj5));
     }
         
     /**
