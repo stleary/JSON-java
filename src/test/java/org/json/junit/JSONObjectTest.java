@@ -130,10 +130,13 @@ public class JSONObjectTest {
         assertTrue("obj1-obj3 Should eval to true", obj1.similar(obj3));
         assertTrue("obj1-obj4 Should eval to true", obj1.similar(obj4));
         assertFalse("obj1-obj5 Should eval to false", obj1.similar(obj5));
-        
         // verify that a double and big decimal are "similar"
         assertTrue("should eval to true",new JSONObject().put("a",1.1d).similar(new JSONObject("{\"a\":1.1}")));
-        
+        // Confirm #618 is fixed (compare should not exit early if similar numbers are found)
+        // Note that this test may not work if the JSONObject map entry order changes
+        JSONObject first = new JSONObject("{\"a\": 1, \"b\": 2, \"c\": 3}");
+        JSONObject second = new JSONObject("{\"a\": 1, \"b\": 2.0, \"c\": 4}");
+        assertFalse("first-second should eval to false", first.similar(second));
     }
     
     @Test
