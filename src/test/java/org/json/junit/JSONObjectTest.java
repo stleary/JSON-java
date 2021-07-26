@@ -126,6 +126,9 @@ public class JSONObjectTest {
         
         assertTrue("Should eval to true", obj1.similar(obj4));
         
+        // verify that a double and big decimal are "similar"
+        assertTrue("should eval to true",new JSONObject().put("a",1.1d).similar(new JSONObject("{\"a\":1.1}")));
+        
     }
     
     @Test
@@ -940,7 +943,7 @@ public class JSONObjectTest {
         assertTrue("-0 Should be a Double!",JSONObject.stringToValue("-0")  instanceof Double);
         assertTrue("-0.0 Should be a Double!",JSONObject.stringToValue("-0.0") instanceof Double);
         assertTrue("'-' Should be a String!",JSONObject.stringToValue("-") instanceof String);
-        assertTrue( "0.2 should be a Double!",
+        assertTrue( "0.2 should be a BigDecimal!",
                 JSONObject.stringToValue( "0.2" ) instanceof BigDecimal );
         assertTrue( "Doubles should be BigDecimal, even when incorrectly converting floats!",
                 JSONObject.stringToValue( new Double( "0.2f" ).toString() ) instanceof BigDecimal );
