@@ -1678,7 +1678,7 @@ public class JSONObjectTest {
         // correct implementation (with change of behavior) would be:
         // this.put(key, new Float((Float) value + 1)); 
         // Probably it would be better to deprecate the method and remove some day, while convenient processing the "payload" is not
-        // really in the the scope of a JSON-library (IMHO.)
+        // really in the scope of a JSON-library (IMHO.)
 
     }
 

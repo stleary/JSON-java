@@ -645,7 +645,7 @@ public class JSONObject {
 
     /**
      * Get the BigDecimal value associated with a key. If the value is float or
-     * double, the the {@link BigDecimal#BigDecimal(double)} constructor will
+     * double, the {@link BigDecimal#BigDecimal(double)} constructor will
      * be used. See notes on the constructor for conversion issues that may
      * arise.
      *
@@ -1613,7 +1613,7 @@ public class JSONObject {
      * @param annotationClass
      *            annotation to look for
      * @return the {@link Annotation} if the annotation exists on the current method
-     *         or one of it's super class definitions
+     *         or one of its super class definitions
      */
     private static <A extends Annotation> A getAnnotation(final Method m, final Class<A> annotationClass) {
         // if we have invalid data the result is null
@@ -2236,7 +2236,7 @@ public class JSONObject {
             // This will narrow any values to the smallest reasonable Object representation
             // (Integer, Long, or BigInteger)
 
-            // BigInteger down conversion: We use a similar bitLenth compare as
+            // BigInteger down conversion: We use a similar bitLength compare as
             // BigInteger#intValueExact uses. Increases GC, but objects hold
             // only what they need. i.e. Less runtime overhead if the value is
             // long lived.
