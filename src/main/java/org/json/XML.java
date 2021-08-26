@@ -532,7 +532,7 @@ public class XML {
             // This will narrow any values to the smallest reasonable Object representation
             // (Integer, Long, or BigInteger)
             
-            // BigInteger down conversion: We use a similar bitLenth compare as
+            // BigInteger down conversion: We use a similar bitLength compare as
             // BigInteger#intValueExact uses. Increases GC, but objects hold
             // only what they need. i.e. Less runtime overhead if the value is
             // long lived.

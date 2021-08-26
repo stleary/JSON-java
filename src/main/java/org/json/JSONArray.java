@@ -385,7 +385,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Get the BigDecimal value associated with an index. If the value is float
-     * or double, the the {@link BigDecimal#BigDecimal(double)} constructor
+     * or double, the {@link BigDecimal#BigDecimal(double)} constructor
      * will be used. See notes on the constructor for conversion issues that
      * may arise.
      *
@@ -792,7 +792,7 @@ public class JSONArray implements Iterable<Object> {
      * Get the optional BigDecimal value associated with an index. The 
      * defaultValue is returned if there is no value for the index, or if the 
      * value is not a number and cannot be converted to a number. If the value
-     * is float or double, the the {@link BigDecimal#BigDecimal(double)}
+     * is float or double, the {@link BigDecimal#BigDecimal(double)}
      * constructor will be used. See notes on the constructor for conversion
      * issues that may arise.
      *
@@ -1157,7 +1157,7 @@ public class JSONArray implements Iterable<Object> {
      *            The Map value.
      * @return this.
      * @throws JSONException
-     *             If the index is negative or if the the value is an invalid
+     *             If the index is negative or if the value is an invalid
      *             number.
      * @throws NullPointerException
      *             If a key in the map is <code>null</code>
@@ -1180,7 +1180,7 @@ public class JSONArray implements Iterable<Object> {
      *            String, or the JSONObject.NULL object.
      * @return this.
      * @throws JSONException
-     *             If the index is negative or if the the value is an invalid
+     *             If the index is negative or if the value is an invalid
      *             number.
      */
     public JSONArray put(int index, Object value) throws JSONException {

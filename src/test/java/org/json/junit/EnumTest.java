@@ -93,7 +93,7 @@ public class EnumTest {
 
     /**
      * To serialize an enum by its set of allowed values, use getNames()
-     * and the the JSONObject Object with names constructor. 
+     * and the JSONObject Object with names constructor.
      */
     @Test
     public void jsonObjectFromEnumWithNames() {
