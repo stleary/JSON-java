@@ -42,7 +42,7 @@ The org.json package can be built from the command line, Maven, and Gradle. The 
 
 *Build the class files from the package root directory src/main/java*
 ````
-javac org\json\*.java
+javac org/json/*.java
 ````
 
 *Create the jar file in the current directory*
