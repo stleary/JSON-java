@@ -2,8 +2,8 @@ package org.json.junit.data;
 
 /**
  * test class for verifying write errors.
- * @author John Aylward
  *
+ * @author John Aylward
  */
 public class BrokenToString {
     @Override

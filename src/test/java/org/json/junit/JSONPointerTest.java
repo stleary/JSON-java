@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONPointer;
@@ -44,9 +43,13 @@ public class JSONPointerTest {
 
     static {
         @SuppressWarnings("resource")
-        InputStream resourceAsStream = JSONPointerTest.class.getClassLoader().getResourceAsStream("jsonpointer-testdoc.json");
-        if(resourceAsStream == null) {
-            throw new ExceptionInInitializerError("Unable to locate test file. Please check your development environment configuration");
+        InputStream resourceAsStream =
+                JSONPointerTest.class
+                        .getClassLoader()
+                        .getResourceAsStream("jsonpointer-testdoc.json");
+        if (resourceAsStream == null) {
+            throw new ExceptionInInitializerError(
+                    "Unable to locate test file. Please check your development environment configuration");
         }
         document = new JSONObject(new JSONTokener(resourceAsStream));
     }
@@ -93,18 +96,14 @@ public class JSONPointerTest {
 
     @Test
     public void queryByEmptyKeySubObjectSubOject() {
-        assertSame(
-            document.getJSONObject("obj").getJSONObject("").get(""),
-            query("/obj//")
-        );
+        assertSame(document.getJSONObject("obj").getJSONObject("").get(""), query("/obj//"));
     }
-    
+
     @Test
     public void queryByEmptyKeySubObjectValue() {
         assertSame(
-            document.getJSONObject("obj").getJSONObject("").get("subKey"),
-            query("/obj//subKey")
-        );
+                document.getJSONObject("obj").getJSONObject("").get("subKey"),
+                query("/obj//subKey"));
     }
 
     @Test
@@ -119,7 +118,7 @@ public class JSONPointerTest {
 
     /**
      * We pass backslashes as-is
-     * 
+     *
      * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
      */
     @Test
@@ -129,7 +128,7 @@ public class JSONPointerTest {
 
     /**
      * We pass quotations as-is
-     * 
+     *
      * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
      */
     @Test
@@ -175,38 +174,42 @@ public class JSONPointerTest {
     public void primitiveFailure() {
         query("/obj/key/failure");
     }
-    
+
     @Test
     public void builderTest() {
-        JSONPointer pointer = JSONPointer.builder()
-                .append("obj")
-                .append("other~key").append("another/key")
-                .append(0)
-                .build();
+        JSONPointer pointer =
+                JSONPointer.builder()
+                        .append("obj")
+                        .append("other~key")
+                        .append("another/key")
+                        .append(0)
+                        .build();
         assertEquals("val", pointer.queryFrom(document));
     }
-    
+
     @Test(expected = NullPointerException.class)
     public void nullToken() {
         JSONPointer.builder().append(null);
     }
-    
+
     @Test
     public void toStringEscaping() {
-        JSONPointer pointer = JSONPointer.builder()
-                .append("obj")
-                .append("other~key").append("another/key")
-                .append("\"")
-                .append(0)
-                .build();
+        JSONPointer pointer =
+                JSONPointer.builder()
+                        .append("obj")
+                        .append("other~key")
+                        .append("another/key")
+                        .append("\"")
+                        .append(0)
+                        .build();
         assertEquals("/obj/other~0key/another~1key/\"/0", pointer.toString());
     }
-    
+
     @Test
     public void emptyPointerToString() {
         assertEquals("", new JSONPointer("").toString());
     }
-    
+
     @Test
     public void toURIFragment() {
         assertEquals("#/c%25d", new JSONPointer("/c%d").toURIFragment());
@@ -214,31 +217,30 @@ public class JSONPointerTest {
         assertEquals("#/g%7Ch", new JSONPointer("/g|h").toURIFragment());
         assertEquals("#/m%7En", new JSONPointer("/m~n").toURIFragment());
     }
-    
+
     @Test
     public void tokenListIsCopiedInConstructor() {
         JSONPointer.Builder b = JSONPointer.builder().append("key1");
         JSONPointer jp1 = b.build();
         b.append("key2");
         JSONPointer jp2 = b.build();
-        if(jp1.toString().equals(jp2.toString())) {
+        if (jp1.toString().equals(jp2.toString())) {
             fail("Oops, my pointers are sharing a backing array");
         }
     }
 
-    /**
-     * Coverage for JSONObject query(String)
-     */
+    /** Coverage for JSONObject query(String) */
     @Test
     public void queryFromJSONObject() {
-        String str = "{"+
-                "\"stringKey\":\"hello world!\","+
-                "\"arrayKey\":[0,1,2],"+
-                "\"objectKey\": {"+
-                    "\"a\":\"aVal\","+
-                    "\"b\":\"bVal\""+
-                "}"+
-            "}";    
+        String str =
+                "{"
+                        + "\"stringKey\":\"hello world!\","
+                        + "\"arrayKey\":[0,1,2],"
+                        + "\"objectKey\": {"
+                        + "\"a\":\"aVal\","
+                        + "\"b\":\"bVal\""
+                        + "}"
+                        + "}";
         JSONObject jsonObject = new JSONObject(str);
         Object obj = jsonObject.query("/stringKey");
         assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
@@ -250,25 +252,25 @@ public class JSONPointerTest {
             obj = jsonObject.query("/a/b/c");
             assertTrue("Expected JSONPointerException", false);
         } catch (JSONPointerException e) {
-            assertTrue("Expected bad key/value exception",
-                    "value [null] is not an array or object therefore its key b cannot be resolved".
-                    equals(e.getMessage()));
+            assertTrue(
+                    "Expected bad key/value exception",
+                    "value [null] is not an array or object therefore its key b cannot be resolved"
+                            .equals(e.getMessage()));
         }
     }
 
-    /**
-     * Coverage for JSONObject query(JSONPointer)
-     */
+    /** Coverage for JSONObject query(JSONPointer) */
     @Test
     public void queryFromJSONObjectUsingPointer() {
-        String str = "{"+
-                "\"stringKey\":\"hello world!\","+
-                "\"arrayKey\":[0,1,2],"+
-                "\"objectKey\": {"+
-                    "\"a\":\"aVal\","+
-                    "\"b\":\"bVal\""+
-                "}"+
-            "}";    
+        String str =
+                "{"
+                        + "\"stringKey\":\"hello world!\","
+                        + "\"arrayKey\":[0,1,2],"
+                        + "\"objectKey\": {"
+                        + "\"a\":\"aVal\","
+                        + "\"b\":\"bVal\""
+                        + "}"
+                        + "}";
         JSONObject jsonObject = new JSONObject(str);
         Object obj = jsonObject.query(new JSONPointer("/stringKey"));
         assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
@@ -280,25 +282,25 @@ public class JSONPointerTest {
             obj = jsonObject.query(new JSONPointer("/a/b/c"));
             assertTrue("Expected JSONPointerException", false);
         } catch (JSONPointerException e) {
-            assertTrue("Expected bad key/value exception",
-                    "value [null] is not an array or object therefore its key b cannot be resolved".
-                    equals(e.getMessage()));
+            assertTrue(
+                    "Expected bad key/value exception",
+                    "value [null] is not an array or object therefore its key b cannot be resolved"
+                            .equals(e.getMessage()));
         }
     }
 
-    /**
-     * Coverage for JSONObject optQuery(JSONPointer)
-     */
+    /** Coverage for JSONObject optQuery(JSONPointer) */
     @Test
     public void optQueryFromJSONObjectUsingPointer() {
-        String str = "{"+
-                "\"stringKey\":\"hello world!\","+
-                "\"arrayKey\":[0,1,2],"+
-                "\"objectKey\": {"+
-                    "\"a\":\"aVal\","+
-                    "\"b\":\"bVal\""+
-                "}"+
-            "}";    
+        String str =
+                "{"
+                        + "\"stringKey\":\"hello world!\","
+                        + "\"arrayKey\":[0,1,2],"
+                        + "\"objectKey\": {"
+                        + "\"a\":\"aVal\","
+                        + "\"b\":\"bVal\""
+                        + "}"
+                        + "}";
         JSONObject jsonObject = new JSONObject(str);
         Object obj = jsonObject.optQuery(new JSONPointer("/stringKey"));
         assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
@@ -309,20 +311,19 @@ public class JSONPointerTest {
         obj = jsonObject.optQuery(new JSONPointer("/a/b/c"));
         assertTrue("Expected null", obj == null);
     }
-    
-    /**
-     * Coverage for JSONArray query(String)
-     */
+
+    /** Coverage for JSONArray query(String) */
     @Test
     public void queryFromJSONArray() {
-        String str = "["+
-                "\"hello world!\","+
-                "[0,1,2],"+
-                "{"+
-                    "\"a\":\"aVal\","+
-                    "\"b\":\"bVal\""+
-                "}"+
-            "]";    
+        String str =
+                "["
+                        + "\"hello world!\","
+                        + "[0,1,2],"
+                        + "{"
+                        + "\"a\":\"aVal\","
+                        + "\"b\":\"bVal\""
+                        + "}"
+                        + "]";
         JSONArray jsonArray = new JSONArray(str);
         Object obj = jsonArray.query("/0");
         assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
@@ -334,24 +335,24 @@ public class JSONPointerTest {
             obj = jsonArray.query("/a/b/c");
             assertTrue("Expected JSONPointerException", false);
         } catch (JSONPointerException e) {
-            assertTrue("Expected bad index exception",
+            assertTrue(
+                    "Expected bad index exception",
                     "a is not an array index".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Coverage for JSONArray query(JSONPointer)
-     */
+    /** Coverage for JSONArray query(JSONPointer) */
     @Test
     public void queryFromJSONArrayUsingPointer() {
-        String str = "["+
-                "\"hello world!\","+
-                "[0,1,2],"+
-                "{"+
-                    "\"a\":\"aVal\","+
-                    "\"b\":\"bVal\""+
-                "}"+
-            "]";    
+        String str =
+                "["
+                        + "\"hello world!\","
+                        + "[0,1,2],"
+                        + "{"
+                        + "\"a\":\"aVal\","
+                        + "\"b\":\"bVal\""
+                        + "}"
+                        + "]";
         JSONArray jsonArray = new JSONArray(str);
         Object obj = jsonArray.query(new JSONPointer("/0"));
         assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
@@ -363,24 +364,24 @@ public class JSONPointerTest {
             obj = jsonArray.query(new JSONPointer("/a/b/c"));
             assertTrue("Expected JSONPointerException", false);
         } catch (JSONPointerException e) {
-            assertTrue("Expected bad index exception",
+            assertTrue(
+                    "Expected bad index exception",
                     "a is not an array index".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Coverage for JSONArray optQuery(JSONPointer)
-     */
+    /** Coverage for JSONArray optQuery(JSONPointer) */
     @Test
     public void optQueryFromJSONArrayUsingPointer() {
-        String str = "["+
-                "\"hello world!\","+
-                "[0,1,2],"+
-                "{"+
-                    "\"a\":\"aVal\","+
-                    "\"b\":\"bVal\""+
-                "}"+
-            "]";    
+        String str =
+                "["
+                        + "\"hello world!\","
+                        + "[0,1,2],"
+                        + "{"
+                        + "\"a\":\"aVal\","
+                        + "\"b\":\"bVal\""
+                        + "}"
+                        + "]";
         JSONArray jsonArray = new JSONArray(str);
         Object obj = jsonArray.optQuery(new JSONPointer("/0"));
         assertTrue("Expected 'hello world!'", "hello world!".equals(obj));

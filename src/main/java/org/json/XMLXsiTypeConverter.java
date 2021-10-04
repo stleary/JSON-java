@@ -25,6 +25,7 @@ SOFTWARE.
 
 /**
  * Type conversion configuration interface to be used with xsi:type attributes.
+ *
  * <pre>
  * <b>XML Sample</b>
  * {@code
@@ -58,6 +59,7 @@ SOFTWARE.
  *      });
  * }
  * </pre>
+ *
  * @author kumar529
  * @param <T> return type of convert method
  */

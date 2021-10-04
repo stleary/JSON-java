@@ -3,27 +3,21 @@ package org.json.junit.data;
 import java.math.BigDecimal;
 
 /**
- * Number override for testing. Number overrides should always override
- * toString, hashCode, and Equals.
- * 
- * @see <a
- *      href="https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html">The
- *      Numbers Classes</a>
- * @see <a
- *      href="https://docs.oracle.com/javase/tutorial/java/data/numberformat.html">Formatting
- *      Numeric Print Output</a>
- * 
+ * Number override for testing. Number overrides should always override toString, hashCode, and
+ * Equals.
+ *
+ * @see <a href="https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html">The Numbers
+ *     Classes</a>
+ * @see <a href="https://docs.oracle.com/javase/tutorial/java/data/numberformat.html">Formatting
+ *     Numeric Print Output</a>
  * @author John Aylward
  */
 public class MyNumber extends Number {
     private Number number = BigDecimal.valueOf(42);
-    /**
-     */
+    /** */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @return number!
-     */
+    /** @return number! */
     public Number getNumber() {
         return this.number;
     }
@@ -50,7 +44,7 @@ public class MyNumber extends Number {
 
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
-     * 
+     *
      * Number overrides should in general always override the  toString method.
      */
     @Override
@@ -93,5 +87,4 @@ public class MyNumber extends Number {
         }
         return true;
     }
-
 }

@@ -1,6 +1,4 @@
-/**
- * 
- */
+/** */
 package org.json.junit.data;
 
 import java.io.Closeable;
@@ -9,13 +7,11 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * Object for testing the exception handling in {@link org.json.JSONObject#populateMap}.
- * 
+ *
  * @author John Aylward
  */
 public class ExceptionalBean {
-    /**
-     * @return a closeable.
-     */
+    /** @return a closeable. */
     public Closeable getCloseable() {
         // anonymous inner class did not work...
         return new MyCloseable();
@@ -23,8 +19,7 @@ public class ExceptionalBean {
 
     /**
      * @return Nothing really. Just can't be void.
-     * @throws IllegalAccessException
-     *             always thrown
+     * @throws IllegalAccessException always thrown
      */
     public int getIllegalAccessException() throws IllegalAccessException {
         throw new IllegalAccessException("Yup, it's illegal");
@@ -32,8 +27,7 @@ public class ExceptionalBean {
 
     /**
      * @return Nothing really. Just can't be void.
-     * @throws IllegalArgumentException
-     *             always thrown
+     * @throws IllegalArgumentException always thrown
      */
     public int getIllegalArgumentException() throws IllegalArgumentException {
         throw new IllegalArgumentException("Yup, it's illegal");
@@ -41,8 +35,7 @@ public class ExceptionalBean {
 
     /**
      * @return Nothing really. Just can't be void.
-     * @throws InvocationTargetException
-     *             always thrown
+     * @throws InvocationTargetException always thrown
      */
     public int getInvocationTargetException() throws InvocationTargetException {
         throw new InvocationTargetException(new Exception("Yup, it's illegal"));
@@ -51,9 +44,7 @@ public class ExceptionalBean {
     /** My closeable class. */
     public static final class MyCloseable implements Closeable {
 
-        /**
-         * @return a string
-         */
+        /** @return a string */
         public String getString() {
             return "Yup, it's closeable";
         }

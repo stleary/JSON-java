@@ -2,9 +2,8 @@ package org.json.junit.data;
 
 /**
  * Sample singleton for use with bean testing.
- * 
- * @author John Aylward
  *
+ * @author John Aylward
  */
 public final class Singleton {
     /** */
@@ -38,9 +37,8 @@ public final class Singleton {
 
     /**
      * sets someInt.
-     * 
-     * @param someInt
-     *            the someInt to set
+     *
+     * @param someInt the someInt to set
      */
     public void setSomeInt(int someInt) {
         this.someInt = someInt;
@@ -53,9 +51,8 @@ public final class Singleton {
 
     /**
      * sets someString.
-     * 
-     * @param someString
-     *            the someString to set
+     *
+     * @param someString the someString to set
      */
     public void setSomeString(String someString) {
         this.someString = someString;
@@ -72,20 +69,14 @@ public final class Singleton {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         Singleton other = (Singleton) obj;
-        if (this.someInt != other.someInt)
-            return false;
+        if (this.someInt != other.someInt) return false;
         if (this.someString == null) {
-            if (other.someString != null)
-                return false;
-        } else if (!this.someString.equals(other.someString))
-            return false;
+            if (other.someString != null) return false;
+        } else if (!this.someString.equals(other.someString)) return false;
         return true;
     }
 }
