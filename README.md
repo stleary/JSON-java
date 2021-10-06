@@ -30,7 +30,9 @@ The files in this package implement JSON encoders and decoders. The package can 
 
 The license includes this restriction: ["The software shall be used for good, not evil."](https://en.wikipedia.org/wiki/Douglas_Crockford#%22Good,_not_Evil%22) If your conscience cannot live with that, then choose a different package.
 
-**If you would like to contribute to this project**
+# If you would like to contribute to this project
+
+For more information on contributions, please see [CONTRIBUTING.md](https://github.com/stleary/JSON-java/blob/master/CONTRIBUTING.md)
 
 Bug fixes, code improvements, and unit test coverage changes are welcome! Because this project is currently in the maintenance phase, the kinds of changes that can be accepted are limited. For more information, please read the [FAQ](https://github.com/stleary/JSON-java/wiki/FAQ).
 
