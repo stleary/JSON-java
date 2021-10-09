@@ -12,7 +12,7 @@ on:
 jobs:
   # old-school build and jar method. No tests run or compiled.
   build-1_6: 
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         # build for java 1.6, however don't run any tests
@@ -38,7 +38,7 @@ jobs:
           path: target/org.json.jar
       
   build:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         # build against supported Java LTS versions:
