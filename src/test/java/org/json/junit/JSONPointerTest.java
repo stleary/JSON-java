@@ -60,7 +60,7 @@ public class JSONPointerTest {
 
     @Test
     public void emptyPointer() {
-        assertEquals(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).toString(), query("").toString());
+        assertTrue(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).similar(query("")));
     }
 
     @SuppressWarnings("unused")
@@ -147,7 +147,7 @@ public class JSONPointerTest {
 
     @Test
     public void uriFragmentNotationRoot() {
-        assertEquals(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).toString(), query("#").toString());
+        assertTrue(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).similar(query("#")));
     }
 
     @Test
