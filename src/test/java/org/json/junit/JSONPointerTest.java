@@ -41,6 +41,10 @@ import org.junit.Test;
 public class JSONPointerTest {
 
     private static final JSONObject document;
+    private static final String EXPECTED_COMPLETE_DOCUMENT = "{\"\":0,\" \":7,\"g|h\":4,\"c%d\":2,\"k\\\"l\":6,\"a/b\":1,\"i\\\\j\":5," +
+            "\"obj\":{\"\":{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some other value\"}," +
+            "\"other~key\":{\"another/key\":[\"val\"]},\"key\":\"value\"},\"foo\":[\"bar\",\"baz\"],\"e^f\":3," +
+            "\"m~n\":8}";
 
     static {
         @SuppressWarnings("resource")
@@ -57,7 +61,7 @@ public class JSONPointerTest {
 
     @Test
     public void emptyPointer() {
-        assertSame(document, query(""));
+        assertEquals(EXPECTED_COMPLETE_DOCUMENT, query("").toString());
     }
 
     @SuppressWarnings("unused")
@@ -68,12 +72,12 @@ public class JSONPointerTest {
 
     @Test
     public void objectPropertyQuery() {
-        assertSame(document.get("foo"), query("/foo"));
+        assertEquals("[\"bar\",\"baz\"]", query("/foo").toString());
     }
 
     @Test
     public void arrayIndexQuery() {
-        assertSame(document.getJSONArray("foo").get(0), query("/foo/0"));
+        assertEquals("bar", query("/foo/0"));
     }
 
     @Test(expected = JSONPointerException.class)
@@ -83,38 +87,33 @@ public class JSONPointerTest {
 
     @Test
     public void queryByEmptyKey() {
-        assertSame(document.get(""), query("/"));
+        assertEquals(0, query("/"));
     }
 
     @Test
     public void queryByEmptyKeySubObject() {
-        assertSame(document.getJSONObject("obj").getJSONObject(""), query("/obj/"));
+        assertEquals( "{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some" +
+                " other value\"}", query("/obj/").toString());
     }
 
     @Test
     public void queryByEmptyKeySubObjectSubOject() {
-        assertSame(
-            document.getJSONObject("obj").getJSONObject("").get(""),
-            query("/obj//")
-        );
+        assertEquals("empty key of an object with an empty key", query("/obj//"));
     }
     
     @Test
     public void queryByEmptyKeySubObjectValue() {
-        assertSame(
-            document.getJSONObject("obj").getJSONObject("").get("subKey"),
-            query("/obj//subKey")
-        );
+        assertEquals("Some other value", query("/obj//subKey"));
     }
 
     @Test
     public void slashEscaping() {
-        assertSame(document.get("a/b"), query("/a~1b"));
+        assertEquals(1, query("/a~1b"));
     }
 
     @Test
     public void tildeEscaping() {
-        assertSame(document.get("m~n"), query("/m~0n"));
+        assertEquals(8, query("/m~0n"));
     }
 
     /**
@@ -124,7 +123,7 @@ public class JSONPointerTest {
      */
     @Test
     public void backslashHandling() {
-        assertSame(document.get("i\\j"), query("/i\\j"));
+        assertEquals(5, query("/i\\j"));
     }
 
     /**
@@ -134,30 +133,30 @@ public class JSONPointerTest {
      */
     @Test
     public void quotationHandling() {
-        assertSame(document.get("k\"l"), query("/k\"l"));
+        assertEquals(6, query("/k\"l"));
     }
 
     @Test
     public void whitespaceKey() {
-        assertSame(document.get(" "), query("/ "));
+        assertEquals(7, query("/ "));
     }
 
     @Test
     public void uriFragmentNotation() {
-        assertSame(document.get("foo"), query("#/foo"));
+        assertEquals("[\"bar\",\"baz\"]", query("#/foo").toString());
     }
 
     @Test
     public void uriFragmentNotationRoot() {
-        assertSame(document, query("#"));
+        assertEquals(EXPECTED_COMPLETE_DOCUMENT, query("#").toString());
     }
 
     @Test
     public void uriFragmentPercentHandling() {
-        assertSame(document.get("c%d"), query("#/c%25d"));
-        assertSame(document.get("e^f"), query("#/e%5Ef"));
-        assertSame(document.get("g|h"), query("#/g%7Ch"));
-        assertSame(document.get("m~n"), query("#/m~0n"));
+        assertEquals(2, query("#/c%25d"));
+        assertEquals(3, query("#/e%5Ef"));
+        assertEquals(4, query("#/g%7Ch"));
+        assertEquals(8, query("#/m~0n"));
     }
 
     @SuppressWarnings("unused")
