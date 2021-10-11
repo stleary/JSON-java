@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -61,7 +60,7 @@ public class JSONPointerTest {
 
     @Test
     public void emptyPointer() {
-        assertEquals(EXPECTED_COMPLETE_DOCUMENT, query("").toString());
+        assertEquals(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).toString(), query("").toString());
     }
 
     @SuppressWarnings("unused")
@@ -148,7 +147,7 @@ public class JSONPointerTest {
 
     @Test
     public void uriFragmentNotationRoot() {
-        assertEquals(EXPECTED_COMPLETE_DOCUMENT, query("#").toString());
+        assertEquals(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).toString(), query("#").toString());
     }
 
     @Test
