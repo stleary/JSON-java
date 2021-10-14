@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 /**
@@ -296,6 +297,7 @@ public class JSONObject {
         	    }
                 final Object value = e.getValue();
                 if (value != null) {
+                	checkForCyclicDependency(value);
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
                 }
             }
@@ -1520,6 +1522,9 @@ public class JSONObject {
      *            the bean
      */
     private void populateMap(Object bean) {
+    	
+    	checkForCyclicDependency(bean);
+    	
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
@@ -2677,5 +2682,78 @@ public class JSONObject {
                 , cause);
     }
     
+    /**
+    *
+    * @param value, the root node to check for the validity of child nodes
+    */
+   private void checkForCyclicDependency(Object value) {
+       checkForCyclicDependency(value, new HashSet<Object>());
+   }
+
+   /**
+    * @param value, the root node to check for the validity of child nodes
+    * @param setOfInstanceVariables, the path from root to {@param value} which acts as the ancestors to the current and child nodes.
+    * @throws JSONException, if there exists a cyclical dependency from ancestorial root to any of the child nodes.
+    */
+   private static void checkForCyclicDependency(Object value, Set<Object> setOfInstanceVariables) throws JSONException {
+       Class<?> klass = value.getClass();
+
+       // If klass is a System class then set includeSuperClass to false.
+       boolean includeSuperClass = klass.getClassLoader() != null;
+
+       Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
+       for (final Method method : methods) {
+           final int modifiers = method.getModifiers();
+           if (Modifier.isPublic(modifiers)
+                   && !Modifier.isStatic(modifiers)
+                   && method.getParameterTypes().length == 0
+                   && !method.isBridge()
+                   && method.getReturnType() != Void.TYPE
+                   && isValidMethodName(method.getName())) {
+               final String key = getKeyNameFromMethod(method);
+               if (key != null && !key.isEmpty()) {
+                   try {
+                       final Object result = method.invoke(value);
+                       if (result != null) {
+                           // we don't use the result anywhere outside of wrap
+                           // if it's a resource we should be sure to close it
+                           // after calling toString
+                           if (result instanceof Closeable) {
+                               try {
+                                   ((Closeable) result).close();
+                               } catch (IOException ignore) {
+                               }
+                           }
+
+                           if (setOfInstanceVariables.contains(result)) {
+                               throw cyclicDependencyFormatException(key);
+                           }
+
+                           //adding the currently checked object to the ancestor path
+                           setOfInstanceVariables.add(result);
+                           //DFS type search for checking depdendency.
+                           checkForCyclicDependency(result, setOfInstanceVariables);
+
+                           //removed the currently checked object from ancestor path for different root to leaf path
+                           setOfInstanceVariables.remove(result);
+                       }
+                   } catch (IllegalAccessException ignore) {
+                   } catch (IllegalArgumentException ignore) {
+                   } catch (InvocationTargetException ignore) {
+                   }
+               }
+           }
+       }
+   }
+
+   /**
+    * Create a new JSONException in a common format for cyclic dependency.
+    *
+    * @return JSONException that can be thrown.
+    */
+   private static JSONException cyclicDependencyFormatException(String key) {
+       return new JSONException(
+               "JSONObject[" + quote(key) + "] cannot be written because of a Cyclic Dependency");
+   }
     
 }
