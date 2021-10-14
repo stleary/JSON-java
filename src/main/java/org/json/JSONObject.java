@@ -270,8 +270,9 @@ public class JSONObject {
      *          the JSONObject.
      * @throws JSONException        If a value in the map is non-finite number.
      * @throws NullPointerException If a key in the map is <code>null</code>
+     * @throws JSONException        If there exists a cyclic dependency in the object provided.
      */
-    public JSONObject(Map<?, ?> m) {
+    public JSONObject(Map<?, ?> m) throws JSONException {
         if (m == null) {
             this.map = new HashMap<String, Object>();
         } else {
@@ -2563,7 +2564,7 @@ public class JSONObject {
                             }
 
                             if (setOfInstanceVariables.contains(result)) {
-                                throw new JSONException("Cyclic Dependency Detected");
+                                throw cyclicDependencyFormatException(key);
                             }
 
                             //adding the currently checked object to the ancestor path
@@ -2582,4 +2583,15 @@ public class JSONObject {
             }
         }
     }
+
+    /**
+     * Create a new JSONException in a common format for cyclic dependency.
+     *
+     * @return JSONException that can be thrown.
+     */
+    private static JSONException cyclicDependencyFormatException(String key) {
+        return new JSONException(
+                "JSONObject[" + quote(key) + "] cannot be written because of a Cyclic Dependency");
+    }
+
 }
