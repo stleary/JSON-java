@@ -3234,7 +3234,7 @@ public class JSONObjectTest {
     @Test(expected = JSONException.class)
     public void jsonObjectMapForCyclicDependency() {
         DependencyClassOuter obj = new DependencyClassOuter();
-        Map<String, DependencyClassOuter> testMap = new HashMap<String, DependencyClassOuter>();
+        Map<String, DependencyClassOuter> testMap = new HashMap<>();
         testMap.put("test", obj);
         new JSONObject(testMap);
     }
