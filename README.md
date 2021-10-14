@@ -54,7 +54,8 @@ jar cf json-java.jar org/json/*.class
 
 *Compile a program that uses the jar (see example code below)*
 ````
-javac -cp .;json-java.jar Test.java 
+javac -cp .;json-java.jar Test.java (Windows)
+javac -cp .:json-java.jar Test.java (Unix Systems)
 ````
 
 *Test file contents*
@@ -71,7 +72,8 @@ public class Test {
 
 *Execute the Test file*
 ```` 
-java -cp .;json-java.jar Test
+java -cp .;json-java.jar Test (Windows)
+java -cp .:json-java.jar Test (Unix Systems)
 ````
 
 *Expected output*
