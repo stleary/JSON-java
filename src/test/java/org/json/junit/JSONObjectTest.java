@@ -58,24 +58,7 @@ import org.json.JSONObject;
 import org.json.JSONPointerException;
 import org.json.JSONTokener;
 import org.json.XML;
-import org.json.junit.data.BrokenToString;
-import org.json.junit.data.ExceptionalBean;
-import org.json.junit.data.Fraction;
-import org.json.junit.data.GenericBean;
-import org.json.junit.data.GenericBeanInt;
-import org.json.junit.data.MyBean;
-import org.json.junit.data.MyBeanCustomName;
-import org.json.junit.data.MyBeanCustomNameSubClass;
-import org.json.junit.data.MyBigNumberBean;
-import org.json.junit.data.MyEnum;
-import org.json.junit.data.MyEnumField;
-import org.json.junit.data.MyJsonString;
-import org.json.junit.data.MyNumber;
-import org.json.junit.data.MyNumberContainer;
-import org.json.junit.data.MyPublicClass;
-import org.json.junit.data.Singleton;
-import org.json.junit.data.SingletonEnum;
-import org.json.junit.data.WeirdList;
+import org.json.junit.data.*;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -3094,8 +3077,8 @@ public class JSONObjectTest {
         final JSONObject jo = new JSONObject(bean);
         assertEquals(jo.keySet().toString(), 8, jo.length());
         assertEquals(42, jo.get("genericValue"));
-        assertEquals("Expected the getter to only be called once",
-                1, bean.genericGetCounter);
+        assertEquals("Expected the getter to only be called twice (to detect cycles and to get object)",
+                2, bean.genericGetCounter);
         assertEquals(0, bean.genericSetCounter);
     }
     
@@ -3109,8 +3092,8 @@ public class JSONObjectTest {
         final JSONObject jo = new JSONObject(bean);
         assertEquals(jo.keySet().toString(), 10, jo.length());
         assertEquals(42, jo.get("genericValue"));
-        assertEquals("Expected the getter to only be called once",
-                1, bean.genericGetCounter);
+        assertEquals("Expected the getter to only be called twice (to detect cycles and to get object)",
+                2, bean.genericGetCounter);
         assertEquals(0, bean.genericSetCounter);
     }
     
@@ -3240,5 +3223,19 @@ public class JSONObjectTest {
         jsonObject.clear(); //Clears the JSONObject
         assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
+    }
+
+    @Test(expected = JSONException.class)
+    public void jsonObjectForCyclicDependency() {
+        DependencyClassOuter obj = new DependencyClassOuter();
+        new JSONObject(obj);
+    }
+
+    @Test(expected = JSONException.class)
+    public void jsonObjectMapForCyclicDependency() {
+        DependencyClassOuter obj = new DependencyClassOuter();
+        Map<String, DependencyClassOuter> testMap = new HashMap<String, DependencyClassOuter>();
+        testMap.put("test", obj);
+        new JSONObject(testMap);
     }
 }
