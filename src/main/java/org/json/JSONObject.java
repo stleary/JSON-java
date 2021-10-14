@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.regex.Pattern;
 
 /**
@@ -226,13 +225,13 @@ public class JSONObject {
         for (;;) {
             c = x.nextClean();
             switch (c) {
-                case 0:
-                    throw x.syntaxError("A JSONObject text must end with '}'");
-                case '}':
-                    return;
-                default:
-                    x.back();
-                    key = x.nextValue().toString();
+            case 0:
+                throw x.syntaxError("A JSONObject text must end with '}'");
+            case '}':
+                return;
+            default:
+                x.back();
+                key = x.nextValue().toString();
             }
 
             // The key is followed by ':'.
@@ -260,17 +259,17 @@ public class JSONObject {
             // Pairs are separated by ','.
 
             switch (x.nextClean()) {
-                case ';':
-                case ',':
-                    if (x.nextClean() == '}') {
-                        return;
-                    }
-                    x.back();
-                    break;
-                case '}':
+            case ';':
+            case ',':
+                if (x.nextClean() == '}') {
                     return;
-                default:
-                    throw x.syntaxError("Expected a ',' or '}'");
+                }
+                x.back();
+                break;
+            case '}':
+                return;
+            default:
+                throw x.syntaxError("Expected a ',' or '}'");
             }
         }
     }
@@ -291,13 +290,12 @@ public class JSONObject {
             this.map = new HashMap<String, Object>();
         } else {
             this.map = new HashMap<String, Object>(m.size());
-            for (final Entry<?, ?> e : m.entrySet()) {
-                if(e.getKey() == null) {
-                    throw new NullPointerException("Null key.");
-                }
+        	for (final Entry<?, ?> e : m.entrySet()) {
+        	    if(e.getKey() == null) {
+        	        throw new NullPointerException("Null key.");
+        	    }
                 final Object value = e.getValue();
                 if (value != null) {
-                    checkForCyclicDependency(value);
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
                 }
             }
@@ -616,11 +614,11 @@ public class JSONObject {
         Object object = this.get(key);
         if (object.equals(Boolean.FALSE)
                 || (object instanceof String && ((String) object)
-                .equalsIgnoreCase("false"))) {
+                        .equalsIgnoreCase("false"))) {
             return false;
         } else if (object.equals(Boolean.TRUE)
                 || (object instanceof String && ((String) object)
-                .equalsIgnoreCase("true"))) {
+                        .equalsIgnoreCase("true"))) {
             return true;
         }
         throw wrongValueFormatException(key, "Boolean", null);
@@ -1001,9 +999,9 @@ public class JSONObject {
      *        is empty.
      */
     public JSONArray names() {
-        if(this.map.isEmpty()) {
-            return null;
-        }
+    	if(this.map.isEmpty()) {
+    		return null;
+    	}
         return new JSONArray(this.map.keySet());
     }
 
@@ -1164,7 +1162,7 @@ public class JSONObject {
     static BigDecimal objectToBigDecimal(Object val, BigDecimal defaultValue) {
         return objectToBigDecimal(val, defaultValue, true);
     }
-
+    
     /**
      * @param val value to convert
      * @param defaultValue default value to return is the conversion doesn't work or is null.
@@ -1522,9 +1520,6 @@ public class JSONObject {
      *            the bean
      */
     private void populateMap(Object bean) {
-
-        checkForCyclicDependency(bean);
-
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
@@ -1966,7 +1961,7 @@ public class JSONObject {
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
      */
     public Object optQuery(String jsonPointer) {
-        return optQuery(new JSONPointer(jsonPointer));
+    	return optQuery(new JSONPointer(jsonPointer));
     }
 
     /**
@@ -2025,42 +2020,42 @@ public class JSONObject {
             b = c;
             c = string.charAt(i);
             switch (c) {
-                case '\\':
-                case '"':
+            case '\\':
+            case '"':
+                w.write('\\');
+                w.write(c);
+                break;
+            case '/':
+                if (b == '<') {
                     w.write('\\');
+                }
+                w.write(c);
+                break;
+            case '\b':
+                w.write("\\b");
+                break;
+            case '\t':
+                w.write("\\t");
+                break;
+            case '\n':
+                w.write("\\n");
+                break;
+            case '\f':
+                w.write("\\f");
+                break;
+            case '\r':
+                w.write("\\r");
+                break;
+            default:
+                if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                        || (c >= '\u2000' && c < '\u2100')) {
+                    w.write("\\u");
+                    hhhh = Integer.toHexString(c);
+                    w.write("0000", 0, 4 - hhhh.length());
+                    w.write(hhhh);
+                } else {
                     w.write(c);
-                    break;
-                case '/':
-                    if (b == '<') {
-                        w.write('\\');
-                    }
-                    w.write(c);
-                    break;
-                case '\b':
-                    w.write("\\b");
-                    break;
-                case '\t':
-                    w.write("\\t");
-                    break;
-                case '\n':
-                    w.write("\\n");
-                    break;
-                case '\f':
-                    w.write("\\f");
-                    break;
-                case '\r':
-                    w.write("\\r");
-                    break;
-                default:
-                    if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                            || (c >= '\u2000' && c < '\u2100')) {
-                        w.write("\\u");
-                        hhhh = Integer.toHexString(c);
-                        w.write("0000", 0, 4 - hhhh.length());
-                        w.write(hhhh);
-                    } else {
-                        w.write(c);
-                    }
+                }
             }
         }
         w.write('"');
@@ -2100,10 +2095,10 @@ public class JSONObject {
                 Object valueThis = entry.getValue();
                 Object valueOther = ((JSONObject)other).get(name);
                 if(valueThis == valueOther) {
-                    continue;
+                	continue;
                 }
                 if(valueThis == null) {
-                    return false;
+                	return false;
                 }
                 if (valueThis instanceof JSONObject) {
                     if (!((JSONObject)valueThis).similar(valueOther)) {
@@ -2115,7 +2110,7 @@ public class JSONObject {
                     }
                 } else if (valueThis instanceof Number && valueOther instanceof Number) {
                     if (!isNumberSimilar((Number)valueThis, (Number)valueOther)) {
-                        return false;
+                    	return false;
                     };
                 } else if (!valueThis.equals(valueOther)) {
                     return false;
@@ -2416,10 +2411,10 @@ public class JSONObject {
      *             If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
-        // moves the implementation to JSONWriter as:
-        // 1. It makes more sense to be part of the writer class
-        // 2. For Android support this method is not available. By implementing it in the Writer
-        //    Android users can use the writer with the built in Android JSONObject implementation.
+    	// moves the implementation to JSONWriter as:
+    	// 1. It makes more sense to be part of the writer class
+    	// 2. For Android support this method is not available. By implementing it in the Writer
+    	//    Android users can use the writer with the built in Android JSONObject implementation.
         return JSONWriter.valueToString(value);
     }
 
@@ -2491,7 +2486,7 @@ public class JSONObject {
     }
 
     static final Writer writeValue(Writer writer, Object value,
-                                   int indentFactor, int indent) throws JSONException, IOException {
+            int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof JSONString) {
@@ -2575,7 +2570,7 @@ public class JSONObject {
             writer.write('{');
 
             if (length == 1) {
-                final Entry<String,?> entry = this.entrySet().iterator().next();
+            	final Entry<String,?> entry = this.entrySet().iterator().next();
                 final String key = entry.getKey();
                 writer.write(quote(key));
                 writer.write(':');
@@ -2681,78 +2676,6 @@ public class JSONObject {
                 "JSONObject[" + quote(key) + "] is not a " + valueType + " (" + value + ")."
                 , cause);
     }
-
-    /**
-     *
-     * @param value, the root node to check for the validity of child nodes
-     */
-    private void checkForCyclicDependency(Object value) {
-        checkForCyclicDependency(value, new HashSet<Object>());
-    }
-
-    /**
-     * @param value, the root node to check for the validity of child nodes
-     * @param setOfInstanceVariables, the path from root to {@param value} which acts as the ancestors to the current and child nodes.
-     * @throws JSONException, if there exists a cyclical dependency from ancestorial root to any of the child nodes.
-     */
-    private static void checkForCyclicDependency(Object value, Set<Object> setOfInstanceVariables) throws JSONException {
-        Class<?> klass = value.getClass();
-
-        // If klass is a System class then set includeSuperClass to false.
-        boolean includeSuperClass = klass.getClassLoader() != null;
-
-        Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
-        for (final Method method : methods) {
-            final int modifiers = method.getModifiers();
-            if (Modifier.isPublic(modifiers)
-                    && !Modifier.isStatic(modifiers)
-                    && method.getParameterTypes().length == 0
-                    && !method.isBridge()
-                    && method.getReturnType() != Void.TYPE
-                    && isValidMethodName(method.getName())) {
-                final String key = getKeyNameFromMethod(method);
-                if (key != null && !key.isEmpty()) {
-                    try {
-                        final Object result = method.invoke(value);
-                        if (result != null) {
-                            // we don't use the result anywhere outside of wrap
-                            // if it's a resource we should be sure to close it
-                            // after calling toString
-                            if (result instanceof Closeable) {
-                                try {
-                                    ((Closeable) result).close();
-                                } catch (IOException ignore) {
-                                }
-                            }
-
-                            if (setOfInstanceVariables.contains(result)) {
-                                throw cyclicDependencyFormatException(key);
-                            }
-
-                            //adding the currently checked object to the ancestor path
-                            setOfInstanceVariables.add(result);
-                            //DFS type search for checking depdendency.
-                            checkForCyclicDependency(result, setOfInstanceVariables);
-
-                            //removed the currently checked object from ancestor path for different root to leaf path
-                            setOfInstanceVariables.remove(result);
-                        }
-                    } catch (IllegalAccessException ignore) {
-                    } catch (IllegalArgumentException ignore) {
-                    } catch (InvocationTargetException ignore) {
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Create a new JSONException in a common format for cyclic dependency.
-     *
-     * @return JSONException that can be thrown.
-     */
-    private static JSONException cyclicDependencyFormatException(String key) {
-        return new JSONException(
-                "JSONObject[" + quote(key) + "] cannot be written because of a Cyclic Dependency");
-    }
+    
+    
 }
