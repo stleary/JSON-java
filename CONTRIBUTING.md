@@ -13,7 +13,7 @@ Anyone can submit pull requests for code, tests, or documentation.
 * Does it call out a bug that needs to be fixed? If so, it goes to the top of the list.
 * Does it fix a major user inconvenience? These are given high priority as well.
 * Does it align with the specs? If not, it will probably not be accepted. It turns out there are gray areas in the specs. If this is in a gray area, it will likely be given the benefit of the doubt.
-* Does it break the existing behavior of the lib? If so, it will not be accepted, unless it fixes an egregious bug. This is happening less frequently now.
+* Does it break the existing behaviour of the lib? If so, it will not be accepted, unless it fixes an egregious bug. This is happening less frequently now.
 
 # For more guidance, see these links:
 
