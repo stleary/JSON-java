@@ -134,6 +134,14 @@ public class JSONPointerTest {
     public void quotationHandling() {
         assertEquals(6, query("/k\"l"));
     }
+    
+    /**
+     * KD Added
+     * */
+    @Test
+    public void quotationEscaping() {
+        assertEquals(document.get("k\"l"), query("/k\\\"l"));
+    }
 
     @Test
     public void whitespaceKey() {
@@ -388,5 +396,34 @@ public class JSONPointerTest {
         assertTrue("Expected bVal", "bVal".equals(obj));
         obj = jsonArray.optQuery(new JSONPointer("/a/b/c"));
         assertTrue("Expected null", obj == null);
+    }
+    
+    /**
+     * KD added
+     * Coverage for JSONObject query(JSONPointer)
+     */
+    @Test
+    public void queryFromJSONObjectUsingPointer2() {
+        String str = "{"+
+            "\"string\\\\\\\\Key\":\"hello world!\","+
+            "}"+
+            "}";
+        JSONObject jsonObject = new JSONObject(str);
+        Object obj = jsonObject.optQuery(new JSONPointer("/string\\\\\\\\Key"));
+        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+    }
+    /**
+     * KD added - understanding behavior
+     * Coverage for JSONObject query(JSONPointer)
+     */
+    @Test
+    public void queryFromJSONObjectUsingPointer0() {
+        String str = "{"+
+            "\"string\\\\Key\":\"hello world!\","+
+            "}"+
+            "}";
+        JSONObject jsonObject = new JSONObject(str);
+        Object obj = jsonObject.optQuery(new JSONPointer("/string\\Key"));
+        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
     }
 }
