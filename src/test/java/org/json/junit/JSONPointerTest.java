@@ -41,10 +41,11 @@ public class JSONPointerTest {
 
     private static final JSONObject document;
     private static final String EXPECTED_COMPLETE_DOCUMENT = "{\"\":0,\" \":7,\"g|h\":4,\"c%d\":2,\"k\\\"l\":6,\"a/b\":1,\"i\\\\j\":5," +
-            "\"obj\":{\"\":{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some other value\"}," +
+    		"\"obj\":{\"\":{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some other value\"}," +
             "\"other~key\":{\"another/key\":[\"val\"]},\"key\":\"value\"},\"foo\":[\"bar\",\"baz\"],\"e^f\":3," +
-            "\"m~n\":8}";
+            "\"m~n\":8,\"four\\\\\\\\slashes\":\"slash test!\"}";
 
+    
     static {
         @SuppressWarnings("resource")
         InputStream resourceAsStream = JSONPointerTest.class.getClassLoader().getResourceAsStream("jsonpointer-testdoc.json");
@@ -126,6 +127,17 @@ public class JSONPointerTest {
     }
 
     /**
+     * When creating a jsonObject we need to parse escaped characters "\\\\"
+     *  --> it's the string representation of  "\\", so when query'ing via the JSONPointer 
+     *  we DON'T escape them
+     *  
+     */
+    @Test
+    public void multipleBackslashHandling() {
+        assertEquals("slash test!", query("/four\\\\slashes"));
+    }
+    
+    /**
      * We pass quotations as-is
      * 
      * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
@@ -134,15 +146,7 @@ public class JSONPointerTest {
     public void quotationHandling() {
         assertEquals(6, query("/k\"l"));
     }
-    
-    /**
-     * KD Added
-     * */
-    @Test
-    public void quotationEscaping() {
-        assertEquals(document.get("k\"l"), query("/k\\\"l"));
-    }
-
+   
     @Test
     public void whitespaceKey() {
         assertEquals(7, query("/ "));
@@ -399,31 +403,21 @@ public class JSONPointerTest {
     }
     
     /**
-     * KD added
-     * Coverage for JSONObject query(JSONPointer)
-     */
-    @Test
-    public void queryFromJSONObjectUsingPointer2() {
-        String str = "{"+
-            "\"string\\\\\\\\Key\":\"hello world!\","+
-            "}"+
-            "}";
-        JSONObject jsonObject = new JSONObject(str);
-        Object obj = jsonObject.optQuery(new JSONPointer("/string\\\\\\\\Key"));
-        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
-    }
-    /**
-     * KD added - understanding behavior
+     * KD added - this should pass
      * Coverage for JSONObject query(JSONPointer)
      */
     @Test
     public void queryFromJSONObjectUsingPointer0() {
-        String str = "{"+
-            "\"string\\\\Key\":\"hello world!\","+
-            "}"+
-            "}";
-        JSONObject jsonObject = new JSONObject(str);
-        Object obj = jsonObject.optQuery(new JSONPointer("/string\\Key"));
-        assertTrue("Expected 'hello world!'", "hello world!".equals(obj));
+    	String str = "{"+
+                "\"string\\\\\\\\Key\":\"hello world!\","+
+
+                "\"\\\\\":\"slash test\"," + 
+                "}"+
+                "}";
+            JSONObject jsonObject = new JSONObject(str);
+            //Summary of issue: When a KEY in the jsonObject is "\\\\" --> it's held
+            // as "\\" which makes it impossible to get back where expected
+            Object obj = jsonObject.optQuery(new JSONPointer("/\\"));
+            assertEquals("slash test", obj);
     }
 }
