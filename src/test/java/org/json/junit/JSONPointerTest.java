@@ -43,7 +43,7 @@ public class JSONPointerTest {
     private static final String EXPECTED_COMPLETE_DOCUMENT = "{\"\":0,\" \":7,\"g|h\":4,\"c%d\":2,\"k\\\"l\":6,\"a/b\":1,\"i\\\\j\":5," +
     		"\"obj\":{\"\":{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some other value\"}," +
             "\"other~key\":{\"another/key\":[\"val\"]},\"key\":\"value\"},\"foo\":[\"bar\",\"baz\"],\"e^f\":3," +
-            "\"m~n\":8,\"four\\\\\\\\slashes\":\"slash test!\"}";
+            "\"m~n\":8}";
 
     
     static {
@@ -124,17 +124,6 @@ public class JSONPointerTest {
     @Test
     public void backslashHandling() {
         assertEquals(5, query("/i\\j"));
-    }
-
-    /**
-     * When creating a jsonObject we need to parse escaped characters "\\\\"
-     *  --> it's the string representation of  "\\", so when query'ing via the JSONPointer 
-     *  we DON'T escape them
-     *  
-     */
-    @Test
-    public void multipleBackslashHandling() {
-        assertEquals("slash test!", query("/four\\\\slashes"));
     }
     
     /**
@@ -403,8 +392,10 @@ public class JSONPointerTest {
     }
     
     /**
-     * KD added - this should pass
-     * Coverage for JSONObject query(JSONPointer)
+     * When creating a jsonObject we need to parse escaped characters "\\\\"
+     *  --> it's the string representation of  "\\", so when query'ing via the JSONPointer 
+     *  we DON'T escape them
+     *  
      */
     @Test
     public void queryFromJSONObjectUsingPointer0() {
@@ -416,8 +407,11 @@ public class JSONPointerTest {
                 "}";
             JSONObject jsonObject = new JSONObject(str);
             //Summary of issue: When a KEY in the jsonObject is "\\\\" --> it's held
-            // as "\\" which makes it impossible to get back where expected
-            Object obj = jsonObject.optQuery(new JSONPointer("/\\"));
-            assertEquals("slash test", obj);
+            // as "\\" which means when querying, we need to use "\\"
+            Object twoBackslahObj = jsonObject.optQuery(new JSONPointer("/\\"));
+            assertEquals("slash test", twoBackslahObj);
+
+            Object fourBackslashObj = jsonObject.optQuery(new JSONPointer("/string\\\\Key"));
+            assertEquals("hello world!", fourBackslashObj);
     }
 }
