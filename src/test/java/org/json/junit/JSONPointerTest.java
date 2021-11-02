@@ -41,10 +41,11 @@ public class JSONPointerTest {
 
     private static final JSONObject document;
     private static final String EXPECTED_COMPLETE_DOCUMENT = "{\"\":0,\" \":7,\"g|h\":4,\"c%d\":2,\"k\\\"l\":6,\"a/b\":1,\"i\\\\j\":5," +
-            "\"obj\":{\"\":{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some other value\"}," +
+    		"\"obj\":{\"\":{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some other value\"}," +
             "\"other~key\":{\"another/key\":[\"val\"]},\"key\":\"value\"},\"foo\":[\"bar\",\"baz\"],\"e^f\":3," +
             "\"m~n\":8}";
 
+    
     static {
         @SuppressWarnings("resource")
         InputStream resourceAsStream = JSONPointerTest.class.getClassLoader().getResourceAsStream("jsonpointer-testdoc.json");
@@ -124,7 +125,7 @@ public class JSONPointerTest {
     public void backslashHandling() {
         assertEquals(5, query("/i\\j"));
     }
-
+    
     /**
      * We pass quotations as-is
      * 
@@ -134,7 +135,7 @@ public class JSONPointerTest {
     public void quotationHandling() {
         assertEquals(6, query("/k\"l"));
     }
-
+   
     @Test
     public void whitespaceKey() {
         assertEquals(7, query("/ "));
@@ -388,5 +389,29 @@ public class JSONPointerTest {
         assertTrue("Expected bVal", "bVal".equals(obj));
         obj = jsonArray.optQuery(new JSONPointer("/a/b/c"));
         assertTrue("Expected null", obj == null);
+    }
+    
+    /**
+     * When creating a jsonObject we need to parse escaped characters "\\\\"
+     *  --> it's the string representation of  "\\", so when query'ing via the JSONPointer 
+     *  we DON'T escape them
+     *  
+     */
+    @Test
+    public void queryFromJSONObjectUsingPointer0() {
+    	String str = "{"+
+                "\"string\\\\\\\\Key\":\"hello world!\","+
+
+                "\"\\\\\":\"slash test\"," + 
+                "}"+
+                "}";
+            JSONObject jsonObject = new JSONObject(str);
+            //Summary of issue: When a KEY in the jsonObject is "\\\\" --> it's held
+            // as "\\" which means when querying, we need to use "\\"
+            Object twoBackslahObj = jsonObject.optQuery(new JSONPointer("/\\"));
+            assertEquals("slash test", twoBackslahObj);
+
+            Object fourBackslashObj = jsonObject.optQuery(new JSONPointer("/string\\\\Key"));
+            assertEquals("hello world!", fourBackslashObj);
     }
 }
