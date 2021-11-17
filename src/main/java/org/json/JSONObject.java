@@ -1540,10 +1540,12 @@ public class JSONObject {
                     try {
                         final Object result = method.invoke(bean);
                         if (result != null) {
+                            // check cyclic dependency and throw error if needed
+
                             this.map.put(key, wrap(result));
                             // we don't use the result anywhere outside of wrap
                             // if it's a resource we should be sure to close it
-                            // after calling toString
+                            // after calling toString 
                             if (result instanceof Closeable) {
                                 try {
                                     ((Closeable) result).close();
