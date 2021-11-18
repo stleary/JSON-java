@@ -3224,7 +3224,17 @@ public class JSONObjectTest {
         RecursiveBean ObjA = new RecursiveBean("ObjA");
         RecursiveBean ObjB = new RecursiveBean("ObjB", ObjA);
         ObjA.setRef(ObjB);
-        JSONObject jsonObject = new JSONObject(ObjA);
+        new JSONObject(ObjA);
+        fail("Expected an exception");
+    }
+    @Test(expected=JSONException.class)
+    public void testLongRecursiveObject() {
+        RecursiveBean ObjA = new RecursiveBean("ObjA");
+        RecursiveBean ObjB = new RecursiveBean("ObjB", ObjA);
+        RecursiveBean ObjC = new RecursiveBean("ObjB", ObjB);
+        RecursiveBean ObjD = new RecursiveBean("ObjB", ObjC);
+        ObjA.setRef(ObjD);
+        new JSONObject(ObjB);
         fail("Expected an exception");
     }
 
