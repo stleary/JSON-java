@@ -3221,22 +3221,59 @@ public class JSONObjectTest {
     }
     @Test(expected=JSONException.class)
     public void testSimpleRecursiveObject() {
+        // B -> A -> B ...
         RecursiveBean ObjA = new RecursiveBean("ObjA");
-        RecursiveBean ObjB = new RecursiveBean("ObjB", ObjA);
+        RecursiveBean ObjB = new RecursiveBean("ObjB");
+        ObjB.setRef(ObjA);
         ObjA.setRef(ObjB);
         new JSONObject(ObjA);
         fail("Expected an exception");
     }
     @Test(expected=JSONException.class)
     public void testLongRecursiveObject() {
+        // D -> C -> B -> A -> D ...
         RecursiveBean ObjA = new RecursiveBean("ObjA");
-        RecursiveBean ObjB = new RecursiveBean("ObjB", ObjA);
-        RecursiveBean ObjC = new RecursiveBean("ObjB", ObjB);
-        RecursiveBean ObjD = new RecursiveBean("ObjB", ObjC);
+        RecursiveBean ObjB = new RecursiveBean("ObjB");
+        RecursiveBean ObjC = new RecursiveBean("ObjC");
+        RecursiveBean ObjD = new RecursiveBean("ObjD");
+        ObjC.setRef(ObjB);
+        ObjB.setRef(ObjA);
+        ObjD.setRef(ObjC);
         ObjA.setRef(ObjD);
         new JSONObject(ObjB);
         fail("Expected an exception");
     }
+    @Test
+    public void testRepeatObjectNotRecursive() {
+        // C -> B -> A
+        //        -> A
+        RecursiveBean ObjA = new RecursiveBean("ObjA");
+        RecursiveBean ObjB = new RecursiveBean("ObjB");
+        RecursiveBean ObjC = new RecursiveBean("ObjC");
+        ObjC.setRef(ObjA);
+        ObjB.setRef(ObjA);
+        ObjB.setRef2(ObjA);
+        new JSONObject(ObjC);
+        new JSONObject(ObjB);
+        new JSONObject(ObjA);
+    }
+    @Test(expected=JSONException.class)
+    public void testRepeatObjectRecursive() {
+        // C -> B -> A -> D -> C
+        //        -> D -> C
+        RecursiveBean ObjA = new RecursiveBean("ObjA");
+        RecursiveBean ObjB = new RecursiveBean("ObjB");
+        RecursiveBean ObjC = new RecursiveBean("ObjC");
+        RecursiveBean ObjD = new RecursiveBean("ObjD");
+        ObjC.setRef(ObjB);
+        ObjB.setRef(ObjA);
+        ObjB.setRef2(ObjD);
+        ObjA.setRef(ObjD);
+        ObjD.setRef(ObjC);
+        new JSONObject(ObjC);
+        fail("Expected an exception");
+    }
+
 
     @Test
     public void testIssue548ObjectWithEmptyJsonArray() {

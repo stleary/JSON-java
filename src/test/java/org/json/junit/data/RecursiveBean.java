@@ -8,16 +8,16 @@ package org.json.junit.data;
 public class RecursiveBean {
     private String name;
     private Object reference;
+    private Object reference2;
     public String getName() { return name; }
     public Object getRef() {return reference;}
+    public Object getRef2() {return reference2;}
     public void setRef(Object refObj) {reference = refObj;}
+    public void setRef2(Object refObj) {reference2 = refObj;}
 
     public RecursiveBean(String name) {
         this.name = name;
         reference = null;
-    }
-    public RecursiveBean(String name, Object refObj) {
-        this.name = name;
-        reference = refObj;
+        reference2 = null;
     }
 }
