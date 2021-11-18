@@ -3220,6 +3220,24 @@ public class JSONObjectTest {
         fail("Expected an exception");
     }
     @Test(expected=JSONException.class)
+    public void testSelfRecursiveObject() {
+        // A -> A ...
+        RecursiveBean ObjA = new RecursiveBean("ObjA");
+        ObjA.setRef(ObjA);
+        new JSONObject(ObjA);
+        fail("Expected an exception");
+    }
+    @Test(expected=JSONException.class)
+    public void testLongSelfRecursiveObject() {
+        // B -> A -> A ...
+        RecursiveBean ObjA = new RecursiveBean("ObjA");
+        RecursiveBean ObjB = new RecursiveBean("ObjB");
+        ObjB.setRef(ObjA);
+        ObjA.setRef(ObjA);
+        new JSONObject(ObjB);
+        fail("Expected an exception");
+    }
+    @Test(expected=JSONException.class)
     public void testSimpleRecursiveObject() {
         // B -> A -> B ...
         RecursiveBean ObjA = new RecursiveBean("ObjA");
@@ -3243,6 +3261,22 @@ public class JSONObjectTest {
         new JSONObject(ObjB);
         fail("Expected an exception");
     }
+    @Test(expected=JSONException.class)
+    public void testRepeatObjectRecursive() {
+        // C -> B -> A -> D -> C ...
+        //        -> D -> C ...
+        RecursiveBean ObjA = new RecursiveBean("ObjA");
+        RecursiveBean ObjB = new RecursiveBean("ObjB");
+        RecursiveBean ObjC = new RecursiveBean("ObjC");
+        RecursiveBean ObjD = new RecursiveBean("ObjD");
+        ObjC.setRef(ObjB);
+        ObjB.setRef(ObjA);
+        ObjB.setRef2(ObjD);
+        ObjA.setRef(ObjD);
+        ObjD.setRef(ObjC);
+        new JSONObject(ObjC);
+        fail("Expected an exception");
+    }
     @Test
     public void testRepeatObjectNotRecursive() {
         // C -> B -> A
@@ -3257,21 +3291,25 @@ public class JSONObjectTest {
         new JSONObject(ObjB);
         new JSONObject(ObjA);
     }
-    @Test(expected=JSONException.class)
-    public void testRepeatObjectRecursive() {
-        // C -> B -> A -> D -> C
-        //        -> D -> C
+    @Test
+    public void testLongRepeatObjectNotRecursive() {
+        // C -> B -> A -> D -> E
+        //        -> D -> E
         RecursiveBean ObjA = new RecursiveBean("ObjA");
         RecursiveBean ObjB = new RecursiveBean("ObjB");
         RecursiveBean ObjC = new RecursiveBean("ObjC");
         RecursiveBean ObjD = new RecursiveBean("ObjD");
+        RecursiveBean ObjE = new RecursiveBean("ObjE");
         ObjC.setRef(ObjB);
         ObjB.setRef(ObjA);
         ObjB.setRef2(ObjD);
         ObjA.setRef(ObjD);
-        ObjD.setRef(ObjC);
+        ObjD.setRef(ObjE);
         new JSONObject(ObjC);
-        fail("Expected an exception");
+        new JSONObject(ObjB);
+        new JSONObject(ObjA);
+        new JSONObject(ObjD);
+        new JSONObject(ObjE);
     }
 
 
