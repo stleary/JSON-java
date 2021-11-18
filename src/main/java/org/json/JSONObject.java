@@ -366,6 +366,11 @@ public class JSONObject {
         this.populateMap(bean);
     }
 
+    private JSONObject(Object bean, Set<Object> objectsRecord) {
+        this();
+        this.populateMap(bean, objectsRecord);
+    }
+
     /**
      * Construct a JSONObject from an Object, using reflection to find the
      * public members. The resulting JSONObject's keys will be the strings from
@@ -1511,11 +1516,6 @@ public class JSONObject {
         return NULL.equals(object) ? defaultValue : object.toString();
     }
 
-    // Set to store the current seen objects in the recursive reaversal
-    // If the next value to be added to this set is a duplicate, a cycle
-    // is found
-    private final Set<Object> objectsRecord = new HashSet<Object>();
-
     /**
      * Populates the internal map of the JSONObject with the bean properties. The
      * bean can not be recursive.
@@ -1526,6 +1526,10 @@ public class JSONObject {
      *            the bean
      */
     private void populateMap(Object bean) {
+        populateMap(bean, new HashSet<Object>());
+    }
+
+    private void populateMap(Object bean, Set<Object> objectsRecord) {
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
@@ -1555,7 +1559,7 @@ public class JSONObject {
                             
                             objectsRecord.add(result);
 
-                            this.map.put(key, wrap(result));
+                            this.map.put(key, wrap(result, objectsRecord));
 
                             objectsRecord.remove(result);
 
@@ -2449,6 +2453,10 @@ public class JSONObject {
      * @return The wrapped value
      */
     public static Object wrap(Object object) {
+        return wrap(object, null);
+    }
+
+    private static Object wrap(Object object, Set<Object> objectsRecord) {
         try {
             if (NULL.equals(object)) {
                 return NULL;
@@ -2483,7 +2491,15 @@ public class JSONObject {
                     || object.getClass().getClassLoader() == null) {
                 return object.toString();
             }
-            return new JSONObject(object);
+            if (objectsRecord != null) {
+                return new JSONObject(object, objectsRecord);
+            }
+            else {
+                return new JSONObject(object);
+            }
+        }
+        catch (JSONException exception) {
+            throw exception;
         } catch (Exception exception) {
             return null;
         }

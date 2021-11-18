@@ -10,6 +10,7 @@ public class RecursiveBean {
     private Object reference;
     public String getName() { return name; }
     public Object getRef() {return reference;}
+    public void setRef(Object refObj) {reference = refObj;}
 
     public RecursiveBean(String name) {
         this.name = name;

@@ -73,6 +73,7 @@ import org.json.junit.data.MyJsonString;
 import org.json.junit.data.MyNumber;
 import org.json.junit.data.MyNumberContainer;
 import org.json.junit.data.MyPublicClass;
+import org.json.junit.data.RecursiveBean;
 import org.json.junit.data.Singleton;
 import org.json.junit.data.SingletonEnum;
 import org.json.junit.data.WeirdList;
@@ -3216,6 +3217,14 @@ public class JSONObjectTest {
         // null put key 
         JSONObject jsonObject = new JSONObject("{}");
         jsonObject.put(null, new Object());
+        fail("Expected an exception");
+    }
+    @Test(expected=JSONException.class)
+    public void testSimpleRecursiveObject() {
+        RecursiveBean ObjA = new RecursiveBean("ObjA");
+        RecursiveBean ObjB = new RecursiveBean("ObjB", ObjA);
+        ObjA.setRef(ObjB);
+        JSONObject jsonObject = new JSONObject(ObjA);
         fail("Expected an exception");
     }
 
