@@ -35,6 +35,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -902,6 +904,34 @@ public class XMLConfigurationTest {
         expectedJsonArray = new JSONArray(expectedStr);
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
 
+    }
+
+    /**
+     * Confirm XMLParserConfiguration functionality
+     */
+    @Test
+    public void testSimpleForceList() {
+
+        String xmlStr = 
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<addresses>\n"+
+                "   <address>\n"+
+                "      <name>Sherlock Holmes</name>\n"+
+                "   </address>\n"+
+                "</addresses>";
+
+        String expectedStr = "{\"addresses\":[{\"address\":{\"name\":\"Sherlock Holmes\"}}]}";
+        
+        Set<String> forceList = new HashSet<String>();
+        forceList.add("addresses");
+
+        XMLParserConfiguration config = 
+                new XMLParserConfiguration()
+                        .withForceList(forceList);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
+        JSONObject expetedJsonObject = new JSONObject(expectedStr);
+
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expetedJsonObject);
     }
     
     
