@@ -415,7 +415,7 @@ public class XML {
                             if (parse(x, jsonObject, tagName, config)) {
                                 if (config.getForceList().contains(tagName)) {
                                     if (jsonObject.length() == 0) {
-                                        context.append(tagName, "");
+                                        context.put(tagName, new JSONArray());
                                     } else if (jsonObject.length() == 1
                                             && jsonObject.opt(config.getcDataTagName()) != null) {
                                         context.append(tagName, jsonObject.opt(config.getcDataTagName()));
