@@ -413,14 +413,26 @@ public class XML {
                         } else if (token == LT) {
                             // Nested element
                             if (parse(x, jsonObject, tagName, config)) {
-                                if (jsonObject.length() == 0) {
-                                    context.accumulate(tagName, "");
-                                } else if (jsonObject.length() == 1
-                                        && jsonObject.opt(config.getcDataTagName()) != null) {
-                                    context.accumulate(tagName, jsonObject.opt(config.getcDataTagName()));
+                                if (config.getForceList().contains(tagName)) {
+                                    if (jsonObject.length() == 0) {
+                                        context.append(tagName, "");
+                                    } else if (jsonObject.length() == 1
+                                            && jsonObject.opt(config.getcDataTagName()) != null) {
+                                        context.append(tagName, jsonObject.opt(config.getcDataTagName()));
+                                    } else {
+                                        context.append(tagName, jsonObject);
+                                    }
                                 } else {
-                                    context.accumulate(tagName, jsonObject);
+                                    if (jsonObject.length() == 0) {
+                                        context.accumulate(tagName, "");
+                                    } else if (jsonObject.length() == 1
+                                            && jsonObject.opt(config.getcDataTagName()) != null) {
+                                        context.accumulate(tagName, jsonObject.opt(config.getcDataTagName()));
+                                    } else {
+                                        context.accumulate(tagName, jsonObject);
+                                    }
                                 }
+                                
                                 return false;
                             }
                         }
