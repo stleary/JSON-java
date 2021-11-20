@@ -907,11 +907,10 @@ public class XMLConfigurationTest {
     }
 
     /**
-     * Confirm XMLParserConfiguration functionality
+     * Test forceList parameter
      */
     @Test
     public void testSimpleForceList() {
-
         String xmlStr = 
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
                 "<addresses>\n"+
@@ -924,6 +923,48 @@ public class XMLConfigurationTest {
         
         Set<String> forceList = new HashSet<String>();
         forceList.add("addresses");
+
+        XMLParserConfiguration config = 
+                new XMLParserConfiguration()
+                        .withForceList(forceList);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
+        JSONObject expetedJsonObject = new JSONObject(expectedStr);
+
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expetedJsonObject);
+    }
+    @Test
+    public void testLongForceList() {
+        String xmlStr = 
+                "<servers>"+
+                    "<server>"+
+                        "<name>host1</name>"+
+                        "<os>Linux</os>"+
+                        "<interfaces>"+
+                            "<interface>"+
+                                "<name>em0</name>"+
+                                "<ip_address>10.0.0.1</ip_address>"+
+                            "</interface>"+
+                        "</interfaces>"+
+                    "</server>"+
+                "</servers>";
+
+        String expectedStr = 
+            "{"+
+            "\"servers\": ["+
+              "{"+
+                "\"server\": {"+
+                  "\"name\": \"host1\","+
+                  "\"os\": \"Linux\","+
+                  "\"interfaces\": ["+
+                   "{"+
+                     "\"interface\": {"+
+                       "\"name\": \"em0\","+
+                       "\"ip_address\": \"10.0.0.1\""+
+                      "}}]}}]}";
+        
+        Set<String> forceList = new HashSet<String>();
+        forceList.add("servers");
+        forceList.add("interfaces");
 
         XMLParserConfiguration config = 
                 new XMLParserConfiguration()
