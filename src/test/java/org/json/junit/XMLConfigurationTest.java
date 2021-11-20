@@ -976,9 +976,86 @@ public class XMLConfigurationTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject, expetedJsonObject);
     }
     @Test
+    public void testMultipleTagForceList() {
+        String xmlStr = 
+                "<addresses>\n"+
+                "   <address>\n"+
+                "      <name>Sherlock Holmes</name>\n"+
+                "      <name>John H. Watson</name>\n"+
+                "   </address>\n"+
+                "</addresses>";
+
+        String expectedStr = 
+                "{"+
+                    "\"addresses\":["+
+                    "{"+
+                        "\"address\":["+
+                            "{"+
+                                "\"name\":["+
+                                "\"Sherlock Holmes\","+
+                                "\"John H. Watson\""+
+                                "]"+
+                            "}"+
+                        "]"+
+                    "}"+
+                    "]"+
+                "}";
+        
+        Set<String> forceList = new HashSet<String>();
+        forceList.add("addresses");
+        forceList.add("address");
+        forceList.add("name");
+
+        XMLParserConfiguration config = 
+                new XMLParserConfiguration()
+                        .withForceList(forceList);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
+        JSONObject expetedJsonObject = new JSONObject(expectedStr);
+
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expetedJsonObject);
+    }
+    @Test
     public void testEmptyForceList() {
         String xmlStr = 
                 "<addresses></addresses>";
+
+        String expectedStr = 
+                "{\"addresses\":[]}";
+        
+        Set<String> forceList = new HashSet<String>();
+        forceList.add("addresses");
+
+        XMLParserConfiguration config = 
+                new XMLParserConfiguration()
+                        .withForceList(forceList);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
+        JSONObject expetedJsonObject = new JSONObject(expectedStr);
+
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expetedJsonObject);
+    }
+    @Test
+    public void testContentForceList() {
+        String xmlStr = 
+                "<addresses>Baker Street</addresses>";
+
+        String expectedStr = 
+                "{\"addresses\":[\"Baker Street\"]}";
+        
+        Set<String> forceList = new HashSet<String>();
+        forceList.add("addresses");
+
+        XMLParserConfiguration config = 
+                new XMLParserConfiguration()
+                        .withForceList(forceList);
+        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
+        JSONObject expetedJsonObject = new JSONObject(expectedStr);
+
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expetedJsonObject);
+    }
+    @Test
+    public void testEmptyTagForceList() {
+        String xmlStr = 
+                "<addresses />";
 
         String expectedStr = 
                 "{\"addresses\":[]}";
