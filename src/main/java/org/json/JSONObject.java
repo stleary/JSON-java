@@ -39,6 +39,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -363,6 +364,11 @@ public class JSONObject {
     public JSONObject(Object bean) {
         this();
         this.populateMap(bean);
+    }
+
+    private JSONObject(Object bean, Set<Object> objectsRecord) {
+        this();
+        this.populateMap(bean, objectsRecord);
     }
 
     /**
@@ -1520,6 +1526,10 @@ public class JSONObject {
      *            the bean
      */
     private void populateMap(Object bean) {
+        populateMap(bean, new HashSet<Object>());
+    }
+
+    private void populateMap(Object bean, Set<Object> objectsRecord) {
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
@@ -1540,10 +1550,22 @@ public class JSONObject {
                     try {
                         final Object result = method.invoke(bean);
                         if (result != null) {
-                            this.map.put(key, wrap(result));
+                            // check cyclic dependency and throw error if needed
+                            // the wrap and populateMap combination method is 
+                            // itself DFS recursive
+                            if (objectsRecord.contains(result)) {
+                                throw recursivelyDefinedObjectException(key);
+                            }
+                            
+                            objectsRecord.add(result);
+
+                            this.map.put(key, wrap(result, objectsRecord));
+
+                            objectsRecord.remove(result);
+
                             // we don't use the result anywhere outside of wrap
                             // if it's a resource we should be sure to close it
-                            // after calling toString
+                            // after calling toString 
                             if (result instanceof Closeable) {
                                 try {
                                     ((Closeable) result).close();
@@ -2431,6 +2453,10 @@ public class JSONObject {
      * @return The wrapped value
      */
     public static Object wrap(Object object) {
+        return wrap(object, null);
+    }
+
+    private static Object wrap(Object object, Set<Object> objectsRecord) {
         try {
             if (NULL.equals(object)) {
                 return NULL;
@@ -2465,7 +2491,15 @@ public class JSONObject {
                     || object.getClass().getClassLoader() == null) {
                 return object.toString();
             }
-            return new JSONObject(object);
+            if (objectsRecord != null) {
+                return new JSONObject(object, objectsRecord);
+            }
+            else {
+                return new JSONObject(object);
+            }
+        }
+        catch (JSONException exception) {
+            throw exception;
         } catch (Exception exception) {
             return null;
         }
@@ -2675,5 +2709,16 @@ public class JSONObject {
         return new JSONException(
                 "JSONObject[" + quote(key) + "] is not a " + valueType + " (" + value + ")."
                 , cause);
+    }
+
+    /**
+     * Create a new JSONException in a common format for recursive object definition.
+     * @param key name of the key
+     * @return JSONException that can be thrown.
+     */
+    private static JSONException recursivelyDefinedObjectException(String key) {
+        return new JSONException(
+            "JavaBean object contains recursively defined member variable of key " + quote(key)
+        );
     }
 }
