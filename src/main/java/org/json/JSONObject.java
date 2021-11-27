@@ -37,9 +37,10 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -1526,7 +1527,7 @@ public class JSONObject {
      *            the bean
      */
     private void populateMap(Object bean) {
-        populateMap(bean, new HashSet<Object>());
+        populateMap(bean, Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>()));
     }
 
     private void populateMap(Object bean, Set<Object> objectsRecord) {
