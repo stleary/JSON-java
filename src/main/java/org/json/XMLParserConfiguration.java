@@ -25,7 +25,9 @@ SOFTWARE.
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -67,6 +69,12 @@ public class XMLParserConfiguration {
     private Map<String, XMLXsiTypeConverter<?>> xsiTypeMap;
 
     /**
+     * When parsing the XML into JSON, specifies the tags whose values should be converted
+     * to arrays
+     */
+    private Set<String> forceList;
+
+    /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert
      * values), and the CDATA Tag Name is "content".
      */
@@ -75,6 +83,7 @@ public class XMLParserConfiguration {
         this.cDataTagName = "content";
         this.convertNilAttributeToNull = false;
         this.xsiTypeMap = Collections.emptyMap();
+        this.forceList = Collections.emptySet();
     }
 
     /**
@@ -151,13 +160,15 @@ public class XMLParserConfiguration {
      *                                  <code>false</code> to parse values with attribute xsi:nil="true" as {"xsi:nil":true}.
      * @param xsiTypeMap  <code>new HashMap<String, XMLXsiTypeConverter<?>>()</code> to parse values with attribute
      *                   xsi:type="integer" as integer,  xsi:type="string" as string
+     * @param forceList  <code>new HashSet<String>()</code> to parse the provided tags' values as arrays 
      */
     private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
-            final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap ) {
+            final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap, final Set<String> forceList ) {
         this.keepStrings = keepStrings;
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
         this.xsiTypeMap = Collections.unmodifiableMap(xsiTypeMap);
+        this.forceList = Collections.unmodifiableSet(forceList);
     }
 
     /**
@@ -174,7 +185,8 @@ public class XMLParserConfiguration {
                 this.keepStrings,
                 this.cDataTagName,
                 this.convertNilAttributeToNull,
-                this.xsiTypeMap
+                this.xsiTypeMap,
+                this.forceList
         );
     }
     
@@ -281,6 +293,28 @@ public class XMLParserConfiguration {
         XMLParserConfiguration newConfig = this.clone();
         Map<String, XMLXsiTypeConverter<?>> cloneXsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>(xsiTypeMap);
         newConfig.xsiTypeMap = Collections.unmodifiableMap(cloneXsiTypeMap);
+        return newConfig;
+    }
+
+    /**
+     * When parsing the XML into JSON, specifies that tags that will be converted to arrays
+     * in this configuration {@code Set<String>} to parse the provided tags' values as arrays 
+     * @return <code>forceList</code> unmodifiable configuration set.
+     */
+    public Set<String> getForceList() {
+        return this.forceList;
+    }
+
+    /**
+     * When parsing the XML into JSON, specifies that tags that will be converted to arrays
+     * in this configuration {@code Set<String>} to parse the provided tags' values as arrays 
+     * @param forceList  {@code new HashSet<String>()} to parse the provided tags' values as arrays 
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    public XMLParserConfiguration withForceList(final Set<String> forceList) {
+        XMLParserConfiguration newConfig = this.clone();
+        Set<String> cloneForceList = new HashSet<String>(forceList);
+        newConfig.forceList = Collections.unmodifiableSet(cloneForceList);
         return newConfig;
     }
 }
