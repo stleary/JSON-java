@@ -74,6 +74,7 @@ import org.json.junit.data.MyNumber;
 import org.json.junit.data.MyNumberContainer;
 import org.json.junit.data.MyPublicClass;
 import org.json.junit.data.RecursiveBean;
+import org.json.junit.data.RecursiveBeanEquals;
 import org.json.junit.data.Singleton;
 import org.json.junit.data.SingletonEnum;
 import org.json.junit.data.WeirdList;
@@ -3310,6 +3311,21 @@ public class JSONObjectTest {
         new JSONObject(ObjA);
         new JSONObject(ObjD);
         new JSONObject(ObjE);
+    }
+    @Test(expected=JSONException.class)
+    public void testRecursiveEquals() {
+        RecursiveBeanEquals a = new RecursiveBeanEquals("same");
+        a.setRef(a);
+        new JSONObject(a);
+    }
+    @Test
+    public void testNotRecursiveEquals() {
+        RecursiveBeanEquals a = new RecursiveBeanEquals("same");
+        RecursiveBeanEquals b = new RecursiveBeanEquals("same");
+        RecursiveBeanEquals c = new RecursiveBeanEquals("same");
+        a.setRef(b);
+        b.setRef(c);
+        new JSONObject(a);
     }
 
 
