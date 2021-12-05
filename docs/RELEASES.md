@@ -5,6 +5,8 @@ and artifactId "json". For example:
 [https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
 
 ~~~
+20211205    Recent commits and some bug fixes for similar()
+
 20210307    Recent commits and potentially breaking fix to JSONPointer
 
 20201115    Recent commits and first release after project structure change
