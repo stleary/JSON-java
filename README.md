@@ -8,7 +8,7 @@ JSON in Java [package org.json]
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.json/json.svg)](https://mvnrepository.com/artifact/org.json/json)
 
-**[Click here if you just want the latest release jar file.](https://search.maven.org/remotecontent?filepath=org/json/json/20210307/json-20210307.jar)**
+**[Click here if you just want the latest release jar file.](https://search.maven.org/remotecontent?filepath=org/json/json/20211205/json-20211205.jar)**
 
 
 # Overview
