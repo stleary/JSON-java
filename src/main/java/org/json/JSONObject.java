@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -185,6 +186,18 @@ public class JSONObject {
         // retrieval based on associative access.
         // Therefore, an implementation mustn't rely on the order of the item.
         this.map = new HashMap<String, Object>();
+    }
+
+    /**
+     * Construct an empty JSONObject specifying if the items are ordered based on the order of insertion.
+     */
+    public JSONObject(boolean ordered) {
+        // If ordered, a LinkedHashMap is used instead of a HashMap. Even if the JSON standard does not mandate the ordering of properties,
+        // in some cases it is requested by the specific use case. For example the ordering of the items is requested by
+        // <a href="https://spec.graphql.org/June2018/#sec-Serialized-Map-Ordering">GraphQL specification</a>. The default implementation
+        // should use the HashMap because if the order is not requested, it is more efficient using the HashMap in terms of memory
+        // consumption and runtime cost for most operations.
+        this.map = ordered ? new LinkedHashMap<String, Object>() : new HashMap<String, Object>();
     }
 
     /**
