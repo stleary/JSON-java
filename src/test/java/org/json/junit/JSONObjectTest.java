@@ -3351,4 +3351,20 @@ public class JSONObjectTest {
         assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
     }
+
+    @Test
+    public void jsonObjectOrdered() {
+      JSONObject jsonObject = new JSONObject(true);
+      for (int i = 0; i < 100; i++)
+        jsonObject.put(String.valueOf(i), i);
+
+      // validate JSON
+      assertEquals("expected 100 items",100, jsonObject.length());
+
+      int i = 0;
+      for( String key : jsonObject.keySet() ){
+        assertEquals("expected "+i+" as key",i, Integer.parseInt(key));
+        ++i;
+      }
+    }
 }
