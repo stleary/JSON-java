@@ -208,16 +208,16 @@ public class JSONObject {
     }
 
     /**
-     * Construct a JSONObject from a JSONTokener.
-     *
-     * @param x
-     *            A JSONTokener object containing the source string.
-     * @throws JSONException
-     *             If there is a syntax error in the source string or a
-     *             duplicated key.
-     */
+         * Construct a JSONObject from a JSONTokener.
+         *
+         * @param x
+         *            A JSONTokener object containing the source string.
+         * @throws JSONException
+         *             If there is a syntax error in the source string or a
+         *             duplicated key.
+         */
     public JSONObject(JSONTokener x) throws JSONException {
-        this();
+        this(x.getMapImplementation());
         char c;
         String key;
 
@@ -369,12 +369,14 @@ public class JSONObject {
 
     protected JSONObject(Class<? extends Map> mapImplementation) {
         if( mapImplementation == null )
-            throw new JSONException("Map implementation is null");
-
-        try {
-            this.map = mapImplementation.getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new JSONException("Error on instantiating default constructor of map implementation from class '"+mapImplementation+"'");
+            // Use the default implementation.
+            this.map = new HashMap<String,Object>();
+        else {
+            try {
+                this.map = mapImplementation.getConstructor().newInstance();
+            } catch (Exception e) {
+                throw new JSONException("Error on instantiating default constructor of map implementation from class '" + mapImplementation + "'");
+            }
         }
     }
 

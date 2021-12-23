@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Map;
 
 /*
 Copyright (c) 2002 JSON.org
@@ -56,6 +57,8 @@ public class JSONTokener {
     /** the number of characters read in the previous line. */
     private long characterPreviousLine;
 
+    /** custom map implementation to use. */
+    private Class<? extends Map> mapImplementation = null;
 
     /**
      * Construct a JSONTokener from a Reader. The caller must close the Reader.
@@ -495,6 +498,15 @@ public class JSONTokener {
         }
         this.back();
         return c;
+    }
+
+    public Class<? extends Map> getMapImplementation() {
+        return mapImplementation;
+    }
+
+    public JSONTokener setMapImplementation(Class<? extends Map> mapImplementation) {
+        this.mapImplementation = mapImplementation;
+        return this;
     }
 
     /**

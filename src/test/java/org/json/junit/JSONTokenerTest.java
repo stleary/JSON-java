@@ -24,23 +24,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
+
+import java.io.*;
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test specific to the {@link org.json.JSONTokener} class.
@@ -333,4 +329,29 @@ public class JSONTokenerTest {
         assertEquals(0, t2.next());
         assertFalse(t2.more());
    }
+
+
+    @Test
+    public void jsonObjectOrdered() {
+        class OrderedJSONObject extends JSONObject {
+            public OrderedJSONObject() {
+                super( LinkedHashMap.class );
+            }
+        }
+
+        JSONObject jsonObject = new OrderedJSONObject();
+        for (int i = 0; i < 100; i++)
+            jsonObject.put(String.valueOf(i), i);
+
+        JSONObject orderedObject = new JSONObject( new JSONTokener(jsonObject.toString()).setMapImplementation( LinkedHashMap.class ) );
+
+        // validate JSON
+        assertEquals("expected 100 items",100, orderedObject.length());
+
+        int i = 0;
+        for( String key : orderedObject.keySet() ){
+            assertEquals("expected "+i+" as key",i, Integer.parseInt(key));
+            ++i;
+        }
+    }
 }
