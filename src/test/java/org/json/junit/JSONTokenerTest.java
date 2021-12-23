@@ -30,8 +30,14 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Test;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+
+import java.util.LinkedHashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -329,7 +335,6 @@ public class JSONTokenerTest {
         assertEquals(0, t2.next());
         assertFalse(t2.more());
    }
-
 
     @Test
     public void jsonObjectOrdered() {
