@@ -164,7 +164,7 @@ public class JSONObject {
     /**
      * The map where the JSONObject's properties are kept.
      */
-    private final Map<String, Object> map;
+    protected final Map<String, Object> map;
 
     /**
      * It is sometimes more convenient and less ambiguous to have a
@@ -365,6 +365,17 @@ public class JSONObject {
     public JSONObject(Object bean) {
         this();
         this.populateMap(bean);
+    }
+
+    protected JSONObject(Class<? extends Map> mapImplementation) {
+        if( mapImplementation == null )
+            throw new JSONException("Map implementation is null");
+
+        try {
+            this.map = mapImplementation.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new JSONException("Error on instantiating default constructor of map implementation from class '"+mapImplementation+"'");
+        }
     }
 
     private JSONObject(Object bean, Set<Object> objectsRecord) {

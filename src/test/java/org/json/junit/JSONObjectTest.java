@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -3350,5 +3351,28 @@ public class JSONObjectTest {
         jsonObject.clear(); //Clears the JSONObject
         assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
+    }
+
+
+    @Test
+    public void jsonObjectOrdered() {
+        class OrderedJSONObject extends JSONObject {
+            public OrderedJSONObject() {
+               super( LinkedHashMap.class );
+            }
+        }
+
+        JSONObject jsonObject = new OrderedJSONObject();
+        for (int i = 0; i < 100; i++)
+           jsonObject.put(String.valueOf(i), i);
+
+        // validate JSON
+        assertEquals("expected 100 items",100, jsonObject.length());
+
+        int i = 0;
+        for( String key : jsonObject.keySet() ){
+            assertEquals("expected "+i+" as key",i, Integer.parseInt(key));
+           ++i;
+        }
     }
 }
