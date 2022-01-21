@@ -340,6 +340,22 @@ public class JSONStringTest {
     }
 
     /**
+     * Test for parsing long numerals from String format
+     *
+     */
+
+    @Test
+    public void testStringLongValue() throws Exception  {
+        JSONObject json = new JSONObject("{\"number_1\":\"01234\", \"number_2\": \"332211\"}");
+
+        assertEquals(1234L, json.getLong("number_1"));
+        assertEquals(1234L, json.optLong("number_1"));
+        assertEquals(332211L, json.getLong("number_2"));
+        assertEquals(332211L, json.optLong("number_2"));
+    }
+
+
+    /**
      * A JSONString that returns a valid JSON string value.
      */
     private static final class JSONStringValue implements JSONString {
