@@ -24,12 +24,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -276,7 +277,6 @@ public class XML {
         token = x.nextToken();
 
         // <!
-
         if (token == BANG) {
             c = x.next();
             if (c == '-') {
@@ -310,15 +310,21 @@ public class XML {
                 }
             } while (i > 0);
             return false;
-        } else if (token == QUEST) {
+        }
+
+        /* skip all xml headers <??> */
+        else if (token == QUEST) { // CLOSE
 
             // <?
             x.skipPast("?>");
             return false;
-        } else if (token == SLASH) {
+        }
 
+        /* go to the token immediately following / */
+        else if (token == SLASH) {
             // Close tag </
 
+            /* System.out.println("slash found, move to next..."); */
             token = x.nextToken();
             if (name == null) {
                 throw x.syntaxError("Mismatched close tag " + token);
@@ -331,12 +337,17 @@ public class XML {
             }
             return true;
 
-        } else if (token instanceof Character) {
+        }
+
+        else if (token instanceof Character) {
             throw x.syntaxError("Misshaped tag");
 
             // Open tag <
 
-        } else {
+        } // CLOSE
+
+        /* THIS IS WHERE THE STRINGS INSIDE ALL <> TAGS GO TO */
+        else {
             tagName = (String) token;
             token = null;
             jsonObject = new JSONObject();
@@ -346,7 +357,8 @@ public class XML {
                 if (token == null) {
                     token = x.nextToken();
                 }
-                // attribute = value
+                //attribute = value
+
                 if (token instanceof String) {
                     string = (String) token;
                     token = x.nextToken();
@@ -360,22 +372,30 @@ public class XML {
                                 && NULL_ATTR.equals(string)
                                 && Boolean.parseBoolean((String) token)) {
                             nilAttributeFound = true;
-                        } else if(config.getXsiTypeMap() != null && !config.getXsiTypeMap().isEmpty()
+                        }
+
+                        else if(config.getXsiTypeMap() != null && !config.getXsiTypeMap().isEmpty()
                                 && TYPE_ATTR.equals(string)) {
                             xmlXsiTypeConverter = config.getXsiTypeMap().get(token);
-                        } else if (!nilAttributeFound) {
+                        }
+
+                        else if (!nilAttributeFound) {
                             jsonObject.accumulate(string,
                                     config.isKeepStrings()
                                             ? ((String) token)
                                             : stringToValue((String) token));
                         }
                         token = null;
-                    } else {
+                    }
+
+                    else {
                         jsonObject.accumulate(string, "");
                     }
 
 
-                } else if (token == SLASH) {
+                }
+
+                else if (token == SLASH) {
                     // Empty tag <.../>
                     if (x.nextToken() != GT) {
                         throw x.syntaxError("Misshaped tag");
@@ -400,8 +420,9 @@ public class XML {
                     }
                     return false;
 
-                } else if (token == GT) {
-                    // Content, between <...> and </...>
+                }
+
+                else if (token == GT) {
                     for (;;) {
                         token = x.nextContent();
                         if (token == null) {
@@ -415,7 +436,8 @@ public class XML {
                                 if(xmlXsiTypeConverter != null) {
                                     jsonObject.accumulate(config.getcDataTagName(),
                                             stringToValue(string, xmlXsiTypeConverter));
-                                } else {
+                                } // CLOSED
+                                else {
                                     jsonObject.accumulate(config.getcDataTagName(),
                                             config.isKeepStrings() ? string : stringToValue(string));
                                 }
@@ -449,7 +471,9 @@ public class XML {
                             }
                         }
                     }
-                } else {
+                } //***
+
+                else {
                     throw x.syntaxError("Misshaped tag");
                 }
             }
@@ -687,7 +711,7 @@ public class XML {
      * JSONObject. Some information may be lost in this transformation because
      * JSON is a data format and XML is a document format. XML uses elements,
      * attributes, and content text, while JSON uses unordered collections of
-     * name/value pairs and arrays of values. JSON does not does not like to
+     * name/value pairs and arrays of values. JSON does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
      * "content" member. Comments, prologs, DTDs, and <pre>{@code 
@@ -879,6 +903,148 @@ public class XML {
         return (tagName == null) ? "\"" + string + "\""
                 : (string.length() == 0) ? "<" + tagName + "/>" : "<" + tagName
                         + ">" + string + "</" + tagName + ">";
+
+    }
+
+    //---------------------------------------------------------------------------------------------------------------------------M1
+
+
+
+    // return a subsection of XML using the path
+    public static String getXMLAtPath(XMLTokener x, List<String> pathTokens) {
+        Object token;
+        int indPathTokens = 0;
+        int pathsMatched = 0;
+        //System.out.println("entered get XML method");
+
+
+        while (x.more()){
+            x.skipPast("<");
+            if (x.more()) {
+
+                token = x.nextToken(); // will return '?' '>' '!' '/' or an xml tag name, we only care about tag names
+                //System.out.println(token);
+
+                // if the tag name returned by nextToken() is an entry in the path, increment matches
+                if (token.toString().equals(pathTokens.get(indPathTokens))) {
+                    //System.out.println("  matched: " + pathTokens.get(indPathTokens));
+                    indPathTokens++;
+                    pathsMatched++;
+
+                    // when we navigate to the final path, extract a string of the object
+                    // do not continue parsing the rest of the file
+                    if (pathsMatched == pathTokens.size()) {
+                        return parseAtPath(x, pathTokens.get(--indPathTokens)); // parse when we have found the innermost key
+                    }
+                }
+            }
+        }
+        throw new JSONPointerException("path not found");
+    }
+
+
+    // returns a string representation of an XML tag
+    private static String parseAtPath(XMLTokener x, String tagName) {
+        char currentChar;
+        StringBuilder xmlBuilder = new StringBuilder();
+
+        // append the tag to the builder
+        xmlBuilder.append("<").append(tagName);
+
+        while (x.more()) {
+            currentChar = x.next();
+            xmlBuilder.append(currentChar);
+            if (currentChar == '>' && xmlBuilder.toString().endsWith("/" + tagName + ">")) {
+                return xmlBuilder.toString();
+            }
+        }
+
+        // <street>something street</street>
+
+        throw x.syntaxError("no closing tag found for <" + tagName + ">");
+    }
+
+
+    /**
+     * Converts a specified subsection of XML into JSON using the key path
+     * @param reader the reader for our XML input
+     * @param path the path to the subsection to be extracted and converted
+     * @return the subsection of XML converted to JSON
+     *
+     * @authors Trent Lilley, Joseph Lee
+     */
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path) {
+        XMLTokener x = new XMLTokener(reader);
+        JSONObject subObject;
+        List<String> pathTokens = path.refTokens;
+        String subXML;
+
+        pathTokens.remove(pathTokens.size() - 1);
+        //System.out.println(pathTokens);
+
+        subXML = getXMLAtPath(x, pathTokens);
+
+        System.out.println("Finished");
+        System.out.println(subXML);
+        subObject = XML.toJSONObject(subXML);
+
+        return subObject;
+    }
+
+
+    public static JSONObject toJSONObject(StringReader reader, JSONPointer path, JSONObject replacement) throws IOException {
+        JSONObject updatedJson;
+        String source;
+        String XMLToReplace;
+        List<String> pathTokens = path.refTokens;
+        XMLTokener x = new XMLTokener(reader);
+
+        pathTokens.remove(pathTokens.size() - 1);
+
+        // get all XML
+        StringBuffer xmlBuilder = new StringBuffer();
+        while (x.more()) {
+            xmlBuilder.append(x.next());
+        }
+        source = xmlBuilder.toString();
+        System.out.println("SOURCE");
+        System.out.println(source);
+        System.out.println("");
+
+        // get xml to replace
+        reader = new StringReader(source);
+        x = new XMLTokener(reader);
+        XMLToReplace = getXMLAtPath(x, pathTokens);
+        System.out.println("TO REPLACE");
+        System.out.println(XMLToReplace);
+        System.out.println("");
+
+        // convert to replace to json
+        String toReplace = XML.toJSONObject(XMLToReplace).toString();
+        System.out.println("TO REPLACE JSON");
+        System.out.println(toReplace);
+        System.out.println();
+
+        // convert source to json
+        String sourceJson = XML.toJSONObject(source).toString();
+        System.out.println("SOURCE JSON");
+        System.out.println(sourceJson);
+        System.out.println();
+
+        // make replacement
+        String replaceWith = replacement.toString();
+        System.out.println(replaceWith);
+        String rep = replaceWith.substring(1, replaceWith.length() -  1);
+        System.out.println("REPLACEMENT");
+        System.out.println(rep);
+        System.out.println();
+        String with = toReplace.substring(1, toReplace.length() - 1);
+        System.out.println("TO REPLACE");
+        System.out.println(with);
+        System.out.println();
+        String result = sourceJson.replace(with, rep);
+
+        return new JSONObject(result);
 
     }
 }

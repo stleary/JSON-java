@@ -127,7 +127,7 @@ public class JSONPointer {
     }
 
     // Segments for the JSONPointer string
-    private final List<String> refTokens;
+    final List<String> refTokens;
 
     /**
      * Pre-parses and initializes a new {@code JSONPointer} instance. If you want to
@@ -154,7 +154,7 @@ public class JSONPointer {
                 throw new RuntimeException(e);
             }
         } else if (pointer.startsWith("/")) {
-            refs = pointer.substring(1);
+            refs = pointer.substring(1); // refs is everything after the first slash in the path string
         } else {
             throw new IllegalArgumentException("a JSON pointer should start with '/' or '#/'");
         }
@@ -170,7 +170,7 @@ public class JSONPointer {
                 this.refTokens.add("");
             } else if (slashIdx >= 0) {
                 final String token = refs.substring(prevSlashIdx, slashIdx);
-                this.refTokens.add(unescape(token));
+                this.refTokens.add(unescape(token)); // get everything in between the slashes
             } else {
                 // last item after separator, or no separator at all.
                 final String token = refs.substring(prevSlashIdx);

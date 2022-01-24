@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 import java.io.Reader;
+import java.util.List;
 
 /**
  * The XMLTokener extends the JSONTokener to provide additional methods

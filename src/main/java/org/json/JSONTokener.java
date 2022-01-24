@@ -518,6 +518,14 @@ public class JSONTokener {
         return new JSONException(message + this.toString(), causedBy);
     }
 
+    public long getIndex() {
+        return index;
+    }
+
+    public long getLine() {
+        return line;
+    }
+
     /**
      * Make a printable string of this JSONTokener.
      *
