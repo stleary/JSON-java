@@ -1,6 +1,6 @@
 # Milestone 2
 
-Project milestone 2 assignment for 262P programming styles. This work for this assignment was done by both Trent Lilley and Joseph Lee.
+Project milestone 2 assignment for 262P programming styles. This work for this assignment was done by both **Trent Lilley** and **Joseph Lee**.
 
 ## Simplifying Assumptions
 
