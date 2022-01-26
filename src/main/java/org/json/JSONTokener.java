@@ -209,6 +209,12 @@ public class JSONTokener {
         this.previous = (char) c;
         return this.previous;
     }
+    
+    /**
+     * Get the last character read from the input or '\0' if nothing has been read yet.
+     * @return the last character read from the input.
+     */
+    protected char getPrevious() { return this.previous;}
 
     /**
      * Increments the internal indexes according to the previous character
@@ -428,10 +434,18 @@ public class JSONTokener {
             return this.nextString(c);
         case '{':
             this.back();
-            return new JSONObject(this);
+            try {
+                return new JSONObject(this);
+            } catch (StackOverflowError e) {
+                throw new JSONException("JSON Array or Object depth too large to process.", e);
+            }
         case '[':
             this.back();
-            return new JSONArray(this);
+            try {
+                return new JSONArray(this);
+            } catch (StackOverflowError e) {
+                throw new JSONException("JSON Array or Object depth too large to process.", e);
+            }
         }
 
         /*
