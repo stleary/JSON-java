@@ -41,13 +41,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.XML;
-import org.json.XMLParserConfiguration;
-import org.json.XMLXsiTypeConverter;
+import org.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -1068,5 +1062,101 @@ public class XMLTest {
             });
             fail("Expected to be unable to modify the config");
         } catch (Exception ignored) { }
+    }
+
+
+    //-------------------------------Milestone1
+
+
+    /**
+     * Verifies that a key pair can be extracted given a path to the key
+     */
+    @Test
+    public void testGetXMLSubObjectKeyPair() {
+        String xmlStr =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<!-- this is a comment -->\n"+
+                "<addresses>\n"+
+                "   <address>\n"+
+                "       <![CDATA[ this is -- <another> comment ]]>\n"+
+                "       <name>Joe Tester</name>\n"+
+                "       <!-- this is a - multi line \n"+
+                "            comment -->\n"+
+                "       <street>Baker street 5</street>\n"+
+                "   </address>\n"+
+                "</addresses>";
+
+        JSONObject jsonObject = XML.toJSONObject(new StringReader(xmlStr), new JSONPointer("/addresses/address/name/"));
+        String expectedStr = "{\"name\":\"Joe Tester\"}";
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+
+    /**
+     * Verifies that a sub object can be extracted from the larger XML
+     */
+    @Test
+    public void testGetXMLSubObject() {
+        String xmlStr= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<contact>\n" +
+            "  <nick>Crista</nick>\n" +
+            "  <name>Crista Lopes</name>\n" +
+            "  <address>\n" +
+            "    <street>Ave of Nowhere</street>\n" +
+            "    <zipcode>92614</zipcode>\n" +
+            "  </address>\n" +
+            "</contact>";
+
+        JSONObject jsonObject = XML.toJSONObject(new StringReader(xmlStr), new JSONPointer("/contact/address/"));
+        String expectedStr = "{\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"}}";
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+    /**
+     * Verifies that a key pair within a converted xml can be replaced with another key pair
+     */
+    @Test
+    public void testReplaceSubObjectKeyPair() throws IOException {
+        String xmlStr= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<contact>\n" +
+            "  <nick>Crista</nick>\n" +
+            "  <name>Crista Lopes</name>\n" +
+            "  <address>\n" +
+            "    <street>Ave of Nowhere</street>\n" +
+            "    <zipcode>92614</zipcode>\n" +
+            "  </address>\n" +
+            "</contact>";
+
+
+        JSONObject replacement = XML.toJSONObject("<street>Main Street</street>\n");
+        JSONObject jsonObject = XML.toJSONObject(new StringReader(xmlStr), new JSONPointer("/contact/address/street/"), replacement);
+        String expectedStr = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":\"92614\",\"street\":\"Main Street\"},\"name\":\"Crista Lopes\"}}";
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+    }
+
+
+    /**
+     * Verifies that a sub object within a converted xml can be replaced with another json
+     */
+    @Test
+    public void testReplaceSubObject() throws IOException {
+        String xmlStr= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<contact>\n" +
+            "  <nick>Crista</nick>\n" +
+            "  <name>Crista Lopes</name>\n" +
+            "  <address>\n" +
+            "    <street>Ave of Nowhere</street>\n" +
+            "    <zipcode>92614</zipcode>\n" +
+            "  </address>\n" +
+            "</contact>";
+
+        JSONObject replacement = XML.toJSONObject("<address><street>Main Street</street><zipcode>00000</zipcode></address>\n");
+        JSONObject jsonObject = XML.toJSONObject(new StringReader(xmlStr), new JSONPointer("/contact/address/"), replacement);
+        String expectedStr = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":\"00000\",\"street\":\"Main Street\"},\"name\":\"Crista Lopes\"}}";
+        JSONObject expectedJsonObject = new JSONObject(expectedStr);
+        Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
     }
 }
