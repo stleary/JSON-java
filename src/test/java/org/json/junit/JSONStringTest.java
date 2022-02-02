@@ -346,12 +346,49 @@ public class JSONStringTest {
 
     @Test
     public void testStringLongValue() throws Exception  {
-        JSONObject json = new JSONObject("{\"number_1\":\"01234\", \"number_2\": \"332211\"}");
+        JSONObject json = new JSONObject("{\"num1\":\"01234\", \"num2\": \"332211\", \"num3\":\"0987\"}");
 
-        assertEquals(1234L, json.getLong("number_1"));
-        assertEquals(1234L, json.optLong("number_1"));
-        assertEquals(332211L, json.getLong("number_2"));
-        assertEquals(332211L, json.optLong("number_2"));
+        assertEquals(1234L, json.getLong("num1"));
+        assertEquals(1234L, json.optLong("num1"));
+        assertEquals(332211L, json.getLong("num2"));
+        assertEquals(332211L, json.optLong("num2"));
+        assertEquals(987, json.getLong("num3"));
+        assertEquals(987, json.optLong("num3"));
+    }
+
+
+    /**
+     * Test for parsing int numerals from String format
+     *
+     */
+
+    @Test
+    public void testStringIntValue() throws Exception   {
+        JSONObject json = new JSONObject("{\"num1\":\"01234\", \"num2\": \"332211\", \"num3\":\"0987\"}");
+
+        assertEquals(1234, json.getInt("num1"));
+        assertEquals(1234, json.optInt("num1"));
+        assertEquals(332211, json.getInt("num2"));
+        assertEquals(332211, json.optInt("num2"));
+        assertEquals(987, json.getInt("num3"));
+        assertEquals(987, json.optInt("num3"));
+    }
+
+    /**
+     * Test for parsing double numerals from String format
+     *
+     */
+
+    @Test
+    public void testStringDoubleValue() throws Exception    {
+        JSONObject json = new JSONObject("{\"num1\":\".123\", \"num2\": \"0.123\", \"num3\":\"8.123\"}");
+
+        //assertEquals(.123, json.getDouble("num1"), 0);
+        assertEquals(.123, json.optDouble("num1"), 0);
+        assertEquals(0.123, json.getDouble("num2"), 0);
+        assertEquals(0.123, json.optDouble("num2"), 0);
+        assertEquals(8.123, json.getDouble("num3"), 0);
+        assertEquals(8.123, json.optDouble("num3"), 0);
     }
 
 
