@@ -2216,61 +2216,42 @@ public class JSONObject {
      *      caller should catch this and wrap it in a {@link JSONException} if applicable.
      */
     protected static Number stringToNumber(final String val) throws NumberFormatException {
-        char initial = val.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-') {
+        String trimmedVal = val.trim();
+        char initial = trimmedVal.charAt(0);
+        if (trimmedVal.matches("-?\\d?(\\.\\d+)?")) {
             // decimal representation
-            if (isDecimalNotation(val)) {
+            if (isDecimalNotation(trimmedVal)) {
                 // Use a BigDecimal all the time so we keep the original
                 // representation. BigDecimal doesn't support -0.0, ensure we
                 // keep that by forcing a decimal.
                 try {
-                    BigDecimal bd = new BigDecimal(val);
+                    BigDecimal bd = new BigDecimal(trimmedVal);
                     if(initial == '-' && BigDecimal.ZERO.compareTo(bd)==0) {
-                        return Double.valueOf(-0.0);
+                        return -0.0;
                     }
                     return bd;
                 } catch (NumberFormatException retryAsDouble) {
-                    // this is to support "Hex Floats" like this: 0x1.0P-1074
-                    try {
-                        Double d = Double.valueOf(val);
-                        if(d.isNaN() || d.isInfinite()) {
-                            throw new NumberFormatException("val ["+val+"] is not a valid number.");
-                        }
-                        return d;
-                    } catch (NumberFormatException ignore) {
-                        throw new NumberFormatException("val ["+val+"] is not a valid number.");
-                    }
-                }
-            }
-            // block items like 00 01 etc. Java number parsers treat these as Octal.
-            if(initial == '0' && val.length() > 1) {
-                char at1 = val.charAt(1);
-                if(at1 >= '0' && at1 <= '9') {
                     throw new NumberFormatException("val ["+val+"] is not a valid number.");
                 }
-            } else if (initial == '-' && val.length() > 2) {
-                char at1 = val.charAt(1);
-                char at2 = val.charAt(2);
-                if(at1 == '0' && at2 >= '0' && at2 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
-                }
-            }
-            // integer representation.
-            // This will narrow any values to the smallest reasonable Object representation
-            // (Integer, Long, or BigInteger)
+            } else {
+                // integer representation.
+                // This will narrow any values to the smallest reasonable Object representation
+                // (Integer, Long, or BigInteger)
 
-            // BigInteger down conversion: We use a similar bitLength compare as
-            // BigInteger#intValueExact uses. Increases GC, but objects hold
-            // only what they need. i.e. Less runtime overhead if the value is
-            // long lived.
-            BigInteger bi = new BigInteger(val);
-            if(bi.bitLength() <= 31){
-                return Integer.valueOf(bi.intValue());
+                // BigInteger down conversion: We use a similar bitLength compare as
+                // BigInteger#intValueExact uses. Increases GC, but objects hold
+                // only what they need. i.e. Less runtime overhead if the value is
+                // long lived.
+
+                BigInteger bi = new BigInteger(trimmedVal);
+                if(bi.bitLength() <= 31){
+                    return bi.intValue();
+                }
+                if(bi.bitLength() <= 63){
+                    return bi.longValue();
+                }
+                return bi;
             }
-            if(bi.bitLength() <= 63){
-                return Long.valueOf(bi.longValue());
-            }
-            return bi;
         }
         throw new NumberFormatException("val ["+val+"] is not a valid number.");
     }
