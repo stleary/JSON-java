@@ -27,6 +27,8 @@ SOFTWARE.
 import static org.junit.Assert.*;
 
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 import org.json.*;
@@ -407,6 +409,39 @@ public class JSONStringTest {
         assertEquals(8.123, json.optFloat("num3"), 0.000001);
     }
 
+
+    /**
+     * Test for parsing BigDecimal numerals from String format
+     *
+     */
+
+    @Test
+    public void testStringBigDecimalValue() throws Exception    {
+        JSONObject json = new JSONObject("{\"num1\":\".123\", \"num2\": \"0.123\", \"num3\":\"8.123\"}");
+
+        assertEquals(new BigDecimal(".123"), json.getBigDecimal("num1"));
+        assertEquals(new BigDecimal(".123"), json.optBigDecimal("num1", BigDecimal.ONE));
+        assertEquals(new BigDecimal("0.123"), json.getBigDecimal("num2"));
+        assertEquals(new BigDecimal("0.123"), json.optBigDecimal("num2", BigDecimal.ONE));
+        assertEquals(new BigDecimal("8.123"), json.getBigDecimal("num3"));
+        assertEquals(new BigDecimal("8.123"), json.optBigDecimal("num3", BigDecimal.ONE));
+    }
+
+    /**
+     * Test for parsing BigInteger numerals from String format
+     */
+
+    @Test
+    public void testStringBigIntegerValue() throws Exception    {
+        JSONObject json = new JSONObject("{\"num1\":\"01234\", \"num2\": \"332211\", \"num3\":\"0987\"}");
+
+        assertEquals(BigInteger.valueOf(1234), json.getBigInteger("num1"));
+        assertEquals(BigInteger.valueOf(1234), json.getBigInteger("num1"));
+        assertEquals(BigInteger.valueOf(332211), json.getBigInteger("num2"));
+        assertEquals(BigInteger.valueOf(332211), json.getBigInteger("num2"));
+        assertEquals(BigInteger.valueOf(987), json.getBigInteger("num3"));
+        assertEquals(BigInteger.valueOf(987), json.getBigInteger("num3"));
+    }
 
     /**
      * A JSONString that returns a valid JSON string value.
