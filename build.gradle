@@ -32,7 +32,7 @@ subprojects {
 group = 'org.json'
 version = 'v20211205-SNAPSHOT'
 description = 'JSON in Java'
-sourceCompatibility = '1.7'
+sourceCompatibility = '11'
 
 configurations.all {
 }
