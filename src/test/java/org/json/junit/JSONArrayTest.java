@@ -29,8 +29,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -47,6 +49,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointerException;
+import org.json.JSONTokener;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -1282,4 +1285,17 @@ public class JSONArrayTest {
 		assertTrue("expected jsonArray.length() == 0", jsonArray.length() == 0); //Check if its length is 0
 		jsonArray.getInt(0); //Should throws org.json.JSONException: JSONArray[0] not found
 	}
+
+    /**
+    * Tests for stack overflow. See https://github.com/stleary/JSON-java/issues/654
+    */
+    @Test(expected = JSONException.class)
+    public void issue654StackOverflowInputWellFormed() {
+        //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
+        final InputStream resourceAsStream = JSONObjectTest.class.getClassLoader().getResourceAsStream("Issue654WellFormedArray.json");
+        JSONTokener tokener = new JSONTokener(resourceAsStream);
+        JSONArray json_input = new JSONArray(tokener);
+        assertNotNull(json_input);
+        fail("Excepected Exception.");
+    }
 }

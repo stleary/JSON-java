@@ -35,6 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -3350,5 +3351,51 @@ public class JSONObjectTest {
         jsonObject.clear(); //Clears the JSONObject
         assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
+    }
+
+    /**
+    * Tests for stack overflow. See https://github.com/stleary/JSON-java/issues/654
+    */
+    @Test(expected = JSONException.class)
+    public void issue654StackOverflowInput() {
+        //String base64Bytes ="eyJHWiI6Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7c3t7e3t7e3vPAAAAAAAAAHt7e3t7e3t7e3t7e3t7e3t7e3t7e1ste3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e88AAAAAAAAAe3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7f3syMv//e3t7e3t7e3t7e3t7e3sx//////8=";
+        //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
+        String input = "{\"GZ\":[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{s{{{{{{{";
+        JSONObject json_input = new JSONObject(input);
+        assertNotNull(json_input);
+        fail("Excepected Exception.");
+    }
+
+    /**
+    * Tests for incorrect object/array nesting. See https://github.com/stleary/JSON-java/issues/654
+    */
+    @Test(expected = JSONException.class)
+    public void issue654IncorrectNestingNoKey1() {
+        JSONObject json_input = new JSONObject("{{\"a\":0}}");
+        assertNotNull(json_input);
+        fail("Excepected Exception.");
+    }
+
+    /**
+    * Tests for incorrect object/array nesting. See https://github.com/stleary/JSON-java/issues/654
+    */
+    @Test(expected = JSONException.class)
+    public void issue654IncorrectNestingNoKey2() {
+        JSONObject json_input = new JSONObject("{[\"a\"]}");
+        assertNotNull(json_input);
+        fail("Excepected Exception.");
+    }
+    
+    /**
+    * Tests for stack overflow. See https://github.com/stleary/JSON-java/issues/654
+    */
+    @Test(expected = JSONException.class)
+    public void issue654StackOverflowInputWellFormed() {
+        //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
+        final InputStream resourceAsStream = JSONObjectTest.class.getClassLoader().getResourceAsStream("Issue654WellFormedObject.json");
+        JSONTokener tokener = new JSONTokener(resourceAsStream);
+        JSONObject json_input = new JSONObject(tokener);
+        assertNotNull(json_input);
+        fail("Excepected Exception.");
     }
 }
