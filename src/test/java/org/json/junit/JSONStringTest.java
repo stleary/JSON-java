@@ -383,12 +383,28 @@ public class JSONStringTest {
     public void testStringDoubleValue() throws Exception    {
         JSONObject json = new JSONObject("{\"num1\":\".123\", \"num2\": \"0.123\", \"num3\":\"8.123\"}");
 
-        //assertEquals(.123, json.getDouble("num1"), 0);
+        assertEquals(.123, json.getDouble("num1"), 0);
         assertEquals(.123, json.optDouble("num1"), 0);
         assertEquals(0.123, json.getDouble("num2"), 0);
         assertEquals(0.123, json.optDouble("num2"), 0);
         assertEquals(8.123, json.getDouble("num3"), 0);
         assertEquals(8.123, json.optDouble("num3"), 0);
+    }
+
+    /**
+     * Test for parsing float numerals from String format
+     */
+
+    @Test
+    public void testStringFloatValue() throws Exception {
+        JSONObject json = new JSONObject("{\"num1\":\".123\", \"num2\": \"0.123\", \"num3\":\"8.123\"}");
+
+        assertEquals(.123, json.getFloat("num1"), 0.000001);
+        assertEquals(.123, json.optFloat("num1"), 0.000001);
+        assertEquals(0.123, json.getFloat("num2"), 0.000001);
+        assertEquals(0.123, json.optFloat("num2"), 0.000001);
+        assertEquals(8.123, json.getFloat("num3"), 0.000001);
+        assertEquals(8.123, json.optFloat("num3"), 0.000001);
     }
 
 
