@@ -33,6 +33,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -1283,4 +1284,264 @@ public class XML {
     }
 
 
+    //----------------------------------- Milestone 3
+    static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) {
+        JSONObject jo = new JSONObject();
+        XMLTokener x = new XMLTokener(reader);
+        XMLParserConfiguration config = new XMLParserConfiguration().withKeepStrings(true);
+
+        while (x.more()) {
+            x.skipPast("<");
+            if (x.more()) {
+                replaceKeys(x, jo, keyTransformer, null, config);
+            }
+
+        } // METHOD LOOP
+
+        return jo;
+    }
+
+    private static boolean replaceKeys(XMLTokener x, JSONObject context, Function<String, String> keyTransformer, String name, XMLParserConfiguration config) throws JSONException {
+        char c;
+        int i;
+        JSONObject jsonObject = null;
+        String string;
+        String tagName;
+        Object token;
+        XMLXsiTypeConverter<?> xmlXsiTypeConverter;
+
+        token = x.nextToken();
+        System.out.println("TOKEN: " + token);
+
+        /* [1]case '!': we have a comment */
+        if (token == BANG) {
+            c = x.next();
+
+            // skip past comments
+            if (c == '-') {
+                if (x.next() == '-') {
+                    x.skipPast("-->");
+                    return false;
+                }
+                x.back();
+            }
+
+            // handle CDATA
+            else if (c == '[') {
+                token = x.nextToken();
+                if ("CDATA".equals(token)) {
+                    if (x.next() == '[') {
+                        string = x.nextCDATA();
+                        if (string.length() > 0) {
+                            context.accumulate(config.getcDataTagName(), string);
+                        }
+                        return false;
+                    }
+                }
+                throw x.syntaxError("Expected 'CDATA['");
+            }
+            i = 1;
+            do {
+                token = x.nextMeta();
+                if (token == null) {
+                    throw x.syntaxError("Missing '>' after '<!'.");
+                } else if (token == LT) {
+                    i += 1;
+                } else if (token == GT) {
+                    i -= 1;
+                }
+            } while (i > 0);
+            return false;
+        } // END '!' CASE
+
+        /* [1]case '?': skip all xml headers */
+        else if (token == QUEST) { // CLOSE
+            System.out.println("  pass");
+            x.skipPast("?>");
+            return false;
+        } // END '?' CASE
+
+        /* [1]case '/': check for errors in closing tag, go to next recursion */
+        else if (token == SLASH) {
+            token = x.nextToken();
+            System.out.println("  passed"); // DEBUG
+            if (name == null) {
+                throw x.syntaxError("Mismatched close tag " + token);
+            }
+            if (!token.equals(name)) {
+                throw x.syntaxError("Mismatched " + name + " and " + token);
+            }
+            if (x.nextToken() != GT) {
+                throw x.syntaxError("Misshaped close tag");
+            }
+            return true;
+        } // END '/' CASE
+
+        /* [2]case: any other char, we may have bad XML */
+        else if (token instanceof Character) {
+            throw x.syntaxError("Misshaped tag");
+
+        } // END OTHER CASE
+
+        /* [1]default: we have an opening tag name */
+        else {
+            tagName = (String) token;
+            token = null;
+            jsonObject = new JSONObject();
+            boolean nilAttributeFound = false;
+            xmlXsiTypeConverter = null;
+
+            for (;;) {
+                if (token == null) {
+                    token = x.nextToken();
+                    System.out.println("  next: |" + tagName + "| " + token);
+                }
+
+                /* [2]Case not '/' or '>': ??? */
+                if (token instanceof String) {
+                    string = (String) token;
+                    token = x.nextToken();
+                    System.out.println("  next: |" + tagName + "| |" + string + "| " + token);
+                    if (token == EQ) {
+                        token = x.nextToken();
+                        if (!(token instanceof String)) {
+                            throw x.syntaxError("Missing value");
+                        }
+
+                        if (config.isConvertNilAttributeToNull()
+                            && NULL_ATTR.equals(string)
+                            && Boolean.parseBoolean((String) token)) {
+                            nilAttributeFound = true;
+                        }
+
+                        else if(config.getXsiTypeMap() != null && !config.getXsiTypeMap().isEmpty()
+                            && TYPE_ATTR.equals(string)) {
+                            xmlXsiTypeConverter = config.getXsiTypeMap().get(token);
+                        }
+
+                        else if (!nilAttributeFound) {
+                            jsonObject.accumulate(string,
+                                config.isKeepStrings()
+                                    ? ((String) token)
+                                    : stringToValue((String) token));
+                        }
+                        token = null;
+                    }
+
+                    else {
+                        jsonObject.accumulate(string, "");
+                    }
+
+
+                }
+
+                /* [2]Case '/': we have an empty tag */
+                else if (token == SLASH) {
+                    // Empty tag <.../>
+                    if (x.nextToken() != GT) {
+                        throw x.syntaxError("Misshaped tag");
+                    }
+                    if (config.getForceList().contains(tagName)) {
+                        // Force the value to be an array
+                        if (nilAttributeFound) {
+                            context.append(tagName, JSONObject.NULL);
+                        } else if (jsonObject.length() > 0) {
+                            context.append(tagName, jsonObject);
+                        } else {
+                            context.put(tagName, new JSONArray());
+                        }
+                    } else {
+                        if (nilAttributeFound) {
+                            context.accumulate(tagName, JSONObject.NULL);
+                        } else if (jsonObject.length() > 0) {
+                            context.accumulate(tagName, jsonObject);
+                        } else {
+                            context.accumulate(tagName, "");
+                        }
+                    }
+                    return false;
+                }
+
+                /* [2]Case '>': opening tag close, now accessing content within tags */
+                else if (token == GT) {
+                    for (;;) {
+                        token = x.nextContent();
+                        System.out.println("  next: |" + tagName + "| |>| " + token) ;
+
+                        if (token == null) {
+                            if (tagName != null) {
+                                throw x.syntaxError("Unclosed tag " + tagName);
+                            }
+                            return false;
+                        }
+
+                        /*  hits when above is a string value (contents inside tag) */
+                        else if (token instanceof String) {
+                            string = (String) token;
+                            if (string.length() > 0) {
+                                if(xmlXsiTypeConverter != null) {
+                                    jsonObject.accumulate(config.getcDataTagName(),
+                                        stringToValue(string, xmlXsiTypeConverter));
+                                }
+                                else {
+                                    System.out.println("  accumulate: " + config.getcDataTagName() + ", " + string);
+
+                                    // KEY TRANSFORM
+                                    String key = null;
+                                    if (keyTransformer != null) {
+                                        key = keyTransformer.apply(config.getcDataTagName());
+                                    }
+
+                                    jsonObject.accumulate(key, config.isKeepStrings() ? string : stringToValue(string));
+                                    // END KEY TRANSFORM
+                                }
+                            }
+                        }
+
+                        /* hits when above is '<' */
+                        else if (token == LT) {
+                            // Nested element
+                            System.out.println("  ---recurse");
+                            if (replaceKeys(x, jsonObject, keyTransformer, tagName, config)) {
+                                System.out.println("  ---recursed true");
+                                if (config.getForceList().contains(tagName)) {
+                                    // Force the value to be an array
+                                    if (jsonObject.length() == 0) {
+                                        context.put(tagName, new JSONArray());
+                                    } else if (jsonObject.length() == 1 && jsonObject.opt(config.getcDataTagName()) != null) {
+                                        context.append(tagName, jsonObject.opt(config.getcDataTagName()));
+                                    } else {
+                                        context.append(tagName, jsonObject);
+                                    }
+                                } else {
+                                    if (jsonObject.length() == 0) {
+                                        context.accumulate(tagName, "");
+                                    } else if (jsonObject.length() == 1 && jsonObject.opt(config.getcDataTagName()) != null) { /*  */
+                                        context.accumulate(tagName, jsonObject.opt(config.getcDataTagName()));
+                                    } else {
+                                        System.out.println("  TEST: " + tagName + ", " + jsonObject);
+
+                                        // KEY TRANSFORM
+                                        String key = null;
+                                        if (keyTransformer != null) {
+                                            key = keyTransformer.apply(tagName);
+                                        }
+
+                                        context.accumulate(key, jsonObject);
+
+                                        // END KEY TRANSFORM
+                                    }
+                                }
+                                return false;
+                            }
+                        }
+                    }
+                }
+                else {
+                    throw x.syntaxError("Misshaped tag");
+                } //END [2]
+                System.out.println("  exit method");
+            }
+        } //END [1]
+    } // END METHOD
 }
