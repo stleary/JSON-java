@@ -36,6 +36,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -2225,7 +2227,7 @@ public class JSONObject {
     protected static Number stringToNumber(final String val) throws NumberFormatException {
         String trimmedVal = val.trim();
         char initial = trimmedVal.charAt(0);
-        if (trimmedVal.matches("-?\\d?(\\.\\d+)?")) {
+        if (isNumeric(trimmedVal)) {
             // decimal representation
             if (isDecimalNotation(trimmedVal)) {
                 // Use a BigDecimal all the time so we keep the original
@@ -2709,5 +2711,11 @@ public class JSONObject {
         return new JSONException(
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
+    }
+
+    private static boolean isNumeric(String str) {
+        ParsePosition pos = new ParsePosition(0);
+        NumberFormat.getInstance().parse(str, pos);
+        return str.length() == pos.getIndex();
     }
 }
