@@ -1,3 +1,19 @@
+# Milestone 2
+
+Project milestone 2 assignment for 262P programming styles. This work for this assignment was done by both **Trent Lilley** and **Joseph Lee**.
+
+## Simplifying Assumptions
+
+- As of now the additional functions do not support JSON arrays and assumes keypaths are unique to a single key.
+
+## Notes For the Grader
+
+- All additional code was appended to the bottom of XML.java. All tests were appended to the bottom of XMLTest.java.
+- The first method searches for and extracts the sub-object as XML and then runs this through the library's original XML parser.
+- The second method uses an almost identical, slightly modified version of the library's XML parser. The crucial changes are denoted by comments prefixed with REPLACE:
+
+<hr/>
+
 ![Json-Java logo](https://github.com/stleary/JSON-java/blob/master/images/JsonJava.png?raw=true)
 
 <sub><sup>image credit: Ismael Pérez Ortiz</sup></sub>
