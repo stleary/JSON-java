@@ -1,3 +1,15 @@
+# Milestone 3
+
+Project milestone 3 assignment for 262P programming styles. This work for this assignment was done by both **Trent Lilley** and **Joseph Lee**.
+
+## Simplifying Assumptions
+- As of now the additional functions do not support JSON arrays.
+
+## For the Graders
+- A custom parse function derived from the original was used. The important changes to the original can be found in XML.java in lines 1489-1496 and lines 1524-1532.
+- The tag name extracted from the XML is converted by the key transformer just before it is sent to the accumulator be transformed into JSON.
+- 4 test cases were appended to the bottom of XMLTest.java
+
 # Milestone 2
 
 Project milestone 2 assignment for 262P programming styles. This work for this assignment was done by both **Trent Lilley** and **Joseph Lee**.
