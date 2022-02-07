@@ -35,7 +35,7 @@ public class Example {
       //JSONObject jobj = XML.toJSONObject(xmlString);
 
       System.out.println("--------------RESULT--------------");
-      System.out.println(jobj);
+      System.out.println(jobj.toString(4));
     } catch (JSONException e) {System.out.println(e);}
   }
 }

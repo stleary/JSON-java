@@ -1285,7 +1285,7 @@ public class XML {
 
 
     //----------------------------------- Milestone 3
-    static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) {
+    public static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) {
         JSONObject jo = new JSONObject();
         XMLTokener x = new XMLTokener(reader);
         XMLParserConfiguration config = new XMLParserConfiguration().withKeepStrings(true);
