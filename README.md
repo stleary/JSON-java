@@ -10,6 +10,8 @@ Project milestone 3 assignment for 262P programming styles. This work for this a
 - The tag name extracted from the XML is converted by the key transformer just before it is sent to the accumulator be transformed into JSON.
 - 4 test cases were appended to the bottom of XMLTest.java
 
+<hr />
+
 # Milestone 2
 
 Project milestone 2 assignment for 262P programming styles. This work for this assignment was done by both **Trent Lilley** and **Joseph Lee**.
