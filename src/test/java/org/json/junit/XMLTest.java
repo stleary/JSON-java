@@ -40,6 +40,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.json.*;
 import org.junit.Rule;
@@ -1069,7 +1070,9 @@ public class XMLTest {
 
 
     /**
-     * Verifies that a key pair can be extracted given a path to the key
+     * Milestone 2 - Part 1
+     * Verifies that a key pair can be extracted given a path to the key1
+     * @authors Trent Lilley, Joseph Lee
      */
     @Test
     public void testGetXMLSubObjectKeyPair() {
@@ -1094,7 +1097,9 @@ public class XMLTest {
 
 
     /**
+     * Milestone 2 - Part 1
      * Verifies that a sub object can be extracted from the larger XML
+     * @authors Trent Lilley, Joseph Lee
      */
     @Test
     public void testGetXMLSubObject() {
@@ -1115,7 +1120,9 @@ public class XMLTest {
     }
 
     /**
+     * Milestone 2 - Part 2
      * Verifies that a key pair within a converted xml can be replaced with another key pair
+     * @authors Trent Lilley, Joseph Lee
      */
     @Test
     public void testReplaceSubObjectKeyPair() throws IOException {
@@ -1139,7 +1146,9 @@ public class XMLTest {
 
 
     /**
+     * Milestone 2 - Part 2
      * Verifies that a sub object within a converted xml can be replaced with another json
+     * @authors Trent Lilley, Joseph Lee
      */
     @Test
     public void testReplaceSubObject() throws IOException {
@@ -1158,5 +1167,101 @@ public class XMLTest {
         String expectedStr = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":\"00000\",\"street\":\"Main Street\"},\"name\":\"Crista Lopes\"}}";
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
+    }
+
+    /**
+     *  Milestone 3
+     *  Unit test - testSimpleAddPrefix():
+     *  Checks if toJSONObject properly modifies the string with given prefix.
+     *
+     *  @authors Trent Lilley, Joseph Lee
+     */
+    @Test
+    public void testSimplePrefix(){
+        String xmlStr = "<contact>c</contact>";
+        String prefix = "swe262_";
+        Function<String, String> transformer = (str) -> {
+            str = prefix + str;
+            return str;
+        };
+
+        JSONObject jsonObject = XML.toJSONObject(new StringReader(xmlStr), transformer);
+        String[] names = JSONObject.getNames(jsonObject);
+        assertEquals("swe262_contact", names[0]);
+    }
+
+    /**
+     *  Milestone 3
+     *  Unit test - handleNullReaderInput():
+     *  Checks if toJSONObject properly handles null input cases.
+     *
+     *  @authors Trent Lilley, Joseph Lee
+     */
+    @Test(expected=NullPointerException.class)
+    public void handleNullReaderInput() {
+        try {
+            Function<String, String> transformer = (str) -> {
+                str += "_K";
+                return str;
+            };
+            JSONObject jsonObject = XML.toJSONObject(new StringReader(null), transformer);
+            assertTrue("jsonObject should be empty", jsonObject.isEmpty());
+        } catch (JSONException e) { System.out.println(e); }
+    }
+
+    /**
+     *  Milestone 3
+     *  Unit test - handleUnescapeEntities():
+     *  Checks whether if unescape entities get handled
+     *
+     *  @authors Trent Lilley, Joseph Lee
+     */
+    @Test
+    public void handleUnescapedEntities() {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<contact>\n"+
+            "  <name>John Doe\n" +
+            "</contact>";
+
+        String prefix = "swe262_";
+
+        try {
+            Function<String, String> transformer = (str) -> {
+                str = prefix + str;
+                return str;
+            };
+            JSONObject jsonObject = XML.toJSONObject(new StringReader(xmlString), transformer);
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                "Mismatched name and contact at 75 [character 9 line 4]",
+                e.getMessage());
+        }
+    }
+
+    /**
+     *  Milestone 3
+     *  Unit test - handleEscapeFirst():
+     *  Checks if toJSONObject properly handles cases where XML is misshaped with
+     *  Tags that have escape first.
+     *
+     *  @authors Trent Lilley, Joseph Lee
+     */
+    @Test
+    public void handleEscapeFirst() {
+        String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+            "<contact>\n"+
+            "  </name>John Doe\n" +
+            "</contact>";
+        try {
+            Function<String, String> transformer = (str) -> {
+                str += "_K";
+                return str;
+            };
+            JSONObject jsonObject = XML.toJSONObject(new StringReader(xmlStr), transformer);
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                "Mismatched contact and name at 57 [character 8 line 3]",
+                e.getMessage());
+        }
     }
 }
