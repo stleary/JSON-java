@@ -2722,4 +2722,12 @@ public class JSONObject {
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
     }
+
+
+    /**
+     * Converts json nodes into a stream object
+     */
+    public Map<String, Object> getMap() {
+        return map;
+    }
 }
