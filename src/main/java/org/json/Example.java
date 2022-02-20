@@ -2,6 +2,9 @@ package org.json;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.json.JSONException;
@@ -21,21 +24,18 @@ public class Example {
         "  </address>\n" +
         "</contact>";
 
-    System.out.println("--------------SOURCE--------------\n" + xmlString);
+    String xmlString2 = "<Books><book><title>AAA</title><author>ASmith</author></book><book><title>BBB</title><author>BSmith</author></book></Books>";
+
+    //System.out.println("--------------SOURCE--------------\n" + xmlString);
+
+    JSONObject obj = XML.toJSONObject(xmlString);
+    System.out.println(obj.toString(4));
 
     System.out.println("--------------DEBUG--------------");
-    try {
-      //JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"));
-      Function<String, String> transformer = (str) -> {
-        str += "_K";
-        return str;
-      };
+    obj.toStream().forEach(System.out::println);
+    //System.out.println("--------------RESULT--------------");
 
-      JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), transformer);
-      //JSONObject jobj = XML.toJSONObject(xmlString);
 
-      System.out.println("--------------RESULT--------------");
-      System.out.println(jobj);
-    } catch (JSONException e) {System.out.println(e);}
+
   }
 }

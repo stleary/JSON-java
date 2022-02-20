@@ -36,18 +36,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -2724,8 +2716,118 @@ public class JSONObject {
     }
 
 
+    //................. Milestone 4
     /**
-     * Converts json nodes into a stream object
+     * Used to construct a stream of JSONObjects
+     */
+    private Stream.Builder<Object> builder = Stream.builder();
+
+    /**
+     * Holds all extracted key-value pairs from the fully developed map
+     */
+    //private HashMap<String, Object> nodes = new LinkedHashMap<>();
+    private List<Map.Entry<String, Object>> nodes = new ArrayList<>();
+
+
+    /**
+     * Constructs a stream of JSONObjects
+     * @return a stream object of Objects
+     */
+    public Stream<Object> toStream() {
+
+        for (Entry<String, Object> e : map.entrySet()) {
+            System.out.println("CURRENT ENTRY: " + e.getKey() + " | " + e.getValue() + " | type=" + e.getValue().getClass());
+
+            if (e.getValue() instanceof JSONObject) { // case JSONObject => recurse
+                System.out.println("  obj_inserted: " + e.getKey() + "=" + e.getValue());
+                Map.Entry<String, Object> data = new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue());
+                builder.add(data);
+                toStream((JSONObject) e.getValue());
+            }
+            else if (e.getValue() instanceof JSONArray) { // case JSONArray => split array
+                System.out.println("  arr_inserted: " + e.getKey() + "=" + e.getValue());
+                Map.Entry<String, Object> data = new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue());
+                builder.add(data);
+                toStream((JSONArray) e.getValue());
+            }
+            else { // case String
+                System.out.println("  str_inserted: " + e.getKey() + "=" + e.getValue());
+                Map.Entry<String, Object> data = new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue());
+                builder.add(data);
+            }
+        }
+        System.out.println();
+        System.out.println("----------------RESULTS-----------------");
+        return builder.build();
+    }
+
+    private void toStream(JSONObject subObj) {
+        System.out.println("NESTED SET: " + subObj.entrySet());
+        for (Entry<String, Object> e : subObj.entrySet()) {
+            System.out.println("  inside recursion JSONObject");
+            System.out.println("  CURRENT ENTRY: " + e.getKey() + " | " + e.getValue() + " | type=" + e.getValue().getClass());
+
+            if (e.getValue() instanceof JSONObject) { // case JSONObject, continue recursion
+                System.out.println("    obj_inserted: " + e.getKey() + "=" + e.getValue());
+                Map.Entry<String, Object> data = new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue());
+                builder.add(data);
+                toStream((JSONObject) e.getValue());
+            }
+            else if (e.getValue() instanceof JSONArray) { // case JSONArray => split array
+                System.out.println("    arr_inserted: " + e.getKey() + "=" + e.getValue());
+                Map.Entry<String, Object> data = new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue());
+                builder.add(data);
+                toStream((JSONArray) e.getValue());
+            }
+            else { // case String, return
+                System.out.println("    str_inserted: " + e.getKey() + "=" + e.getValue());
+                Map.Entry<String, Object> data = new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue());
+                builder.add(data);
+            }
+        }
+    }
+
+    private void toStream(JSONArray arr) {
+        /*
+        System.out.println("  entering recursion JSONArray");
+        if (arr.isEmpty()) return;
+
+        for (int i = 0; i < arr.length(); i++) { // iterate each array item
+            System.out.println("  array item: " + "[" + + i + "] " + arr.get(i) + ", type: " + arr.get(i).getClass());
+            nodes.put(i + "", arr.get(i));
+
+            if (arr.get(i) instanceof JSONObject) { // case JSONObject {"key1":val1, "key2":"val2"}
+                for (Entry<String, Object> e : ((JSONObject) arr.get(i)).entrySet()) {
+                    System.out.println("    nestarr_entry: " + e.getKey() + " | " + e.getValue() + " | " + e.getClass());
+
+                    if (e.getValue() instanceof JSONObject) {
+
+                    }
+                    else if (e.getValue() instanceof JSONArray) {
+
+                    }
+                    else {
+                        HashMap<String, Object> arrNodes = new HashMap<>();
+                        System.out.println("    neststr_inserted: " + e.getKey() + "=" + e.getValue());
+                        arrNodes.put(e.getKey(), e.getValue());
+                        builder.add(arrNodes);
+                    }
+                }
+            }
+            else if (arr.get(i) instanceof JSONArray) { // case JSONArray
+                toStream((JSONArray) arr.get(i));
+            }
+            else { // case node {key1=val2}
+
+            }
+        }
+
+         */
+    }
+
+    /**
+     * Temporary helper to get the map in Example class
+     * @return
      */
     public Map<String, Object> getMap() {
         return map;
