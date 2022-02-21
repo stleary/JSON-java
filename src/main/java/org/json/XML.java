@@ -835,7 +835,7 @@ public class XML {
                             sb.append(toString(val, key, config));
                         }
                     }
-                } else if ("".equals(value)) {
+                } else if (value instanceof String && ((String) value).length() == 0) {
                     sb.append('<');
                     sb.append(key);
                     sb.append("/>");
