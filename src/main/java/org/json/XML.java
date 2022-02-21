@@ -479,7 +479,7 @@ public class XML {
     // the one in JSONObject. Changes made here should be reflected there.
     // This method should not make calls out of the XML object.
     public static Object stringToValue(String string) {
-        if ("".equals(string)) {
+        if (string.length() == 0) {
             return string;
         }
 
