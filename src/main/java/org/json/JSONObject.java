@@ -2767,7 +2767,6 @@ public class JSONObject {
 
             // current is the node that gets streamed.
             JSONObject current = tree;
-            int length2 = tree.length();
             action.accept(current);
             Iterator<String> iter = current.keys();
 
@@ -2786,31 +2785,13 @@ public class JSONObject {
                     }
                     return false;
 
-                    // If next node is JSONObject
+                // If next node is JSONObject
                 } else if (current.get(nextKey) instanceof JSONObject) {
                     // Another JSONObject, advance
                     tree = current.getJSONObject(nextKey);
                     tryAdvance(action);
                     return false;
 
-                } else if (length2 > 1) {
-                    // leaf nodes, loop through
-//                    JSONArray subtree = current.getJSONArray(nextKey);
-                    Map<String, Object> subtree = tree.getMap();
-                    Iterator<String> keys = subtree.keySet().iterator();
-
-                    for (int i = 0; i < length2; i++) {
-
-                        String subkey = keys.next();
-                        if (subtree.get(subkey) != null) {
-                            JSONObject json = new JSONObject();
-                            json.put(subkey, subtree.get(subkey));
-                            tree = json;
-                            tryAdvance(action);
-                        }
-                    }
-
-                    return true;
                 } else {
                     // Leaf node
                     return false;

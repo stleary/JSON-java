@@ -42,7 +42,6 @@ public class ExampleStream {
         obj.toStream().filter(node -> node.has("author"))
         .forEach(node -> node.put("Rating", "TBD"));
         System.out.println(obj.toString(4));
-//
 
         System.out.println("EX 2:");
         List<String> titles = obj.toStream()
