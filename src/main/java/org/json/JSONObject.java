@@ -2764,37 +2764,59 @@ public class JSONObject {
              *      The method takes a Consumer that’s used to consume elements of the Spliterator
              *      one by one sequentially and returns false if there’re no elements to be traversed.
              */
+
+            // current is the node that gets streamed.
             JSONObject current = tree;
+            int length2 = tree.length();
             action.accept(current);
             Iterator<String> iter = current.keys();
 
             // Recursive traversal down the tree nodes.
-            while(iter.hasNext()){
+            while (iter.hasNext()) {
                 nextKey = iter.next();
 
+                // If next node is JSON Array
                 if (current.get(nextKey) instanceof JSONArray) {
                     JSONArray subtree = current.getJSONArray(nextKey);
 
-                    for(int i = 0; i < subtree.length(); i++ ){
+                    for (int i = 0; i < subtree.length(); i++) {
                         // Advance for each JSONObject in the JSONArray
                         tree = subtree.getJSONObject(i);
                         tryAdvance(action);
                     }
                     return false;
 
+                    // If next node is JSONObject
                 } else if (current.get(nextKey) instanceof JSONObject) {
                     // Another JSONObject, advance
                     tree = current.getJSONObject(nextKey);
                     tryAdvance(action);
                     return false;
 
+                } else if (length2 > 1) {
+                    // leaf nodes, loop through
+//                    JSONArray subtree = current.getJSONArray(nextKey);
+                    Map<String, Object> subtree = tree.getMap();
+                    Iterator<String> keys = subtree.keySet().iterator();
+
+                    for (int i = 0; i < length2; i++) {
+
+                        String subkey = keys.next();
+                        if (subtree.get(subkey) != null) {
+                            JSONObject json = new JSONObject();
+                            json.put(subkey, subtree.get(subkey));
+                            tree = json;
+                            tryAdvance(action);
+                        }
+                    }
+
+                    return true;
                 } else {
-                    // leaf node
+                    // Leaf node
                     return false;
                 }
             }
-
-            if(tree == root){
+            if (tree == root) {
                 return false;
             } else {
                 return true;

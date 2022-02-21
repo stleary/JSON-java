@@ -23,8 +23,6 @@ public class ExampleStream {
                             "<title>BBB</title>" +
                             "<author>BSmith</author>" +
                         "</book>" +
-                    "</Books>" +
-                        "<Books>" +
                         "<book>" +
                         "<title>CCC</title>" +
                         "<author>CSmith</author>" +
@@ -33,15 +31,18 @@ public class ExampleStream {
                         "<title>DDD</title>" +
                         "<author>DSmith</author>" +
                         "</book>" +
-                        "</Books>");
+                        "</Books>"
+        );
 
         System.out.println("EX 1:");
         JSONPointer ptr = new JSONPointer("/Books/book");
-        obj.toStream().forEach(node -> System.out.println(node.toString()));
-//                .filter(node -> node.has("author"))
-//                .forEach(node -> node.put("Rating", "TBD"));
-//        System.out.println(obj.toString(4));
+        obj.toStream().forEach(node -> System.out.println("Node: " + node.toString()));
 
+        System.out.println("EX 1.2:");
+        obj.toStream().filter(node -> node.has("author"))
+        .forEach(node -> node.put("Rating", "TBD"));
+        System.out.println(obj.toString(4));
+//
 
         System.out.println("EX 2:");
         List<String> titles = obj.toStream()
