@@ -14,27 +14,50 @@ import org.json.XML;
 public class ExampleStream {
     public static void main(String[] args) {
         JSONObject obj = XML.toJSONObject(
-                "<Books><book>" +
-                        "<title>AAA</title>" +
-                        "<author>ASmith</author>" +
-                        "</book><book>" +
-                        "<title>BBB</title>" +
-                        "<author>BSmith</author>" +
-                        "</book></Books>");
+                "<Books>" +
+                        "<book>" +
+                            "<title>AAA</title>" +
+                            "<author>ASmith</author>" +
+                        "</book>" +
+                        "<book>" +
+                            "<title>BBB</title>" +
+                            "<author>BSmith</author>" +
+                        "</book>" +
+                    "</Books>" +
+                        "<Books>" +
+                        "<book>" +
+                        "<title>CCC</title>" +
+                        "<author>CSmith</author>" +
+                        "</book>" +
+                        "<book>" +
+                        "<title>DDD</title>" +
+                        "<author>DSmith</author>" +
+                        "</book>" +
+                        "</Books>");
 
         System.out.println("EX 1:");
+        JSONPointer ptr = new JSONPointer("/Books/book");
         obj.toStream().forEach(node -> System.out.println(node.toString()));
+//                .filter(node -> node.has("author"))
+//                .forEach(node -> node.put("Rating", "TBD"));
+//        System.out.println(obj.toString(4));
+
 
         System.out.println("EX 2:");
-        List<String> titles = obj.toStream().map(node -> node.toString())
+        List<String> titles = obj.toStream()
+                .filter(node -> node.has("title"))
+                .map(node -> node.get("title").toString())
                 .collect(Collectors.toList());
 
+        System.out.println("Titles List:");
         titles.forEach(name -> System.out.println(name));
 
         System.out.println("EX 3:");
-        obj.toStream().filter(node -> node.has("title")).forEach(node ->
-                node.put("title", "new" + node.get("title")));
+        obj.toStream()
+                .filter(node -> node.has("title"))
+                .forEach(node -> node.put("title", "new_" + node.get("title")));
 
+        System.out.println("Modified Titles:");
         System.out.println(obj.toString(4));
 
 

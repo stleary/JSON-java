@@ -2723,26 +2723,22 @@ public class JSONObject {
      * It streams nodes using Depth First search order.
      *
      */
-    // TODO: Extend it with toStream Method
-/*
-        JSON OBJECT is a tree, and we will be streaming a tree
-        Stream per node, stream just leaf nodes, strea
-        1)Traverse the tree, 2) catch the node, and  put it into a stream the node that is targeted
-        Recursive data structure
-        Stream of nodes... the stream should allow chaining of nodes
-        Stream path?
-
- */
-
     public Map<String, Object> getMap() {
         return map;
 
     }
 
 
-    // TODO: Spliterator to partition and stream the data
-    public Stream<JSONObject> toStream(){
+    /**
+     * Milestone 4 -
+     *
+     *  Streaming of JSONObject class.
+     *  Utilizes Spliterator class, which traverses down all of the nodes within the tryAdvance method.
+     *  Streaming is performed in series, thus trySplit is not implemented.
+     *
+     */
 
+    public Stream<JSONObject> toStream(){
         return StreamSupport.stream(this.spliterator(), false);
     }
 
@@ -2754,13 +2750,10 @@ public class JSONObject {
 
         private JSONObject root;
         private JSONObject tree;
-        private int objsize;
-        private int curr_index;
         private String nextKey;
 
         TreeSpliterator(JSONObject t) {
             this.root = this.tree = t;
-            objsize = this.root.length();
         }
 
         @Override
@@ -2775,37 +2768,31 @@ public class JSONObject {
             action.accept(current);
             Iterator<String> iter = current.keys();
 
-
-            // TODO: Traversing down the tree
-            if(!iter.hasNext()){
-                return false;
-            }
-
+            // Recursive traversal down the tree nodes.
             while(iter.hasNext()){
                 nextKey = iter.next();
 
                 if (current.get(nextKey) instanceof JSONArray) {
                     JSONArray subtree = current.getJSONArray(nextKey);
 
-                    System.out.println(subtree.length());
-                    JSONObject test = subtree.getJSONObject(0);
-                    JSONObject test2 = subtree.getJSONObject(1);
-
                     for(int i = 0; i < subtree.length(); i++ ){
+                        // Advance for each JSONObject in the JSONArray
                         tree = subtree.getJSONObject(i);
                         tryAdvance(action);
                     }
-
-                    tryAdvance(action);
-                    return true;
+                    return false;
 
                 } else if (current.get(nextKey) instanceof JSONObject) {
+                    // Another JSONObject, advance
                     tree = current.getJSONObject(nextKey);
                     tryAdvance(action);
                     return false;
+
+                } else {
+                    // leaf node
+                    return false;
                 }
             }
-
 
             if(tree == root){
                 return false;
@@ -2814,22 +2801,8 @@ public class JSONObject {
             }
         }
 
-
         @Override
         public Spliterator<JSONObject> trySplit() {
-
-            // Returns a spliterator that covers the elements in underlying collection
-            // That will no longer be covered by the invoking spliterator
-
-//            if(input <= minimum size){
-//                return null;
-//            }
-//            else {
-////                split input in 2 chunks
-////                update "right chunk"
-////                reutnr spliterator for left chunk
-//            }
-
             return null;
         }
 
