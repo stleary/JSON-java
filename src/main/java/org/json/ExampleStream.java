@@ -1,0 +1,45 @@
+package org.json;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.json.JSONException;
+import org.json.JSONPointer;
+import org.json.JSONObject;
+import org.json.XML;
+
+public class ExampleStream {
+    public static void main(String[] args) {
+        JSONObject obj = XML.toJSONObject(
+                "<Books><book>" +
+                        "<title>AAA</title>" +
+                        "<author>ASmith</author>" +
+                        "</book><book>" +
+                        "<title>BBB</title>" +
+                        "<author>BSmith</author>" +
+                        "</book></Books>");
+
+        System.out.println("EX 1:");
+        obj.toStream().forEach(node -> System.out.println(node.toString()));
+
+        System.out.println("EX 2:");
+        List<String> titles = obj.toStream().map(node -> node.toString())
+                .collect(Collectors.toList());
+
+        titles.forEach(name -> System.out.println(name));
+
+        System.out.println("EX 3:");
+        obj.toStream().filter(node -> node.has("title")).forEach(node ->
+                node.put("title", "new" + node.get("title")));
+
+        System.out.println(obj.toString(4));
+
+
+//    obj.toStream().forEach(node -> do some transformation, possibly based on the path of the node);
+//    List<String> titles = obj.toStream().map(node -> extract value for key "title").collect(Collectors.toList());
+//      obj.toStream().filter(node -> node with certain properties).forEach(node -> do some transformation);
+    }
+}

@@ -36,18 +36,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -2725,9 +2719,131 @@ public class JSONObject {
 
 
     /**
-     * Converts json nodes into a stream object
+     * Converts tree of json nodes into a stream object
+     * It streams nodes using Depth First search order.
+     *
      */
+    // TODO: Extend it with toStream Method
+/*
+        JSON OBJECT is a tree, and we will be streaming a tree
+        Stream per node, stream just leaf nodes, strea
+        1)Traverse the tree, 2) catch the node, and  put it into a stream the node that is targeted
+        Recursive data structure
+        Stream of nodes... the stream should allow chaining of nodes
+        Stream path?
+
+ */
+
     public Map<String, Object> getMap() {
         return map;
+
+    }
+
+
+    // TODO: Spliterator to partition and stream the data
+    public Stream<JSONObject> toStream(){
+
+        return StreamSupport.stream(this.spliterator(), false);
+    }
+
+    public Spliterator<JSONObject> spliterator(){
+        return new TreeSpliterator(this);
+    }
+
+    static class TreeSpliterator implements Spliterator<JSONObject> {
+
+        private JSONObject root;
+        private JSONObject tree;
+        private int objsize;
+        private int curr_index;
+        private String nextKey;
+
+        TreeSpliterator(JSONObject t) {
+            this.root = this.tree = t;
+            objsize = this.root.length();
+        }
+
+        @Override
+        public boolean tryAdvance(Consumer<? super JSONObject> action) {
+
+            /** tryAdvance:
+             *      This is the main method used for stepping through a sequence.
+             *      The method takes a Consumer that’s used to consume elements of the Spliterator
+             *      one by one sequentially and returns false if there’re no elements to be traversed.
+             */
+            JSONObject current = tree;
+            action.accept(current);
+            Iterator<String> iter = current.keys();
+
+
+            // TODO: Traversing down the tree
+            if(!iter.hasNext()){
+                return false;
+            }
+
+            while(iter.hasNext()){
+                nextKey = iter.next();
+
+                if (current.get(nextKey) instanceof JSONArray) {
+                    JSONArray subtree = current.getJSONArray(nextKey);
+
+                    System.out.println(subtree.length());
+                    JSONObject test = subtree.getJSONObject(0);
+                    JSONObject test2 = subtree.getJSONObject(1);
+
+                    for(int i = 0; i < subtree.length(); i++ ){
+                        tree = subtree.getJSONObject(i);
+                        tryAdvance(action);
+                    }
+
+                    tryAdvance(action);
+                    return true;
+
+                } else if (current.get(nextKey) instanceof JSONObject) {
+                    tree = current.getJSONObject(nextKey);
+                    tryAdvance(action);
+                    return false;
+                }
+            }
+
+
+            if(tree == root){
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+
+        @Override
+        public Spliterator<JSONObject> trySplit() {
+
+            // Returns a spliterator that covers the elements in underlying collection
+            // That will no longer be covered by the invoking spliterator
+
+//            if(input <= minimum size){
+//                return null;
+//            }
+//            else {
+////                split input in 2 chunks
+////                update "right chunk"
+////                reutnr spliterator for left chunk
+//            }
+
+            return null;
+        }
+
+        @Override
+        public long estimateSize() {
+            return 0;
+        }
+
+        @Override
+        public int characteristics() {
+            return Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL;
+        }
+
     }
 }
+
+
