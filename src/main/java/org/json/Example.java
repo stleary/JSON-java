@@ -2,15 +2,16 @@ package org.json;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.json.JSONException;
 import org.json.JSONPointer;
 import org.json.JSONObject;
 import org.json.XML;
+
+import static java.util.stream.Collectors.toList;
 
 public class Example {
   public static void main(String[] args) {
@@ -28,12 +29,23 @@ public class Example {
 
     //System.out.println("--------------SOURCE--------------\n" + xmlString);
 
-    JSONObject obj = XML.toJSONObject(xmlString);
+    JSONObject obj = XML.toJSONObject(xmlString2);
     System.out.println(obj.toString(4));
 
     System.out.println("--------------DEBUG--------------");
+    System.out.println("--------------RESULT--------------");
+    //Stream<Map.Entry<String, Object>> stream1 = obj.toStream();
+    //Stream<Map.Entry<String, Object>> stream2 = obj.toStream();
+
     obj.toStream().forEach(System.out::println);
-    //System.out.println("--------------RESULT--------------");
+    System.out.println("KEYS");
+    List<String> keys = obj.toStream().map(Map.Entry::getKey).collect(toList());
+    System.out.println("VALS");
+    List<Object> vals = obj.toStream().map(Map.Entry::getValue).collect(toList());
+
+
+    System.out.println(keys);
+    System.out.println(vals);
 
 
 
