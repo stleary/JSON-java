@@ -2750,6 +2750,7 @@ public class JSONObject {
 
         private JSONObject root;
         private JSONObject tree;
+        private int json_length;
         private String nextKey;
 
         TreeSpliterator(JSONObject t) {
@@ -2767,6 +2768,7 @@ public class JSONObject {
 
             // current is the node that gets streamed.
             JSONObject current = tree;
+            json_length = current.length();
             action.accept(current);
             Iterator<String> iter = current.keys();
 
@@ -2776,14 +2778,28 @@ public class JSONObject {
 
                 // If next node is JSON Array
                 if (current.get(nextKey) instanceof JSONArray) {
-                    JSONArray subtree = current.getJSONArray(nextKey);
+                    JSONArray jsonArray = current.getJSONArray(nextKey);
 
-                    for (int i = 0; i < subtree.length(); i++) {
-                        // Advance for each JSONObject in the JSONArray
-                        tree = subtree.getJSONObject(i);
-                        tryAdvance(action);
+                    if(jsonArray.length() > 1){
+                        for (int i = 0; i < jsonArray.length(); i++) {
+
+                            tree = jsonArray.getJSONObject(i);
+                            tryAdvance(action);
+
+//                            // Advance for each JSONObject in the JSONArray
+//                            JSONObject tmp_json = jsonArray.getJSONObject(i);
+//                            Iterator<String> subkeys = tmp_json.keys();
+//                            String subkey = null;
+//
+//                            for(int j = 0; j < tmp_json.length(); j++){
+//                                subkey = subkeys.next();
+//                                JSONObject new_json = new JSONObject();
+//                                new_json.put(subkey, tmp_json.get(subkey));
+//                                tree = new_json;
+//                                tryAdvance(action);
+//                            }
+                        }
                     }
-                    return false;
 
                 // If next node is JSONObject
                 } else if (current.get(nextKey) instanceof JSONObject) {
@@ -2792,8 +2808,33 @@ public class JSONObject {
                     tryAdvance(action);
                     return false;
 
-                } else {
+                }
+//                else if(current.length() > 1){
+//                    // Advance for each JSONObject in the JSONArray
+//                    JSONObject new_json = new JSONObject();
+//                    new_json.put(nextKey, current.getJSONObject(nextKey));
+//                    tree = new_json;
+//                    tryAdvance(action);
+//                }
+                else {
+
                     // Leaf node
+//                    if(json_length > 1){
+//                        Iterator<String> key2 = current.keys();
+//                        String subkey = null;
+//
+//                        for(int j = 0; j < current.length(); j++){
+//                            subkey = key2.next();
+//                            if(current.get(subkey) != null ){
+//                                JSONObject new_json = new JSONObject();
+//                                new_json.put(subkey, current.get(subkey));
+//                                tree = new_json;
+//                                tryAdvance(action);
+//                            }
+//                        }
+//                    }
+
+
                     return false;
                 }
             }

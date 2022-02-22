@@ -38,9 +38,13 @@ public class ExampleStream {
         JSONPointer ptr = new JSONPointer("/Books/book");
         obj.toStream().forEach(node -> System.out.println("Node: " + node.toString()));
 
+//        System.out.println("EX 1:");
+//        obj.toStream().forEach(node -> node.query(ptr));
+//        System.out.println(obj);
+
         System.out.println("EX 1.2:");
         obj.toStream().filter(node -> node.has("author"))
-        .forEach(node -> node.put("Rating", "TBD"));
+        .forEach(node -> node.put("category", "sci-fi"));
         System.out.println(obj.toString(4));
 
         System.out.println("EX 2:");
@@ -55,7 +59,7 @@ public class ExampleStream {
         System.out.println("EX 3:");
         obj.toStream()
                 .filter(node -> node.has("title"))
-                .forEach(node -> node.put("title", "new_" + node.get("title")));
+                .forEach(node -> node.put("title", "newrelease_" + node.get("title")));
 
         System.out.println("Modified Titles:");
         System.out.println(obj.toString(4));
