@@ -35,10 +35,11 @@ public class ExampleStream {
         );
 
         System.out.println("EX 1:");
-        JSONPointer ptr = new JSONPointer("/Books/book");
-        obj.toStream().forEach(node -> System.out.println("Node: " + node.toString()));
+
+        obj.toStream().forEach(node -> System.out.println("JSONObject Node: " + node.toString()));
 
 //        System.out.println("EX 1:");
+//        JSONPointer ptr = new JSONPointer("/Books/book");
 //        obj.toStream().forEach(node -> node.query(ptr));
 //        System.out.println(obj);
 

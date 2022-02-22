@@ -2774,7 +2774,9 @@ public class JSONObject {
 
             // Recursive traversal down the tree nodes.
             while (iter.hasNext()) {
-                nextKey = iter.next();
+                nextKey = (String) iter.next();
+                JSONPointer pointer = new JSONPointer("/" + nextKey);
+                System.out.println("JSONPointer:" +  pointer.toString());
 
                 // If next node is JSON Array
                 if (current.get(nextKey) instanceof JSONArray) {
@@ -2804,7 +2806,8 @@ public class JSONObject {
                 // If next node is JSONObject
                 } else if (current.get(nextKey) instanceof JSONObject) {
                     // Another JSONObject, advance
-                    tree = current.getJSONObject(nextKey);
+                    tree = (JSONObject) current.query(pointer);
+//                    tree = current.getJSONObject(nextKey);
                     tryAdvance(action);
                     return false;
 
