@@ -10,6 +10,8 @@ Project milestone 4 assignment for 262P programming styles. The work for this as
 - The implementation is appended to the bottom of JSONObject.java. It uses a recursive style to break down and iterate through the class' map field  that is constructed upon the initialization of a JSONObject instance. It uses a Stream Builder to construct a stream of map entries.
 - The test cases are appended to the botton of JSONObjectTest.java
 
+<hr />
+
 # Milestone 3
 
 Project milestone 3 assignment for 262P programming styles. This work for this assignment was done by both **Trent Lilley** and **Joseph Lee**.
