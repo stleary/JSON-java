@@ -1,3 +1,15 @@
+# Milestone 4
+Project milestone 4 assignment for 262P programming styles. The work for this assignment was completed by both **Trent Lilley** and **Joseph Lee**.
+
+## Specifications
+- the toStream method in JSONObject streams key value pairs. The keys are of type String and correspond to JSON keys. The values types are diverse and can be of type JSONObject, JSONArray, or String. 
+- Nodes of all levels, including the root node and leaf nodes, are included in the stream. Non-leaf nodes will have the their entire child tree structure either of type JSONObject or JSONArray set as their values. All leaf nodes have values of type String, a characteristic that can be used to isolate these nodes.
+- JSONArray nodes are formatted as follows: array elements have a string representation of their index set as the key while the element itself is set as the value.
+
+## For the Graders
+- The implementation is appended to the bottom of JSONObject.java. It uses a recursive style to break down and iterate through the class' map field  that is constructed upon the initialization of a JSONObject instance. It uses a Stream Builder to construct a stream of map entries.
+- The test cases are appended to the botton of JSONObjectTest.java
+
 # Milestone 3
 
 Project milestone 3 assignment for 262P programming styles. This work for this assignment was done by both **Trent Lilley** and **Joseph Lee**.
