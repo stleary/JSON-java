@@ -40,41 +40,57 @@ public class ExampleStream {
                 "  <name>Crista Lopes</name>\n" +
                 "  <address>\n" +
                 "    <street>Ave of Nowhere</street>\n" +
+                    "  <sub_address>\n" +
+                    "    <area>Kitchen</area>\n" +
+                    "    <windows>3</windows>\n" +
+                    "  </sub_address>\n" +
                 "    <zipcode>92614</zipcode>\n" +
                 "  </address>\n" +
                 "</contact>";
         JSONObject json2 = XML.toJSONObject(xmlString);
-        JSONObject obj = json2;
+        JSONObject obj = json1;
 
+        // Accessing each JSONObject nodes and print
         System.out.println("EX 1:");
         obj.toStream().forEach(node -> System.out.println("JSONObject Node: " + node.toString()));
 
-//        System.out.println("EX 1:");
-//        JSONPointer ptr = new JSONPointer("/Books/book");
-//        obj.toStream().forEach(node -> node.query(ptr));
-//        System.out.println(obj);
 
         System.out.println("EX 1.2:");
         obj.toStream().filter(node -> node.has("author"))
         .forEach(node -> node.put("category", "sci-fi"));
         System.out.println(obj.toString(4));
 
+        // Search for nodes, and get key "title"
         System.out.println("EX 2:");
         List<String> titles = obj.toStream()
                 .filter(node -> node.has("title"))
                 .map(node -> node.get("title").toString())
                 .collect(Collectors.toList());
-
         System.out.println("Titles List:");
         titles.forEach(name -> System.out.println(name));
 
+
+
         System.out.println("EX 3:");
         obj.toStream()
-                .filter(node -> node.has("zipcode"))
-                .forEach(node -> node.put("title", "newrelease_" + node.get("title")));
-
+                .filter(node -> node.has("title")) // Node with zipcode
+                .forEach(node -> node.put("title", "newrelease_" + node.get("title"))); // transform value
         System.out.println("Modified Titles:");
         System.out.println(obj.toString(4));
+
+        System.out.println("EX 4:");
+        obj.toStream()
+                .filter(node -> node.has("title")) // Node with zipcode
+                .forEach(node -> node.put("status", "new")); // transform value
+        System.out.println("Modified Titles:");
+        System.out.println(obj.toString(4));
+
+//        System.out.println("EX 3:");
+//        obj.toStream()
+//                .filter(node -> node.has("zipcode")) // Node with zipcode
+//                .forEach(node -> node.put("zipcode", "newrelease_" + node.get("zipcode"))); // transform value
+//        System.out.println("Modified Titles:");
+//        System.out.println(obj.toString(4));
 
 
 //    obj.toStream().forEach(node -> do some transformation, possibly based on the path of the node);

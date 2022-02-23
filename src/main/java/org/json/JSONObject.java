@@ -2733,9 +2733,11 @@ public class JSONObject {
      * Milestone 4 -
      *
      *  Streaming of JSONObject class.
-     *  Utilizes Spliterator class, which traverses down all of the nodes within the tryAdvance method.
+     *  Utilizes Spliterator class, which traverses down all of JSONObject the nodes
+     *  using depth-first search within the tryAdvance method.
      *  Streaming is performed in series, thus trySplit is not implemented.
      *
+     * @author Trent Lilley, Joseph Lee
      */
 
     public Stream<JSONObject> toStream(){
@@ -2776,30 +2778,17 @@ public class JSONObject {
             while (iter.hasNext()) {
                 nextKey = (String) iter.next();
                 JSONPointer pointer = new JSONPointer("/" + nextKey);
-                System.out.println("JSONPointer:" +  pointer.toString());
+//                System.out.println("[DEBUG] " + "JSONPointer: " +  pointer.toString());
 
                 // If next node is JSON Array
                 if (current.get(nextKey) instanceof JSONArray) {
                     JSONArray jsonArray = current.getJSONArray(nextKey);
 
+                    // advance JSONArray objects within the array
                     if(jsonArray.length() > 1){
                         for (int i = 0; i < jsonArray.length(); i++) {
-
                             tree = jsonArray.getJSONObject(i);
                             tryAdvance(action);
-
-//                            // Advance for each JSONObject in the JSONArray
-//                            JSONObject tmp_json = jsonArray.getJSONObject(i);
-//                            Iterator<String> subkeys = tmp_json.keys();
-//                            String subkey = null;
-//
-//                            for(int j = 0; j < tmp_json.length(); j++){
-//                                subkey = subkeys.next();
-//                                JSONObject new_json = new JSONObject();
-//                                new_json.put(subkey, tmp_json.get(subkey));
-//                                tree = new_json;
-//                                tryAdvance(action);
-//                            }
                         }
                     }
 
@@ -2807,18 +2796,12 @@ public class JSONObject {
                 } else if (current.get(nextKey) instanceof JSONObject) {
                     // Another JSONObject, advance
                     tree = (JSONObject) current.query(pointer);
-//                    tree = current.getJSONObject(nextKey);
                     tryAdvance(action);
                     return false;
 
                 }
-//                else if(current.length() > 1){
-//                    // Advance for each JSONObject in the JSONArray
-//                    JSONObject new_json = new JSONObject();
-//                    new_json.put(nextKey, current.getJSONObject(nextKey));
-//                    tree = new_json;
-//                    tryAdvance(action);
-//                }
+
+                // if next object is not JSONObject nor JSONArray; possibly just key/value pair
                 else {
 
                     // Leaf node
@@ -2836,8 +2819,6 @@ public class JSONObject {
                             }
                         }
                     }
-
-
                     return false;
                 }
             }
@@ -2862,7 +2843,6 @@ public class JSONObject {
         public int characteristics() {
             return Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL;
         }
-
     }
 }
 
