@@ -13,7 +13,7 @@ import org.json.XML;
 
 public class ExampleStream {
     public static void main(String[] args) {
-        JSONObject obj = XML.toJSONObject(
+        JSONObject json1 = XML.toJSONObject(
                 "<Books>" +
                         "<book>" +
                             "<title>AAA</title>" +
@@ -34,8 +34,19 @@ public class ExampleStream {
                         "</Books>"
         );
 
-        System.out.println("EX 1:");
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <nick>Crista </nick>\n"+
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "  </address>\n" +
+                "</contact>";
+        JSONObject json2 = XML.toJSONObject(xmlString);
+        JSONObject obj = json2;
 
+        System.out.println("EX 1:");
         obj.toStream().forEach(node -> System.out.println("JSONObject Node: " + node.toString()));
 
 //        System.out.println("EX 1:");
@@ -59,7 +70,7 @@ public class ExampleStream {
 
         System.out.println("EX 3:");
         obj.toStream()
-                .filter(node -> node.has("title"))
+                .filter(node -> node.has("zipcode"))
                 .forEach(node -> node.put("title", "newrelease_" + node.get("title")));
 
         System.out.println("Modified Titles:");

@@ -2822,20 +2822,20 @@ public class JSONObject {
                 else {
 
                     // Leaf node
-//                    if(json_length > 1){
-//                        Iterator<String> key2 = current.keys();
-//                        String subkey = null;
-//
-//                        for(int j = 0; j < current.length(); j++){
-//                            subkey = key2.next();
-//                            if(current.get(subkey) != null ){
-//                                JSONObject new_json = new JSONObject();
-//                                new_json.put(subkey, current.get(subkey));
-//                                tree = new_json;
-//                                tryAdvance(action);
-//                            }
-//                        }
-//                    }
+                    if(json_length > 1){
+                        Iterator<String> key2 = current.keys();
+                        String subkey = null;
+
+                        for(int j = 0; j < current.length(); j++){
+                            subkey = key2.next();
+                            if(current.get(subkey) != null ){
+                                JSONObject new_json = new JSONObject();
+                                new_json.put(subkey, current.get(subkey));
+                                tree = new_json;
+                                tryAdvance(action);
+                            }
+                        }
+                    }
 
 
                     return false;
