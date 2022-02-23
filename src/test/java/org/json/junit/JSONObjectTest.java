@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -50,6 +51,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.json.CDL;
 import org.json.JSONArray;
@@ -3352,5 +3354,114 @@ public class JSONObjectTest {
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
     }
 
-    //TODO: Milestone 4 Test Cases
+  /**
+   * Milestone 4
+   * Trent Lilley / Joseph Lee
+   *
+   * Tests if the toStream function properly handles JSONArrays
+   * with nested JSONObject elements and outputs nodes in
+   * the expected order (top - bottom hierarchy). JSONArray elements should
+   * be key value pairs where the key corresponds to the index of the
+   * array element
+   */
+
+  @Test
+  public void jsonStreamArraysTest() {
+    String jsonString = "{\"Books\": {\"book\": [\n" +
+        "    {\n" +
+        "        \"author\": \"ASmith\",\n" +
+        "        \"title\": \"AAA\"\n" +
+        "    },\n" +
+        "    {\n" +
+        "        \"author\": \"BSmith\",\n" +
+        "        \"title\": \"BBB\"\n" +
+        "    }\n" +
+        "]}}";
+
+    JSONObject json = new JSONObject(jsonString);
+
+    List<String> expectedKeys = new ArrayList<>(
+        Arrays.asList("Books", "book", "0", "author", "title", "1", "author", "title")
+    );
+
+    List<String> expectedTitleVals = new ArrayList<>(
+        Arrays.asList("AAA", "BBB")
+    );
+
+    // compare complete ordered list of keys
+    List<String> actualKeys = json.toStream()
+        .map(Map.Entry::getKey)
+        .collect(Collectors.toList());
+    assertEquals(expectedKeys, actualKeys);
+
+    // get all values for keys that equal "title"
+    List<Object> actualTitleVals = json.toStream()
+        .filter(node -> node.getKey().equals("title"))
+        .map(node -> node.getValue().toString())
+        .collect(toList());
+    assertEquals(expectedTitleVals, actualTitleVals);
+
+    // test transformations
+    json.toStream().filter(node -> node.getValue().equals("AAA") && node.getKey().contains("title"))
+        .forEach(node -> {
+          assertEquals("aaa", node.getValue().toString().toLowerCase());
+        });
+  }
+
+  /**
+   * Milestone 4
+   * Trent Lilley / Joseph Lee
+   *
+   * Tests if the toStream function properly handles
+   * array elements that are not key-value pairs
+   * nodes with array values should be further expanded into
+   * key value pairs where the key is the array index and the
+   * value is the array element
+   */
+  @Test
+  public void jsonStreamsTestArrayElements() {
+    String jsonString =
+        "{" +
+            "\"key1\":" +
+            "[1,2," +
+            "{\"key3\":true}" +
+            "]," +
+            "\"key2\":" +
+            "{\"key1\":\"val1\",\"key2\":" +
+            "{\"key2\":null}," +
+            "\"key3\":42" +
+            "}," +
+            "\"key4\":" +
+            "[" +
+            "[\"value1\",2.1]" +
+            "," +
+            "[null]" +
+            "]" +
+            "}";
+
+    JSONObject json = new JSONObject(jsonString);
+
+    List<String> expectedEntries = new ArrayList<>(
+        Arrays.asList("key1=[1,2,{\"key3\":true}]", "0=1", "1=2", "2={\"key3\":true}")
+    );
+
+    List<String> expectedNestedEntries = new ArrayList<>(
+        Arrays.asList("key4=[[\"value1\",2.1],[null]]", "0=[\"value1\",2.1]", "0=value1", "1=2.1", "1=[null]", "0=null")
+    );
+
+    // check the first four entries to see if array value nodes were expanded as specified
+    List<String> actualEntires = json.toStream()
+        .map(Object::toString)
+        .limit(4)
+        .collect(toList());
+    assertEquals(expectedEntries, actualEntires);
+
+    // check if nested arrays are handled
+    List<String> actualNestedEntries = json.toStream()
+        .map(Object::toString)
+        .skip(10)
+        .collect(toList());
+    assertEquals(expectedNestedEntries, actualNestedEntries);
+  }
 }
+

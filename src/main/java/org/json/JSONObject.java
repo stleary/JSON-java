@@ -2805,7 +2805,7 @@ public class JSONObject {
             else { // case key val pair
                 builder.add(new AbstractMap.SimpleEntry<>(i + "", arr.get(i)));
                 String[] keyval = arr.get(i).toString().split(":");
-                builder.add(new AbstractMap.SimpleEntry<>(keyval[0], keyval[1]));
+                if (keyval.length == 2) builder.add(new AbstractMap.SimpleEntry<>(keyval[0], keyval[1]));
             }
         } // end array loop
     }
