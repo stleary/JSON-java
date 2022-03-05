@@ -3,6 +3,10 @@ package org.json;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -57,10 +61,27 @@ public class Example {
             "]" +
             "}";
 
-    JSONObject json = new JSONObject(jsonString2);
-    System.out.println(json.toString(4));
-    System.out.println("----------TESTING----------");
-    json.toStream().forEach(System.out::println);
+
+    // Function passed as 2nd arg, can be anything that takes a JSONObject and returns a JSONObject
+    Function<JSONObject, JSONObject> toLowercase = (obj) -> {
+      String JsonStr = obj.toString().toLowerCase();
+      return new JSONObject(JsonStr);
+    };
+
+    // Milestone 5 Method returns a future that the client must get
+    Future<JSONObject> futureObj = XML.toJSONObjectAsync(new StringReader(xmlString), toLowercase);
+
+    // Get the future and put it into a JSONObject instance
+    // Waits 5 seconds to retrieve the data, otherwise goes to TimeoutException
+    try {
+      JSONObject obj = futureObj.get(5, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      e.printStackTrace();
+    } catch (TimeoutException e) {
+      e.printStackTrace();
+    }
 
 
 

@@ -33,6 +33,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -1544,4 +1546,30 @@ public class XML {
             }
         } //END [1]
     } // END METHOD
+
+
+    //----------------------------------- Milestone 5
+
+    /**
+     * Milestone 5
+     * Asynchronous method that returns a future JSONObject and performs a specified
+     * operation on that object before returning to the caller
+     * @Source: Modern Java in Action: Listing 16.6, pg 394
+     */
+    public static Future<JSONObject> toJSONObjectAsync(Reader reader, Function<JSONObject, JSONObject> operation) {
+        CompletableFuture<JSONObject> futureJson = new CompletableFuture<>();
+        new Thread(() -> {
+            try {
+                JSONObject jsonObj = XML.toJSONObject(reader);
+                jsonObj = operation.apply(jsonObj);
+                futureJson.complete(jsonObj);
+            }
+            catch (Exception e) {
+                // ensures error is not confined to thread, prevents indefinite blocking
+                futureJson.completeExceptionally(e);
+            }
+        }).start();
+
+        return futureJson;
+    }
 }
