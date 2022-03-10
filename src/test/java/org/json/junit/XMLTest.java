@@ -40,9 +40,14 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
 import org.json.*;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -1262,6 +1267,156 @@ public class XMLTest {
             assertEquals("Expecting an exception message",
                 "Mismatched contact and name at 57 [character 8 line 3]",
                 e.getMessage());
+        }
+    }
+
+    /**
+     *  Milestone 5
+     *  Unit test - testAsyncToJsonSimpleLowerCase():
+     *  Checks if toJSONObjectAsync can perform simple operations
+     *  asynchronously for the resulting Future object
+     *
+     *  @authors Trent Lilley, Joseph Lee
+     */
+    @Test
+    public void testToJsonFutureSimpleLowerCase(){
+        String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <NAME>JOHN DOE</NAME>\n" +
+                "</contact>";
+
+        Function<JSONObject, JSONObject> toLowercase = (obj) -> {
+            String JsonStr = obj.toString().toLowerCase();
+            return new JSONObject(JsonStr);
+        };
+
+        Future<JSONObject> futureObj = XML.toJSONObjectAsync(new StringReader(xmlStr), toLowercase);
+
+        try {
+            // Delaying the thread to allow async operation to complete
+            Thread.sleep(2000);
+            JSONObject obj = futureObj.get(5, TimeUnit.SECONDS);
+            Assert.assertEquals(obj.toString(),"{\"contact\":{\"name\":\"john doe\"}}");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *  Milestone 5
+     *  Unit test - testToJsonFutureReplaceStringValue():
+     *  Checks if toJSONObjectAsync can perform simple
+     *  replacement operations asynchronously for the resulting Future object
+     *
+     *  @authors Trent Lilley, Joseph Lee
+     */
+    @Test
+    public void testToJsonAsyncFutureReplaceStringValue(){
+        String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <name>John Doe</name>\n" +
+                "</contact>";
+
+        Function<JSONObject, JSONObject> appendValue = (obj) -> {
+            String data = obj.toString();
+            data = data.replace("John Doe", "Mary Jane");
+            JSONObject newJson = new JSONObject(data);
+            return newJson;
+        };
+
+        Future<JSONObject> futureObj = XML.toJSONObjectAsync(new StringReader(xmlStr), appendValue);
+
+        try {
+            // Delaying the thread to allow async operation to complete
+            Thread.sleep(2000);
+            JSONObject obj = futureObj.get(5, TimeUnit.SECONDS);
+            Assert.assertEquals(obj.toString(),"{\"contact\":{\"name\":\"Mary Jane\"}}");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     *  Milestone 5
+     *  Unit test - testToJsonFuturePutObject():
+     *  Checks if toJSONObjectAsync can properly put additional key-value pairs
+     *  into the generated JSONObject, asynchronously for the resulting Future object
+     *
+     *  @authors Trent Lilley, Joseph Lee
+     */
+    @Test
+    public void testToJsonAsyncFuturePutObject(){
+        String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "</contact>";
+
+        Function<JSONObject, JSONObject> appendValue = (obj) -> {
+            JSONObject addObj = new JSONObject();
+            addObj.put("name", "John Doe");
+
+            if(obj.has("contact")){
+                obj.put("contact", addObj);
+            }
+
+            return obj;
+        };
+
+        Future<JSONObject> futureObj = XML.toJSONObjectAsync(new StringReader(xmlStr), appendValue);
+
+        try {
+            // Delaying the thread to allow async operation to complete
+            Thread.sleep(2000);
+            JSONObject obj = futureObj.get(5, TimeUnit.SECONDS);
+            Assert.assertEquals(obj.toString(),"{\"contact\":{\"name\":\"John Doe\"}}");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     *  Milestone 5
+     *  Unit test - testToJsonAsyncHandleUnclosedTag():
+     *  Checks if toJSONObjectAsync can properly handle malformed XMLs.
+     *  Specifically XML with unclosed tags.
+     *
+     *  @authors Trent Lilley, Joseph Lee
+     */
+    @Test
+    public void testToJsonAsyncHandleUnclosedTag(){
+        String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <name>John Doe</name>\n";
+
+        Function<JSONObject, JSONObject> doNothing = (obj) -> { return obj; };
+        Future<JSONObject> futureObj = XML.toJSONObjectAsync(new StringReader(xmlStr), doNothing);
+
+        try {
+            // Delaying the thread to allow async operation to complete
+            Thread.sleep(2000);
+            JSONObject obj = futureObj.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            //Check the exception
+            assertEquals("Expecting an exception message",
+                    "org.json.JSONException: Unclosed tag contact at 73 [character 0 line 4]",
+                    e.getMessage());
+        } catch (TimeoutException e) {
+            e.printStackTrace();
         }
     }
 }
