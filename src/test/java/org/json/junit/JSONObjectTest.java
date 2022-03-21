@@ -1090,7 +1090,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a Boolean.",
+                    "JSONObject[\"stringKey\"] is not a Boolean (class java.lang.String : hello world!).",
                     e.getMessage());
         }
         try {
@@ -1106,7 +1106,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"trueKey\"] is not a string.",
+                    "JSONObject[\"trueKey\"] is not a string (class java.lang.Boolean : true).",
                     e.getMessage());
         }
         try {
@@ -1122,7 +1122,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a double.",
+                    "JSONObject[\"stringKey\"] is not a double (class java.lang.String : hello world!).",
                     e.getMessage());
         }
         try {
@@ -1138,7 +1138,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a float.",
+                    "JSONObject[\"stringKey\"] is not a float (class java.lang.String : hello world!).",
                     e.getMessage());
         }
         try {
@@ -1154,7 +1154,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a int.",
+                    "JSONObject[\"stringKey\"] is not a int (class java.lang.String : hello world!).",
                     e.getMessage());
         }
         try {
@@ -1170,7 +1170,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a long.",
+                    "JSONObject[\"stringKey\"] is not a long (class java.lang.String : hello world!).",
                     e.getMessage());
         }
         try {
@@ -1186,7 +1186,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a JSONArray.",
+                    "JSONObject[\"stringKey\"] is not a JSONArray (class java.lang.String : hello world!).",
                     e.getMessage());
         }
         try {
@@ -1202,7 +1202,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a JSONObject.",
+                    "JSONObject[\"stringKey\"] is not a JSONObject (class java.lang.String : hello world!).",
                     e.getMessage());
         }
     }
