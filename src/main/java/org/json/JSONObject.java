@@ -609,7 +609,7 @@ public class JSONObject {
             // JSONException should really take a throwable argument.
             // If it did, I would re-implement this with the Enum.valueOf
             // method and place any thrown exception in the JSONException
-            throw wrongValueFormatException(key, "enum of type " + quote(clazz.getSimpleName()), null);
+            throw wrongValueFormatException(key, "enum of type " + quote(clazz.getSimpleName()), opt(key), null);
         }
         return val;
     }
@@ -635,7 +635,7 @@ public class JSONObject {
                         .equalsIgnoreCase("true"))) {
             return true;
         }
-        throw wrongValueFormatException(key, "Boolean", null);
+        throw wrongValueFormatException(key, "Boolean", object, null);
     }
 
     /**
@@ -697,7 +697,7 @@ public class JSONObject {
         try {
             return Double.parseDouble(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(key, "double", e);
+            throw wrongValueFormatException(key, "double", object, e);
         }
     }
 
@@ -719,7 +719,7 @@ public class JSONObject {
         try {
             return Float.parseFloat(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(key, "float", e);
+            throw wrongValueFormatException(key, "float", object, e);
         }
     }
 
@@ -741,7 +741,7 @@ public class JSONObject {
             }
             return stringToNumber(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(key, "number", e);
+            throw wrongValueFormatException(key, "number", object, e);
         }
     }
 
@@ -763,7 +763,7 @@ public class JSONObject {
         try {
             return Integer.parseInt(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(key, "int", e);
+            throw wrongValueFormatException(key, "int", object, e);
         }
     }
 
@@ -781,7 +781,7 @@ public class JSONObject {
         if (object instanceof JSONArray) {
             return (JSONArray) object;
         }
-        throw wrongValueFormatException(key, "JSONArray", null);
+        throw wrongValueFormatException(key, "JSONArray", object, null);
     }
 
     /**
@@ -798,7 +798,7 @@ public class JSONObject {
         if (object instanceof JSONObject) {
             return (JSONObject) object;
         }
-        throw wrongValueFormatException(key, "JSONObject", null);
+        throw wrongValueFormatException(key, "JSONObject", object, null);
     }
 
     /**
@@ -819,7 +819,7 @@ public class JSONObject {
         try {
             return Long.parseLong(object.toString());
         } catch (Exception e) {
-            throw wrongValueFormatException(key, "long", e);
+            throw wrongValueFormatException(key, "long", object, e);
         }
     }
 
@@ -875,7 +875,7 @@ public class JSONObject {
         if (object instanceof String) {
             return (String) object;
         }
-        throw wrongValueFormatException(key, "string", null);
+        throw wrongValueFormatException(key, "string", object, null);
     }
 
     /**
@@ -1201,12 +1201,11 @@ public class JSONObject {
             }
             if (exact) {
                 return new BigDecimal(((Number)val).doubleValue());
-            }else {
-                // use the string constructor so that we maintain "nice" values for doubles and floats
-                // the double constructor will translate doubles to "exact" values instead of the likely
-                // intended representation
-                return new BigDecimal(val.toString());
             }
+            // use the string constructor so that we maintain "nice" values for doubles and floats
+            // the double constructor will translate doubles to "exact" values instead of the likely
+            // intended representation
+            return new BigDecimal(val.toString());
         }
         if (val instanceof Long || val instanceof Integer
                 || val instanceof Short || val instanceof Byte){
@@ -2021,6 +2020,7 @@ public class JSONObject {
      *            A String
      * @return A String correctly formatted for insertion in a JSON text.
      */
+    @SuppressWarnings("resource")
     public static String quote(String string) {
         StringWriter sw = new StringWriter();
         synchronized (sw.getBuffer()) {
@@ -2141,7 +2141,7 @@ public class JSONObject {
                 } else if (valueThis instanceof Number && valueOther instanceof Number) {
                     if (!isNumberSimilar((Number)valueThis, (Number)valueOther)) {
                     	return false;
-                    };
+                    }
                 } else if (!valueThis.equals(valueOther)) {
                     return false;
                 }
@@ -2409,6 +2409,7 @@ public class JSONObject {
      * @throws JSONException
      *             If the object contains an invalid number.
      */
+    @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
         StringWriter w = new StringWriter();
         synchronized (w.getBuffer()) {
@@ -2502,9 +2503,7 @@ public class JSONObject {
             if (objectsRecord != null) {
                 return new JSONObject(object, objectsRecord);
             }
-            else {
-                return new JSONObject(object);
-            }
+            return new JSONObject(object);
         }
         catch (JSONException exception) {
             throw exception;
@@ -2527,6 +2526,7 @@ public class JSONObject {
         return this.write(writer, 0, 0);
     }
 
+    @SuppressWarnings("resource")
     static final Writer writeValue(Writer writer, Object value,
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
@@ -2604,6 +2604,7 @@ public class JSONObject {
      * @throws JSONException if a called function has an error or a write error
      * occurs
      */
+    @SuppressWarnings("resource")
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
         try {
@@ -2696,26 +2697,22 @@ public class JSONObject {
     private static JSONException wrongValueFormatException(
             String key,
             String valueType,
-            Throwable cause) {
-        return new JSONException(
-                "JSONObject[" + quote(key) + "] is not a " + valueType + "."
-                , cause);
-    }
-
-    /**
-     * Create a new JSONException in a common format for incorrect conversions.
-     * @param key name of the key
-     * @param valueType the type of value being coerced to
-     * @param cause optional cause of the coercion failure
-     * @return JSONException that can be thrown.
-     */
-    private static JSONException wrongValueFormatException(
-            String key,
-            String valueType,
             Object value,
             Throwable cause) {
+        if(value == null) {
+
+            return new JSONException(
+                    "JSONObject[" + quote(key) + "] is not a " + valueType + " (null)."
+                    , cause);
+        }
+        // don't try to toString collections or known object types that could be large.
+        if(value instanceof Map || value instanceof Iterable || value instanceof JSONObject) {
+            return new JSONException(
+                    "JSONObject[" + quote(key) + "] is not a " + valueType + " (" + value.getClass() + ")."
+                    , cause);
+        }
         return new JSONException(
-                "JSONObject[" + quote(key) + "] is not a " + valueType + " (" + value + ")."
+                "JSONObject[" + quote(key) + "] is not a " + valueType + " (" + value.getClass() + " : " + value + ")."
                 , cause);
     }
 
