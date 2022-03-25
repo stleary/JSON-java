@@ -158,7 +158,7 @@ public class JSONMLTest {
             assertTrue("Expecting an exception", false);
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "JSONArray[0] is not a String.",
+                "JSONArray[0] is not a String (class org.json.JSONArray).",
                 e.getMessage());
         }
     }

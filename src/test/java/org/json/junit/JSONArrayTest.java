@@ -412,7 +412,7 @@ public class JSONArrayTest {
             assertTrue("expected getBoolean to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a boolean.",e.getMessage());
+                    "JSONArray[4] is not a boolean (class java.lang.String : hello).",e.getMessage());
         }
         try {
             jsonArray.get(-1);
@@ -426,42 +426,42 @@ public class JSONArrayTest {
             assertTrue("expected getDouble to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a double.",e.getMessage());
+                    "JSONArray[4] is not a double (class java.lang.String : hello).",e.getMessage());
         }
         try {
             jsonArray.getInt(4);
             assertTrue("expected getInt to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a int.",e.getMessage());
+                    "JSONArray[4] is not a int (class java.lang.String : hello).",e.getMessage());
         }
         try {
             jsonArray.getJSONArray(4);
             assertTrue("expected getJSONArray to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a JSONArray.",e.getMessage());
+                    "JSONArray[4] is not a JSONArray (class java.lang.String : hello).",e.getMessage());
         }
         try {
             jsonArray.getJSONObject(4);
             assertTrue("expected getJSONObject to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a JSONObject.",e.getMessage());
+                    "JSONArray[4] is not a JSONObject (class java.lang.String : hello).",e.getMessage());
         }
         try {
             jsonArray.getLong(4);
             assertTrue("expected getLong to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a long.",e.getMessage());
+                    "JSONArray[4] is not a long (class java.lang.String : hello).",e.getMessage());
         }
         try {
             jsonArray.getString(5);
             assertTrue("expected getString to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[5] is not a String.",e.getMessage());
+                    "JSONArray[5] is not a String (class java.math.BigDecimal : 0.002345).",e.getMessage());
         }
     }
 
