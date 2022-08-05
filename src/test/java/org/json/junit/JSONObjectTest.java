@@ -57,6 +57,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointerException;
+import org.json.JSONString;
 import org.json.JSONTokener;
 import org.json.XML;
 import org.json.junit.data.BrokenToString;
@@ -3397,5 +3398,26 @@ public class JSONObjectTest {
         JSONObject json_input = new JSONObject(tokener);
         assertNotNull(json_input);
         fail("Excepected Exception.");
+    }
+
+    @Test
+    public void testIssue682SimilarityOfJSONString() {
+        JSONObject jo1 = new JSONObject()
+                .put("a", new MyJsonString())
+                .put("b", 2);
+        JSONObject jo2 = new JSONObject()
+                .put("a", new MyJsonString())
+                .put("b", 2);
+        assertTrue(jo1.similar(jo2));
+
+        JSONObject jo3 = new JSONObject()
+                .put("a", new JSONString() {
+                    @Override
+                    public String toJSONString() {
+                        return "\"different value\"";
+                    }
+                })
+                .put("b", 2);
+        assertFalse(jo1.similar(jo3));
     }
 }
