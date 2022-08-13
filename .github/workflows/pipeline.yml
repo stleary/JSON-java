@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         # build against supported Java LTS versions:
-        java: [ 1.7, 8, 11 ]
+        java: [ 8, 11 ]
     name: Java ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v2
