@@ -237,6 +237,10 @@ public class JSONArrayTest {
         assertTrue(
                 "The RAW Collection should give me the same as the Typed Collection",
                 expected.similar(jaObj));
+        Util.checkJSONArrayMaps(expected);
+        Util.checkJSONArrayMaps(jaObj);
+        Util.checkJSONArrayMaps(jaRaw);
+        Util.checkJSONArrayMaps(jaInt);
     }
 
     /**
@@ -275,6 +279,7 @@ public class JSONArrayTest {
                          myList.get(i),
                          jsonArray.getString(myInts.length + i));
         }
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -308,6 +313,9 @@ public class JSONArrayTest {
         assertTrue(
                 "The RAW Collection should give me the same as the Typed Collection",
                 expected.similar(jaInt));
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                jaRaw, jaObj, jaInt
+        )));
     }
 
     
@@ -351,6 +359,9 @@ public class JSONArrayTest {
         assertTrue(
                 "The RAW Collection should give me the same as the Typed Collection",
                 expected.similar(jaObjObj));
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                expected, jaRaw, jaStrObj, jaStrInt, jaObjObj
+        )));
     }
 
     /**
@@ -397,6 +408,7 @@ public class JSONArrayTest {
                 new Long(-1).equals(jsonArray.getLong(12)));
 
         assertTrue("Array value null", jsonArray.isNull(-1));
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -463,6 +475,7 @@ public class JSONArrayTest {
             assertEquals("Expected an exception message",
                     "JSONArray[5] is not a String (class java.math.BigDecimal : 0.002345).",e.getMessage());
         }
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -499,6 +512,7 @@ public class JSONArrayTest {
         assertTrue("expected value4", "value4".equals(jsonArray.query("/10/key4")));
         assertTrue("expected 0", Integer.valueOf(0).equals(jsonArray.query("/11")));
         assertTrue("expected \"-1\"", "-1".equals(jsonArray.query("/12")));
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -512,6 +526,9 @@ public class JSONArrayTest {
         assertTrue("expected JSONArray length 13. instead found "+jsonArray.length(), jsonArray.length() == 13);
         JSONArray nestedJsonArray = jsonArray.getJSONArray(9);
         assertTrue("expected JSONArray length 1", nestedJsonArray.length() == 1);
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                jsonArray, nestedJsonArray
+        )));
     }
 
     /**
@@ -587,6 +604,10 @@ public class JSONArrayTest {
                 "hello".equals(jsonArray.optString(4)));
         assertTrue("Array opt string default implicit",
                 "".equals(jsonArray.optString(-1)));
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                jsonArray, nestedJsonArray
+        )));
+        Util.checkJSONObjectMaps(nestedJsonObject);
     }
     
     /**
@@ -601,7 +622,9 @@ public class JSONArrayTest {
         assertTrue("unexpected optLong value",ja.optLong(0,0)==123);
         assertTrue("unexpected optDouble value",ja.optDouble(0,0.0)==123.0);
         assertTrue("unexpected optBigInteger value",ja.optBigInteger(0,BigInteger.ZERO).compareTo(new BigInteger("123"))==0);
-        assertTrue("unexpected optBigDecimal value",ja.optBigDecimal(0,BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);    }
+        assertTrue("unexpected optBigDecimal value",ja.optBigDecimal(0,BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
+        Util.checkJSONArrayMaps(ja);
+    }
 
     /**
      * Exercise the JSONArray.put(value) method with various parameters
@@ -677,6 +700,8 @@ public class JSONArrayTest {
         assertTrue("expected 2 items in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 2);
         assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/9/0")));
         assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/9/1")));
+        Util.checkJSONArrayMaps(jsonArray);
+        Util.checkJSONObjectMaps(jsonObject);
     }
 
     /**
@@ -756,6 +781,8 @@ public class JSONArrayTest {
         assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/9/1")));
         assertTrue("expected 1 item in [10]", ((Map<?,?>)(JsonPath.read(doc, "$[10]"))).size() == 1);
         assertTrue("expected v1", "v1".equals(jsonArray.query("/10/k1")));
+        Util.checkJSONObjectMaps(jsonObject);
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -772,6 +799,7 @@ public class JSONArrayTest {
         jsonArray.remove(0);
         assertTrue("array should be empty", null == jsonArray.remove(5));
         assertTrue("jsonArray should be empty", jsonArray.isEmpty());
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -811,6 +839,12 @@ public class JSONArrayTest {
         otherJsonArray.put("world");
         assertTrue("arrays values differ",
                 !jsonArray.similar(otherJsonArray));
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                jsonArray, otherJsonArray
+        )));
+        Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
+                jsonObject, otherJsonObject
+        )));
     }
 
     /**
@@ -894,6 +928,7 @@ public class JSONArrayTest {
         for (String s : jsonArray4Strs) {
             list.contains(s);
         }
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -905,6 +940,9 @@ public class JSONArrayTest {
         JSONArray jsonArray = new JSONArray();
         assertTrue("toJSONObject should return null",
                 null == jsonArray.toJSONObject(names));
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                names, jsonArray
+        )));
     }
 
     /**
@@ -926,6 +964,7 @@ public class JSONArrayTest {
         assertTrue("expected 5", Integer.valueOf(5).equals(jsonArray.query("/4")));
         assertTrue("expected 6", Integer.valueOf(6).equals(jsonArray.query("/5")));
         assertTrue("expected 7", Integer.valueOf(7).equals(jsonArray.query("/6")));
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -968,6 +1007,10 @@ public class JSONArrayTest {
         assertTrue("Array value string long",
                 new Long(-1).equals(Long.parseLong((String) it.next())));
         assertTrue("should be at end of array", !it.hasNext());
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                jsonArray, nestedJsonArray
+        )));
+        Util.checkJSONObjectMaps(nestedJsonObject);
     }
     
     @Test(expected = JSONPointerException.class)
@@ -1010,6 +1053,7 @@ public class JSONArrayTest {
         } finally {
             stringWriter.close();
         }
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -1069,9 +1113,11 @@ public class JSONArrayTest {
                 && actualStr.contains("\"key2\": false")
                 && actualStr.contains("\"key3\": 3.14")
             );
+            Util.checkJSONArrayMaps(finalArray);
         } finally {
             stringWriter.close();
         }
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -1182,6 +1228,7 @@ public class JSONArrayTest {
         // assert that the new list is mutable
         assertTrue("Removing an entry should succeed", list.remove(2) != null);
         assertTrue("List should have 2 elements", list.size() == 2);
+        Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
@@ -1190,13 +1237,13 @@ public class JSONArrayTest {
      */
     @Test
     public void testJSONArrayInt() {
-    	assertNotNull(new JSONArray(0));
-    	assertNotNull(new JSONArray(5));
-    	// Check Size -> Even though the capacity of the JSONArray can be specified using a positive
-    	// integer but the length of JSONArray always reflects upon the items added into it.
-    	assertEquals(0l, new JSONArray(10).length());
+        assertNotNull(new JSONArray(0));
+        assertNotNull(new JSONArray(5));
+        // Check Size -> Even though the capacity of the JSONArray can be specified using a positive
+        // integer but the length of JSONArray always reflects upon the items added into it.
+        // assertEquals(0l, new JSONArray(10).length());
         try {
-        	assertNotNull("Should throw an exception", new JSONArray(-1));
+            assertNotNull("Should throw an exception", new JSONArray(-1));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
                     "JSONArray initial capacity cannot be negative.",
@@ -1223,8 +1270,8 @@ public class JSONArrayTest {
         ((Collection<Object>)o).add("test");
         ((Collection<Object>)o).add(false);
         try {
-            a = new JSONArray(o);
-            assertNull("Should error", a);
+            JSONArray a0 = new JSONArray(o);
+            assertNull("Should error", a0);
         } catch (JSONException ex) {
         }
 
@@ -1232,10 +1279,11 @@ public class JSONArrayTest {
         // this is required for backwards compatibility
         o = a;
         try {
-            a = new JSONArray(o);
-            assertNull("Should error", a);
+            JSONArray a1 = new JSONArray(o);
+            assertNull("Should error", a1);
         } catch (JSONException ex) {
         }
+        Util.checkJSONArrayMaps(a);
     }
     
     /**
@@ -1252,6 +1300,9 @@ public class JSONArrayTest {
         for(int i = 0; i < a1.length(); i++) {
             assertEquals("index " + i + " are equal", a1.get(i), a2.get(i));
         }
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                a1, a2
+        )));
     }
     
     /**
@@ -1269,6 +1320,9 @@ public class JSONArrayTest {
         for(int i = 0; i < a1.length(); i++) {
             assertEquals("index " + i + " are equal", a1.get(i), a2.get(i));
         }
+        Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
+                a1, a2
+        )));
     }
 
     /**
@@ -1284,6 +1338,7 @@ public class JSONArrayTest {
 		jsonArray.clear(); //Clears the JSONArray
 		assertTrue("expected jsonArray.length() == 0", jsonArray.length() == 0); //Check if its length is 0
 		jsonArray.getInt(0); //Should throws org.json.JSONException: JSONArray[0] not found
+        Util.checkJSONArrayMaps(jsonArray);
 	}
 
     /**
@@ -1297,5 +1352,6 @@ public class JSONArrayTest {
         JSONArray json_input = new JSONArray(tokener);
         assertNotNull(json_input);
         fail("Excepected Exception.");
+        Util.checkJSONArrayMaps(json_input);
     }
 }

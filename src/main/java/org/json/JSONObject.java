@@ -166,6 +166,10 @@ public class JSONObject {
      */
     private final Map<String, Object> map;
 
+    public Class<? extends Map> getMapType() {
+        return map.getClass();
+    }
+
     /**
      * It is sometimes more convenient and less ambiguous to have a
      * <code>NULL</code> object than to use Java's <code>null</code> value.

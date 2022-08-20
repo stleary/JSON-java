@@ -78,7 +78,6 @@ public class Util {
      * or something else.
      * @param value created by the code to be tested
      * @param expectedValue created specifically for comparing
-     * @param key key to the jsonObject entry to be compared
      */
     private static void compareActualVsExpectedObjects(Object value,
             Object expectedValue) {
@@ -115,6 +114,108 @@ public class Util {
                 expectedValue.toString(),
                 value.toString()
             );
+        }
+    }
+
+    /**
+     * Asserts that all JSONObject maps are the same as the default ctor
+     * @param jsonObjects list of objects to be tested
+     */
+    public static void checkJSONObjectsMaps(List<JSONObject> jsonObjects) {
+        if (jsonObjects == null || jsonObjects.size() == 0) {
+            return;
+        }
+        Class<? extends Map> mapType = new JSONObject().getMapType();
+        for (JSONObject jsonObject : jsonObjects) {
+            if (jsonObject != null) {
+                assertTrue(mapType == jsonObject.getMapType());
+                checkJSONObjectMaps(jsonObject, mapType);
+            }
+        }
+    }
+
+    /**
+     * Asserts that all JSONObject maps are the same as the default ctor
+     * @param jsonObject the object to be tested
+     */
+    public static void checkJSONObjectMaps(JSONObject jsonObject) {
+        if (jsonObject != null) {
+            checkJSONObjectMaps(jsonObject, jsonObject.getMapType());
+        }
+    }
+
+    /**
+     * Asserts that all JSONObject maps are the same as mapType
+     * @param jsonObject object to be tested
+     * @param mapType mapType to test against
+     */
+    public static void checkJSONObjectMaps(JSONObject jsonObject, Class<? extends Map> mapType) {
+        if (mapType == null) {
+            mapType = new JSONObject().getMapType();
+        }
+        Set<String> keys = jsonObject.keySet();
+        for (String key : keys) {
+            Object val = jsonObject.get(key);
+            if (val instanceof JSONObject) {
+                JSONObject jsonObjectVal = (JSONObject) val;
+                assertTrue(mapType == ((JSONObject) val).getMapType());
+                checkJSONObjectMaps(jsonObjectVal, mapType);
+            } else if (val instanceof JSONArray) {
+                JSONArray jsonArrayVal = (JSONArray)val;
+                checkJSONArrayMaps(jsonArrayVal, mapType);
+            }
+        }
+    }
+
+    /**
+     * Asserts that all JSONObject maps in the JSONArray object match the default map
+     * @param jsonArrays list of JSONArray objects to be tested
+     */
+    public static void checkJSONArraysMaps(List<JSONArray> jsonArrays) {
+        if (jsonArrays == null || jsonArrays.size() == 0) {
+            return;
+        }
+        Class<? extends Map> mapType = new JSONObject().getMapType();
+        for (JSONArray jsonArray : jsonArrays) {
+            if (jsonArray != null) {
+                checkJSONArrayMaps(jsonArray, mapType);
+            }
+        }
+    }
+
+    /**
+     * Asserts that all JSONObject maps in the JSONArray object match mapType
+     * @param jsonArray object to be tested
+     * @param mapType map type to be tested against
+     */
+    public static void checkJSONArrayMaps(JSONArray jsonArray, Class<? extends Map> mapType) {
+        if (jsonArray == null) {
+            return;
+        }
+        if (mapType == null) {
+            mapType = new JSONObject().getMapType();
+        }
+        Iterator<Object> it = jsonArray.iterator();
+        while (it.hasNext()) {
+            Object val = it.next();
+            if (val instanceof JSONObject) {
+                JSONObject jsonObjectVal = (JSONObject)val;
+                checkJSONObjectMaps(jsonObjectVal, mapType);
+            } else if (val instanceof JSONArray) {
+                JSONArray jsonArrayVal = (JSONArray)val;
+                checkJSONArrayMaps(jsonArrayVal, mapType);
+            }
+        }
+    }
+
+    /**
+     * Asserts that all JSONObject maps nested in the JSONArray match
+     * the default mapType
+     * @param jsonArray the object to be tested
+     */
+    public static void checkJSONArrayMaps(JSONArray jsonArray) {
+        if (jsonArray != null) {
+            checkJSONArrayMaps(jsonArray, null);
         }
     }
 }
