@@ -218,7 +218,7 @@ import java.util.Properties;
 	}
 ```	
 <h2>Part 2: Conversion methods</h2>
-<p>We don't need to have a JSON docuemnt to work. This project also admits conversions from other type of files.</p>
+<p>We don't need to have a JSON document to work. This project also admits conversions from other type of files.</p>
 <p>Secondly, we can also convert from JSON to those type of files.</p>
 	
 <h3>Extra: Conversion to JSONArray</h3>
