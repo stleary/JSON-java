@@ -2125,6 +2125,10 @@ public class JSONObject {
                     if (!isNumberSimilar((Number)valueThis, (Number)valueOther)) {
                     	return false;
                     }
+                } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
+                    if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
+                    	return false;
+                    }
                 } else if (!valueThis.equals(valueOther)) {
                     return false;
                 }

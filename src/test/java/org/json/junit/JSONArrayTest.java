@@ -6,6 +6,7 @@ Public Domain.
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -29,7 +30,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointerException;
+import org.json.JSONString;
 import org.json.JSONTokener;
+import org.json.junit.data.MyJsonString;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -1333,5 +1336,26 @@ public class JSONArrayTest {
         assertNotNull(json_input);
         fail("Excepected Exception.");
         Util.checkJSONArrayMaps(json_input);
+    }
+
+    @Test
+    public void testIssue682SimilarityOfJSONString() {
+        JSONArray ja1 = new JSONArray()
+                .put(new MyJsonString())
+                .put(2);
+        JSONArray ja2 = new JSONArray()
+                .put(new MyJsonString())
+                .put(2);
+        assertTrue(ja1.similar(ja2));
+
+        JSONArray ja3 = new JSONArray()
+                .put(new JSONString() {
+                    @Override
+                    public String toJSONString() {
+                        return "\"different value\"";
+                    }
+                })
+                .put(2);
+        assertFalse(ja1.similar(ja3));
     }
 }
