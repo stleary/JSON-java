@@ -5,6 +5,8 @@ and artifactId "json". For example:
 [https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
 
 ~~~
+20220924    New License - public domain, and some minor updates
+
 20220320    Wrap StackOverflow with JSONException
 
 20211205    Recent commits and some bug fixes for similar()
