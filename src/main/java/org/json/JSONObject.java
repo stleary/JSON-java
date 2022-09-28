@@ -2350,8 +2350,8 @@ public class JSONObject {
 
     /**
      * Make a JSON text of this JSONObject. For compactness, no whitespace is
-     * added. If this would not result in a syntactically correct JSON text,
-     * then null will be returned instead.
+     * added. This method will throw a JSONException if this object cannot
+     * produce syntactically correct JSON text.
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      * </b>
@@ -2360,14 +2360,12 @@ public class JSONObject {
      *         of the object, beginning with <code>{</code>&nbsp;<small>(left
      *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
      *         brace)</small>.
+     * @throws JSONException
+     *             If the object contains an invalid number.
      */
     @Override
-    public String toString() {
-        try {
-            return this.toString(0);
-        } catch (Exception e) {
-            return null;
-        }
+    public String toString() throws JSONException {
+        return this.toString(0);
     }
 
     /**

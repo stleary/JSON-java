@@ -215,7 +215,15 @@ public class JSONObjectTest {
         assertTrue("expected 42", textStr.contains("42"));
         Util.checkJSONObjectMaps(jsonObject);
     }
-    
+
+    @Test(expected=JSONException.class)
+    public void shouldThrowExceptionOnToStringWithDoubleInfinityMap() {
+        Map<String,Double> map = new HashMap<String,Double>();
+        map.put("infinity", Double.POSITIVE_INFINITY);
+        JSONObject o = new JSONObject(map);
+        o.toString();
+    }
+
     @Test
     public void testLongFromString(){
         String str = "26315000000253009";
