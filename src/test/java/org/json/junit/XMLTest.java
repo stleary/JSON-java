@@ -1049,4 +1049,82 @@ public class XMLTest {
             fail("Expected to be unable to modify the config");
         } catch (Exception ignored) { }
     }
+
+    @Test
+    public void testXmlToStringWithIndent(){
+        String str = "{\n" +
+                "  \"success\": true,\n" +
+                "  \"error\": null,\n" +
+                "  \"response\": [\n" +
+                "    {\n" +
+                "      \"timestamp\": 1664917200,\n" +
+                "      \"dateTimeISO\": \"2022-10-05T00:00:00+03:00\",\n" +
+                "      \"loc\": {\n" +
+                "        \"lat\": 39.91987,\n" +
+                "        \"long\": 32.85427\n" +
+                "      },\n" +
+                "      \"place\": {\n" +
+                "        \"name\": \"ankara\",\n" +
+                "        \"state\": \"an\",\n" +
+                "        \"country\": \"tr\"\n" +
+                "      },\n" +
+                "      \"profile\": {\n" +
+                "        \"tz\": \"Europe/Istanbul\"\n" +
+                "      },\n" +
+                "      \"sun\": {\n" +
+                "        \"rise\": 1664941721,\n" +
+                "        \"riseISO\": \"2022-10-05T06:48:41+03:00\",\n" +
+                "        \"set\": 1664983521,\n" +
+                "        \"setISO\": \"2022-10-05T18:25:21+03:00\",\n" +
+                "        \"transit\": 1664962621,\n" +
+                "        \"transitISO\": \"2022-10-05T12:37:01+03:00\",\n" +
+                "        \"midnightSun\": false,\n" +
+                "        \"polarNight\": false,\n" +
+                "        \"twilight\": {\n" +
+                "          \"civilBegin\": 1664940106,\n" +
+                "          \"civilBeginISO\": \"2022-10-05T06:21:46+03:00\",\n" +
+                "          \"civilEnd\": 1664985136,\n" +
+                "          \"civilEndISO\": \"2022-10-05T18:52:16+03:00\",\n" +
+                "          \"nauticalBegin\": 1664938227,\n" +
+                "          \"nauticalBeginISO\": \"2022-10-05T05:50:27+03:00\",\n" +
+                "          \"nauticalEnd\": 1664987015,\n" +
+                "          \"nauticalEndISO\": \"2022-10-05T19:23:35+03:00\",\n" +
+                "          \"astronomicalBegin\": 1664936337,\n" +
+                "          \"astronomicalBeginISO\": \"2022-10-05T05:18:57+03:00\",\n" +
+                "          \"astronomicalEnd\": 1664988905,\n" +
+                "          \"astronomicalEndISO\": \"2022-10-05T19:55:05+03:00\"\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"moon\": {\n" +
+                "        \"rise\": 1664976480,\n" +
+                "        \"riseISO\": \"2022-10-05T16:28:00+03:00\",\n" +
+                "        \"set\": 1664921520,\n" +
+                "        \"setISO\": \"2022-10-05T01:12:00+03:00\",\n" +
+                "        \"transit\": 1664994240,\n" +
+                "        \"transitISO\": \"2022-10-05T21:24:00+03:00\",\n" +
+                "        \"underfoot\": 1664949360,\n" +
+                "        \"underfootISO\": \"2022-10-05T08:56:00+03:00\",\n" +
+                "        \"phase\": {\n" +
+                "          \"phase\": 0.3186,\n" +
+                "          \"name\": \"waxing gibbous\",\n" +
+                "          \"illum\": 71,\n" +
+                "          \"age\": 9.41,\n" +
+                "          \"angle\": 0.55\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}" ;
+        JSONObject jsonObject = new JSONObject(str);
+        String xmlString = XML.toString(jsonObject, "Outer", 1);
+        System.out.println(xmlString);
+        System.out.println(XML.toIndentedXmlString(xmlString, 2, true));
+
+
+    }
+
+
 }
+
+
+
