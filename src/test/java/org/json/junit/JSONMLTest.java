@@ -4,6 +4,7 @@ package org.json.junit;
 Public Domain.
 */
 
+import com.google.gson.JsonParser;
 import static org.junit.Assert.*;
 
 import org.json.*;
@@ -762,8 +763,9 @@ public class JSONMLTest {
         final String xml = JSONML.toString(originalObject);
         final JSONObject revertedObject = JSONML.toJSONObject(xml, false);
         final String newJson = revertedObject.toString();
+        JsonParser parser = new JsonParser();
         assertTrue("JSON Objects are not similar",originalObject.similar(revertedObject));
-        assertEquals("original JSON does not equal the new JSON",originalJson, newJson);
+        assertEquals("original JSON does not equal the new JSON", parser.parse(originalJson), parser.parse(newJson));
     }
 
 // these tests do not pass for the following reasons:
