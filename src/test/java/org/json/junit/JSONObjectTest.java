@@ -4,7 +4,6 @@ package org.json.junit;
 Public Domain.
 */
 
-import com.google.gson.JsonParser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -1999,21 +1998,20 @@ public class JSONObjectTest {
                 "\"key2\":\"val2\","+
                 "\"key3\":\"val3\""+
              "}";
-        JsonParser parser = new JsonParser();
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
         assertTrue("jsonObject valueToString() incorrect",
-                parser.parse(JSONObject.valueToString(jsonObject)).equals(parser.parse(jsonObject.toString())));
+                JSONObject.valueToString(jsonObject).equals(jsonObject.toString()));
         String jsonArrayStr = 
             "[1,2,3]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
         assertTrue("jsonArray valueToString() incorrect",
                 JSONObject.valueToString(jsonArray).equals(jsonArray.toString()));
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("key1", "val1");
         map.put("key2", "val2");
         map.put("key3", "val3");
         assertTrue("map valueToString() incorrect",
-                parser.parse(jsonObject.toString()).equals(parser.parse(JSONObject.valueToString(map)))); 
+                jsonObject.toString().equals(JSONObject.valueToString(map))); 
         Collection<Integer> collection = new ArrayList<Integer>();
         collection.add(new Integer(1));
         collection.add(new Integer(2));
