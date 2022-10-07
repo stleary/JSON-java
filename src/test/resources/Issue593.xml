@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<clinical_study>
+  <!-- This xml conforms to an XML Schema at:
+    https://clinicaltrials.gov/ct2/html/images/info/public.xsd -->
+  <required_header>
+    <download_date>ClinicalTrials.gov processed this data on July 19, 2020</download_date>
+    <link_text>Link to the current ClinicalTrials.gov record.</link_text>
+    <url>https://clinicaltrials.gov/show/NCT03874338</url>
+  </required_header>
+  <id_info>
+    <org_study_id>18-01323</org_study_id>
+    <secondary_id>1R01HL146206</secondary_id>
+    <nct_id>NCT03874338</nct_id>
+  </id_info>
+  <brief_title>CLEAR SYNERGY Neutrophil Substudy</brief_title>
+  <official_title>Studies on the Effects of Colchicine on Neutrophil Biology in Acute Myocardial Infarction: A Substudy of the CLEAR SYNERGY (OASIS 9) Trial</official_title>
+  <sponsors>
+    <lead_sponsor>
+      <agency>NYU Langone Health</agency>
+      <agency_class>Other</agency_class>
+    </lead_sponsor>
+    <collaborator>
+      <agency>Population Health Research Institute</agency>
+      <agency_class>Other</agency_class>
+    </collaborator>
+    <collaborator>
+      <agency>National Heart, Lung, and Blood Institute (NHLBI)</agency>
+      <agency_class>NIH</agency_class>
+    </collaborator>
+  </sponsors>
+  <source>NYU Langone Health</source>
+  <oversight_info>
+    <has_dmc>No</has_dmc>
+    <is_fda_regulated_drug>No</is_fda_regulated_drug>
+    <is_fda_regulated_device>No</is_fda_regulated_device>
+  </oversight_info>
+  <brief_summary>
+    <textblock>
+      CLEAR SYNERGY is an international multi center 2x2 randomized placebo controlled trial of
+    </textblock>
+  </brief_summary>
+  <overall_status>Recruiting</overall_status>
+  <start_date type="Actual">March 4, 2019</start_date>
+  <completion_date type="Anticipated">February 1, 2022</completion_date>
+  <primary_completion_date type="Anticipated">February 1, 2021</primary_completion_date>
+  <study_type>Observational</study_type>
+  <has_expanded_access>No</has_expanded_access>
+  <study_design_info>
+    <observational_model>Other</observational_model>
+    <time_perspective>Prospective</time_perspective>
+  </study_design_info>
+  <primary_outcome>
+    <measure>soluble L-selectin</measure>
+    <time_frame>between baseline and 3 months</time_frame>
+    <description>Change in soluble L-selectin between baseline and 3 mo after STEMI in the placebo vs. colchicine groups.</description>
+  </primary_outcome>
+  <secondary_outcome>
+    <measure>Other soluble markers of neutrophil activity</measure>
+    <time_frame>between baseline and 3 months</time_frame>
+    <description>Other markers of neutrophil activity will be evaluated at baseline and 3 months after STEMI (myeloperoxidase, matrix metalloproteinase-9, neutrophil gelatinase-associated lipocalin, neutrophil elastase, intercellular/vascular cellular adhesion molecules)</description>
+  </secondary_outcome>
+  <secondary_outcome>
+    <measure>Markers of systemic inflammation</measure>
+    <time_frame>between baseline and 3 months</time_frame>
+    <description>Markers of systemic inflammation will be evaluated at baseline and 3 months after STEMI (high sensitive CRP, IL-1β)</description>
+  </secondary_outcome>
+  <secondary_outcome>
+    <measure>Neutrophil-driven responses that may further propagate injury</measure>
+    <time_frame>between baseline and 3 months</time_frame>
+    <description>Neutrophil-driven responses that may further propagate injury will be evaluated at baseline and 3 months after STEMI (neutrophil extracellular traps, neutrophil-derived microparticles)</description>
+  </secondary_outcome>
+  <number_of_groups>2</number_of_groups>
+  <enrollment type="Anticipated">670</enrollment>
+  <condition>Neutrophils.Hypersegmented &#X7C; Bld-Ser-Plas</condition>
+  <condition>STEMI - ST Elevation Myocardial Infarction</condition>
+  <arm_group>
+    <arm_group_label>Colchicine</arm_group_label>
+  </arm_group>
+  <arm_group>
+    <arm_group_label>Placebo</arm_group_label>
+  </arm_group>
+  <intervention>
+    <intervention_type>Drug</intervention_type>
+    <intervention_name>Colchicine Pill</intervention_name>
+    <description>Participants in the main CLEAR SYNERGY trial are randomized to colchicine/spironolactone versus placebo in a 2x2 factorial design. The substudy is interested in the evaluation of biospecimens obtained from patients in the colchicine vs placebo group.</description>
+    <arm_group_label>Colchicine</arm_group_label>
+    <arm_group_label>Placebo</arm_group_label>
+  </intervention>
+  <eligibility>
+    <study_pop>
+      <textblock>
+        Patients who are randomized to the drug RCT portion of the CLEAR SYNERGY (OASIS 9) trial
+      </textblock>
+    </study_pop>
+    <sampling_method>Non-Probability Sample</sampling_method>
+    <criteria>
+      <textblock>
+        Inclusion Criteria:
+      </textblock>
+    </criteria>
+    <gender>All</gender>
+    <minimum_age>19 Years</minimum_age>
+    <maximum_age>110 Years</maximum_age>
+    <healthy_volunteers>No</healthy_volunteers>
+  </eligibility>
+  <overall_official>
+    <last_name>Binita Shah, MD</last_name>
+    <role>Principal Investigator</role>
+    <affiliation>NYU School of Medicine</affiliation>
+  </overall_official>
+  <overall_contact>
+    <last_name>Fatmira Curovic</last_name>
+    <phone>646-501-9648</phone>
+    <email>fatmira.curovic@nyumc.org</email>
+  </overall_contact>
+  <overall_contact_backup>
+    <last_name>Binita Shah, MD</last_name>
+  </overall_contact_backup>
+  <location>
+    <facility>
+      <name>NYU School of Medicine</name>
+      <address>
+        <city>New York</city>
+        <state>New York</state>
+        <zip>10016</zip>
+        <country>United States</country>
+      </address>
+    </facility>
+    <status>Recruiting</status>
+    <contact>
+      <last_name>Fatmira Curovic</last_name>
+      <phone>646-501-9648</phone>
+      <email>fatmira.curovic@nyumc.org</email>
+    </contact>
+    <contact_backup>
+      <last_name>Binita Shah, MD</last_name>
+    </contact_backup>
+  </location>
+  <location_countries>
+    <country>United States</country>
+  </location_countries>
+  <verification_date>September 2019</verification_date>
+  <study_first_submitted>March 12, 2019</study_first_submitted>
+  <study_first_submitted_qc>March 12, 2019</study_first_submitted_qc>
+  <study_first_posted type="Actual">March 14, 2019</study_first_posted>
+  <last_update_submitted>September 10, 2019</last_update_submitted>
+  <last_update_submitted_qc>September 10, 2019</last_update_submitted_qc>
+  <last_update_posted type="Actual">September 12, 2019</last_update_posted>
+  <responsible_party>
+    <responsible_party_type>Principal Investigator</responsible_party_type>
+    <investigator_affiliation>NYU Langone Health</investigator_affiliation>
+    <investigator_full_name>Binita Shah</investigator_full_name>
+    <investigator_title>Assistant Professor of Medicine</investigator_title>
+  </responsible_party>
+  <condition_browse>
+    <!-- CAUTION:  The following MeSH terms are assigned with an imperfect algorithm            -->
+    <mesh_term>Myocardial Infarction</mesh_term>
+    <mesh_term>ST Elevation Myocardial Infarction</mesh_term>
+    <mesh_term>Infarction</mesh_term>
+  </condition_browse>
+  <intervention_browse>
+    <!-- CAUTION:  The following MeSH terms are assigned with an imperfect algorithm            -->
+    <mesh_term>Colchicine</mesh_term>
+  </intervention_browse>
+  <patient_data>
+    <sharing_ipd>No</sharing_ipd>
+  </patient_data>
+  <!-- Results have not yet been posted for this study                                          -->
+</clinical_study>
