@@ -755,6 +755,23 @@ public class XML {
         return toString(object, tagName, config, 0, 0);
     }
 
+    /**
+     * Convert a JSONObject into a well-formed, element-normal XML string,
+     * either pretty print or single-lined depending on indent factor.
+     *
+     * @param object
+     *            A JSONObject.
+     * @param tagName
+     *            The optional name of the enclosing tag.
+     * @param config
+     *            Configuration that can control output to XML.
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The current ident level in spaces.
+     * @return
+     * @throws JSONException
+     */
     private static String toString(final Object object, final String tagName, final XMLParserConfiguration config, int indentFactor, int indent)
             throws JSONException {
         StringBuilder sb = new StringBuilder();
@@ -934,6 +951,13 @@ public class XML {
         return toString(object, tagName, config, indentFactor, 0);
     }
 
+    /**
+     * Return a String consisting of a number of space characters specified by indent
+     *
+     * @param indent
+     *          The number of spaces to be appended to the String.
+     * @return
+     */
     private static final String indent(int indent) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < indent; i++) {
