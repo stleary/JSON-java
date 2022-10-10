@@ -1232,7 +1232,7 @@ public class XMLTest {
                     for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
                         expected.append(buffer, 0, numRead);
                     }
-                    assertEquals(expected.toString(), actualString);
+                    assertEquals(expected.toString().replaceAll("\\n|\\r\\n", System.getProperty("line.separator")), actualString);
                 } finally {
                     if (xmlStream != null) {
                         xmlStream.close();
