@@ -72,8 +72,10 @@ public class JSONPointerTest {
 
     @Test
     public void queryByEmptyKeySubObject() {
-        assertEquals( "{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some" +
-                " other value\"}", query("/obj/").toString());
+        JSONObject json = new JSONObject("{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some" +
+                " other value\"}");
+        JSONObject obj = (JSONObject) query("/obj/");
+        assertTrue(json.similar(obj));
     }
 
     @Test
