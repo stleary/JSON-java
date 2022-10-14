@@ -21,13 +21,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.XML;
-import org.json.XMLParserConfiguration;
-import org.json.XMLXsiTypeConverter;
+import org.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -1049,4 +1043,211 @@ public class XMLTest {
             fail("Expected to be unable to modify the config");
         } catch (Exception ignored) { }
     }
+
+    @Test
+    public void testIndentComplicatedJsonObject(){
+        String str = "{\n" +
+                "  \"success\": true,\n" +
+                "  \"error\": null,\n" +
+                "  \"response\": [\n" +
+                "    {\n" +
+                "      \"timestamp\": 1664917200,\n" +
+                "      \"dateTimeISO\": \"2022-10-05T00:00:00+03:00\",\n" +
+                "      \"loc\": {\n" +
+                "        \"lat\": 39.91987,\n" +
+                "        \"long\": 32.85427\n" +
+                "      },\n" +
+                "      \"place\": {\n" +
+                "        \"name\": \"ankara\",\n" +
+                "        \"state\": \"an\",\n" +
+                "        \"country\": \"tr\"\n" +
+                "      },\n" +
+                "      \"profile\": {\n" +
+                "        \"tz\": \"Europe/Istanbul\"\n" +
+                "      },\n" +
+                "      \"sun\": {\n" +
+                "        \"rise\": 1664941721,\n" +
+                "        \"riseISO\": \"2022-10-05T06:48:41+03:00\",\n" +
+                "        \"set\": 1664983521,\n" +
+                "        \"setISO\": \"2022-10-05T18:25:21+03:00\",\n" +
+                "        \"transit\": 1664962621,\n" +
+                "        \"transitISO\": \"2022-10-05T12:37:01+03:00\",\n" +
+                "        \"midnightSun\": false,\n" +
+                "        \"polarNight\": false,\n" +
+                "        \"twilight\": {\n" +
+                "          \"civilBegin\": 1664940106,\n" +
+                "          \"civilBeginISO\": \"2022-10-05T06:21:46+03:00\",\n" +
+                "          \"civilEnd\": 1664985136,\n" +
+                "          \"civilEndISO\": \"2022-10-05T18:52:16+03:00\",\n" +
+                "          \"nauticalBegin\": 1664938227,\n" +
+                "          \"nauticalBeginISO\": \"2022-10-05T05:50:27+03:00\",\n" +
+                "          \"nauticalEnd\": 1664987015,\n" +
+                "          \"nauticalEndISO\": \"2022-10-05T19:23:35+03:00\",\n" +
+                "          \"astronomicalBegin\": 1664936337,\n" +
+                "          \"astronomicalBeginISO\": \"2022-10-05T05:18:57+03:00\",\n" +
+                "          \"astronomicalEnd\": 1664988905,\n" +
+                "          \"astronomicalEndISO\": \"2022-10-05T19:55:05+03:00\"\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"moon\": {\n" +
+                "        \"rise\": 1664976480,\n" +
+                "        \"riseISO\": \"2022-10-05T16:28:00+03:00\",\n" +
+                "        \"set\": 1664921520,\n" +
+                "        \"setISO\": \"2022-10-05T01:12:00+03:00\",\n" +
+                "        \"transit\": 1664994240,\n" +
+                "        \"transitISO\": \"2022-10-05T21:24:00+03:00\",\n" +
+                "        \"underfoot\": 1664949360,\n" +
+                "        \"underfootISO\": \"2022-10-05T08:56:00+03:00\",\n" +
+                "        \"phase\": {\n" +
+                "          \"phase\": 0.3186,\n" +
+                "          \"name\": \"waxing gibbous\",\n" +
+                "          \"illum\": 71,\n" +
+                "          \"age\": 9.41,\n" +
+                "          \"angle\": 0.55\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}" ;
+        JSONObject jsonObject = new JSONObject(str);
+        String actualIndentedXmlString = XML.toString(jsonObject, 1);
+        String expected = "<success>true</success>\n" +
+                "<response>\n" +
+                " <dateTimeISO>2022-10-05T00:00:00+03:00</dateTimeISO>\n" +
+                " <loc>\n" +
+                "  <lat>39.91987</lat>\n" +
+                "  <long>32.85427</long>\n" +
+                " </loc>\n" +
+                " <moon>\n" +
+                "  <phase>\n" +
+                "   <phase>0.3186</phase>\n" +
+                "   <name>waxing gibbous</name>\n" +
+                "   <angle>0.55</angle>\n" +
+                "   <illum>71</illum>\n" +
+                "   <age>9.41</age>\n" +
+                "  </phase>\n" +
+                "  <setISO>2022-10-05T01:12:00+03:00</setISO>\n" +
+                "  <underfoot>1664949360</underfoot>\n" +
+                "  <set>1664921520</set>\n" +
+                "  <transit>1664994240</transit>\n" +
+                "  <transitISO>2022-10-05T21:24:00+03:00</transitISO>\n" +
+                "  <riseISO>2022-10-05T16:28:00+03:00</riseISO>\n" +
+                "  <rise>1664976480</rise>\n" +
+                "  <underfootISO>2022-10-05T08:56:00+03:00</underfootISO>\n" +
+                " </moon>\n" +
+                " <profile>\n" +
+                "  <tz>Europe/Istanbul</tz>\n" +
+                " </profile>\n" +
+                " <place>\n" +
+                "  <country>tr</country>\n" +
+                "  <name>ankara</name>\n" +
+                "  <state>an</state>\n" +
+                " </place>\n" +
+                " <sun>\n" +
+                "  <setISO>2022-10-05T18:25:21+03:00</setISO>\n" +
+                "  <midnightSun>false</midnightSun>\n" +
+                "  <set>1664983521</set>\n" +
+                "  <transit>1664962621</transit>\n" +
+                "  <polarNight>false</polarNight>\n" +
+                "  <transitISO>2022-10-05T12:37:01+03:00</transitISO>\n" +
+                "  <riseISO>2022-10-05T06:48:41+03:00</riseISO>\n" +
+                "  <rise>1664941721</rise>\n" +
+                "  <twilight>\n" +
+                "   <civilEnd>1664985136</civilEnd>\n" +
+                "   <astronomicalBegin>1664936337</astronomicalBegin>\n" +
+                "   <astronomicalEnd>1664988905</astronomicalEnd>\n" +
+                "   <astronomicalBeginISO>2022-10-05T05:18:57+03:00</astronomicalBeginISO>\n" +
+                "   <civilBegin>1664940106</civilBegin>\n" +
+                "   <nauticalEndISO>2022-10-05T19:23:35+03:00</nauticalEndISO>\n" +
+                "   <astronomicalEndISO>2022-10-05T19:55:05+03:00</astronomicalEndISO>\n" +
+                "   <nauticalBegin>1664938227</nauticalBegin>\n" +
+                "   <nauticalEnd>1664987015</nauticalEnd>\n" +
+                "   <nauticalBeginISO>2022-10-05T05:50:27+03:00</nauticalBeginISO>\n" +
+                "   <civilBeginISO>2022-10-05T06:21:46+03:00</civilBeginISO>\n" +
+                "   <civilEndISO>2022-10-05T18:52:16+03:00</civilEndISO>\n" +
+                "  </twilight>\n" +
+                " </sun>\n" +
+                " <timestamp>1664917200</timestamp>\n" +
+                "</response>\n" +
+                "<error>null</error>\n";
+        assertEquals(actualIndentedXmlString, expected);
+
+
+    }
+    @Test
+    public void testIndentSimpleJsonObject(){
+        String str = "{    \"employee\": {  \n" +
+                "        \"name\":       \"sonoo\",   \n" +
+                "        \"salary\":      56000,   \n" +
+                "        \"married\":    true  \n" +
+                "    }}";
+        JSONObject jsonObject = new JSONObject(str);
+        String actual = XML.toString(jsonObject, "Test", 2);
+        String expected = "<Test>\n" +
+                "  <employee>\n" +
+                "    <name>sonoo</name>\n" +
+                "    <salary>56000</salary>\n" +
+                "    <married>true</married>\n" +
+                "  </employee>\n" +
+                "</Test>\n";
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testIndentSimpleJsonArray(){
+        String str = "[  \n" +
+                "    {\"name\":\"Ram\", \"email\":\"Ram@gmail.com\"},  \n" +
+                "    {\"name\":\"Bob\", \"email\":\"bob32@gmail.com\"}  \n" +
+                "]  ";
+        JSONArray jsonObject = new JSONArray(str);
+        String actual = XML.toString(jsonObject, 2);
+        String expected = "<array>\n" +
+                "  <name>Ram</name>\n" +
+                "  <email>Ram@gmail.com</email>\n" +
+                "</array>\n" +
+                "<array>\n" +
+                "  <name>Bob</name>\n" +
+                "  <email>bob32@gmail.com</email>\n" +
+                "</array>\n";
+        assertEquals(actual, expected);
+
+
+    }
+
+    @Test
+    public void testIndentComplicatedJsonObjectWithArrayAndWithConfig(){
+        try {
+            InputStream jsonStream = null;
+            try {
+                jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.json");
+                final JSONObject object = new JSONObject(new JSONTokener(jsonStream));
+                String actualString = XML.toString(object, null, XMLParserConfiguration.KEEP_STRINGS,2);
+                InputStream xmlStream = null;
+                try {
+                    xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.xml");
+                    int bufferSize = 1024;
+                    char[] buffer = new char[bufferSize];
+                    StringBuilder expected = new StringBuilder();
+                    Reader in = new InputStreamReader(xmlStream, "UTF-8");
+                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                        expected.append(buffer, 0, numRead);
+                    }
+                    assertEquals(expected.toString(), actualString.replaceAll("\\n|\\r\\n", System.getProperty("line.separator")));
+                } finally {
+                    if (xmlStream != null) {
+                        xmlStream.close();
+                    }
+                }
+            } finally {
+                if (jsonStream != null) {
+                    jsonStream.close();
+                }
+            }
+        } catch (IOException e) {
+            fail("file writer error: " +e.getMessage());
+        }
+    }
 }
+
+
+

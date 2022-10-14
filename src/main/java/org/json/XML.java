@@ -752,6 +752,28 @@ public class XML {
      */
     public static String toString(final Object object, final String tagName, final XMLParserConfiguration config)
             throws JSONException {
+        return toString(object, tagName, config, 0, 0);
+    }
+
+    /**
+     * Convert a JSONObject into a well-formed, element-normal XML string,
+     * either pretty print or single-lined depending on indent factor.
+     *
+     * @param object
+     *            A JSONObject.
+     * @param tagName
+     *            The optional name of the enclosing tag.
+     * @param config
+     *            Configuration that can control output to XML.
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The current ident level in spaces.
+     * @return
+     * @throws JSONException
+     */
+    private static String toString(final Object object, final String tagName, final XMLParserConfiguration config, int indentFactor, int indent)
+            throws JSONException {
         StringBuilder sb = new StringBuilder();
         JSONArray ja;
         JSONObject jo;
@@ -761,9 +783,14 @@ public class XML {
 
             // Emit <tagName>
             if (tagName != null) {
+                sb.append(indent(indent));
                 sb.append('<');
                 sb.append(tagName);
                 sb.append('>');
+                if(indentFactor > 0){
+                    sb.append("\n");
+                    indent += indentFactor;
+                }
             }
 
             // Loop thru the keys.
@@ -806,31 +833,39 @@ public class XML {
                             sb.append('<');
                             sb.append(key);
                             sb.append('>');
-                            sb.append(toString(val, null, config));
+                            sb.append(toString(val, null, config, indentFactor, indent));
                             sb.append("</");
                             sb.append(key);
                             sb.append('>');
                         } else {
-                            sb.append(toString(val, key, config));
+                            sb.append(toString(val, key, config, indentFactor, indent));
                         }
                     }
                 } else if ("".equals(value)) {
+                    sb.append(indent(indent));
                     sb.append('<');
                     sb.append(key);
                     sb.append("/>");
+                    if(indentFactor > 0){
+                        sb.append("\n");
+                    }
 
                     // Emit a new tag <k>
 
                 } else {
-                    sb.append(toString(value, key, config));
+                    sb.append(toString(value, key, config, indentFactor, indent));
                 }
             }
             if (tagName != null) {
 
                 // Emit the </tagName> close tag
+                sb.append(indent(indent - indentFactor));
                 sb.append("</");
                 sb.append(tagName);
                 sb.append('>');
+                if(indentFactor > 0){
+                    sb.append("\n");
+                }
             }
             return sb.toString();
 
@@ -849,15 +884,85 @@ public class XML {
                 // XML does not have good support for arrays. If an array
                 // appears in a place where XML is lacking, synthesize an
                 // <array> element.
-                sb.append(toString(val, tagName == null ? "array" : tagName, config));
+                sb.append(toString(val, tagName == null ? "array" : tagName, config, indentFactor, indent));
             }
             return sb.toString();
         }
 
-        string = (object == null) ? "null" : escape(object.toString());
-        return (tagName == null) ? "\"" + string + "\""
-                : (string.length() == 0) ? "<" + tagName + "/>" : "<" + tagName
-                        + ">" + string + "</" + tagName + ">";
 
+        string = (object == null) ? "null" : escape(object.toString());
+
+        if(tagName == null){
+            return indent(indent) + "\"" + string + "\"" + ((indentFactor > 0) ? "\n" : "");
+        } else if(string.length() == 0){
+            return indent(indent) + "<" + tagName + "/>" + ((indentFactor > 0) ? "\n" : "");
+        } else {
+            return indent(indent) + "<" + tagName
+                    + ">" + string + "</" + tagName + ">" + ((indentFactor > 0) ? "\n" : "");
+        }
+    }
+
+    /**
+     * Convert a JSONObject into a well-formed, pretty printed element-normal XML string.
+     *
+     * @param object
+     *            A JSONObject.
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @return A string.
+     * @throws JSONException Thrown if there is an error parsing the string
+     */
+    public static String toString(Object object, int indentFactor){
+        return toString(object, null, XMLParserConfiguration.ORIGINAL, indentFactor);
+    }
+
+    /**
+     * Convert a JSONObject into a well-formed, pretty printed element-normal XML string.
+     *
+     * @param object
+     *            A JSONObject.
+     * @param tagName
+     *            The optional name of the enclosing tag.
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @return A string.
+     * @throws JSONException Thrown if there is an error parsing the string
+     */
+    public static String toString(final Object object, final String tagName, int indentFactor) {
+        return toString(object, tagName, XMLParserConfiguration.ORIGINAL, indentFactor);
+    }
+
+    /**
+     * Convert a JSONObject into a well-formed, pretty printed element-normal XML string.
+     *
+     * @param object
+     *            A JSONObject.
+     * @param tagName
+     *            The optional name of the enclosing tag.
+     * @param config
+     *            Configuration that can control output to XML.
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @return A string.
+     * @throws JSONException Thrown if there is an error parsing the string
+     */
+    public static String toString(final Object object, final String tagName, final XMLParserConfiguration config, int indentFactor)
+            throws JSONException {
+        return toString(object, tagName, config, indentFactor, 0);
+    }
+
+    /**
+     * Return a String consisting of a number of space characters specified by indent
+     *
+     * @param indent
+     *          The number of spaces to be appended to the String.
+     * @return
+     */
+    private static final String indent(int indent) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < indent; i++) {
+            sb.append(' ');
+        }
+        return sb.toString();
     }
 }
