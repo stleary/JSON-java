@@ -142,10 +142,6 @@ public class JSONArray implements Iterable<Object> {
     public JSONArray(String source) throws JSONException {
         this(new JSONTokener(source));
     }
-    
-    public JSONArray(Collection<?> collection) {
-        this(collection, null);
-    }
 
     /**
      * Construct a JSONArray from a Collection.
@@ -153,7 +149,23 @@ public class JSONArray implements Iterable<Object> {
      * @param collection
      *            A Collection.
      */
-    public JSONArray(Collection<?> collection, Set<Object> objectsRecord) {
+    public JSONArray(Collection<?> collection) {
+        this(collection, null);
+    }
+
+    /**
+     * Construct a JSONArray from a Collection, with an objectsRecord
+     * set to identify recursively defined objects.
+     * 
+     * It's package-private because it is called exclusively by
+     * {@code JSONObject#wrap(Object, Set)}.
+     *
+     * @param collection
+     *            A Collection.
+     * @param objectsRecord
+     *            The set of already recorded objects
+     */
+    JSONArray(Collection<?> collection, Set<Object> objectsRecord) {
         if (collection == null) {
             this.myArrayList = new ArrayList<Object>();
         } else {
@@ -1598,6 +1610,18 @@ public class JSONArray implements Iterable<Object> {
         this.addAll(collection, wrap, null);
     }
     
+    /**
+     * In addition to adding a collection to the JSONArray in the manner of {@code #addAll(Collection, boolean)},
+     * propagates the objectsRecord to {@code JSONObject#wrap(Object, Set)} to identify recursively defined objects.
+     * 
+     * @param collection
+     *            A Collection.
+     * @param wrap
+     *            {@code true} to call {@link JSONObject#wrap(Object)} for each item,
+     *            {@code false} to add the items directly
+     * @param objectsRecord
+     *            The set of already recorded objects
+     */
     private void addAll(Collection<?> collection, boolean wrap, Set<Object> objectsRecord) {
         this.myArrayList.ensureCapacity(this.myArrayList.size() + collection.size());
         if (wrap) {

@@ -2466,7 +2466,20 @@ public class JSONObject {
         return wrap(object, null);
     }
 
-    public static Object wrap(Object object, Set<Object> objectsRecord) {
+    /**
+     * Wraps the object much like {@code #wrap(Object)}, but propagates an objectsRecord set
+     * to identify recursively defined objects.
+     * 
+     * It's package private because other classes in this package may need to further propagate
+     * the set.
+     * 
+     * @param object
+     *            The object to wrap
+     * @param objectsRecord
+     *            The set of already recorded objects
+     * @return The wrapped value
+     */
+    static Object wrap(Object object, Set<Object> objectsRecord) {
         try {
             if (NULL.equals(object)) {
                 return NULL;
