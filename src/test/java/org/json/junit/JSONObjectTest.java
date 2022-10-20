@@ -71,6 +71,8 @@ public class JSONObjectTest {
      *  output to guarantee that we are always writing valid JSON. 
      */
     static final Pattern NUMBER_PATTERN = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
+    
+
 
     /**
      * Tests that the similar method is working as expected.
