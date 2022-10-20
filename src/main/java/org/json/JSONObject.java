@@ -1545,6 +1545,20 @@ public class JSONObject {
                             // itself DFS recursive
                             if (objectsRecord.contains(result)) {
                                 throw recursivelyDefinedObjectException(key);
+                            } else if (result instanceof Collection) {
+                                Collection<?> collection = (Collection<?>) result;
+                                // We're modifying the collection to check it,
+                                // so we want to not affect the original collection.
+                                Set<Object> set =  Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>());
+                                set.addAll(collection);
+                                
+                                for (Object object : objectsRecord) {
+                                    if (object instanceof Collection 
+                                            && set.removeAll((Collection<?>) object)
+                                            || set.remove(object)) {
+                                        throw recursivelyDefinedObjectException(key);
+                                    }
+                                }
                             }
                             
                             objectsRecord.add(result);
@@ -2452,7 +2466,7 @@ public class JSONObject {
         return wrap(object, null);
     }
 
-    private static Object wrap(Object object, Set<Object> objectsRecord) {
+    public static Object wrap(Object object, Set<Object> objectsRecord) {
         try {
             if (NULL.equals(object)) {
                 return NULL;
@@ -2470,7 +2484,7 @@ public class JSONObject {
 
             if (object instanceof Collection) {
                 Collection<?> coll = (Collection<?>) object;
-                return new JSONArray(coll);
+                return new JSONArray(coll, objectsRecord);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);

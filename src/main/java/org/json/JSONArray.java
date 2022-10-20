@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -141,6 +142,10 @@ public class JSONArray implements Iterable<Object> {
     public JSONArray(String source) throws JSONException {
         this(new JSONTokener(source));
     }
+    
+    public JSONArray(Collection<?> collection) {
+        this(collection, null);
+    }
 
     /**
      * Construct a JSONArray from a Collection.
@@ -148,12 +153,12 @@ public class JSONArray implements Iterable<Object> {
      * @param collection
      *            A Collection.
      */
-    public JSONArray(Collection<?> collection) {
+    public JSONArray(Collection<?> collection, Set<Object> objectsRecord) {
         if (collection == null) {
             this.myArrayList = new ArrayList<Object>();
         } else {
             this.myArrayList = new ArrayList<Object>(collection.size());
-            this.addAll(collection, true);
+            this.addAll(collection, true, objectsRecord);
         }
     }
 
@@ -1577,7 +1582,8 @@ public class JSONArray implements Iterable<Object> {
     public boolean isEmpty() {
         return this.myArrayList.isEmpty();
     }
-
+    
+    
     /**
      * Add a collection's elements to the JSONArray.
      *
@@ -1589,10 +1595,14 @@ public class JSONArray implements Iterable<Object> {
      *            
      */
     private void addAll(Collection<?> collection, boolean wrap) {
+        this.addAll(collection, wrap, null);
+    }
+    
+    private void addAll(Collection<?> collection, boolean wrap, Set<Object> objectsRecord) {
         this.myArrayList.ensureCapacity(this.myArrayList.size() + collection.size());
         if (wrap) {
             for (Object o: collection){
-                this.put(JSONObject.wrap(o));
+                this.put(JSONObject.wrap(o, objectsRecord));
             }
         } else {
             for (Object o: collection){
