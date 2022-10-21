@@ -9,6 +9,7 @@ import org.hamcrest.core.StringContains;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -49,18 +50,20 @@ public class JSONObjectRecursiveExceptionTest {
         exceptionRule.expectMessage(StringContains.containsString("JavaBean object contains recursively defined member variable of key"));
     }
    
-    @Test//(expected = JSONException.class)
-    public void testRecursiveList() {
-          
+    
+    @Test
+    public void testRecursiveList() {          
         new JSONObject(new RecursiveList());
     }
     
-    @Test//(expected = JSONException.class)
+    @Ignore
+    @Test
     public void testRecursiveArray() {        
         new JSONObject(new RecursiveArray());
     }
     
-    @Test//(expected = JSONException.class)
+    @Ignore
+    @Test
     public void testRecursiveMap() {        
         new JSONObject(new RecursiveMap());
     }
