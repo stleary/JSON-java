@@ -20,6 +20,7 @@ and artifactId "json". For example:
 20190722    Recent commits
 
 20180813    POM change to include Automatic-Module-Name (#431)
+            JSONObject(Map) now throws an exception if any of a map keys are null (#405)
 
 20180130    Recent commits
 
