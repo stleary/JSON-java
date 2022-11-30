@@ -102,10 +102,6 @@ For more information, please see [NOTES.md](https://github.com/stleary/JSON-java
 
 For more information on files, please see [FILES.md](https://github.com/stleary/JSON-java/blob/master/docs/FILES.md)
 
-# Interview Practice Problems
-
-[Pretty Json](https://www.interviewbit.com/problems/pretty-json/) - Problem asked in Microsoft & Facebook
-
 # Release history:
 
 For the release history, please see [RELEASES.md](https://github.com/stleary/JSON-java/blob/master/docs/RELEASES.md)
