@@ -6,6 +6,8 @@ Public Domain.
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
@@ -81,7 +83,14 @@ import java.util.regex.Pattern;
  * @author JSON.org
  * @version 2016-08-15
  */
-public class JSONObject {
+public class JSONObject implements Serializable, Cloneable {
+
+    /** Only expected to ever be one representation - to/from a JSON string. */
+    private static final long serialVersionUID = 1L;
+
+    /** Used temporarily when reading serialized state from JSON string. */
+    private transient String tmpSerialized;
+
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
      * whilst Java's null is equivalent to the value that JavaScript calls
@@ -456,6 +465,35 @@ public class JSONObject {
      */
     protected JSONObject(int initialCapacity){
         this.map = new HashMap<String, Object>(initialCapacity);
+    }
+
+
+    /** Serialize state to a JSON string */
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.writeObject(this.toString());
+    }
+
+    /** De-serialize state from a JSON string */
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+//        in.registerValidation(this, 0); // Do not see any need for special validation
+        tmpSerialized = (String) in.readObject();
+    }
+
+    /* Do not see any need for special validation
+    @Override
+    public void validateObject() throws InvalidObjectException {
+        System.out.println("validateObject");
+    }
+    */
+
+    /** Create new object from JSON string read from serialized input stream. */
+    private Object readResolve() throws ObjectStreamException {
+        return new JSONObject(tmpSerialized);
+    }
+
+    /** Clone this object (via JSON string representation). */ 
+    public Object clone() throws CloneNotSupportedException {
+        return new JSONObject(this.toString());
     }
 
     /**
