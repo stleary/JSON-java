@@ -211,19 +211,19 @@ public class JSONObject {
             char prev = x.getPrevious();
             c = x.nextClean();
             switch (c) {
-                case 0:
-                    throw x.syntaxError("A JSONObject text must end with '}'");
-                case '}':
-                    return;
-                case '{':
-                case '[':
-                    if(prev=='{') {
-                        throw x.syntaxError("A JSON Object can not directly nest another JSON Object or JSON Array.");
-                    }
-                    // fall through
-                default:
-                    x.back();
-                    key = x.nextValue().toString();
+            case 0:
+                throw x.syntaxError("A JSONObject text must end with '}'");
+            case '}':
+                return;
+            case '{':
+            case '[':
+                if(prev=='{') {
+                    throw x.syntaxError("A JSON Object can not directly nest another JSON Object or JSON Array.");
+                }
+                // fall through
+            default:
+                x.back();
+                key = x.nextValue().toString();
             }
 
             // The key is followed by ':'.
@@ -251,17 +251,17 @@ public class JSONObject {
             // Pairs are separated by ','.
 
             switch (x.nextClean()) {
-                case ';':
-                case ',':
-                    if (x.nextClean() == '}') {
-                        return;
-                    }
-                    x.back();
-                    break;
-                case '}':
+            case ';':
+            case ',':
+                if (x.nextClean() == '}') {
                     return;
-                default:
-                    throw x.syntaxError("Expected a ',' or '}'");
+                }
+                x.back();
+                break;
+            case '}':
+                return;
+            default:
+                throw x.syntaxError("Expected a ',' or '}'");
             }
         }
     }
@@ -282,10 +282,10 @@ public class JSONObject {
             this.map = new HashMap<String, Object>();
         } else {
             this.map = new HashMap<String, Object>(m.size());
-            for (final Entry<?, ?> e : m.entrySet()) {
-                if(e.getKey() == null) {
-                    throw new NullPointerException("Null key.");
-                }
+        	for (final Entry<?, ?> e : m.entrySet()) {
+        	    if(e.getKey() == null) {
+        	        throw new NullPointerException("Null key.");
+        	    }
                 final Object value = e.getValue();
                 if (value != null) {
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
@@ -611,11 +611,11 @@ public class JSONObject {
         Object object = this.get(key);
         if (object.equals(Boolean.FALSE)
                 || (object instanceof String && ((String) object)
-                .equalsIgnoreCase("false"))) {
+                        .equalsIgnoreCase("false"))) {
             return false;
         } else if (object.equals(Boolean.TRUE)
                 || (object instanceof String && ((String) object)
-                .equalsIgnoreCase("true"))) {
+                        .equalsIgnoreCase("true"))) {
             return true;
         }
         throw wrongValueFormatException(key, "Boolean", object, null);
@@ -996,9 +996,9 @@ public class JSONObject {
      *        is empty.
      */
     public JSONArray names() {
-        if(this.map.isEmpty()) {
-            return null;
-        }
+    	if(this.map.isEmpty()) {
+    		return null;
+    	}
         return new JSONArray(this.map.keySet());
     }
 
@@ -1590,7 +1590,6 @@ public class JSONObject {
         if (annotation != null && annotation.value() != null && !annotation.value().isEmpty()) {
             return annotation.value();
         }
-
         String key;
         final String name = method.getName();
         if (name.startsWith("get") && name.length() > 3) {
@@ -1980,7 +1979,7 @@ public class JSONObject {
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
      */
     public Object optQuery(String jsonPointer) {
-        return optQuery(new JSONPointer(jsonPointer));
+    	return optQuery(new JSONPointer(jsonPointer));
     }
 
     /**
@@ -2040,42 +2039,42 @@ public class JSONObject {
             b = c;
             c = string.charAt(i);
             switch (c) {
-                case '\\':
-                case '"':
+            case '\\':
+            case '"':
+                w.write('\\');
+                w.write(c);
+                break;
+            case '/':
+                if (b == '<') {
                     w.write('\\');
+                }
+                w.write(c);
+                break;
+            case '\b':
+                w.write("\\b");
+                break;
+            case '\t':
+                w.write("\\t");
+                break;
+            case '\n':
+                w.write("\\n");
+                break;
+            case '\f':
+                w.write("\\f");
+                break;
+            case '\r':
+                w.write("\\r");
+                break;
+            default:
+                if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                        || (c >= '\u2000' && c < '\u2100')) {
+                    w.write("\\u");
+                    hhhh = Integer.toHexString(c);
+                    w.write("0000", 0, 4 - hhhh.length());
+                    w.write(hhhh);
+                } else {
                     w.write(c);
-                    break;
-                case '/':
-                    if (b == '<') {
-                        w.write('\\');
-                    }
-                    w.write(c);
-                    break;
-                case '\b':
-                    w.write("\\b");
-                    break;
-                case '\t':
-                    w.write("\\t");
-                    break;
-                case '\n':
-                    w.write("\\n");
-                    break;
-                case '\f':
-                    w.write("\\f");
-                    break;
-                case '\r':
-                    w.write("\\r");
-                    break;
-                default:
-                    if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                            || (c >= '\u2000' && c < '\u2100')) {
-                        w.write("\\u");
-                        hhhh = Integer.toHexString(c);
-                        w.write("0000", 0, 4 - hhhh.length());
-                        w.write(hhhh);
-                    } else {
-                        w.write(c);
-                    }
+                }
             }
         }
         w.write('"');
@@ -2115,10 +2114,10 @@ public class JSONObject {
                 Object valueThis = entry.getValue();
                 Object valueOther = ((JSONObject)other).get(name);
                 if(valueThis == valueOther) {
-                    continue;
+                	continue;
                 }
                 if(valueThis == null) {
-                    return false;
+                	return false;
                 }
                 if (valueThis instanceof JSONObject) {
                     if (!((JSONObject)valueThis).similar(valueOther)) {
@@ -2130,11 +2129,11 @@ public class JSONObject {
                     }
                 } else if (valueThis instanceof Number && valueOther instanceof Number) {
                     if (!isNumberSimilar((Number)valueThis, (Number)valueOther)) {
-                        return false;
+                    	return false;
                     }
                 } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
                     if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
-                        return false;
+                    	return false;
                     }
                 } else if (!valueThis.equals(valueOther)) {
                     return false;
@@ -2436,10 +2435,10 @@ public class JSONObject {
      *             If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
-        // moves the implementation to JSONWriter as:
-        // 1. It makes more sense to be part of the writer class
-        // 2. For Android support this method is not available. By implementing it in the Writer
-        //    Android users can use the writer with the built in Android JSONObject implementation.
+    	// moves the implementation to JSONWriter as:
+    	// 1. It makes more sense to be part of the writer class
+    	// 2. For Android support this method is not available. By implementing it in the Writer
+    	//    Android users can use the writer with the built in Android JSONObject implementation.
         return JSONWriter.valueToString(value);
     }
 
@@ -2522,7 +2521,7 @@ public class JSONObject {
 
     @SuppressWarnings("resource")
     static final Writer writeValue(Writer writer, Object value,
-                                   int indentFactor, int indent) throws JSONException, IOException {
+            int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof JSONString) {
@@ -2607,7 +2606,7 @@ public class JSONObject {
             writer.write('{');
 
             if (length == 1) {
-                final Entry<String,?> entry = this.entrySet().iterator().next();
+            	final Entry<String,?> entry = this.entrySet().iterator().next();
                 final String key = entry.getKey();
                 writer.write(quote(key));
                 writer.write(':');
@@ -2717,7 +2716,7 @@ public class JSONObject {
      */
     private static JSONException recursivelyDefinedObjectException(String key) {
         return new JSONException(
-                "JavaBean object contains recursively defined member variable of key " + quote(key)
+            "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
     }
 }
