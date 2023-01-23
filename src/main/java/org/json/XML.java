@@ -560,6 +560,15 @@ public class XML {
     }
 
 
+    //TODO: For Sonia
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path){
+        return new JSONObject();
+    }
+
+    //TODO: For Jane
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement){
+        return new JSONObject();
+    }
     /**
      * Convert a well-formed (but not necessarily valid) XML string into a
      * JSONObject. Some information may be lost in this transformation because
