@@ -40,15 +40,15 @@ public class JSONPointerTest {
     }
 
     // Jane: nextKey() unit tests
-    @Test
-    public void nextKeyTest(){
-        JSONPointer pointer = new JSONPointer("/obj/other~0key/another~1key/0");
-        assertEquals("obj", pointer.nextKey());
-        assertEquals("other~key", pointer.nextKey());
-        assertEquals("another/key", pointer.nextKey());
-        assertEquals("0", pointer.nextKey());
-        assertEquals("", pointer.nextKey());
-    }
+//    @Test
+//    public void nextKeyTest(){
+//        JSONPointer pointer = new JSONPointer("/obj/other~0key/another~1key/0");
+//        assertEquals("obj", pointer.nextKey());
+//        assertEquals("other~key", pointer.nextKey());
+//        assertEquals("another/key", pointer.nextKey());
+//        assertEquals("0", pointer.nextKey());
+//        assertEquals("", pointer.nextKey());
+//    }
     @Test
     public void emptyPointer() {
         assertTrue(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).similar(query("")));

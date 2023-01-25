@@ -109,13 +109,9 @@ public class JSONPointer {
     // Segments for the JSONPointer string
     private final List<String> refTokens;
     // Jane: add some fields and functions to access the next refTokens
-    private int currentInd;
-
-    public String nextKey(){
-        if (currentInd + 1 <= this.refTokens.size()){
-            return refTokens.get(currentInd++);
-        }
-        return "";
+    public List<String> getRefTokens(){
+        // read only
+        return new ArrayList<>(this.refTokens);
     }
 
     /**
