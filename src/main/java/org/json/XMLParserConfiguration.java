@@ -16,6 +16,12 @@ import java.util.Set;
  */
 @SuppressWarnings({""})
 public class XMLParserConfiguration {
+    /**
+     * Used to indicate there's no defined limit to the maximum nesting depth when parsing a XML
+     * document to JSON.
+     */
+    public static final int UNDEFINED_MAXIMUM_NESTING_DEPTH = -1;
+
     /** Original Configuration of the XML Parser. */
     public static final XMLParserConfiguration ORIGINAL
         = new XMLParserConfiguration();
@@ -53,6 +59,12 @@ public class XMLParserConfiguration {
      * to arrays
      */
     private Set<String> forceList;
+
+    /**
+     * When parsing the XML into JSON, specifies the tags whose values should be converted
+     * to arrays
+     */
+    private int maxNestingDepth = UNDEFINED_MAXIMUM_NESTING_DEPTH;
 
     /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert
@@ -295,6 +307,35 @@ public class XMLParserConfiguration {
         XMLParserConfiguration newConfig = this.clone();
         Set<String> cloneForceList = new HashSet<String>(forceList);
         newConfig.forceList = Collections.unmodifiableSet(cloneForceList);
+        return newConfig;
+    }
+
+    /**
+     * The maximum nesting depth that the parser will descend before throwing an exception
+     * when parsing the XML into JSON.
+     * @return the maximum nesting depth set for this configuration
+     */
+    public int getMaxNestingDepth() {
+        return maxNestingDepth;
+    }
+
+    /**
+     * Defines the maximum nesting depth that the parser will descend before throwing an exception
+     * when parsing the XML into JSON. The default max nesting depth is undefined, which means the
+     * parser will go as deep as the maximum call stack size allows. Using any negative value as a
+     * parameter is equivalent to setting no limit to the nesting depth.
+     * @param maxNestingDepth the maximum nesting depth allowed to the XML parser
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    public XMLParserConfiguration withMaxNestingDepth(int maxNestingDepth) {
+        XMLParserConfiguration newConfig = this.clone();
+
+        if (maxNestingDepth > UNDEFINED_MAXIMUM_NESTING_DEPTH) {
+            newConfig.maxNestingDepth = maxNestingDepth;
+        } else {
+            newConfig.maxNestingDepth = UNDEFINED_MAXIMUM_NESTING_DEPTH;
+        }
+
         return newConfig;
     }
 }
