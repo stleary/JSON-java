@@ -1285,6 +1285,27 @@ public class XMLTest {
                 e.getMessage().startsWith("Maximum nesting depth of " + maxNestingDepth));
         }
     }
+
+    @Test
+    public void testMaxNestingDepthWithValidFittingXML() {
+        final String perfectlyFineXML = "<Test>\n" +
+            "  <employee>\n" +
+            "    <name>sonoo</name>\n" +
+            "    <salary>56000</salary>\n" +
+            "    <married>true</married>\n" +
+            "  </employee>\n" +
+            "</Test>\n";
+
+        final int maxNestingDepth = 3;
+
+        try {
+            XML.toJSONObject(perfectlyFineXML, XMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            fail("XML document should be parsed as its maximum depth fits the maxNestingDepth " +
+                "parameter of the XMLParserConfiguration used");
+        }
+    }
 }
 
 
