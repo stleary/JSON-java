@@ -648,10 +648,6 @@ public class XML {
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
      * numbers but will instead be the exact value as seen in the XML document.
      *
-     * This method can parse documents with a maximum nesting depth of 256. If you
-     * need to parse documents with a nesting depth greater than 256, you should use
-     *
-     *
      * @param reader The XML source reader.
      * @param config Configuration options for the parser
      * @return A JSONObject containing the structured data from the XML string.
