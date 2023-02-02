@@ -1056,7 +1056,7 @@ public class XMLConfigurationTest {
     public void testMaxNestingDepthIsSet() {
         XMLParserConfiguration xmlParserConfiguration = XMLParserConfiguration.ORIGINAL;
 
-        assertEquals(xmlParserConfiguration.getMaxNestingDepth(), XMLParserConfiguration.UNDEFINED_MAXIMUM_NESTING_DEPTH);
+        assertEquals(xmlParserConfiguration.getMaxNestingDepth(), XMLParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH);
 
         xmlParserConfiguration = xmlParserConfiguration.withMaxNestingDepth(42);
 

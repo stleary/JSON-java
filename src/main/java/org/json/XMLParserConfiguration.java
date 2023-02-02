@@ -22,6 +22,11 @@ public class XMLParserConfiguration {
      */
     public static final int UNDEFINED_MAXIMUM_NESTING_DEPTH = -1;
 
+    /**
+     * The default maximum nesting depth when parsing a XML document to JSON.
+     */
+    public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = 512;
+
     /** Original Configuration of the XML Parser. */
     public static final XMLParserConfiguration ORIGINAL
         = new XMLParserConfiguration();
@@ -64,7 +69,7 @@ public class XMLParserConfiguration {
      * When parsing the XML into JSON, specifies the tags whose values should be converted
      * to arrays
      */
-    private int maxNestingDepth = UNDEFINED_MAXIMUM_NESTING_DEPTH;
+    private int maxNestingDepth = DEFAULT_MAXIMUM_NESTING_DEPTH;
 
     /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert
@@ -321,8 +326,8 @@ public class XMLParserConfiguration {
 
     /**
      * Defines the maximum nesting depth that the parser will descend before throwing an exception
-     * when parsing the XML into JSON. The default max nesting depth is undefined, which means the
-     * parser will go as deep as the maximum call stack size allows. Using any negative value as a
+     * when parsing the XML into JSON. The default max nesting depth is 512, which means the parser
+     * will go as deep as the maximum call stack size allows. Using any negative value as a
      * parameter is equivalent to setting no limit to the nesting depth.
      * @param maxNestingDepth the maximum nesting depth allowed to the XML parser
      * @return The existing configuration will not be modified. A new configuration is returned.
