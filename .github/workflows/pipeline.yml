@@ -32,7 +32,7 @@ jobs:
         run: |
           jar cvf target/org.json.jar -C target/classes .
       - name: Upload Java ${{ matrix.java }} JAR
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Java ${{ matrix.java }} JAR
           path: target/org.json.jar
@@ -64,13 +64,13 @@ jobs:
           mvn site -DgenerateReports=false -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
       - name: Upload Test Results ${{ matrix.java }}
         if: ${{ always() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Test Results ${{ matrix.java }}
           path: target/surefire-reports/
       - name: Upload Test Report ${{ matrix.java }}
         if: ${{ always() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Test Report ${{ matrix.java }}
           path: target/site/
