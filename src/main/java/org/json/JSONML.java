@@ -1,5 +1,8 @@
 package org.json;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 /*
 Public Domain.
 */
@@ -38,6 +41,7 @@ public class JSONML {
         Object     token;
         String     tagName = null;
 
+        Deque<ParsingContext> stack = new ArrayDeque<ParsingContext>();
 // Test for and skip past these forms:
 //      <!-- ... -->
 //      <![  ... ]]>
@@ -65,7 +69,39 @@ public class JSONML {
                         if (x.nextToken() != XML.GT) {
                             throw x.syntaxError("Misshaped close tag");
                         }
-                        return token;
+
+                        if (stack.isEmpty()) {
+                            return token;
+                        }
+
+                        closeTag = (String) token;
+
+                        ParsingContext context = stack.pop();
+
+                        tagName = context.tagName;
+
+                        newja = context.newJsonArray;
+
+                        newjo = context.newJsonObject;
+
+                        ja = context.jsonArray;
+
+                        if (closeTag != null) {
+                            if (!closeTag.equals(tagName)) {
+                                throw x.syntaxError("Mismatched '" + tagName +
+                                        "' and '" + closeTag + "'");
+                            }
+                            tagName = null;
+                            if (!arrayForm && newja.length() > 0) {
+                                newjo.put("childNodes", newja);
+                            }
+                            if (ja == null) {
+                                if (arrayForm) {
+                                    return newja;
+                                }
+                                return newjo;
+                            }
+                        }
                     } else if (token == XML.BANG) {
 
 // <!
@@ -181,23 +217,12 @@ public class JSONML {
                         if (token != XML.GT) {
                             throw x.syntaxError("Misshaped tag");
                         }
-                        closeTag = (String)parse(x, arrayForm, newja, keepStrings);
-                        if (closeTag != null) {
-                            if (!closeTag.equals(tagName)) {
-                                throw x.syntaxError("Mismatched '" + tagName +
-                                        "' and '" + closeTag + "'");
-                            }
-                            tagName = null;
-                            if (!arrayForm && newja.length() > 0) {
-                                newjo.put("childNodes", newja);
-                            }
-                            if (ja == null) {
-                                if (arrayForm) {
-                                    return newja;
-                                }
-                                return newjo;
-                            }
-                        }
+
+                        stack.push(new ParsingContext(newja, newjo, ja, tagName));
+
+                        ja = newja;
+
+                        continue;
                     }
                 }
             } else {
@@ -518,5 +543,19 @@ public class JSONML {
             sb.append('>');
         }
         return sb.toString();
+    }
+
+    private static class ParsingContext {
+        JSONArray newJsonArray;
+        JSONObject newJsonObject;
+        JSONArray jsonArray;
+        String tagName;
+
+        public ParsingContext(JSONArray newJsonArray, JSONObject newJsonObject, JSONArray jsonArray, String tagName) {
+            this.newJsonArray = newJsonArray;
+            this.newJsonObject = newJsonObject;
+            this.jsonArray = jsonArray;
+            this.tagName = tagName;
+        }
     }
 }
