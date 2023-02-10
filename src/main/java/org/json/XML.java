@@ -98,7 +98,7 @@ public class XML {
     /**
      * Replace special characters with XML escapes:
      *
-     * <pre>{@code 
+     * <pre>{@code
      * &amp; (ampersand) is replaced by &amp;amp;
      * &lt; (less than) is replaced by &amp;lt;
      * &gt; (greater than) is replaced by &amp;gt;
@@ -229,8 +229,12 @@ public class XML {
      *            The JSONObject that will include the new material.
      * @param name
      *            The tag name.
+     * @param config
+     *            The XML parser configuration.
+     * @param currentNestingDepth
+     *            The current nesting depth.
      * @return true if the close tag is processed.
-     * @throws JSONException
+     * @throws JSONException Thrown if any parsing error occurs.
      */
     private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, int currentNestingDepth)
             throws JSONException {
@@ -427,7 +431,7 @@ public class XML {
                                         context.accumulate(tagName, jsonObject);
                                     }
                                 }
-                                
+
                                 return false;
                             }
                         }
@@ -491,7 +495,7 @@ public class XML {
         }
         return string;
     }
-    
+
     /**
      * direct copy of {@link JSONObject#stringToNumber(String)} to maintain Android support.
      */
@@ -538,7 +542,7 @@ public class XML {
             // integer representation.
             // This will narrow any values to the smallest reasonable Object representation
             // (Integer, Long, or BigInteger)
-            
+
             // BigInteger down conversion: We use a similar bitLength compare as
             // BigInteger#intValueExact uses. Increases GC, but objects hold
             // only what they need. i.e. Less runtime overhead if the value is
@@ -554,7 +558,7 @@ public class XML {
         }
         throw new NumberFormatException("val ["+val+"] is not a valid number.");
     }
-    
+
     /**
      * direct copy of {@link JSONObject#isDecimalNotation(String)} to maintain Android support.
      */
@@ -572,7 +576,7 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code 
+     * "content" member. Comments, prologs, DTDs, and <pre>{@code
      * &lt;[ [ ]]>}</pre>
      * are ignored.
      *
@@ -593,7 +597,7 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code 
+     * "content" member. Comments, prologs, DTDs, and <pre>{@code
      * &lt;[ [ ]]>}</pre>
      * are ignored.
      *
@@ -673,7 +677,7 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code 
+     * "content" member. Comments, prologs, DTDs, and <pre>{@code
      * &lt;[ [ ]]>}</pre>
      * are ignored.
      *
@@ -699,7 +703,7 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code 
+     * "content" member. Comments, prologs, DTDs, and <pre>{@code
      * &lt;[ [ ]]>}</pre>
      * are ignored.
      *
