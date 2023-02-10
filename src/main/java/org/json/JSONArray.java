@@ -85,47 +85,8 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(JSONTokener x) throws JSONException {
         this();
-        if (x.nextClean() != '[') {
-            throw x.syntaxError("A JSONArray text must start with '['");
-        }
         
-        char nextChar = x.nextClean();
-        if (nextChar == 0) {
-            // array is unclosed. No ']' found, instead EOF
-            throw x.syntaxError("Expected a ',' or ']'");
-        }
-        if (nextChar != ']') {
-            x.back();
-            for (;;) {
-                if (x.nextClean() == ',') {
-                    x.back();
-                    this.myArrayList.add(JSONObject.NULL);
-                } else {
-                    x.back();
-                    this.myArrayList.add(x.nextValue());
-                }
-                switch (x.nextClean()) {
-                case 0:
-                    // array is unclosed. No ']' found, instead EOF
-                    throw x.syntaxError("Expected a ',' or ']'");
-                case ',':
-                    nextChar = x.nextClean();
-                    if (nextChar == 0) {
-                        // array is unclosed. No ']' found, instead EOF
-                        throw x.syntaxError("Expected a ',' or ']'");
-                    }
-                    if (nextChar == ']') {
-                        return;
-                    }
-                    x.back();
-                    break;
-                case ']':
-                    return;
-                default:
-                    throw x.syntaxError("Expected a ',' or ']'");
-                }
-            }
-        }
+        x.processJSONArray(this);
     }
 
     /**

@@ -201,69 +201,8 @@ public class JSONObject {
      */
     public JSONObject(JSONTokener x) throws JSONException {
         this();
-        char c;
-        String key;
 
-        if (x.nextClean() != '{') {
-            throw x.syntaxError("A JSONObject text must begin with '{'");
-        }
-        for (;;) {
-            char prev = x.getPrevious();
-            c = x.nextClean();
-            switch (c) {
-            case 0:
-                throw x.syntaxError("A JSONObject text must end with '}'");
-            case '}':
-                return;
-            case '{':
-            case '[':
-                if(prev=='{') {
-                    throw x.syntaxError("A JSON Object can not directly nest another JSON Object or JSON Array.");
-                }
-                // fall through
-            default:
-                x.back();
-                key = x.nextValue().toString();
-            }
-
-            // The key is followed by ':'.
-
-            c = x.nextClean();
-            if (c != ':') {
-                throw x.syntaxError("Expected a ':' after a key");
-            }
-
-            // Use syntaxError(..) to include error location
-
-            if (key != null) {
-                // Check if key exists
-                if (this.opt(key) != null) {
-                    // key already exists
-                    throw x.syntaxError("Duplicate key \"" + key + "\"");
-                }
-                // Only add value if non-null
-                Object value = x.nextValue();
-                if (value!=null) {
-                    this.put(key, value);
-                }
-            }
-
-            // Pairs are separated by ','.
-
-            switch (x.nextClean()) {
-            case ';':
-            case ',':
-                if (x.nextClean() == '}') {
-                    return;
-                }
-                x.back();
-                break;
-            case '}':
-                return;
-            default:
-                throw x.syntaxError("Expected a ',' or '}'");
-            }
-        }
+        x.processJSONObject(this);
     }
 
     /**

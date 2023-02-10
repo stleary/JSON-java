@@ -415,14 +415,22 @@ public class JSONTokener {
         case '{':
             this.back();
             try {
-                return new JSONObject(this);
+                JSONObject jsonObject = new JSONObject();
+
+				processJSONObject(jsonObject);
+
+				return jsonObject;
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
         case '[':
             this.back();
             try {
-                return new JSONArray(this);
+                JSONArray jsonArray = new JSONArray();
+
+                processJSONArray(jsonArray);
+
+				return jsonArray;
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
@@ -521,5 +529,115 @@ public class JSONTokener {
     public String toString() {
         return " at " + this.index + " [character " + this.character + " line " +
                 this.line + "]";
+    }
+
+    public void processJSONObject(JSONObject jsonObject) {
+    	char c;
+        String key;
+
+        if (this.nextClean() != '{') {
+            throw this.syntaxError("A JSONObject text must begin with '{'");
+        }
+        for (;;) {
+            char prev = this.getPrevious();
+            c = this.nextClean();
+            switch (c) {
+            case 0:
+                throw this.syntaxError("A JSONObject text must end with '}'");
+            case '}':
+                return;
+            case '{':
+            case '[':
+                if(prev=='{') {
+                    throw this.syntaxError("A JSON Object can not directly nest another JSON Object or JSON Array.");
+                }
+                // fall through
+            default:
+                this.back();
+                key = this.nextValue().toString();
+            }
+
+            // The key is followed by ':'.
+
+            c = this.nextClean();
+            if (c != ':') {
+                throw this.syntaxError("Expected a ':' after a key");
+            }
+
+            // Use syntaxError(..) to include error location
+
+            if (key != null) {
+                // Check if key exists
+                if (jsonObject.opt(key) != null) {
+                    // key already exists
+                    throw this.syntaxError("Duplicate key \"" + key + "\"");
+                }
+                // Only add value if non-null
+                Object value = this.nextValue();
+                if (value!=null) {
+                	jsonObject.put(key, value);
+                }
+            }
+
+            // Pairs are separated by ','.
+
+            switch (this.nextClean()) {
+            case ';':
+            case ',':
+                if (this.nextClean() == '}') {
+                    return;
+                }
+                this.back();
+                break;
+            case '}':
+                return;
+            default:
+                throw this.syntaxError("Expected a ',' or '}'");
+            }
+        }
+    }
+
+    public void processJSONArray(JSONArray jsonArray) {
+    	if (this.nextClean() != '[') {
+            throw this.syntaxError("A JSONArray text must start with '['");
+        }
+        
+        char nextChar = this.nextClean();
+        if (nextChar == 0) {
+            // array is unclosed. No ']' found, instead EOF
+            throw this.syntaxError("Expected a ',' or ']'");
+        }
+        if (nextChar != ']') {
+            this.back();
+            for (;;) {
+                if (this.nextClean() == ',') {
+                    this.back();
+                    jsonArray.put(JSONObject.NULL);
+                } else {
+                    this.back();
+                    jsonArray.put(this.nextValue());
+                }
+                switch (this.nextClean()) {
+                case 0:
+                    // array is unclosed. No ']' found, instead EOF
+                    throw this.syntaxError("Expected a ',' or ']'");
+                case ',':
+                    nextChar = this.nextClean();
+                    if (nextChar == 0) {
+                        // array is unclosed. No ']' found, instead EOF
+                        throw this.syntaxError("Expected a ',' or ']'");
+                    }
+                    if (nextChar == ']') {
+                        return;
+                    }
+                    this.back();
+                    break;
+                case ']':
+                    return;
+                default:
+                    throw this.syntaxError("Expected a ',' or ']'");
+                }
+            }
+        }
     }
 }
