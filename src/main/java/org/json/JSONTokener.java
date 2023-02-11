@@ -420,7 +420,7 @@ public class JSONTokener {
             try {
                 JSONObject jsonObject = new JSONObject();
 
-				processJSONObject(jsonObject);
+				consumeTo(jsonObject);
 
 				return jsonObject;
             } catch (StackOverflowError e) {
@@ -431,7 +431,7 @@ public class JSONTokener {
             try {
                 JSONArray jsonArray = new JSONArray();
 
-                processJSONArray(jsonArray);
+                consumeTo(jsonArray);
 
 				return jsonArray;
             } catch (StackOverflowError e) {
@@ -540,7 +540,7 @@ public class JSONTokener {
                 this.line + "]";
     }
 
-    public void processJSONObject(JSONObject jsonObject) {
+    public void consumeTo(JSONObject jsonObject) {
     	char c;
         String key;
 
@@ -606,7 +606,7 @@ public class JSONTokener {
         }
     }
 
-    public void processJSONArray(JSONArray jsonArray) {
+    public void consumeTo(JSONArray jsonArray) {
     	if (this.nextClean() != '[') {
             throw this.syntaxError("A JSONArray text must start with '['");
         }

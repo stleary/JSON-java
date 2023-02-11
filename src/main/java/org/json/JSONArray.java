@@ -86,7 +86,7 @@ public class JSONArray implements Iterable<Object> {
     public JSONArray(JSONTokener x) throws JSONException {
         this();
         
-        x.processJSONArray(this);
+        x.consumeTo(this);
     }
 
     /**

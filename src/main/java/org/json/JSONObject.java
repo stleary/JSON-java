@@ -202,7 +202,7 @@ public class JSONObject {
     public JSONObject(JSONTokener x) throws JSONException {
         this();
 
-        x.processJSONObject(this);
+        x.consumeTo(this);
     }
 
     /**
