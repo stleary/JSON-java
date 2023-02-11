@@ -19,7 +19,11 @@ Public Domain.
  * @version 2014-05-03
  */
 public class JSONTokener {
-    /** current read character position on the current line. */
+    private static final char OPEN_SQUARE_BRACKET = '[';
+	private static final char OPEN_CURLY_BRACKET = '{';
+	private static final char SINGLE_QUOTE = '\'';
+	private static final char DOUBLE_QUOTE = '"';
+	/** current read character position on the current line. */
     private long character;
     /** flag to indicate if the end of the input has been found. */
     private boolean eof;
@@ -406,13 +410,12 @@ public class JSONTokener {
      */
     public Object nextValue() throws JSONException {
         char c = this.nextClean();
-        String string;
 
         switch (c) {
-        case '"':
-        case '\'':
+        case DOUBLE_QUOTE:
+        case SINGLE_QUOTE:
             return this.nextString(c);
-        case '{':
+        case OPEN_CURLY_BRACKET:
             this.back();
             try {
                 JSONObject jsonObject = new JSONObject();
@@ -423,7 +426,7 @@ public class JSONTokener {
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
-        case '[':
+        case OPEN_SQUARE_BRACKET:
             this.back();
             try {
                 JSONArray jsonArray = new JSONArray();
@@ -445,7 +448,13 @@ public class JSONTokener {
          * formatting character.
          */
 
-        StringBuilder sb = new StringBuilder();
+        return handleUnquotedText(c);
+    }
+
+
+	private Object handleUnquotedText(char c) {
+		String string;
+		StringBuilder sb = new StringBuilder();
         while (c >= ' ' && ",:]}/\\\"[{;=#".indexOf(c) < 0) {
             sb.append(c);
             c = this.next();
@@ -459,7 +468,7 @@ public class JSONTokener {
             throw this.syntaxError("Missing value");
         }
         return JSONObject.stringToValue(string);
-    }
+	}
 
 
     /**
