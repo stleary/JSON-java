@@ -1,12 +1,7 @@
-/**
- * 
- */
+/** */
 package org.json.junit.data;
 
-/**
- * @author john
- *
- */
+/** @author john */
 public class GenericBeanInt extends GenericBean<Integer> {
     /** */
     final char a = 'A';
@@ -18,7 +13,7 @@ public class GenericBeanInt extends GenericBean<Integer> {
 
     /**
      * Should not be beanable
-     * 
+     *
      * @return false
      */
     public boolean getable() {
@@ -27,7 +22,7 @@ public class GenericBeanInt extends GenericBean<Integer> {
 
     /**
      * Should not be beanable
-     * 
+     *
      * @return false
      */
     public boolean get() {
@@ -36,7 +31,7 @@ public class GenericBeanInt extends GenericBean<Integer> {
 
     /**
      * Should not be beanable
-     * 
+     *
      * @return false
      */
     public boolean is() {
@@ -45,17 +40,14 @@ public class GenericBeanInt extends GenericBean<Integer> {
 
     /**
      * Should be beanable
-     * 
+     *
      * @return false
      */
     public boolean isB() {
-        return this.genericValue.equals((Integer.valueOf(this.a+1)));
+        return this.genericValue.equals((Integer.valueOf(this.a + 1)));
     }
 
-    /**
-     * @param genericValue
-     *            the value to initiate with.
-     */
+    /** @param genericValue the value to initiate with. */
     public GenericBeanInt(Integer genericValue) {
         super(genericValue);
     }
@@ -65,5 +57,4 @@ public class GenericBeanInt extends GenericBean<Integer> {
     public Integer getGenericValue() {
         return super.getGenericValue();
     }
-
 }

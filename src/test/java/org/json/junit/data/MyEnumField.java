@@ -1,8 +1,6 @@
 package org.json.junit.data;
 
-/**
- * An enum that contains getters and some internal fields
- */
+/** An enum that contains getters and some internal fields */
 @SuppressWarnings("boxing")
 public enum MyEnumField {
     VAL1(1, "val 1"),
@@ -11,18 +9,22 @@ public enum MyEnumField {
 
     private String value;
     private Integer intVal;
+
     private MyEnumField(Integer intVal, String value) {
         this.value = value;
         this.intVal = intVal;
     }
+
     public String getValue() {
         return this.value;
     }
+
     public Integer getIntVal() {
         return this.intVal;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         return this.value;
     }
 }

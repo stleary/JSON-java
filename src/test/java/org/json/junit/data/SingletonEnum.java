@@ -2,14 +2,11 @@ package org.json.junit.data;
 
 /**
  * Sample singleton done as an Enum for use with bean testing.
- * 
- * @author John Aylward
  *
+ * @author John Aylward
  */
 public enum SingletonEnum {
-    /**
-     * the singleton instance.
-     */
+    /** the singleton instance. */
     INSTANCE;
     /** */
     private int someInt;
@@ -19,16 +16,15 @@ public enum SingletonEnum {
     /** single instance. */
 
     /**
-     * @return the singleton instance. In a real application, I'd hope no one did
-     *         this to an enum singleton.
+     * @return the singleton instance. In a real application, I'd hope no one did this to an enum
+     *     singleton.
      */
     public static final SingletonEnum getInstance() {
         return INSTANCE;
     }
 
     /** */
-    private SingletonEnum() {
-    }
+    private SingletonEnum() {}
 
     /** @return someInt */
     public int getSomeInt() {
@@ -37,9 +33,8 @@ public enum SingletonEnum {
 
     /**
      * sets someInt.
-     * 
-     * @param someInt
-     *            the someInt to set
+     *
+     * @param someInt the someInt to set
      */
     public void setSomeInt(int someInt) {
         this.someInt = someInt;
@@ -52,9 +47,8 @@ public enum SingletonEnum {
 
     /**
      * sets someString.
-     * 
-     * @param someString
-     *            the someString to set
+     *
+     * @param someString the someString to set
      */
     public void setSomeString(String someString) {
         this.someString = someString;

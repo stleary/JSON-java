@@ -1,45 +1,34 @@
-/**
- * 
- */
+/** */
 package org.json.junit.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author John Aylward
- */
+/** @author John Aylward */
 public class WeirdList {
     /** */
     private final List<Integer> list = new ArrayList();
 
-    /**
-     * @param vals
-     */
+    /** @param vals */
     public WeirdList(Integer... vals) {
         this.list.addAll(Arrays.asList(vals));
     }
 
-    /**
-     * @return a copy of the list
-     */
+    /** @return a copy of the list */
     public List<Integer> get() {
         return new ArrayList(this.list);
     }
 
-    /**
-     * @return a copy of the list
-     */
+    /** @return a copy of the list */
     public List<Integer> getALL() {
         return new ArrayList(this.list);
     }
 
     /**
      * get a value at an index.
-     * 
-     * @param i
-     *            index to get
+     *
+     * @param i index to get
      * @return the value at the index
      */
     public Integer get(int i) {
@@ -48,9 +37,8 @@ public class WeirdList {
 
     /**
      * get a value at an index.
-     * 
-     * @param i
-     *            index to get
+     *
+     * @param i index to get
      * @return the value at the index
      */
     @SuppressWarnings("boxing")
@@ -58,10 +46,7 @@ public class WeirdList {
         return this.list.get(i);
     }
 
-    /**
-     * @param value
-     *            new value to add to the end of the list
-     */
+    /** @param value new value to add to the end of the list */
     public void add(Integer value) {
         this.list.add(value);
     }

@@ -3,17 +3,11 @@ package org.json.junit.data;
 import java.io.StringReader;
 
 /**
- * 
  * @author John Aylward
- *
- * @param <T>
- *            generic number value
+ * @param <T> generic number value
  */
 public class GenericBean<T extends Number & Comparable<T>> implements MyBean {
-    /**
-     * @param genericValue
-     *            value to initiate with
-     */
+    /** @param genericValue value to initiate with */
     public GenericBean(T genericValue) {
         super();
         this.genericValue = genericValue;
@@ -32,10 +26,7 @@ public class GenericBean<T extends Number & Comparable<T>> implements MyBean {
         return this.genericValue;
     }
 
-    /**
-     * @param genericValue
-     *            generic value to set
-     */
+    /** @param genericValue generic value to set */
     public void setGenericValue(T genericValue) {
         this.genericSetCounter++;
         this.genericValue = genericValue;
@@ -75,5 +66,4 @@ public class GenericBean<T extends Number & Comparable<T>> implements MyBean {
     public StringReader getStringReaderKey() {
         return new StringReader("Some String Value in a reader");
     }
-
 }

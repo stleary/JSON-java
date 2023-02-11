@@ -6,24 +6,16 @@ Public Domain.
 
 import static org.junit.Assert.*;
 
+import com.jayway.jsonpath.*;
 import java.math.BigDecimal;
 import java.util.*;
-
 import org.json.*;
 import org.junit.Test;
 
-import com.jayway.jsonpath.*;
-
-
-/**
- * Tests for JSON-Java JSONStringer and JSONWriter.
- */
+/** Tests for JSON-Java JSONStringer and JSONWriter. */
 public class JSONStringerTest {
 
-    /**
-     * Object with a null key.
-     * Expects a JSONException.
-     */
+    /** Object with a null key. Expects a JSONException. */
     @Test
     public void nullKeyException() {
         JSONStringer jsonStringer = new JSONStringer();
@@ -32,16 +24,11 @@ public class JSONStringerTest {
             jsonStringer.key(null);
             assertTrue("Expected an exception", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Null key.".
-                    equals(e.getMessage()));
+            assertTrue("Expected an exception message", "Null key.".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Add a key with no object.
-     * Expects a JSONException.
-     */
+    /** Add a key with no object. Expects a JSONException. */
     @Test
     public void outOfSequenceException() {
         JSONStringer jsonStringer = new JSONStringer();
@@ -49,16 +36,11 @@ public class JSONStringerTest {
             jsonStringer.key("hi");
             assertTrue("Expected an exception", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced key.".
-                    equals(e.getMessage()));
+            assertTrue("Expected an exception message", "Misplaced key.".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Missplace an array.
-     * Expects a JSONException
-     */
+    /** Missplace an array. Expects a JSONException */
     @Test
     public void missplacedArrayException() {
         JSONStringer jsonStringer = new JSONStringer();
@@ -67,16 +49,11 @@ public class JSONStringerTest {
             jsonStringer.array();
             assertTrue("Expected an exception", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced array.".
-                    equals(e.getMessage()));
+            assertTrue("Expected an exception message", "Misplaced array.".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Missplace an endErray.
-     * Expects a JSONException
-     */
+    /** Missplace an endErray. Expects a JSONException */
     @Test
     public void missplacedEndArrayException() {
         JSONStringer jsonStringer = new JSONStringer();
@@ -85,16 +62,12 @@ public class JSONStringerTest {
             jsonStringer.endArray();
             assertTrue("Expected an exception", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced endArray.".
-                    equals(e.getMessage()));
+            assertTrue(
+                    "Expected an exception message", "Misplaced endArray.".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Missplace an endObject.
-     * Expects a JSONException
-     */
+    /** Missplace an endObject. Expects a JSONException */
     @Test
     public void missplacedEndObjectException() {
         JSONStringer jsonStringer = new JSONStringer();
@@ -103,16 +76,12 @@ public class JSONStringerTest {
             jsonStringer.endObject();
             assertTrue("Expected an exception", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced endObject.".
-                    equals(e.getMessage()));
+            assertTrue(
+                    "Expected an exception message", "Misplaced endObject.".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Missplace an object.
-     * Expects a JSONException.
-     */
+    /** Missplace an object. Expects a JSONException. */
     @Test
     public void missplacedObjectException() {
         JSONStringer jsonStringer = new JSONStringer();
@@ -121,111 +90,803 @@ public class JSONStringerTest {
             jsonStringer.object();
             assertTrue("Expected an exception", false);
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced object.".
-                    equals(e.getMessage()));
+            assertTrue("Expected an exception message", "Misplaced object.".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Exceeds implementation max nesting depth.
-     * Expects a JSONException
-     */
+    /** Exceeds implementation max nesting depth. Expects a JSONException */
     @Test
     public void exceedNestDepthException() {
         try {
             JSONStringer s = new JSONStringer();
-            s.object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object();
-            s.key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object().
-            key("k").object().key("k").object().key("k").object().key("k").object().key("k").object();
+            s.object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object();
+            s.key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object()
+                    .key("k")
+                    .object();
             fail("Expected an exception message");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Nesting too deep.".
-                    equals(e.getMessage()));
+            assertTrue("Expected an exception message", "Nesting too deep.".equals(e.getMessage()));
         }
     }
 
-    /**
-     * Build a JSON doc using JSONString API calls,
-     * then convert to JSONObject
-     */
+    /** Build a JSON doc using JSONString API calls, then convert to JSONObject */
     @Test
     public void simpleObjectString() {
         JSONStringer jsonStringer = new JSONStringer();
@@ -242,21 +903,25 @@ public class JSONStringerTest {
         JSONObject jsonObject = new JSONObject(str);
 
         // validate JSON content
-        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 7 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 7);
+        Object doc =
+                Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
+        assertTrue(
+                "expected 7 top level items", ((Map<?, ?>) (JsonPath.read(doc, "$"))).size() == 7);
         assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueValue")));
         assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseValue")));
         assertTrue("expected null", JSONObject.NULL.equals(jsonObject.query("/nullValue")));
-        assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/stringValue")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/complexStringValue")));
+        assertTrue(
+                "expected hello world!", "hello world!".equals(jsonObject.query("/stringValue")));
+        assertTrue(
+                "expected h\be\tllo w\u1234orld!",
+                "h\be\tllo w\u1234orld!".equals(jsonObject.query("/complexStringValue")));
         assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/intValue")));
-        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
+        assertTrue(
+                "expected -23.45e67",
+                BigDecimal.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
     }
 
-    /**
-     * Build a JSON doc using JSONString API calls,
-     * then convert to JSONArray
-     */
+    /** Build a JSON doc using JSONString API calls, then convert to JSONArray */
     @Test
     public void simpleArrayString() {
         JSONStringer jsonStringer = new JSONStringer();
@@ -272,72 +937,105 @@ public class JSONStringerTest {
         JSONArray jsonArray = new JSONArray(str);
 
         // validate JSON content
-        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
-        assertTrue("expected 6 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 6);
+        Object doc =
+                Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
+        assertTrue("expected 6 top level items", ((List<?>) (JsonPath.read(doc, "$"))).size() == 6);
         assertTrue("expected true", Boolean.TRUE.equals(jsonArray.query("/0")));
         assertTrue("expected false", Boolean.FALSE.equals(jsonArray.query("/1")));
         assertTrue("expected null", JSONObject.NULL.equals(jsonArray.query("/2")));
         assertTrue("expected hello world!", "hello world!".equals(jsonArray.query("/3")));
         assertTrue("expected 42", Integer.valueOf(42).equals(jsonArray.query("/4")));
-        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonArray.query("/5")));
+        assertTrue(
+                "expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonArray.query("/5")));
     }
 
     /**
-     * Build a nested JSON doc using JSONString API calls, then convert to
-     * JSONObject. Will create a long cascade of output by reusing the
-     * returned values..
+     * Build a nested JSON doc using JSONString API calls, then convert to JSONObject. Will create a
+     * long cascade of output by reusing the returned values..
      */
     @Test
     public void complexObjectString() {
         JSONStringer jsonStringer = new JSONStringer();
-        jsonStringer.object().
-            key("trueValue").value(true).
-            key("falseValue").value(false).
-            key("nullValue").value(null).
-            key("stringValue").value("hello world!").
-            key("object2").object().
-            key("k1").value("v1").
-            key("k2").value("v2").
-            key("k3").value("v3").
-            key("array1").array().
-            value(1).
-            value(2).
-            object().
-            key("k4").value("v4").
-            key("k5").value("v5").
-            key("k6").value("v6").
-            key("array2").array().
-            value(5).
-            value(6).
-            value(7).
-            value(8).
-            endArray().
-            endObject().
-            value(3).
-            value(4).
-            endArray().
-            endObject().
-            key("complexStringValue").value("h\be\tllo w\u1234orld!").
-            key("intValue").value(42).
-            key("doubleValue").value(-23.45e67).
-            endObject();
+        jsonStringer
+                .object()
+                .key("trueValue")
+                .value(true)
+                .key("falseValue")
+                .value(false)
+                .key("nullValue")
+                .value(null)
+                .key("stringValue")
+                .value("hello world!")
+                .key("object2")
+                .object()
+                .key("k1")
+                .value("v1")
+                .key("k2")
+                .value("v2")
+                .key("k3")
+                .value("v3")
+                .key("array1")
+                .array()
+                .value(1)
+                .value(2)
+                .object()
+                .key("k4")
+                .value("v4")
+                .key("k5")
+                .value("v5")
+                .key("k6")
+                .value("v6")
+                .key("array2")
+                .array()
+                .value(5)
+                .value(6)
+                .value(7)
+                .value(8)
+                .endArray()
+                .endObject()
+                .value(3)
+                .value(4)
+                .endArray()
+                .endObject()
+                .key("complexStringValue")
+                .value("h\be\tllo w\u1234orld!")
+                .key("intValue")
+                .value(42)
+                .key("doubleValue")
+                .value(-23.45e67)
+                .endObject();
         String str = jsonStringer.toString();
         JSONObject jsonObject = new JSONObject(str);
 
         // validate JSON content
-        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 8 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 8);
-        assertTrue("expected 4 object2 items", ((Map<?,?>)(JsonPath.read(doc, "$.object2"))).size() == 4);
-        assertTrue("expected 5 array1 items", ((List<?>)(JsonPath.read(doc, "$.object2.array1"))).size() == 5);
-        assertTrue("expected 4 array[2] items", ((Map<?,?>)(JsonPath.read(doc, "$.object2.array1[2]"))).size() == 4);
-        assertTrue("expected 4 array1[2].array2 items", ((List<?>)(JsonPath.read(doc, "$.object2.array1[2].array2"))).size() == 4);
+        Object doc =
+                Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
+        assertTrue(
+                "expected 8 top level items", ((Map<?, ?>) (JsonPath.read(doc, "$"))).size() == 8);
+        assertTrue(
+                "expected 4 object2 items",
+                ((Map<?, ?>) (JsonPath.read(doc, "$.object2"))).size() == 4);
+        assertTrue(
+                "expected 5 array1 items",
+                ((List<?>) (JsonPath.read(doc, "$.object2.array1"))).size() == 5);
+        assertTrue(
+                "expected 4 array[2] items",
+                ((Map<?, ?>) (JsonPath.read(doc, "$.object2.array1[2]"))).size() == 4);
+        assertTrue(
+                "expected 4 array1[2].array2 items",
+                ((List<?>) (JsonPath.read(doc, "$.object2.array1[2].array2"))).size() == 4);
         assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueValue")));
         assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseValue")));
         assertTrue("expected null", JSONObject.NULL.equals(jsonObject.query("/nullValue")));
-        assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/stringValue")));
+        assertTrue(
+                "expected hello world!", "hello world!".equals(jsonObject.query("/stringValue")));
         assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/intValue")));
-        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/complexStringValue")));
+        assertTrue(
+                "expected -23.45e67",
+                BigDecimal.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
+        assertTrue(
+                "expected h\be\tllo w\u1234orld!",
+                "h\be\tllo w\u1234orld!".equals(jsonObject.query("/complexStringValue")));
         assertTrue("expected v1", "v1".equals(jsonObject.query("/object2/k1")));
         assertTrue("expected v2", "v2".equals(jsonObject.query("/object2/k2")));
         assertTrue("expected v3", "v3".equals(jsonObject.query("/object2/k3")));
@@ -346,12 +1044,19 @@ public class JSONStringerTest {
         assertTrue("expected v4", "v4".equals(jsonObject.query("/object2/array1/2/k4")));
         assertTrue("expected v5", "v5".equals(jsonObject.query("/object2/array1/2/k5")));
         assertTrue("expected v6", "v6".equals(jsonObject.query("/object2/array1/2/k6")));
-        assertTrue("expected 5", Integer.valueOf(5).equals(jsonObject.query("/object2/array1/2/array2/0")));
-        assertTrue("expected 6", Integer.valueOf(6).equals(jsonObject.query("/object2/array1/2/array2/1")));
-        assertTrue("expected 7", Integer.valueOf(7).equals(jsonObject.query("/object2/array1/2/array2/2")));
-        assertTrue("expected 8", Integer.valueOf(8).equals(jsonObject.query("/object2/array1/2/array2/3")));
+        assertTrue(
+                "expected 5",
+                Integer.valueOf(5).equals(jsonObject.query("/object2/array1/2/array2/0")));
+        assertTrue(
+                "expected 6",
+                Integer.valueOf(6).equals(jsonObject.query("/object2/array1/2/array2/1")));
+        assertTrue(
+                "expected 7",
+                Integer.valueOf(7).equals(jsonObject.query("/object2/array1/2/array2/2")));
+        assertTrue(
+                "expected 8",
+                Integer.valueOf(8).equals(jsonObject.query("/object2/array1/2/array2/3")));
         assertTrue("expected 3", Integer.valueOf(3).equals(jsonObject.query("/object2/array1/3")));
         assertTrue("expected 4", Integer.valueOf(4).equals(jsonObject.query("/object2/array1/4")));
     }
-
 }
