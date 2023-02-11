@@ -280,6 +280,55 @@ public class JSONML {
     }
 
 
+
+    /**
+     * Convert a well-formed (but not necessarily valid) XML string into a
+     * JSONArray using the JsonML transform. Each XML tag is represented as
+     * a JSONArray in which the first element is the tag name. If the tag has
+     * attributes, then the second element will be JSONObject containing the
+     * name/value pairs. If the tag contains children, then strings and
+     * JSONArrays will represent the child tags.
+     * As opposed to toJSONArray this method does not attempt to convert
+     * any text node or attribute value to any type
+     * but just leaves it as a string.
+     * Comments, prologs, DTDs, and <pre>{@code &lt;[ [ ]]>}</pre> are ignored.
+     * @param string The source string.
+     * @param config  The XML parser configuration:
+     *     XMLtoJSONMLParserConfiguration.ORIGINAL is the default behaviour;
+     *     XMLtoJSONMLParserConfiguration.KEEP_STRINGS means values will not be coerced into boolean
+     *       or numeric values and will instead be left as strings
+     * @return A JSONArray containing the structured data from the XML string.
+     * @throws JSONException Thrown on error converting to a JSONArray
+     */
+    public static JSONArray toJSONArray(String string, XMLtoJSONMLParserConfiguration config) throws JSONException {
+        return (JSONArray)parse(new XMLTokener(string), true, null, config, 0);
+    }
+
+
+    /**
+     * Convert a well-formed (but not necessarily valid) XML string into a
+     * JSONArray using the JsonML transform. Each XML tag is represented as
+     * a JSONArray in which the first element is the tag name. If the tag has
+     * attributes, then the second element will be JSONObject containing the
+     * name/value pairs. If the tag contains children, then strings and
+     * JSONArrays will represent the child content and tags.
+     * As opposed to toJSONArray this method does not attempt to convert
+     * any text node or attribute value to any type
+     * but just leaves it as a string.
+     * Comments, prologs, DTDs, and <pre>{@code &lt;[ [ ]]>}</pre> are ignored.
+     * @param x An XMLTokener.
+     * @param config  The XML parser configuration:
+     *     XMLtoJSONMLParserConfiguration.ORIGINAL is the default behaviour;
+     *     XMLtoJSONMLParserConfiguration.KEEP_STRINGS means values will not be coerced into boolean
+     *       or numeric values and will instead be left as strings
+     * @return A JSONArray containing the structured data from the XML string.
+     * @throws JSONException Thrown on error converting to a JSONArray
+     */
+    public static JSONArray toJSONArray(XMLTokener x, XMLtoJSONMLParserConfiguration config) throws JSONException {
+        return (JSONArray)parse(x, true, null, config, 0);
+    }
+
+
     /**
      * Convert a well-formed (but not necessarily valid) XML string into a
      * JSONArray using the JsonML transform. Each XML tag is represented as

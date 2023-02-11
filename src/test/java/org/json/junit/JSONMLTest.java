@@ -835,7 +835,71 @@ public class JSONMLTest {
     }
 
     @Test
-    public void testMaxNestingDepthOf42IsRespected() {
+    public void testToJSONArrayMaxNestingDepthOf42IsRespected() {
+        final String wayTooLongMalformedXML = new String(new char[6000]).replace("\0", "<a>");
+
+        final int maxNestingDepth = 42;
+
+        try {
+            JSONML.toJSONArray(wayTooLongMalformedXML, XMLtoJSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+
+            fail("Expecting a JSONException");
+        } catch (JSONException e) {
+            assertTrue("Wrong throwable thrown: not expecting message <" + e.getMessage() + ">",
+                e.getMessage().startsWith("Maximum nesting depth of " + maxNestingDepth));
+        }
+    }
+
+
+    @Test
+    public void testToJSONArrayMaxNestingDepthIsRespectedWithValidXML() {
+        final String perfectlyFineXML = "<Test>\n" +
+            "  <employee>\n" +
+            "    <name>sonoo</name>\n" +
+            "    <salary>56000</salary>\n" +
+            "    <married>true</married>\n" +
+            "  </employee>\n" +
+            "</Test>\n";
+
+        final int maxNestingDepth = 1;
+
+        try {
+            JSONML.toJSONArray(perfectlyFineXML, XMLtoJSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+
+            fail("Expecting a JSONException");
+        } catch (JSONException e) {
+            assertTrue("Wrong throwable thrown: not expecting message <" + e.getMessage() + ">",
+                e.getMessage().startsWith("Maximum nesting depth of " + maxNestingDepth));
+        }
+    }
+
+    @Test
+    public void testToJSONArrayMaxNestingDepthWithValidFittingXML() {
+        final String perfectlyFineXML = "<Test>\n" +
+            "  <employee>\n" +
+            "    <name>sonoo</name>\n" +
+            "    <salary>56000</salary>\n" +
+            "    <married>true</married>\n" +
+            "  </employee>\n" +
+            "</Test>\n";
+
+        final int maxNestingDepth = 3;
+
+        try {
+            JSONML.toJSONArray(perfectlyFineXML, XMLtoJSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            fail("XML document should be parsed as its maximum depth fits the maxNestingDepth " +
+                "parameter of the XMLtoJSONMLParserConfiguration used");
+        }
+    }
+
+
+
+
+
+    @Test
+    public void testToJSONObjectMaxNestingDepthOf42IsRespected() {
         final String wayTooLongMalformedXML = new String(new char[6000]).replace("\0", "<a>");
 
         final int maxNestingDepth = 42;
@@ -851,7 +915,7 @@ public class JSONMLTest {
     }
 
     @Test
-    public void testMaxNestingDepthIsRespectedWithValidXML() {
+    public void testToJSONObjectMaxNestingDepthIsRespectedWithValidXML() {
         final String perfectlyFineXML = "<Test>\n" +
             "  <employee>\n" +
             "    <name>sonoo</name>\n" +
@@ -873,7 +937,7 @@ public class JSONMLTest {
     }
 
     @Test
-    public void testMaxNestingDepthWithValidFittingXML() {
+    public void testToJSONObjectMaxNestingDepthWithValidFittingXML() {
         final String perfectlyFineXML = "<Test>\n" +
             "  <employee>\n" +
             "    <name>sonoo</name>\n" +
