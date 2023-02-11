@@ -51,7 +51,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
       - name: Compile Java ${{ matrix.java }}
-        run: mvn clean compile -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }} -Dmaven.test.skip=true -Dmaven.site.skip=true -Dmaven.javadoc.skip=true
+        run: mvn clean com.coveo:fmt-maven-plugin:2.9.1:check compile -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }} -Dmaven.test.skip=true -Dmaven.site.skip=true -Dmaven.javadoc.skip=true
       - name: Run Tests ${{ matrix.java }}
         run: |
           mvn test -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
