@@ -7,7 +7,7 @@ Public Domain.
  * Configuration object for the XML to JSONML parser. The configuration is immutable.
  */
 @SuppressWarnings({""})
-public class XMLtoJSONMLParserConfiguration {
+public class JSONMLParserConfiguration {
     /**
      * Used to indicate there's no defined limit to the maximum nesting depth when parsing a XML
      * document to JSONML.
@@ -20,11 +20,11 @@ public class XMLtoJSONMLParserConfiguration {
     public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = 512;
 
     /** Original Configuration of the XML to JSONML Parser. */
-    public static final XMLtoJSONMLParserConfiguration ORIGINAL
-        = new XMLtoJSONMLParserConfiguration();
+    public static final JSONMLParserConfiguration ORIGINAL
+        = new JSONMLParserConfiguration();
     /** Original configuration of the XML to JSONML Parser except that values are kept as strings. */
-    public static final XMLtoJSONMLParserConfiguration KEEP_STRINGS
-        = new XMLtoJSONMLParserConfiguration().withKeepStrings(true);
+    public static final JSONMLParserConfiguration KEEP_STRINGS
+        = new JSONMLParserConfiguration().withKeepStrings(true);
 
     /**
      * When parsing the XML into JSONML, specifies if values should be kept as strings (<code>true</code>), or if
@@ -40,7 +40,7 @@ public class XMLtoJSONMLParserConfiguration {
     /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert values).
      */
-    public XMLtoJSONMLParserConfiguration() {
+    public JSONMLParserConfiguration() {
         this.keepStrings = false;
     }
 
@@ -50,7 +50,7 @@ public class XMLtoJSONMLParserConfiguration {
      *      <code>false</code> to try and convert XML string values into a JSON value.
      * @param maxNestingDepth <code>int</code> to limit the nesting depth
      */
-    public XMLtoJSONMLParserConfiguration(final boolean keepStrings, final int maxNestingDepth) {
+    public JSONMLParserConfiguration(final boolean keepStrings, final int maxNestingDepth) {
         this.keepStrings = keepStrings;
         this.maxNestingDepth = maxNestingDepth;
     }
@@ -59,13 +59,13 @@ public class XMLtoJSONMLParserConfiguration {
      * Provides a new instance of the same configuration.
      */
     @Override
-    protected XMLtoJSONMLParserConfiguration clone() {
+    protected JSONMLParserConfiguration clone() {
         // future modifications to this method should always ensure a "deep"
         // clone in the case of collections. i.e. if a Map is added as a configuration
         // item, a new map instance should be created and if possible each value in the
         // map should be cloned as well. If the values of the map are known to also
         // be immutable, then a shallow clone of the map is acceptable.
-        return new XMLtoJSONMLParserConfiguration(
+        return new JSONMLParserConfiguration(
                 this.keepStrings,
                 this.maxNestingDepth
         );
@@ -90,8 +90,8 @@ public class XMLtoJSONMLParserConfiguration {
      *
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
-    public XMLtoJSONMLParserConfiguration withKeepStrings(final boolean newVal) {
-        XMLtoJSONMLParserConfiguration newConfig = this.clone();
+    public JSONMLParserConfiguration withKeepStrings(final boolean newVal) {
+        JSONMLParserConfiguration newConfig = this.clone();
         newConfig.keepStrings = newVal;
         return newConfig;
     }
@@ -114,8 +114,8 @@ public class XMLtoJSONMLParserConfiguration {
      * @param maxNestingDepth the maximum nesting depth allowed to the XML parser
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
-    public XMLtoJSONMLParserConfiguration withMaxNestingDepth(int maxNestingDepth) {
-        XMLtoJSONMLParserConfiguration newConfig = this.clone();
+    public JSONMLParserConfiguration withMaxNestingDepth(int maxNestingDepth) {
+        JSONMLParserConfiguration newConfig = this.clone();
 
         if (maxNestingDepth > UNDEFINED_MAXIMUM_NESTING_DEPTH) {
             newConfig.maxNestingDepth = maxNestingDepth;
