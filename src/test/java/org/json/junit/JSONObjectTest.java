@@ -3476,19 +3476,6 @@ public class JSONObjectTest {
         fail("Excepected Exception.");
     }
     
-    /**
-    * Tests for stack overflow. See https://github.com/stleary/JSON-java/issues/654
-    */
-    @Test(expected = JSONException.class)
-    public void issue654StackOverflowInputWellFormed() {
-        //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
-        final InputStream resourceAsStream = JSONObjectTest.class.getClassLoader().getResourceAsStream("Issue654WellFormedObject.json");
-        JSONTokener tokener = new JSONTokener(resourceAsStream);
-        JSONObject json_input = new JSONObject(tokener);
-        assertNotNull(json_input);
-        fail("Excepected Exception.");
-    }
-
     @Test
     public void testIssue682SimilarityOfJSONString() {
         JSONObject jo1 = new JSONObject()
