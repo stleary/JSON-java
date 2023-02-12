@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /*
 Public Domain.
@@ -19,7 +21,11 @@ Public Domain.
  * @version 2014-05-03
  */
 public class JSONTokener {
-    private static final char OPEN_SQUARE_BRACKET = '[';
+    private static final char COMMA = ',';
+	private static final char SEMICOLON = ';';
+	private static final char COLON = ':';
+	private static final char CLOSE_CURLY_BRACKET = '}';
+	private static final char OPEN_SQUARE_BRACKET = '[';
 	private static final char OPEN_CURLY_BRACKET = '{';
 	private static final char SINGLE_QUOTE = '\'';
 	private static final char DOUBLE_QUOTE = '"';
@@ -409,46 +415,261 @@ public class JSONTokener {
      * @return An object.
      */
     public Object nextValue() throws JSONException {
-        char c = this.nextClean();
+		Deque<ParsingContext> stack = new ArrayDeque<ParsingContext>();
 
-        switch (c) {
-        case DOUBLE_QUOTE:
-        case SINGLE_QUOTE:
-            return this.nextString(c);
-        case OPEN_CURLY_BRACKET:
-            this.back();
-            try {
-                JSONObject jsonObject = new JSONObject();
+		Object value = null;
 
-				consumeTo(jsonObject);
+		State state = null;
 
-				return jsonObject;
-            } catch (StackOverflowError e) {
-                throw new JSONException("JSON Array or Object depth too large to process.", e);
-            }
-        case OPEN_SQUARE_BRACKET:
-            this.back();
-            try {
-                JSONArray jsonArray = new JSONArray();
+		JSONObject jsonObject = null;
 
-                consumeTo(jsonArray);
+		JSONArray jsonArray = null;
 
-				return jsonArray;
-            } catch (StackOverflowError e) {
-                throw new JSONException("JSON Array or Object depth too large to process.", e);
-            }
-        }
+		push: while (true) {
+			if (state == State.OBJECT_PRE_VALUE) {
+				String key;
 
-        /*
-         * Handle unquoted text. This could be the values true, false, or
-         * null, or it can be a number. An implementation (such as this one)
-         * is allowed to also accept non-standard forms.
-         *
-         * Accumulate characters until we reach the end of the text or a
-         * formatting character.
-         */
+				loop: for (;;) {
+					char prev = this.getPrevious();
 
-        return handleUnquotedText(c);
+					char c = this.nextClean();
+
+					switch (c) {
+					case 0:
+						throw this.syntaxError("A JSONObject text must end with '}'");
+					case CLOSE_CURLY_BRACKET:
+						break loop;
+					case OPEN_CURLY_BRACKET:
+					case OPEN_SQUARE_BRACKET:
+						if(prev=='{') {
+							throw this.syntaxError("A JSON Object can not directly nest another JSON Object or JSON Array.");
+						}
+						// fall through
+					default:
+						this.back();
+						key = this.nextValue().toString();
+					}
+
+					// The key is followed by ':'.
+
+					c = this.nextClean();
+
+					if (c != COLON) {
+						throw this.syntaxError("Expected a ':' after a key");
+					}
+
+					// Use syntaxError(..) to include error location
+
+					if (key != null) {
+						// Check if key exists
+						if (jsonObject.opt(key) != null) {
+							// key already exists
+							throw this.syntaxError("Duplicate key \"" + key + "\"");
+						}
+						// Only add value if non-null
+						ParsingContext parsingContext = new ParsingContext();
+
+						parsingContext.key = key;
+
+						parsingContext.jsonObject = jsonObject;
+
+						parsingContext.state = State.OBJECT_POST_VALUE;
+
+						state = null;
+
+						stack.push(parsingContext);
+
+						continue push;
+					}
+				}
+
+				if (stack.isEmpty()) {
+					return jsonObject;
+				}
+
+				ParsingContext previousContext = stack.peek();
+
+				state = previousContext.state;
+
+				value = jsonObject;
+
+				continue push;
+			} else if (state == State.OBJECT_POST_VALUE) {
+				ParsingContext previousContext = stack.pop();
+
+				String key = previousContext.key;
+
+				jsonObject = previousContext.jsonObject;
+
+				if (value!=null) {
+					jsonObject.put(key, value);
+				}
+
+				switch (this.nextClean()) {
+				case SEMICOLON:
+				case COMMA:
+					if (this.nextClean() == CLOSE_CURLY_BRACKET) {
+						break;
+					}
+
+					this.back();
+
+					state = State.OBJECT_PRE_VALUE;
+
+					continue push;
+				case CLOSE_CURLY_BRACKET:
+					break;
+				default:
+					throw this.syntaxError("Expected a ',' or '}'");
+				}
+
+				if (stack.isEmpty()) {
+					return jsonObject;
+				}
+
+				previousContext = stack.peek();
+
+				state = previousContext.state;
+
+				value = jsonObject;
+
+				continue push;
+			} else if (state == State.ARRAY_POST_VALUE) {
+				ParsingContext previousContext = stack.pop();
+
+				jsonArray = previousContext.jsonArray;
+
+				jsonArray.put(value);
+
+				char nextChar;
+
+				switch (this.nextClean()) {
+				case 0:
+					// array is unclosed. No ']' found, instead EOF
+					throw this.syntaxError("Expected a ',' or ']'");
+				case ',':
+					nextChar = this.nextClean();
+					if (nextChar == 0) {
+						// array is unclosed. No ']' found, instead EOF
+						throw this.syntaxError("Expected a ',' or ']'");
+					}
+					if (nextChar == ']') {
+						break;
+					}
+					this.back();
+
+					state = State.ARRAY_PRE_VALUE;
+
+					continue push;
+				case ']':
+					break;
+				default:
+					throw this.syntaxError("Expected a ',' or ']'");
+				}
+
+				if (stack.isEmpty()) {
+					return jsonArray;
+				}
+
+				previousContext = stack.peek();
+
+				state = previousContext.state;
+
+				value = jsonArray;
+
+				continue push;
+			} else if (state == State.ARRAY_PRE_VALUE) {
+				char nextChar = this.nextClean();
+
+				if (nextChar == 0) {
+					// array is unclosed. No ']' found, instead EOF
+					throw this.syntaxError("Expected a ',' or ']'");
+				}
+
+				if (nextChar != ']') {
+					this.back();
+
+					for (;;) {
+						if (this.nextClean() == ',') {
+							this.back();
+							jsonArray.put(JSONObject.NULL);
+						} else {
+							this.back();
+
+							ParsingContext parsingContext = new ParsingContext();
+
+							parsingContext.jsonArray= jsonArray;
+
+							parsingContext.state = State.ARRAY_POST_VALUE;
+
+							state = null;
+
+							stack.push(parsingContext);
+
+							continue push;
+						}
+					}
+				}
+
+				if (stack.isEmpty()) {
+					return jsonArray;
+				}
+
+				ParsingContext previousContext = stack.peek();
+
+				state = previousContext.state;
+
+				value = jsonArray;
+
+				continue push;
+			} else {
+				value = null;
+
+				char c = this.nextClean();
+
+				switch (c) {
+				case DOUBLE_QUOTE:
+				case SINGLE_QUOTE:
+					value = nextString(c);
+					break;
+				case OPEN_CURLY_BRACKET:
+					state = State.OBJECT_PRE_VALUE;
+
+					jsonObject = new JSONObject();
+
+					continue push;
+				case OPEN_SQUARE_BRACKET:
+					jsonArray = new JSONArray();
+
+					state = State.ARRAY_PRE_VALUE;
+
+					continue push;
+				}
+
+				/*
+				 * Handle unquoted text. This could be the values true, false, or
+				 * null, or it can be a number. An implementation (such as this one)
+				 * is allowed to also accept non-standard forms.
+				 *
+				 * Accumulate characters until we reach the end of the text or a
+				 * formatting character.
+				 */
+
+				if (value == null) {
+					value = handleUnquotedText(c);
+				}
+
+				if (stack.isEmpty()) {
+					return value;
+				}
+
+				ParsingContext previousContext = stack.peek();
+
+				state = previousContext.state;
+
+				continue push;
+			}
+		}
     }
 
 
@@ -544,19 +765,19 @@ public class JSONTokener {
     	char c;
         String key;
 
-        if (this.nextClean() != '{') {
+        if (this.nextClean() != OPEN_CURLY_BRACKET) {
             throw this.syntaxError("A JSONObject text must begin with '{'");
         }
-        for (;;) {
+        loop: for (;;) {
             char prev = this.getPrevious();
             c = this.nextClean();
             switch (c) {
             case 0:
                 throw this.syntaxError("A JSONObject text must end with '}'");
-            case '}':
-                return;
-            case '{':
-            case '[':
+            case CLOSE_CURLY_BRACKET:
+                break loop;
+            case OPEN_CURLY_BRACKET:
+            case OPEN_SQUARE_BRACKET:
                 if(prev=='{') {
                     throw this.syntaxError("A JSON Object can not directly nest another JSON Object or JSON Array.");
                 }
@@ -569,7 +790,7 @@ public class JSONTokener {
             // The key is followed by ':'.
 
             c = this.nextClean();
-            if (c != ':') {
+            if (c != COLON) {
                 throw this.syntaxError("Expected a ':' after a key");
             }
 
@@ -591,15 +812,15 @@ public class JSONTokener {
             // Pairs are separated by ','.
 
             switch (this.nextClean()) {
-            case ';':
-            case ',':
-                if (this.nextClean() == '}') {
-                    return;
+            case SEMICOLON:
+            case COMMA:
+                if (this.nextClean() == CLOSE_CURLY_BRACKET) {
+                    break loop;
                 }
                 this.back();
                 break;
-            case '}':
-                return;
+            case CLOSE_CURLY_BRACKET:
+                break loop;
             default:
                 throw this.syntaxError("Expected a ',' or '}'");
             }
@@ -618,7 +839,7 @@ public class JSONTokener {
         }
         if (nextChar != ']') {
             this.back();
-            for (;;) {
+            loop: for (;;) {
                 if (this.nextClean() == ',') {
                     this.back();
                     jsonArray.put(JSONObject.NULL);
@@ -637,16 +858,33 @@ public class JSONTokener {
                         throw this.syntaxError("Expected a ',' or ']'");
                     }
                     if (nextChar == ']') {
-                        return;
+                        break loop;
                     }
                     this.back();
-                    break;
+                    continue loop;
                 case ']':
-                    return;
+                    break loop;
                 default:
                     throw this.syntaxError("Expected a ',' or ']'");
                 }
             }
         }
     }
+
+    private class ParsingContext {
+		State state;
+
+		String key;
+
+		JSONObject jsonObject;
+
+		JSONArray jsonArray;
+	}
+
+	enum State {
+		OBJECT_PRE_VALUE,
+		OBJECT_POST_VALUE,
+		ARRAY_PRE_VALUE,
+		ARRAY_POST_VALUE,
+	}
 }
