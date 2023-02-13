@@ -50,7 +50,7 @@ public class JSONMLParserConfiguration {
      *      <code>false</code> to try and convert XML string values into a JSON value.
      * @param maxNestingDepth <code>int</code> to limit the nesting depth
      */
-    public JSONMLParserConfiguration(final boolean keepStrings, final int maxNestingDepth) {
+    private JSONMLParserConfiguration(final boolean keepStrings, final int maxNestingDepth) {
         this.keepStrings = keepStrings;
         this.maxNestingDepth = maxNestingDepth;
     }
