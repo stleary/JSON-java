@@ -895,7 +895,36 @@ public class JSONMLTest {
     }
 
 
+    @Test
+    public void testToJSONObjectMaxDefaultNestingDepthIsRespected() {
+        final String wayTooLongMalformedXML = new String(new char[6000]).replace("\0", "<a>");
 
+        try {
+            JSONML.toJSONObject(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL);
+
+            fail("Expecting a JSONException");
+        } catch (JSONException e) {
+            assertTrue("Wrong throwable thrown: not expecting message <" + e.getMessage() + ">",
+                e.getMessage().startsWith("Maximum nesting depth of " + JSONMLParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH));
+        }
+    }
+
+    @Test
+    public void testToJSONObjectUnlimitedNestingDepthIsPossible() {
+        int actualDepth = JSONMLParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH +10;
+        final String deeperThanDefaultMax = new String(new char[actualDepth]).replace("\0", "<a>") +
+            "value" +
+            new String(new char[actualDepth]).replace("\0", "</a>");
+
+        try {
+            JSONML.toJSONObject(deeperThanDefaultMax, JSONMLParserConfiguration.ORIGINAL
+                .withMaxNestingDepth(JSONMLParserConfiguration.UNDEFINED_MAXIMUM_NESTING_DEPTH));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            fail("XML document should be parsed beyond the default maximum depth if maxNestingDepth " +
+                "parameter is set to -1 in JSONMLParserConfiguration");
+        }
+    }
 
 
     @Test
