@@ -1,11 +1,6 @@
 package org.json;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 
 /*
 Public Domain.
@@ -18,7 +13,7 @@ Public Domain.
  * @author JSON.org
  * @version 2014-05-03
  */
-public class JSONTokener {
+public class JSONTokener implements Closeable {
     /** current read character position on the current line. */
     private long character;
     /** flag to indicate if the end of the input has been found. */
@@ -521,5 +516,12 @@ public class JSONTokener {
     public String toString() {
         return " at " + this.index + " [character " + this.character + " line " +
                 this.line + "]";
+    }
+
+    @Override
+    public void close() throws IOException {
+        if(reader!=null){
+            reader.close();
+        }
     }
 }
