@@ -13,7 +13,7 @@ Public Domain.
  * @author JSON.org
  * @version 2014-05-03
  */
-public class JSONTokener implements Closeable {
+public class JSONTokener {
     /** current read character position on the current line. */
     private long character;
     /** flag to indicate if the end of the input has been found. */
@@ -518,7 +518,6 @@ public class JSONTokener implements Closeable {
                 this.line + "]";
     }
 
-    @Override
     public void close() throws IOException {
         if(reader!=null){
             reader.close();
