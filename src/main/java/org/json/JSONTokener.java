@@ -1,11 +1,6 @@
 package org.json;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 
 /*
 Public Domain.
@@ -521,5 +516,11 @@ public class JSONTokener {
     public String toString() {
         return " at " + this.index + " [character " + this.character + " line " +
                 this.line + "]";
+    }
+
+    public void close() throws IOException {
+        if(reader!=null){
+            reader.close();
+        }
     }
 }

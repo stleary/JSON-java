@@ -313,4 +313,16 @@ public class JSONTokenerTest {
         assertEquals(0, t2.next());
         assertFalse(t2.more());
    }
+
+   @Test
+   public void testAutoClose(){
+       Reader reader = new StringReader("some test string");
+       try {
+           JSONTokener tokener = new JSONTokener(reader);
+           tokener.close();
+           tokener.next();
+       } catch (Exception exception){
+           assertEquals("Stream closed", exception.getMessage());
+       }
+   }
 }
