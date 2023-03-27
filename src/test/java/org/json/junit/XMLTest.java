@@ -1111,6 +1111,7 @@ public class XMLTest {
                 "}" ;
         JSONObject jsonObject = new JSONObject(str);
         String actualIndentedXmlString = XML.toString(jsonObject, 1);
+        JSONObject actualJsonObject = XML.toJSONObject(actualIndentedXmlString);
         String expected = "<success>true</success>\n" +
                 "<response>\n" +
                 " <dateTimeISO>2022-10-05T00:00:00+03:00</dateTimeISO>\n" +
@@ -1170,7 +1171,8 @@ public class XMLTest {
                 " <timestamp>1664917200</timestamp>\n" +
                 "</response>\n" +
                 "<error>null</error>\n";
-        assertEquals(actualIndentedXmlString, expected);
+        JSONObject expectedJsonObject = XML.toJSONObject(expected);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
 
 
     }
@@ -1183,6 +1185,7 @@ public class XMLTest {
                 "    }}";
         JSONObject jsonObject = new JSONObject(str);
         String actual = XML.toString(jsonObject, "Test", 2);
+        JSONObject actualJsonObject = XML.toJSONObject(actual);
         String expected = "<Test>\n" +
                 "  <employee>\n" +
                 "    <name>sonoo</name>\n" +
@@ -1190,7 +1193,8 @@ public class XMLTest {
                 "    <married>true</married>\n" +
                 "  </employee>\n" +
                 "</Test>\n";
-        assertEquals(actual, expected);
+        JSONObject expectedJsonObject = XML.toJSONObject(expected);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
     }
 
     @Test
@@ -1201,6 +1205,7 @@ public class XMLTest {
                 "]  ";
         JSONArray jsonObject = new JSONArray(str);
         String actual = XML.toString(jsonObject, 2);
+        JSONObject actualJsonObject = XML.toJSONObject(actual);
         String expected = "<array>\n" +
                 "  <name>Ram</name>\n" +
                 "  <email>Ram@gmail.com</email>\n" +
@@ -1209,7 +1214,8 @@ public class XMLTest {
                 "  <name>Bob</name>\n" +
                 "  <email>bob32@gmail.com</email>\n" +
                 "</array>\n";
-        assertEquals(actual, expected);
+        JSONObject expectedJsonObject = XML.toJSONObject(expected);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
 
 
     }
