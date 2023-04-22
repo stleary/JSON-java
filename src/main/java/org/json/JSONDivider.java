@@ -40,7 +40,36 @@ public class JSONDivider {
 
     public static List<Map<String, String>> JsonStrMapList = new ArrayList<Map<String, String>>();
 
+    public static List<Integer> FIT_SIZEList = new ArrayList<Integer>();
+
+    public static Object getJSONObjectWithoutJSONArrays(String currJsonStr){
+        JSONObject currJson = new JSONObject(currJsonStr);
+        Iterator itr = currJson.keySet().iterator();
+
+        while(itr.hasNext()) {
+            String key = (String) itr.next();
+            Object getValue = currJson.get(key);
+            if(getValue instanceof  JSONArray){
+                currJson.put(key, new JSONArray());
+            } else if(getValue instanceof JSONObject) {
+                Object rtnValue = getJSONObjectWithoutJSONArrays(getValue.toString());
+                currJson.put(key, rtnValue);
+            } else {
+                currJson.put(key, getValue);
+            }
+        }
+
+        return currJson;
+    }
+
+    public static int getFIT_SIZE(String originalJsonStr){
+        JSONObject jo = (JSONObject)getJSONObjectWithoutJSONArrays(originalJsonStr);
+        return jo.toString().getBytes().length;
+    }
+
     public static Object funcDisassembling(String currJsonStr, int MAX_SIZE) {
+        FIT_SIZEList.add(getFIT_SIZE(currJsonStr));
+        int FIT_SIZE = Collections.max(FIT_SIZEList);
         JSONObject currJson = new JSONObject(currJsonStr);
         Iterator itr = currJson.keySet().iterator();
 
@@ -51,24 +80,14 @@ public class JSONDivider {
 
             if(getValue instanceof JSONArray) {
                 List<Map<String, Object>> subList = JSONDivider.toList((JSONArray)getValue);
-                if(subList.size() == 1){
-                    Map<String, Object> innerOneMap = subList.get(0);
-                    JSONObject innerOneJO = new JSONObject(innerOneMap);
+                JSONObject subJson = new JSONObject();
+                subJson.put(key, subList);
+                List<String> temp = funcDividingOrNot(subJson.toString(), key, MAX_SIZE-FIT_SIZE);
+                for(String jsonStr : temp) {
                     Map<String, String> map = new HashMap<String, String>();
                     String ListKey = getUpperKeyString(key);
-                    checkContainsListKey(key, ListKey, innerOneJO, map);
+                    checkContainsListKey(key, ListKey, new JSONObject(jsonStr), map);
                     JsonStrMapList.add(map);
-                    funcDisassembling(innerOneJO.toString(), MAX_SIZE);
-                }else{
-                    JSONObject subJson = new JSONObject();
-                    subJson.put(key, subList);
-                    List<String> temp = funcDividingOrNot(subJson.toString(), key, MAX_SIZE);
-                    for(String jsonStr : temp) {
-                        Map<String, String> map = new HashMap<String, String>();
-                        String ListKey = getUpperKeyString(key);
-                        checkContainsListKey(key, ListKey, new JSONObject(jsonStr), map);
-                        JsonStrMapList.add(map);
-                    }
                 }
             } else if(getValue instanceof JSONObject) {
                 Object rtnValue = funcDisassembling(getValue.toString(), MAX_SIZE);
@@ -115,14 +134,7 @@ public class JSONDivider {
 
             if(getValue instanceof JSONArray) {
                 List<Map<String, Object>> subList = (List<Map<String, Object>>)JSONDivider.toList((JSONArray)getValue);
-                if(subList.size() == 1){
-                    Map<String, Object> innerOneMap = subList.get(0);
-                    JSONObject innerOneJO = new JSONObject(innerOneMap);
-                    setParsedJsonObjects(innerOneJO.toString(), map);
-                    JSONDivider.checkContainsKey(currJson, map, key);
-                }else{
-                    JSONDivider.checkContainsKey(currJson, map, key);
-                }
+                JSONDivider.checkContainsKey(currJson, map, key);
             } else if(getValue instanceof JSONObject) {
                 Object rtnValue = setParsedJsonObjects(getValue.toString(), map);
                 JSONDivider.checkContainsKey(currJson, map, key);
@@ -150,26 +162,38 @@ public class JSONDivider {
     public static List<String> funcDividingOrNot(String dividedJsonArrayStr
             , String key
             , int MAX_SIZE){
-        int dividedJoStrLength = dividedJsonArrayStr.getBytes().length;
         JSONObject json = new JSONObject(dividedJsonArrayStr);
-        List<String> tempList = new ArrayList<String>();
         JSONArray dividedJa = json.getJSONArray(key);
+        int dividedJaStrLength = dividedJa.toString().getBytes().length;
         json.put(key, new JSONArray());
+        List<String> tempList = new ArrayList<String>();
 
-        if(dividedJoStrLength > MAX_SIZE) {
-            List<Map<String, Object>> list = JSONDivider.toList(dividedJa);
-            int cnt = (int) Math.ceil(((double)dividedJoStrLength/MAX_SIZE));
-            int size = list.size();
-            int idx = 0;
-            for(int i = 1; i<=cnt; i++) {
-                List<Map<String, Object>> subList = new ArrayList<Map<String, Object>>();
-                int eIdx = i==cnt ? size : idx+(size + 1) / cnt;
-                subList = list.subList(idx, eIdx);
-                idx = eIdx;
-                JSONObject subJson = new JSONObject();
-                subJson.put(key, subList);
-                String sendingJsonStr = subJson.toString();
-                tempList.add(sendingJsonStr);
+        if(dividedJaStrLength > MAX_SIZE) {
+            boolean isUnderMaxSize = false;
+            int cnt = (int) Math.ceil(((double)dividedJaStrLength/MAX_SIZE));
+            while(isUnderMaxSize==false){
+                tempList = new ArrayList<String>();
+                List<Map<String, Object>> list = JSONDivider.toList(dividedJa);
+                int size = list.size();
+                int idx = 0;
+                for(int i = 1; i<=cnt; i++) {
+                    List<Map<String, Object>> subList = new ArrayList<Map<String, Object>>();
+                    int eIdx = i==cnt ? size : idx+(size + 1) / cnt;
+                    subList = list.subList(idx, eIdx);
+                    idx = eIdx;
+                    JSONObject subJson = new JSONObject();
+                    subJson.put(key, subList);
+                    String sendingJsonStr = subJson.toString();
+                    tempList.add(sendingJsonStr);
+                }
+                for (int i=0; i<=tempList.size(); i++){
+                    if(i == tempList.size()){
+                        isUnderMaxSize = true; break;
+                    }
+                    if (tempList.get(i).getBytes().length > MAX_SIZE){
+                        cnt += 1; break;
+                    }
+                }
             }
         } else {
             JSONObject subJson = new JSONObject();
@@ -178,7 +202,6 @@ public class JSONDivider {
             tempList.add(sendingJsonStr);
         }
 
-        Collections.sort(tempList);
         return tempList;
     }
 
@@ -199,7 +222,7 @@ public class JSONDivider {
         return isNotDivided;
     }
 
-    public static List<String> disassembleJsonStr(String jsonStr
+    public static List<String> divideJsonStr(String jsonStr
             , int MAX_SIZE
             , boolean isLogging) throws Exception{
 
@@ -217,15 +240,14 @@ public class JSONDivider {
 
         if(isLogging){
             for(String str : JSONDivider.JsonStrArr) {
-                System.out.println("disassembledJsonStr : " + str);
-                System.out.println("disassembledJsonStr bytes length : " + str.getBytes().length);
+                System.out.println("dividedJsonStr : " + str);
+                System.out.println("dividedJsonStr bytes length : " + str.getBytes().length);
             }
-            System.out.println("jsonStr bytes length : " + jsonStr.getBytes().length);
-            System.out.println("JsonStrList size : " + JSONDivider.JsonStrArr.size());
-            System.out.println("MAX_SIZE : " + MAX_SIZE); // 3. logging
-        }
+            System.out.println("MAX_SIZE : " + MAX_SIZE);
+            System.out.println("originalJsonStr bytes length : " + jsonStr.getBytes().length);
+            System.out.println("dividedJsonStrList size : " + JSONDivider.JsonStrArr.size());
+        } // 3. logging
 
         return JSONDivider.JsonStrArr;
     }
-
 }
