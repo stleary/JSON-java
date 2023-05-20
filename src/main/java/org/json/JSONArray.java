@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.StreamSupport;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -227,6 +228,15 @@ public class JSONArray implements Iterable<Object> {
     @Override
     public Iterator<Object> iterator() {
         return this.myArrayList.iterator();
+    }
+
+    /**
+     * Returns a Java 8 stream of JSONArray entries.
+     *
+     * @return A stream of JSONArray values
+     */
+    public Stream<Object> stream() {
+        return this.myArrayList.stream();
     }
 
     /**
@@ -1693,5 +1703,5 @@ public class JSONArray implements Iterable<Object> {
                 "JSONArray[" + idx + "] is not a " + valueType + " (" + value.getClass() + " : " + value + ")."
                 , cause);
     }
-
+    
 }
