@@ -11,19 +11,21 @@ on:
 
 jobs:
   # old-school build and jar method. No tests run or compiled.
-  build-1_6: 
+  build-11: 
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # build for java 1.6, however don't run any tests
-        java: [ 1.6 ]
+        # build for java 11, however don't run any tests
+        java: [ 11, 17, 19, 20 ]
     name: Java ${{ matrix.java }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup java
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'
           java-version: ${{ matrix.java }}
+          cache: 'maven'
       - name: Compile Java ${{ matrix.java }}
         run: |
           mkdir -p target/classes
@@ -42,14 +44,16 @@ jobs:
     strategy:
       matrix:
         # build against supported Java LTS versions:
-        java: [ 8, 11 ]
+        java: [ 11, 17 ]
     name: Java ${{ matrix.java }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup java
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'
           java-version: ${{ matrix.java }}
+          cache: 'maven'
       - name: Compile Java ${{ matrix.java }}
         run: mvn clean compile -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }} -Dmaven.test.skip=true -Dmaven.site.skip=true -Dmaven.javadoc.skip=true
       - name: Run Tests ${{ matrix.java }}
