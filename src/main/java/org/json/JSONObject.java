@@ -1132,6 +1132,45 @@ public class JSONObject {
     }
 
     /**
+     * Get an optional boolean object associated with a key. It returns false if there
+     * is no such key, or if the value is not Boolean.TRUE or the String "true".
+     *
+     * @param key
+     *            A key string.
+     * @return The truth.
+     */
+    public Boolean optBooleanObj(String key) {
+        return this.optBooleanObj(key, false);
+    }
+
+    /**
+     * Get an optional boolean object associated with a key. It returns the
+     * defaultValue if there is no such key, or if it is not a Boolean or the
+     * String "true" or "false" (case insensitive).
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return The truth.
+     */
+    public Boolean optBooleanObj(String key, Boolean defaultValue) {
+        Object val = this.opt(key);
+        if (NULL.equals(val)) {
+            return defaultValue;
+        }
+        if (val instanceof Boolean){
+            return ((Boolean) val).booleanValue();
+        }
+        try {
+            // we'll use the get anyway because it does string conversion.
+            return this.getBoolean(key);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
      * Get an optional BigDecimal associated with a key, or the defaultValue if
      * there is no such key or if its value is not a number. If the value is a
      * string, an attempt will be made to evaluate it as a number. If the value
@@ -1159,7 +1198,7 @@ public class JSONObject {
     static BigDecimal objectToBigDecimal(Object val, BigDecimal defaultValue) {
         return objectToBigDecimal(val, defaultValue, true);
     }
-    
+
     /**
      * @param val value to convert
      * @param defaultValue default value to return is the conversion doesn't work or is null.
@@ -1330,6 +1369,42 @@ public class JSONObject {
     }
 
     /**
+     * Get the optional double (obj) value associated with an index. NaN is returned
+     * if there is no value for the index, or if the value is not a number and
+     * cannot be converted to a number.
+     *
+     * @param key
+     *            A key string.
+     * @return The value.
+     */
+    public Float optFloatObj(String key) {
+        return this.optFloatObj(key, Float.NaN);
+    }
+
+    /**
+     * Get the optional double (obj) value associated with an index. The defaultValue
+     * is returned if there is no value for the index, or if the value is not a
+     * number and cannot be converted to a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default value.
+     * @return The value.
+     */
+    public Float optFloatObj(String key, Float defaultValue) {
+        Number val = this.optNumber(key);
+        if (val == null) {
+            return defaultValue;
+        }
+        final Float floatValue = val.floatValue();
+        // if (Float.isNaN(floatValue) || Float.isInfinite(floatValue)) {
+        // return defaultValue;
+        // }
+        return floatValue;
+    }
+
+    /**
      * Get an optional int value associated with a key, or zero if there is no
      * such key or if the value is not a number. If the value is a string, an
      * attempt will be made to evaluate it as a number.
@@ -1354,6 +1429,38 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public int optInt(String key, int defaultValue) {
+        final Number val = this.optNumber(key, null);
+        if (val == null) {
+            return defaultValue;
+        }
+        return val.intValue();
+    }
+
+    /**
+     * Get an optional integer value associated with a key, or zero if there is no
+     * such key or if the value is not a number. If the value is a string, an
+     * attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @return An object which is the value.
+     */
+    public Integer optIntegerObj(String key) {
+        return this.optIntegerObj(key, 0);
+    }
+
+    /**
+     * Get an optional integer value associated with a key, or the default if there
+     * is no such key or if the value is not a number. If the value is a string,
+     * an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public Integer optIntegerObj(String key, Integer defaultValue) {
         final Number val = this.optNumber(key, null);
         if (val == null) {
             return defaultValue;
@@ -1424,6 +1531,39 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public long optLong(String key, long defaultValue) {
+        final Number val = this.optNumber(key, null);
+        if (val == null) {
+            return defaultValue;
+        }
+
+        return val.longValue();
+    }
+
+    /**
+     * Get an optional long object value associated with a key, or zero if there is no
+     * such key or if the value is not a number. If the value is a string, an
+     * attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @return An object which is the value.
+     */
+    public Long optLongObj(String key) {
+        return this.optLongObj(key, 0L);
+    }
+
+    /**
+     * Get an optional long object value associated with a key, or the default if there
+     * is no such key or if the value is not a number. If the value is a string,
+     * an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @return An object which is the value.
+     */
+    public Long optLongObj(String key, Long defaultValue) {
         final Number val = this.optNumber(key, null);
         if (val == null) {
             return defaultValue;
@@ -1537,12 +1677,12 @@ public class JSONObject {
                         final Object result = method.invoke(bean);
                         if (result != null) {
                             // check cyclic dependency and throw error if needed
-                            // the wrap and populateMap combination method is 
+                            // the wrap and populateMap combination method is
                             // itself DFS recursive
                             if (objectsRecord.contains(result)) {
                                 throw recursivelyDefinedObjectException(key);
                             }
-                            
+
                             objectsRecord.add(result);
 
                             this.map.put(key, wrap(result, objectsRecord));
@@ -1551,7 +1691,7 @@ public class JSONObject {
 
                             // we don't use the result anywhere outside of wrap
                             // if it's a resource we should be sure to close it
-                            // after calling toString 
+                            // after calling toString
                             if (result instanceof Closeable) {
                                 try {
                                     ((Closeable) result).close();
