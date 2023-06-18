@@ -5,6 +5,8 @@ and artifactId "json". For example:
 [https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
 
 ~~~
+20230618    Final release with Java 1.6 compatibility. Future releases will require Java 1.8 or greater.
+
 20230227    Fix for CVE-2022-45688 and recent commits
 
 20220924    New License - public domain, and some minor updates
