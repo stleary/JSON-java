@@ -3,7 +3,7 @@
 
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
-    <version>20230227</version>
+    <version>20230618</version>
     <packaging>bundle</packaging>
 
     <name>JSON in Java</name>
