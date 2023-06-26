@@ -625,13 +625,10 @@ public class JSONObjectTest {
         assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/escapeStringKey")));
         assertTrue("expected 42", Integer.valueOf("42").equals(jsonObject.query("/intKey")));
         assertTrue("expected -23.45e7", Double.valueOf("-23.45e7").equals(jsonObject.query("/doubleKey")));
-<<<<<<< HEAD
         // sorry, mockito artifact
         assertTrue("expected 2 mockitoInterceptor items", ((Map<?,?>)(JsonPath.read(doc, "$.mockitoInterceptor"))).size() == 2);
         assertTrue("expected 0 mockitoInterceptor.serializationSupport items",
                 ((Map<?,?>)(JsonPath.read(doc, "$.mockitoInterceptor.serializationSupport"))).size() == 0);
-=======
->>>>>>> 88968f3 (Updated mockito)
         Util.checkJSONObjectMaps(jsonObject);
     }
 
