@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -915,7 +916,7 @@ public class XMLTest {
             InputStream xmlStream = null;
             try {
                 xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.xml");
-                Reader xmlReader = new InputStreamReader(xmlStream);
+                Reader xmlReader = new InputStreamReader(xmlStream, Charset.forName("UTF-8"));
                 JSONObject actual = XML.toJSONObject(xmlReader, true);
                 InputStream jsonStream = null;
                 try {
