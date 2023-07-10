@@ -782,6 +782,23 @@ public class XML {
      */
     private static String toString(final Object object, final String tagName, final XMLParserConfiguration config, int indentFactor, int indent)
             throws JSONException {
+        return toString(object, tagName, config, indentFactor, indent, true);
+    }
+
+    /**
+     * Convert a JSONObject into a well-formed, element-normal XML string,
+     * either pretty print or single-lined depending on indent factor as well as having the choice to keep self closing tags.
+     *
+     * @param object              A JSONObject.
+     * @param tagName             The optional name of the enclosing tag.
+     * @param config              Configuration that can control output to XML.
+     * @param indentFactor        The number of spaces to add to each level of indentation.
+     * @param indent              The current ident level in spaces.
+     * @param keepSelfClosingTags The boolean value to either keep or remove self-closing tags
+     * @return A String
+     * @throws JSONException
+     */
+    private static String toString(final Object object, final String tagName, final XMLParserConfiguration config, int indentFactor, int indent, Boolean keepSelfClosingTags) throws JSONException {
         StringBuilder sb = new StringBuilder();
         JSONArray ja;
         JSONObject jo;
@@ -853,8 +870,15 @@ public class XML {
                     sb.append(indent(indent));
                     sb.append('<');
                     sb.append(key);
-                    sb.append("/>");
-                    if(indentFactor > 0){
+                    if (!keepSelfClosingTags) {
+                        sb.append('>');
+                        sb.append("</");
+                        sb.append(key);
+                        sb.append('>');
+                    } else {
+                        sb.append("/>");
+                    }
+                    if (indentFactor > 0) {
                         sb.append("\n");
                     }
 
@@ -902,8 +926,9 @@ public class XML {
 
         if(tagName == null){
             return indent(indent) + "\"" + string + "\"" + ((indentFactor > 0) ? "\n" : "");
-        } else if(string.length() == 0){
-            return indent(indent) + "<" + tagName + "/>" + ((indentFactor > 0) ? "\n" : "");
+        } else if (string.length() == 0) {
+            String tag = (keepSelfClosingTags) ? "<" + tagName + "/>" : "<" + tagName + ">" + "</" + tagName + ">";
+            return indent(indent) + tag + ((indentFactor > 0) ? "\n" : "");
         } else {
             return indent(indent) + "<" + tagName
                     + ">" + string + "</" + tagName + ">" + ((indentFactor > 0) ? "\n" : "");

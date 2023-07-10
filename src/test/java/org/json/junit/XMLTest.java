@@ -1313,6 +1313,31 @@ public class XMLTest {
                 "parameter of the XMLParserConfiguration used");
         }
     }
+
+    @Test
+    public void testSelfClosingTagAttributeForFalse(){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name","Madhav");
+        jsonObject.put("job","");
+
+        final String expected = "<name>Madhav</name><job></job>";
+
+        final String actual = XML.toString(jsonObject,false);
+        assertEquals("The self closing tag should not be present",expected,actual);
+    }
+
+    @Test
+    public void testSelfClosingTagAttributeInNormalConditions(){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name","Madhav");
+        jsonObject.put("job","");
+
+        final String expected = "<name>Madhav</name><job/>";
+
+        final String actual = XML.toString(jsonObject);
+        assertEquals("The self closing tag should be present in normal conditions",expected,actual);
+    }
+
 }
 
 
