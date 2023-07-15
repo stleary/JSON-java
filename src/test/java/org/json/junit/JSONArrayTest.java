@@ -537,6 +537,13 @@ public class JSONArrayTest {
         assertTrue("Array opt boolean implicit default",
                 Boolean.FALSE == jsonArray.optBoolean(-1));
 
+         assertTrue("Array opt boolean object",
+                Boolean.TRUE.equals(jsonArray.optBooleanObject(0)));
+        assertTrue("Array opt boolean object default",
+                Boolean.FALSE.equals(jsonArray.optBooleanObject(-1, Boolean.FALSE)));
+        assertTrue("Array opt boolean object implicit default",
+                Boolean.FALSE.equals(jsonArray.optBooleanObject(-1)));
+
         assertTrue("Array opt double",
                 new Double(23.45e-4).equals(jsonArray.optDouble(5)));
         assertTrue("Array opt double default",
@@ -544,12 +551,26 @@ public class JSONArrayTest {
         assertTrue("Array opt double default implicit",
            new Double(jsonArray.optDouble(99)).isNaN());
 
+        assertTrue("Array opt double object",
+                Double.valueOf(23.45e-4).equals(jsonArray.optDoubleObject(5)));
+        assertTrue("Array opt double object default",
+                Double.valueOf(1).equals(jsonArray.optDoubleObject(0, 1D)));
+        assertTrue("Array opt double object default implicit",
+                jsonArray.optDoubleObject(99).isNaN());
+
         assertTrue("Array opt float",
                 new Float(23.45e-4).equals(jsonArray.optFloat(5)));
         assertTrue("Array opt float default",
                 new Float(1).equals(jsonArray.optFloat(0, 1)));
         assertTrue("Array opt float default implicit",
            new Float(jsonArray.optFloat(99)).isNaN());
+
+        assertTrue("Array opt float object",
+                Float.valueOf(23.45e-4F).equals(jsonArray.optFloatObject(5)));
+        assertTrue("Array opt float object default",
+                Float.valueOf(1).equals(jsonArray.optFloatObject(0, 1F)));
+        assertTrue("Array opt float object default implicit",
+                jsonArray.optFloatObject(99).isNaN());
 
         assertTrue("Array opt Number",
                 BigDecimal.valueOf(23.45e-4).equals(jsonArray.optNumber(5)));
@@ -564,6 +585,13 @@ public class JSONArrayTest {
                 new Integer(-1).equals(jsonArray.optInt(0, -1)));
         assertTrue("Array opt int default implicit",
                 0 == jsonArray.optInt(0));
+
+        assertTrue("Array opt int object",
+                Integer.valueOf(42).equals(jsonArray.optIntegerObject(7)));
+        assertTrue("Array opt int object default",
+                Integer.valueOf(-1).equals(jsonArray.optIntegerObject(0, -1)));
+        assertTrue("Array opt int object default implicit",
+                Integer.valueOf(0).equals(jsonArray.optIntegerObject(0)));
 
         JSONArray nestedJsonArray = jsonArray.optJSONArray(9);
         assertTrue("Array opt JSONArray", nestedJsonArray != null);
@@ -582,6 +610,13 @@ public class JSONArrayTest {
         assertTrue("Array opt long default implicit",
                 0 == jsonArray.optLong(-1));
 
+        assertTrue("Array opt long object",
+                Long.valueOf(0).equals(jsonArray.optLongObject(11)));
+        assertTrue("Array opt long object default",
+                Long.valueOf(-2).equals(jsonArray.optLongObject(-1, -2L)));
+        assertTrue("Array opt long object default implicit",
+                Long.valueOf(0).equals(jsonArray.optLongObject(-1)));
+
         assertTrue("Array opt string",
                 "hello".equals(jsonArray.optString(4)));
         assertTrue("Array opt string default implicit",
@@ -599,10 +634,15 @@ public class JSONArrayTest {
     public void optStringConversion(){
         JSONArray ja = new JSONArray("[\"123\",\"true\",\"false\"]");
         assertTrue("unexpected optBoolean value",ja.optBoolean(1,false)==true);
+        assertTrue("unexpected optBooleanObject value",Boolean.valueOf(true).equals(ja.optBooleanObject(1,false)));
         assertTrue("unexpected optBoolean value",ja.optBoolean(2,true)==false);
+        assertTrue("unexpected optBooleanObject value",Boolean.valueOf(false).equals(ja.optBooleanObject(2,true)));
         assertTrue("unexpected optInt value",ja.optInt(0,0)==123);
+        assertTrue("unexpected optIntegerObject value",Integer.valueOf(123).equals(ja.optIntegerObject(0,0)));
         assertTrue("unexpected optLong value",ja.optLong(0,0)==123);
+        assertTrue("unexpected optLongObject value",Long.valueOf(123).equals(ja.optLongObject(0,0L)));
         assertTrue("unexpected optDouble value",ja.optDouble(0,0.0)==123.0);
+        assertTrue("unexpected optDoubleObject value",Double.valueOf(123.0).equals(ja.optDoubleObject(0,0.0)));
         assertTrue("unexpected optBigInteger value",ja.optBigInteger(0,BigInteger.ZERO).compareTo(new BigInteger("123"))==0);
         assertTrue("unexpected optBigDecimal value",ja.optBigDecimal(0,BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
         Util.checkJSONArrayMaps(ja);

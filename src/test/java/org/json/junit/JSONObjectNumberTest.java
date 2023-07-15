@@ -110,8 +110,18 @@ public class JSONObjectNumberTest {
     }
 
     @Test
+    public void testOptFloatObject() {
+        assertEquals((Float) value.floatValue(), object.optFloatObject("value"), 0.0f);
+    }
+
+    @Test
     public void testOptDouble() {
         assertEquals(value.doubleValue(), object.optDouble("value"), 0.0d);
+    }
+
+    @Test
+    public void testOptDoubleObject() {
+        assertEquals((Double) value.doubleValue(), object.optDoubleObject("value"), 0.0d);
     }
 
     @Test
@@ -120,7 +130,17 @@ public class JSONObjectNumberTest {
     }
 
     @Test
+    public void testOptIntegerObject() {
+        assertEquals((Integer) value.intValue(), object.optIntegerObject("value"));
+    }
+
+    @Test
     public void testOptLong() {
         assertEquals(value.longValue(), object.optLong("value"));
+    }
+
+    @Test
+    public void testOptLongObject() {
+        assertEquals((Long) value.longValue(), object.optLongObject("value"));
     }
 }
