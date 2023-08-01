@@ -2226,6 +2226,15 @@ public class JSONObjectTest {
                     e.getMessage());
         }
         try {
+            // \0 after ,
+            String str = "{\"myKey\":true, \0\"myOtherKey\":false}";
+            assertNull("Expected an exception",new JSONObject(str));
+        } catch (JSONException e) {
+          assertEquals("Expecting an exception message",
+              "A JSONObject text must end with '}' at 15 [character 16 line 1]",
+              e.getMessage());
+        }
+        try {
             // append to wrong key
             String str = "{\"myKey\":true, \"myOtherKey\":false}";
             JSONObject jsonObject = new JSONObject(str);
