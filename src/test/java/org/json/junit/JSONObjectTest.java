@@ -2230,9 +2230,9 @@ public class JSONObjectTest {
             String str = "{\"myKey\":true, \0\"myOtherKey\":false}";
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) {
-          assertEquals("Expecting an exception message",
-              "A JSONObject text must end with '}' at 15 [character 16 line 1]",
-              e.getMessage());
+            assertEquals("Expecting an exception message",
+                    "A JSONObject text must end with '}' at 15 [character 16 line 1]",
+                    e.getMessage());
         }
         try {
             // append to wrong key
