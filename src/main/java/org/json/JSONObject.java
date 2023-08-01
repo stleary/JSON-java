@@ -253,12 +253,11 @@ public class JSONObject {
             switch (x.nextClean()) {
             case ';':
             case ',':
-                c = x.nextClean();
-                if (c == 0) {
-                    throw x.syntaxError("A JSONObject text must end with '}'");
-                }
-                if (c == '}') {
+                if (x.nextClean() == '}') {
                     return;
+                }
+                if (x.end()) {
+                    throw x.syntaxError("A JSONObject text must end with '}'");
                 }
                 x.back();
                 break;
