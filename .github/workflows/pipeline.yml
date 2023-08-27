@@ -11,12 +11,12 @@ on:
 
 jobs:
   # old-school build and jar method. No tests run or compiled.
-  build-11: 
+  build-8: 
     runs-on: ubuntu-latest
     strategy:
       matrix:
         # build for java 11, however don't run any tests
-        java: [ 11, 17, 19, 20 ]
+        java: [ 8, 11, 17, 19, 20 ]
     name: Java ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         # build against supported Java LTS versions:
-        java: [ 11, 17 ]
+        java: [ 8, 11, 17 ]
     name: Java ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v3
