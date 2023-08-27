@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # build for java 11, however don't run any tests
+        # build for java 8, however don't run any tests
         java: [ 8, 11, 17, 19, 20 ]
     name: Java ${{ matrix.java }}
     steps:
