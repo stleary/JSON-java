@@ -10,35 +10,6 @@ on:
     branches: [ master ]
 
 jobs:
-  # old-school build and jar method. No tests run or compiled.
-  build-8: 
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        # build for java 8, however don't run any tests
-        java: [ 8, 11, 17, 19, 20 ]
-    name: Java ${{ matrix.java }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: ${{ matrix.java }}
-          cache: 'maven'
-      - name: Compile Java ${{ matrix.java }}
-        run: |
-          mkdir -p target/classes
-          javac -d target/classes/ src/main/java/org/json/*.java
-      - name: Create java ${{ matrix.java }} JAR
-        run: |
-          jar cvf target/org.json.jar -C target/classes .
-      - name: Upload Java ${{ matrix.java }} JAR
-        uses: actions/upload-artifact@v1
-        with:
-          name: Java ${{ matrix.java }} JAR
-          path: target/org.json.jar
-      
   build:
     runs-on: ubuntu-latest
     strategy:
