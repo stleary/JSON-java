@@ -1,8 +1,8 @@
 # Contribution Guidelines
 
-Feel free to work on any issue with a #hacktoberfest label.
+Feel free to work on any open issue, you don't need to ask permission first. This year, the hacktoberfest label will be added to any PR and associated issue during the month of October.
 
-If you discover an issue you would like to work on, you can add a new issue to the list. If it meets our criteria, a hacktoberfest label will be added.
+If you discover an issue you would like to work on, you can add a new issue to the list. If it meets our criteria, it will be available to work on (if not, it will be closed after review).
 
 # Who is allowed to submit pull requests for this project?
 
