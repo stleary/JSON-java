@@ -22,7 +22,7 @@ repositories {
 dependencies {
     testImplementation 'junit:junit:4.13.1'
     testImplementation 'com.jayway.jsonpath:json-path:2.1.0'
-    testImplementation 'org.mockito:mockito-core:1.9.5'
+    testImplementation 'org.mockito:mockito-core:4.2.0'
 }
 
 subprojects {
@@ -30,9 +30,9 @@ subprojects {
 }
 
 group = 'org.json'
-version = 'v20211205-SNAPSHOT'
+version = 'v20230618-SNAPSHOT'
 description = 'JSON in Java'
-sourceCompatibility = '1.7'
+sourceCompatibility = '1.8'
 
 configurations.all {
 }
