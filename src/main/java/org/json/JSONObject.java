@@ -77,7 +77,7 @@ import java.util.stream.Stream;
 public class JSONObject implements Iterable<String> {
     @Override
     public Iterator<String> iterator() {
-        return null;
+        return keys();
     }
 
     @Override
