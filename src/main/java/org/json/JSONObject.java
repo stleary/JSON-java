@@ -75,19 +75,10 @@ import java.util.stream.Stream;
  * @version 2016-08-15
  */
 public class JSONObject implements Iterable<String> {
+
     @Override
     public Iterator<String> iterator() {
         return keys();
-    }
-
-    @Override
-    public void forEach(Consumer<? super String> action) {
-        Iterable.super.forEach(action);
-    }
-
-    @Override
-    public Spliterator<String> spliterator() {
-        return Iterable.super.spliterator();
     }
 
     /**
