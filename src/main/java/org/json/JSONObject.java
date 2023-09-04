@@ -15,18 +15,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -81,7 +74,22 @@ import java.util.regex.Pattern;
  * @author JSON.org
  * @version 2016-08-15
  */
-public class JSONObject {
+public class JSONObject implements Iterable<String> {
+    @Override
+    public Iterator<String> iterator() {
+        return null;
+    }
+
+    @Override
+    public void forEach(Consumer<? super String> action) {
+        Iterable.super.forEach(action);
+    }
+
+    @Override
+    public Spliterator<String> spliterator() {
+        return Iterable.super.spliterator();
+    }
+
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
      * whilst Java's null is equivalent to the value that JavaScript calls
@@ -459,6 +467,10 @@ public class JSONObject {
      */
     protected JSONObject(int initialCapacity){
         this.map = new HashMap<String, Object>(initialCapacity);
+    }
+
+    public Stream<String> stream() {
+        return keySet().stream();
     }
 
     /**

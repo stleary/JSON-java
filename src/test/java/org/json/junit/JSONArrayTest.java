@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +67,42 @@ public class JSONArrayTest {
                 "0,"+
                 "\"-1\""+
             "]";
+
+    /**
+     * Tests the stream() API
+     */
+    public void testStream() {
+        String data = "[\n" +
+                "    {\n" +
+                "      \"id\": 1,\n" +
+                "      \"name\": \"Alice\",\n" +
+                "      \"department\": \"HR\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": 2,\n" +
+                "      \"name\": \"Bonnie\",\n" +
+                "      \"department\": \"Engineering\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": 3,\n" +
+                "      \"name\": \"Carol\",\n" +
+                "      \"department\": \"Marketing\"\n" +
+                "    }\n" +
+                "  ]";
+        JSONArray jsonArray = new JSONArray(data);
+
+        // Get employees from the engineering dept
+        List<String> actualList = StreamSupport.stream(jsonArray.spliterator(), false)
+                .map(JSONObject.class::cast)
+                .filter(employee -> "Engineering".equals(employee.getString("department")))
+                .map(employee -> employee.getString("name"))
+                .collect(Collectors.toList());
+
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add("Bonnie");
+        assertEquals(actualList, expectedList);
+    }
+
 
     /**
      * Tests that the similar method is working as expected.

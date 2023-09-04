@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.json.CDL;
 import org.json.JSONArray;
@@ -71,6 +72,53 @@ public class JSONObjectTest {
      *  output to guarantee that we are always writing valid JSON. 
      */
     static final Pattern NUMBER_PATTERN = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
+
+    /**
+     * Tests the stream api
+     */
+    @Test
+    public void testStream() {
+        String data = "{\n" +
+                "  \"employees\": [\n" +
+                "    {\n" +
+                "      \"id\": 1,\n" +
+                "      \"name\": \"Alice\",\n" +
+                "      \"department\": \"HR\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": 2,\n" +
+                "      \"name\": \"Bonnie\",\n" +
+                "      \"department\": \"Engineering\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id\": 3,\n" +
+                "      \"name\": \"Carol\",\n" +
+                "      \"department\": \"Marketing\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        JSONObject jsonObject = new JSONObject(data);
+
+        // Get employees from the Engineering department
+        List<String> actualList = new ArrayList<>();
+
+        jsonObject.stream()
+                .filter(key -> key.startsWith("employees"))
+                .map(jsonObject::getJSONArray)
+                .flatMap(JSONArray::stream)
+                .map(JSONObject.class::cast)
+                .filter(employee -> "Engineering".equals(employee.getString("department")))
+                .map(employee -> employee.getString("name"))
+                .forEach(name -> actualList.add(name));
+
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add("Bonnie");
+        assertEquals(expectedList, actualList);
+    }
+
+
+
 
     /**
      * Tests that the similar method is working as expected.

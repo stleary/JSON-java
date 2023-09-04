@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 /**
@@ -222,6 +224,10 @@ public class JSONArray implements Iterable<Object> {
                     "JSONArray initial capacity cannot be negative.");
     	}
     	this.myArrayList = new ArrayList<Object>(initialCapacity);
+    }
+
+    public Stream<Object> stream() {
+        return IntStream.range(0, length()).mapToObj(this::get);
     }
 
     @Override
