@@ -15,8 +15,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
+import java.util.Spliterators;
+import java.util.Spliterator;
 
 
 /**
@@ -63,7 +67,7 @@ import java.util.stream.Stream;
  * @author JSON.org
  * @version 2016-08/15
  */
-public class JSONArray implements Iterable<Object> {
+public class JSONArray {
 
     /**
      * The arrayList where the JSONArray's properties are kept.
@@ -226,11 +230,56 @@ public class JSONArray implements Iterable<Object> {
     	this.myArrayList = new ArrayList<Object>(initialCapacity);
     }
 
+    /**
+     * Support for streams.
+     * TODO: This can be simplified when the project is updated to Java 9 or later
+     * @return Stream of array elements for this object
+     */
     public Stream<Object> stream() {
-        return IntStream.range(0, length()).mapToObj(this::get);
+        Iterator<Object> iterator = new Iterator<Object>() {
+            private int index = 0;
+            private int max = length();
+
+            @Override
+            public boolean hasNext() {
+                return index < max;
+            }
+
+            @Override
+            public Object next() {
+                return get(index++);
+            }
+        };
+
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
+                false
+        );
     }
 
-    @Override
+    /**
+     * Returns a Spliterator over the elements in this JSONArray.
+     * @return Spliterator object
+     */
+    public Spliterator<Object> spliterator() {
+        Iterator<Object> iterator = new Iterator<Object>() {
+            private int index = 0;
+            private int max = length();
+
+            @Override
+            public boolean hasNext() {
+                return index < max;
+            }
+
+            @Override
+            public Object next() {
+                return get(index++);
+            }
+        };
+
+        return Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
+    }
+
     public Iterator<Object> iterator() {
         return this.myArrayList.iterator();
     }

@@ -103,7 +103,7 @@ public class JSONObjectTest {
         // Get employees from the Engineering department
         List<String> actualList = new ArrayList<>();
 
-        jsonObject.stream()
+        jsonObject.streamKeys()
                 .filter(key -> key.startsWith("employees"))
                 .map(jsonObject::getJSONArray)
                 .flatMap(JSONArray::stream)
