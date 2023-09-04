@@ -15,23 +15,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.ResourceBundle;
-import java.util.stream.StreamSupport;
-import java.util.Spliterators;
-import java.util.Spliterator;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -86,7 +74,21 @@ import java.util.Spliterator;
  * @author JSON.org
  * @version 2016-08-15
  */
-public class JSONObject {
+public class JSONObject implements Iterable<String> {
+    @Override
+    public Iterator<String> iterator() {
+        return null;
+    }
+
+    @Override
+    public void forEach(Consumer<? super String> action) {
+        Iterable.super.forEach(action);
+    }
+
+    @Override
+    public Spliterator<String> spliterator() {
+        return Iterable.super.spliterator();
+    }
 
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
@@ -467,30 +469,8 @@ public class JSONObject {
         this.map = new HashMap<String, Object>(initialCapacity);
     }
 
-    /**
-     * Support for streams
-     * TODO: This can be simplified when the project is updated to Java 9 or later
-     * @return Stream of keys for this object
-     */
-    public Stream<String> streamKeys() {
-        Iterator<String> keys = this.keys();
-        return StreamSupport.stream(
-            Spliterators.spliteratorUnknownSize(
-                new Iterator<String>() {
-                    @Override
-                    public boolean hasNext() {
-                        return keys.hasNext();
-                    }
-
-                    @Override
-                    public String next() {
-                        return keys.next();
-                    }
-                },
-                Spliterator.ORDERED | Spliterator.IMMUTABLE
-            ),
-            false
-        );
+    public Stream<String> stream() {
+        return keySet().stream();
     }
 
     /**
