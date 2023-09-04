@@ -226,6 +226,10 @@ public class JSONArray implements Iterable<Object> {
     	this.myArrayList = new ArrayList<Object>(initialCapacity);
     }
 
+    /**
+     * Stream support - requires java 8
+     * @return Stream of array elements
+     */
     public Stream<Object> stream() {
         return IntStream.range(0, length()).mapToObj(this::get);
     }

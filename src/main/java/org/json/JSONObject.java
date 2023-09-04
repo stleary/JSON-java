@@ -469,6 +469,10 @@ public class JSONObject implements Iterable<String> {
         this.map = new HashMap<String, Object>(initialCapacity);
     }
 
+    /**
+     * Stream support - requires java 8
+     * @return Stream of keys
+     */
     public Stream<String> stream() {
         return keySet().stream();
     }

@@ -117,7 +117,24 @@ public class JSONObjectTest {
         assertEquals(expectedList, actualList);
     }
 
-
+    /**
+     * Confirms new iterator() functionality
+     */
+    @Test
+    public void testIterator() {
+        JSONObject jsonObject = new JSONObject("{ a: 1, b: true, c: \"abc\" }");
+        Iterator<String> it1 = jsonObject.keys();
+        Iterator<String> it2 = jsonObject.iterator();
+        boolean isEqual = true;
+        while (it1.hasNext() && it2.hasNext()) {
+            if (!it1.next().equals(it2.next())) {
+                isEqual = false;
+                break;
+            }
+        }
+        isEqual = isEqual && !it1.hasNext() && !it2.hasNext();
+        assertTrue("Iterators are not equal", isEqual);
+    }
 
 
     /**
