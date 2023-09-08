@@ -54,7 +54,6 @@ import org.json.junit.data.Singleton;
 import org.json.junit.data.SingletonEnum;
 import org.json.junit.data.WeirdList;
 import org.junit.Test;
-import org.json.junit.Util;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -304,12 +303,12 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectByMap() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("trueKey", new Boolean(true));
-        map.put("falseKey", new Boolean(false));
+        map.put("trueKey", Boolean.valueOf(true));
+        map.put("falseKey", Boolean.valueOf(false));
         map.put("stringKey", "hello world!");
         map.put("escapeStringKey", "h\be\tllo w\u1234orld!");
-        map.put("intKey", new Long(42));
-        map.put("doubleKey", new Double(-23.45e67));
+        map.put("intKey", Long.valueOf(42));
+        map.put("doubleKey", Double.valueOf(-23.45e67));
         JSONObject jsonObject = new JSONObject(map);
 
         // validate JSON
@@ -570,13 +569,13 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectByMapWithNullValue() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("trueKey", new Boolean(true));
-        map.put("falseKey", new Boolean(false));
+        map.put("trueKey", Boolean.valueOf(true));
+        map.put("falseKey", Boolean.valueOf(false));
         map.put("stringKey", "hello world!");
         map.put("nullKey", null);
         map.put("escapeStringKey", "h\be\tllo w\u1234orld!");
-        map.put("intKey", new Long(42));
-        map.put("doubleKey", new Double(-23.45e67));
+        map.put("intKey", Long.valueOf(42));
+        map.put("doubleKey", Double.valueOf(-23.45e67));
         JSONObject jsonObject = new JSONObject(map);
 
         // validate JSON
@@ -996,7 +995,7 @@ public class JSONObjectTest {
         assertTrue( "0.2 should be a BigDecimal!",
                 JSONObject.stringToValue( "0.2" ) instanceof BigDecimal );
         assertTrue( "Doubles should be BigDecimal, even when incorrectly converting floats!",
-                JSONObject.stringToValue( new Double( "0.2f" ).toString() ) instanceof BigDecimal );
+                JSONObject.stringToValue( Double.valueOf( "0.2f" ).toString() ) instanceof BigDecimal );
         /**
          * This test documents a need for BigDecimal conversion.
          */
@@ -1006,13 +1005,13 @@ public class JSONObjectTest {
         assertTrue( "1 should be an Integer!",
                 JSONObject.stringToValue( "1" ) instanceof Integer );
         assertTrue( "Integer.MAX_VALUE should still be an Integer!",
-                JSONObject.stringToValue( new Integer( Integer.MAX_VALUE ).toString() ) instanceof Integer );
+                JSONObject.stringToValue( Integer.valueOf( Integer.MAX_VALUE ).toString() ) instanceof Integer );
         assertTrue( "Large integers should be a Long!",
                 JSONObject.stringToValue( Long.valueOf(((long)Integer.MAX_VALUE) + 1 ) .toString() ) instanceof Long );
         assertTrue( "Long.MAX_VALUE should still be an Integer!",
-                JSONObject.stringToValue( new Long( Long.MAX_VALUE ).toString() ) instanceof Long );
+                JSONObject.stringToValue( Long.valueOf( Long.MAX_VALUE ).toString() ) instanceof Long );
 
-        String str = new BigInteger( new Long( Long.MAX_VALUE ).toString() ).add( BigInteger.ONE ).toString();
+        String str = new BigInteger( Long.valueOf( Long.MAX_VALUE ).toString() ).add( BigInteger.ONE ).toString();
         assertTrue( "Really large integers currently evaluate to BigInteger",
                 JSONObject.stringToValue(str).equals(new BigInteger("9223372036854775808")));
     }
@@ -1259,8 +1258,8 @@ public class JSONObjectTest {
         String key30 = "key30";
         String key31 = "key31";
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put(key30, new Double(3.0));
-        jsonObject.put(key31, new Double(3.1));
+        jsonObject.put(key30, Double.valueOf(3.0));
+        jsonObject.put(key31, Double.valueOf(3.1));
 
         assertTrue("3.0 should remain a double",
                 jsonObject.getDouble(key30) == 3); 
@@ -1713,19 +1712,19 @@ public class JSONObjectTest {
         */
         assertFalse("Document unexpected behaviour with explicit type-casting float as double!", (double)0.2f == 0.2d );
         assertFalse("Document unexpected behaviour with implicit type-cast!", 0.2f == 0.2d );
-        Double d1 = new Double( 1.1f );
-        Double d2 = new Double( "1.1f" );
+        Double d1 = Double.valueOf( 1.1f );
+        Double d2 = Double.valueOf( "1.1f" );
         assertFalse( "Document implicit type cast from float to double before calling Double(double d) constructor", d1.equals( d2 ) );
 
-        assertTrue( "Correctly converting float to double via base10 (string) representation!", new Double( 3.1d ).equals(  new Double( new Float( 3.1f ).toString() ) ) );
+        assertTrue( "Correctly converting float to double via base10 (string) representation!", Double.valueOf( 3.1d ).equals(  Double.valueOf( Float.valueOf( 3.1f ).toString() ) ) );
 
         // Pinpointing the not so obvious "buggy" conversion from float to double in JSONObject
         JSONObject jo = new JSONObject();
         jo.put( "bug", 3.1f ); // will call put( String key, double value ) with implicit and "buggy" type-cast from float to double
-        assertFalse( "The java-compiler did add some zero bits for you to the mantissa (unexpected, but well documented)", jo.get( "bug" ).equals(  new Double( 3.1d ) ) );
+        assertFalse( "The java-compiler did add some zero bits for you to the mantissa (unexpected, but well documented)", jo.get( "bug" ).equals(  Double.valueOf( 3.1d ) ) );
 
         JSONObject inc = new JSONObject();
-        inc.put( "bug", new Float( 3.1f ) ); // This will put in instance of Float into JSONObject, i.e. call put( String key, Object value )
+        inc.put( "bug", Float.valueOf( 3.1f ) ); // This will put in instance of Float into JSONObject, i.e. call put( String key, Object value )
         assertTrue( "Everything is ok here!", inc.get( "bug" ) instanceof Float );
         inc.increment( "bug" ); // after adding 1, increment will call put( String key, double value ) with implicit and "buggy" type-cast from float to double!
         // this.put(key, (Float) value + 1);
@@ -2040,14 +2039,14 @@ public class JSONObjectTest {
         assertTrue("map valueToString() incorrect",
                 jsonObject.toString().equals(JSONObject.valueToString(map))); 
         Collection<Integer> collection = new ArrayList<Integer>();
-        collection.add(new Integer(1));
-        collection.add(new Integer(2));
-        collection.add(new Integer(3));
+        collection.add(Integer.valueOf(1));
+        collection.add(Integer.valueOf(2));
+        collection.add(Integer.valueOf(3));
         assertTrue("collection valueToString() expected: "+
                 jsonArray.toString()+ " actual: "+
                 JSONObject.valueToString(collection),
                 jsonArray.toString().equals(JSONObject.valueToString(collection))); 
-        Integer[] array = { new Integer(1), new Integer(2), new Integer(3) };
+        Integer[] array = { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) };
         assertTrue("array valueToString() incorrect",
                 jsonArray.toString().equals(JSONObject.valueToString(array)));
         Util.checkJSONObjectMaps(jsonObject);
@@ -2085,7 +2084,7 @@ public class JSONObjectTest {
                 JSONObject.NULL == JSONObject.wrap(null));
 
         // wrap(Integer) returns Integer
-        Integer in = new Integer(1);
+        Integer in = Integer.valueOf(1);
         assertTrue("Integer wrap() incorrect",
                 in == JSONObject.wrap(in));
 
@@ -2112,9 +2111,9 @@ public class JSONObjectTest {
 
         // wrap collection returns JSONArray
         Collection<Integer> collection = new ArrayList<Integer>();
-        collection.add(new Integer(1));
-        collection.add(new Integer(2));
-        collection.add(new Integer(3));
+        collection.add(Integer.valueOf(1));
+        collection.add(Integer.valueOf(2));
+        collection.add(Integer.valueOf(3));
         JSONArray jsonArray = (JSONArray) (JSONObject.wrap(collection));
 
         // validate JSON
@@ -2125,7 +2124,7 @@ public class JSONObjectTest {
         assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
 
         // wrap Array returns JSONArray
-        Integer[] array = { new Integer(1), new Integer(2), new Integer(3) };
+        Integer[] array = { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) };
         JSONArray integerArrayJsonArray = (JSONArray)(JSONObject.wrap(array));
 
         // validate JSON
