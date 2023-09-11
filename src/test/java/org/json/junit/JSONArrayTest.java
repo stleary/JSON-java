@@ -9,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -16,16 +17,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,40 +62,191 @@ public class JSONArrayTest {
             "]";
 
     /**
-     * Tests the stream() API
+     * 1. JSONArray stream tests
+     * 1.1 Basic tests
+     * 1.2 Advanced tests
+     * 1.3 Exception tests
+     * 1.4 Integrated tests
      */
-    public void testStream() {
-        String data = "[\n" +
-                "    {\n" +
-                "      \"id\": 1,\n" +
-                "      \"name\": \"Alice\",\n" +
-                "      \"department\": \"HR\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"id\": 2,\n" +
-                "      \"name\": \"Bonnie\",\n" +
-                "      \"department\": \"Engineering\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"id\": 3,\n" +
-                "      \"name\": \"Carol\",\n" +
-                "      \"department\": \"Marketing\"\n" +
-                "    }\n" +
-                "  ]";
+
+    /**
+     * 1.1.1 Stream JSONArray to a list
+     */
+    @Test
+    public void testStream_1_1_1() {
+        String data = "[ 1, 2, 3, true, false, null, \"abc\", \"def\", { \"a\": \"b\" }, []]";
         JSONArray jsonArray = new JSONArray(data);
+        Object[] expectedList = {1, 2, 3, true, false, null, "abc", "def",
+                new JSONObject("{ \"a\": \"b\" }"), new JSONArray("[]")};
 
-        // Get employees from the engineering dept
-        List<String> actualList = StreamSupport.stream(jsonArray.spliterator(), false)
-                .map(JSONObject.class::cast)
-                .filter(employee -> "Engineering".equals(employee.getString("department")))
-                .map(employee -> employee.getString("name"))
+        List<Object> actualList = jsonArray.stream()
                 .collect(Collectors.toList());
-
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add("Bonnie");
-        assertEquals(actualList, expectedList);
+        assertEquals(actualList.size(), expectedList.length);
+        for (int i = 0; i < actualList.size(); ++i) {
+            Object actual = actualList.get(i);
+            Object expected = expectedList[i];
+            if (actual instanceof JSONObject) {
+                assertTrue(((JSONObject) actual).similar((JSONObject)expected));
+            } else if (actual instanceof JSONArray) {
+                assertTrue(((JSONArray) actual).similar((JSONArray) expected));
+            } else if (actual == JSONObject.NULL) {
+                assertNull(expected);
+            } else {
+                assertEquals(expected, actual);
+            }
+        }
     }
 
+    /**
+     * 1.1.2 Stream JSONArray through a filter.
+     */
+    @Test
+    public void testStream_1_1_2() {
+        String data = "[ 1, 2, 3, true, false, null, \"abc\", \"def\", { \"a\": \"b\" }, []]";
+        JSONArray jsonArray = new JSONArray(data);
+        Object[] expectedList = { 2 };
+
+        List<Object> actualList = jsonArray.stream()
+                .filter(x -> x instanceof Number)
+                .filter(x -> (int)x % 2 == 0)
+                .collect(Collectors.toList());
+        assertEquals(actualList.size(), expectedList.length);
+        assertEquals(expectedList[0], actualList.get(0));
+    }
+
+    /**
+     * 1.1.3 Stream JSONArray to find first.
+     */
+    @Test
+    public void testStream_1_1_3() {
+        String data = "[ 1, 2, 3, true, false, null, \"abc\", \"def\", { \"a\": \"b\" }, []]";
+        JSONArray jsonArray = new JSONArray(data);
+        Object[] expectedList = { 2 };
+
+        Optional<Object> firstString = jsonArray.stream()
+                .filter(x -> x instanceof String)
+                .findFirst();
+
+
+        String actual = (String)firstString.get();
+        assertEquals("abc", actual);
+    }
+
+    /**
+     * 1.2.1 Stream JSONArray through a map
+     */
+    @Test
+    public void testStream_1_2_1() {
+        String data = "[ 1, 2, 3, true, false, null, \"abc\", \"def\", { \"a\": \"b\" }, []]";
+        JSONArray jsonArray = new JSONArray(data);
+        Object[] expectedList = { "Number: 1", "Number: 2", "Number: 3" };
+
+        List<String> actualList = jsonArray.stream()
+                .filter(x -> x instanceof Number)
+                .map(x -> "Number: " + x)
+                .collect(Collectors.toList());
+
+        assertEquals(expectedList.length, actualList.size());
+        for (int i = 0; i < actualList.size(); ++i) {
+            assertEquals(expectedList[i], actualList.get(i));
+        }
+    }
+
+    /**
+     * 1.2.2 Stream JSONArray to find min and max
+     */
+    @Test
+    public void testStream_1_2_2() {
+        String data = "[ 1, 2, 3, true, false, null, \"abc\", \"def\", { \"a\": \"b\" }, []]";
+        JSONArray jsonArray = new JSONArray(data);
+
+        Optional<Object> min = jsonArray.stream()
+                .filter(x -> x instanceof Number)
+                .min(Comparator.comparingInt(x -> (int) x));
+        Optional<Object> max = jsonArray.stream()
+                .filter(x -> x instanceof Number)
+                .max(Comparator.comparingInt(x -> (int) x));
+
+        // Assert
+        assertTrue(min.isPresent());
+        assertEquals(1, min.get());
+
+        assertTrue(max.isPresent());
+        assertEquals(3, max.get());
+    }
+
+    /**
+     * 1.2.3 Stream JSONArray through groupingBy
+     */
+    @Test
+    public void testStream_1_2_3() {
+        String data = "[ 1, 2, 3, true, false, null, \"abc\", \"def\", { \"a\": \"b\" }, []]";
+        JSONArray jsonArray = new JSONArray(data);
+        Object[] expectedList = { "Number: 1", "Number: 2", "Number: 3" };
+
+        Map<Object, List<Object>> groupedByMod2 = jsonArray.stream()
+                .filter(x -> x instanceof Number)
+                .collect(Collectors.groupingBy(x -> (int) x % 2));
+
+        // Assert
+        assertEquals(2, groupedByMod2.size());
+
+        assertEquals(1, groupedByMod2.get(0).size());
+        assertEquals(2, groupedByMod2.get(0).get(0));
+
+        assertEquals(2, groupedByMod2.get(1).size());
+        assertEquals(1, groupedByMod2.get(1).get(0));
+        assertEquals(3, groupedByMod2.get(1).get(1));
+    }
+
+    /**
+     * 1.3.1 Stream empty JSONArray
+     */
+    @Test
+    public void testStream_1_3_1() {
+        JSONArray jsonArray = new JSONArray();
+
+        List<Object> list = jsonArray.stream()
+                .collect(Collectors.toList());
+
+        assertTrue(list.isEmpty());
+    }
+
+    /**
+     * 1.3.2 Stream null JSONArray
+     */
+    @Test
+    public void testStream_1_3_2() {
+        JSONArray jsonArray = null;
+
+        assertThrows(NullPointerException.class, () -> {
+            jsonArray.stream();
+        });
+    }
+
+    /**
+     * 1.4.1 Map from JSONObject
+     */
+    @Test
+    public void testStream_1_4_1() {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put("apple");
+        jsonArray.put("banana");
+        jsonObject.put("fruits", jsonArray);
+        Object[] expectedList = { "apple", "banana" };
+
+        List<String> actualList = jsonObject.stream()
+                .filter(key -> key.equals("fruits"))
+                .flatMap(key -> jsonObject.getJSONArray(key).stream())
+                .map(Object::toString)
+                .collect(Collectors.toList());
+
+        assertEquals(actualList.size(), expectedList.length);
+        for (int i = 0; i < actualList.size(); ++i) {
+            assertEquals(expectedList[i], actualList.get(i));
+        }
+    }
 
     /**
      * Tests that the similar method is working as expected.
