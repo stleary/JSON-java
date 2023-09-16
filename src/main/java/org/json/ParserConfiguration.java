@@ -6,7 +6,6 @@ Public Domain.
 /**
  * Configuration base object for parsers. The configuration is immutable.
  */
-@SuppressWarnings({""})
 public class ParserConfiguration {
     /**
      * Used to indicate there's no defined limit to the maximum nesting depth when parsing a document.
@@ -68,10 +67,9 @@ public class ParserConfiguration {
     /**
      * When parsing the XML into JSONML, specifies if values should be kept as strings (<code>true</code>), or if
      * they should try to be guessed into JSON values (numeric, boolean, string)
-     *
+     * @param <T> type parameter
      * @param newVal
      *      new value to use for the <code>keepStrings</code> configuration option.
-     *
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
     public <T extends ParserConfiguration> T withKeepStrings(final boolean newVal) {
@@ -95,6 +93,7 @@ public class ParserConfiguration {
      * will throw a JsonException if the maximum depth is reached.
      * Using any negative value as a parameter is equivalent to setting no limit to the nesting depth,
      * which means the parses will go as deep as the maximum call stack size allows.
+     * @param <T> type parameter
      * @param maxNestingDepth the maximum nesting depth allowed to the XML parser
      * @return The existing configuration will not be modified. A new configuration is returned.
      */

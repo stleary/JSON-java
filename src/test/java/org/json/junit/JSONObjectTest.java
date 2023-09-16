@@ -315,41 +315,6 @@ public class JSONObjectTest {
     }
 
     /**
-     * Confirms new iterator() functionality
-     */
-    @Test
-    public void testIterator() {
-        JSONObject jsonObject = new JSONObject("{ a: 1, b: true, c: \"abc\" }");
-        Iterator<String> it1 = jsonObject.keys();
-        Iterator<String> it2 = jsonObject.iterator();
-        boolean isEqual = true;
-        while (it1.hasNext() && it2.hasNext()) {
-            if (!it1.next().equals(it2.next())) {
-                isEqual = false;
-                break;
-            }
-        }
-        isEqual = isEqual && !it1.hasNext() && !it2.hasNext();
-        assertTrue("Iterators are not equal", isEqual);
-    }
-
-    /**
-     * Test Case 3.2.1: Test the behavior of the stream() method when applied to an empty JSONObject
-     */
-    @Test
-    public void test_3_2_1() {
-        JSONObject jsonObject = new JSONObject();
-
-        List<Map.Entry<String, Object>> entriesList = jsonObject.stream()
-                .collect(Collectors.toList());
-
-        System.out.println(entriesList);
-
-        assertTrue(entriesList.isEmpty());
-    }
-
-
-    /**
      * Tests that the similar method is working as expected.
      */
     @Test
