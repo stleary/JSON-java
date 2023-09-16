@@ -81,6 +81,7 @@ public class JSONArrayTest {
 
         List<Object> actualList = jsonArray.stream()
                 .collect(Collectors.toList());
+        System.out.println(actualList);
         assertEquals(actualList.size(), expectedList.length);
         for (int i = 0; i < actualList.size(); ++i) {
             Object actual = actualList.get(i);
@@ -237,8 +238,8 @@ public class JSONArrayTest {
         Object[] expectedList = { "apple", "banana" };
 
         List<String> actualList = jsonObject.stream()
-                .filter(key -> key.equals("fruits"))
-                .flatMap(key -> jsonObject.getJSONArray(key).stream())
+                .filter(entry -> entry.getKey().equals("fruits"))
+                .flatMap(entry -> jsonObject.getJSONArray((String)entry.getKey()).stream())
                 .map(Object::toString)
                 .collect(Collectors.toList());
 

@@ -462,10 +462,10 @@ public class JSONObject implements Iterable<String> {
 
     /**
      * Stream support - requires java 8
-     * @return Stream of keys
+     * @return Stream of map entries
      */
-    public Stream<String> stream() {
-        return keySet().stream();
+    public Stream<Map.Entry<String, Object>> stream() {
+        return this.entrySet().stream();
     }
 
     /**

@@ -4,13 +4,7 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -74,47 +68,250 @@ public class JSONObjectTest {
     static final Pattern NUMBER_PATTERN = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
 
     /**
-     * Tests the stream api
+     * 2. JSONObject stream tests
+     * 2.1 Basic tests
+     * 2.2 Advanced tests
+     * 2.3 Exception tests
+     * 2.4 Integrated tests
+     */
+
+    /**
+     * Test 2.1.1 stream JSONObject to list
      */
     @Test
-    public void testStream() {
+    public void test_2_1_1() {
         String data = "{\n" +
-                "  \"employees\": [\n" +
-                "    {\n" +
-                "      \"id\": 1,\n" +
-                "      \"name\": \"Alice\",\n" +
-                "      \"department\": \"HR\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"id\": 2,\n" +
-                "      \"name\": \"Bonnie\",\n" +
-                "      \"department\": \"Engineering\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"id\": 3,\n" +
-                "      \"name\": \"Carol\",\n" +
-                "      \"department\": \"Marketing\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+                "  \"key1\": \"abc\",\n" +
+                "  \"key2\": 42,\n" +
+                "  \"key3\": true,\n" +
+                "  \"key4\": null,\n" +
+                "  \"key5\": [1,2,3],\n" +
+                "  \"key6\": {\"a\":\"b\"},\n" +
+                "  \"key7\": [],\n" +
+                "  \"key8\": {}\n" +
+                "}\n";
+
+        JSONObject jsonObject = new JSONObject(data);
+        List<Object> actualList = jsonObject.stream()
+                .map(entry -> {
+                    Object value = entry.getValue();
+                    if (value instanceof HashMap) {
+                        // must be a JSONObject
+                        value = new JSONObject((Map<?,?>) value);
+                    }
+                    return entry.getKey() + ": " + value;
+                })
+                .collect(Collectors.toList());
+
+        System.out.println(actualList);
+        assertEquals(8, actualList.size());
+        assertTrue(actualList.contains("key1: abc"));
+        assertTrue(actualList.contains("key2: 42"));
+        assertTrue(actualList.contains("key3: true"));
+        assertTrue(actualList.contains("key4: null"));
+        assertTrue(actualList.contains("key5: [1,2,3]"));
+        assertTrue(actualList.contains("key6: {\"a\":\"b\"}"));
+        assertTrue(actualList.contains("key7: []"));
+        assertTrue(actualList.contains("key8: {}"));
+    }
+
+    /**
+     * Test 2.1.2 filter entries based on a key condition
+     */
+    @Test
+    public void test_2_1_2() {
+        String data = "{\n" +
+                "  \"key1\": \"abc\",\n" +
+                "  \"key2\": 42,\n" +
+                "  \"key3\": true,\n" +
+                "  \"key4\": null,\n" +
+                "  \"key5\": [1,2,3],\n" +
+                "  \"key6\": {\"a\":\"b\"},\n" +
+                "  \"key7\": [],\n" +
+                "  \"key8\": {}\n" +
+                "}\n";
+
+        JSONObject jsonObject = new JSONObject(data);
+        List<String> actualList = jsonObject.stream()
+                .filter(entry -> entry.getValue() instanceof Number)
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .collect(Collectors.toList());
+
+        System.out.println(actualList);
+        assertEquals(1, actualList.size());
+        assertTrue(actualList.contains("key2: 42"));
+    }
+
+    /**
+     * Test Case 2.1.3: Use the stream() method to find the first entry satisfying a key condition.
+     */
+    @Test
+    public void test_2_1_3() {
+        String data = "{\n" +
+                "  \"key1\": \"abc\",\n" +
+                "  \"key2\": 42,\n" +
+                "  \"key3\": true,\n" +
+                "  \"key4\": null,\n" +
+                "  \"key5\": [1,2,3],\n" +
+                "  \"key6\": {\"a\":\"b\"},\n" +
+                "  \"key7\": [],\n" +
+                "  \"key8\": {}\n" +
+                "}\n";
+
+        JSONObject jsonObject = new JSONObject(data);
+        Optional<Map.Entry<String, Object>> firstEntry = jsonObject.stream()
+                .filter(entry -> entry.getKey().startsWith("key5"))
+                .findFirst();
+
+        System.out.println(firstEntry);
+        assertTrue(firstEntry.isPresent());
+        assertEquals("key5: [1,2,3]", firstEntry.get().getKey() + ": " + firstEntry.get().getValue());
+    }
+
+    /**
+     * Test Case 2.2.1: Use the stream() method in conjunction with map() to transform the values of the JSONObject
+     */
+    @Test
+    public void test_2_2_1() {
+        String data = "{\n" +
+                "  \"key1\": \"abc\",\n" +
+                "  \"key2\": 42,\n" +
+                "  \"key3\": true,\n" +
+                "  \"key4\": null,\n" +
+                "  \"key5\": [1,2,3],\n" +
+                "  \"key6\": {\"a\":\"b\"},\n" +
+                "  \"key7\": [],\n" +
+                "  \"key8\": {}\n" +
+                "}\n";
 
         JSONObject jsonObject = new JSONObject(data);
 
-        // Get employees from the Engineering department
-        List<String> actualList = new ArrayList<>();
+        Map<String, String> transformedMap = jsonObject.stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().toString()
+                ));
 
+        System.out.println(transformedMap);
+        assertEquals(8, transformedMap.size());
+        assertEquals("abc", transformedMap.get("key1"));
+        assertEquals("42", transformedMap.get("key2"));
+        assertEquals("true", transformedMap.get("key3"));
+        assertEquals("null", transformedMap.get("key4"));
+        assertEquals("[1,2,3]", transformedMap.get("key5"));
+        assertEquals("{\"a\":\"b\"}", transformedMap.get("key6"));
+        assertEquals("[]", transformedMap.get("key7"));
+        assertEquals("{}", transformedMap.get("key8"));
+    }
+
+    /**
+     * Test Case 2.2.2: Use the stream() method to find the entry with the
+     * minimum and maximum value based on a comparator
+     */
+    @Test
+    public void test_2_2_2() {
+        String data = "{\n" +
+                "  \"key1\": 3,\n" +
+                "  \"key2\": 42,\n" +
+                "  \"key3\": 15,\n" +
+                "  \"key4\": 8,\n" +
+                "}\n";
+
+        JSONObject jsonObject = new JSONObject(data);
+        Comparator<Map.Entry<String, Object>> valueComparator = Comparator.comparingInt(entry -> (Integer) entry.getValue());
+
+        Optional<Map.Entry<String, Object>> minEntry = jsonObject.stream()
+                .min(valueComparator);
+        Optional<Map.Entry<String, Object>> maxEntry = jsonObject.stream()
+                .max(valueComparator);
+
+        System.out.println("Min entry: " + minEntry);
+        System.out.println("Max entry: " + maxEntry);
+        assertTrue(minEntry.isPresent());
+        assertEquals("key1: 3", minEntry.get().getKey() + ": " + minEntry.get().getValue());
+        assertTrue(maxEntry.isPresent());
+        assertEquals("key2: 42", maxEntry.get().getKey() + ": " + maxEntry.get().getValue());
+    }
+
+    /**
+     * Test Case 2.2.3: Use the stream() method to collect entries into a map grouping them
+     * by a classification function based on the keys
+     */
+    @Test
+    public void test_2_2_3() {
+        String data = "{\n" +
+                "  \"akey1\": \"abc\",\n" +
+                "  \"bkey1\": 42,\n" +
+                "  \"akeyA\": true,\n" +
+                "  \"bkeyA\": null,\n" +
+                "  \"akeyX\": [1,2,3],\n" +
+                "  \"bkeyX\": {\"a\":\"b\"}\n" +
+                "}\n";
+
+        JSONObject jsonObject = new JSONObject(data);
+        Map<Character, List<Map.Entry<String, Object>>> groupedByInitial = jsonObject.stream()
+                .collect(Collectors.groupingBy(entry -> entry.getKey().charAt(4)));
+
+        System.out.println(groupedByInitial);
+        assertEquals(3, groupedByInitial.size());
+        assertEquals(2, groupedByInitial.get('1').size());
+        assertEquals(2, groupedByInitial.get('A').size());
+        assertEquals(2, groupedByInitial.get('X').size());
+    }
+
+    /**
+     * Test Case 2.3.1: Test the behavior of the stream() method when applied to an empty JSONObject
+     */
+    @Test
+    public void test_2_3_1() {
+        JSONObject jsonObject = new JSONObject();
+        List<Map.Entry<String, Object>> entriesList = jsonObject.stream()
+                .collect(Collectors.toList());
+
+        System.out.println(entriesList);
+        assertTrue(entriesList.isEmpty());
+    }
+
+    /**
+     * Test Case 2.3.2: stream a null JSONObject
+     */
+    @Test
+    public void test_2_3_2() {
+        JSONObject jsonObject = null;
+
+        assertThrows(NullPointerException.class, () -> {
+            jsonObject.stream();
+        });
+    }
+
+    /**
+     * Test Case 4.1.2: Use the stream() method to convert a JSONObject to a JSONArray and vice versa.
+     */
+    @Test
+    public void test_2_4_1() {
+        String data = "{\n" +
+                "  \"key1\": \"value1\",\n" +
+                "  \"key2\": \"value2\"\n" +
+                "}\n";
+
+        JSONObject jsonObject = new JSONObject(data);
+
+        // Convert JSONObject to JSONArray
+        JSONArray jsonArray = new JSONArray();
         jsonObject.stream()
-                .filter(key -> key.startsWith("employees"))
-                .map(jsonObject::getJSONArray)
-                .flatMap(JSONArray::stream)
-                .map(JSONObject.class::cast)
-                .filter(employee -> "Engineering".equals(employee.getString("department")))
-                .map(employee -> employee.getString("name"))
-                .forEach(name -> actualList.add(name));
+                .forEach(entry -> jsonArray.put(new JSONObject().put(entry.getKey(), entry.getValue())));
 
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add("Bonnie");
-        assertEquals(expectedList, actualList);
+        System.out.println(jsonArray);
+
+        // Convert JSONArray back to JSONObject
+        JSONObject newJsonObject = new JSONObject();
+        jsonArray.forEach(item -> {
+            JSONObject jsonItem = (JSONObject) item;
+            jsonItem.keySet().forEach(key -> newJsonObject.put(key, jsonItem.get(key)));
+        });
+
+        System.out.println(newJsonObject);
+        assertEquals(jsonObject.toString(), newJsonObject.toString());
     }
 
     /**
@@ -134,6 +331,21 @@ public class JSONObjectTest {
         }
         isEqual = isEqual && !it1.hasNext() && !it2.hasNext();
         assertTrue("Iterators are not equal", isEqual);
+    }
+
+    /**
+     * Test Case 3.2.1: Test the behavior of the stream() method when applied to an empty JSONObject
+     */
+    @Test
+    public void test_3_2_1() {
+        JSONObject jsonObject = new JSONObject();
+
+        List<Map.Entry<String, Object>> entriesList = jsonObject.stream()
+                .collect(Collectors.toList());
+
+        System.out.println(entriesList);
+
+        assertTrue(entriesList.isEmpty());
     }
 
 
