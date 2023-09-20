@@ -2225,6 +2225,24 @@ public class JSONObjectTest {
                     e.getMessage());
         }
         try {
+            // key is a nested map
+            String str = "{{\"foo\": \"bar\"}: \"baz\"}";
+            assertNull("Expected an exception",new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                "Nested object not expected here. at 2 [character 3 line 1]",
+                e.getMessage());
+        }
+        try {
+            // key is a nested array containing a map
+            String str = "{\"a\": 1, [{\"foo\": \"bar\"}]: \"baz\"}";
+            assertNull("Expected an exception",new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                "Nested array not expected here. at 10 [character 11 line 1]",
+                e.getMessage());
+        }
+        try {
             // \0 after ,
             String str = "{\"myKey\":true, \0\"myOtherKey\":false}";
             assertNull("Expected an exception",new JSONObject(str));
