@@ -214,18 +214,6 @@ public class JSONArrayTest {
     }
 
     /**
-     * 1.3.2 Stream null JSONArray
-     */
-    @Test
-    public void testStream_1_3_2() {
-        JSONArray jsonArray = null;
-
-        assertThrows(NullPointerException.class, () -> {
-            jsonArray.stream();
-        });
-    }
-
-    /**
      * 1.4.1 Map from JSONObject
      */
     @Test
@@ -246,6 +234,63 @@ public class JSONArrayTest {
         assertEquals(actualList.size(), expectedList.length);
         for (int i = 0; i < actualList.size(); ++i) {
             assertEquals(expectedList[i], actualList.get(i));
+        }
+    }
+
+    @Test
+    public void testStream_ComposeFromArray() {
+        @SuppressWarnings("boxing")
+        Object[] expectedList = new Object[] { 1, 2, 3, true, false, null, "abc", "def", new JSONObject("{ \"a\": \"b\" }"), new JSONArray()};
+        JSONArray jsonArray = new JSONArray(expectedList);
+
+        List<Object> actualList = jsonArray.stream()
+                .collect(Collectors.toList());
+        System.out.println(actualList);
+        assertEquals(actualList.size(), expectedList.length);
+        for (int i = 0; i < actualList.size(); ++i) {
+            Object actual = actualList.get(i);
+            Object expected = expectedList[i];
+            if (actual instanceof JSONObject) {
+                assertTrue("Json Object test",((JSONObject) actual).similar(expected));
+            } else if (actual instanceof JSONArray) {
+                assertTrue("Json Array test", ((JSONArray) actual).similar(expected));
+            } else if (JSONObject.NULL.equals(expected)) {
+                assertTrue("Null test", JSONObject.NULL.equals(actual));
+            } else {
+                assertEquals("value test: "+expected, expected, actual);
+            }
+        }
+    }
+
+    @Test
+    public void testStream_ComposeFromCode() {
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put(1).put(2).put(3)
+                .put(true).put(false)
+                .put((Object)null)
+                .put("abc").put("def")
+                .put(new JSONObject("{ \"a\": \"b\" }"))
+                .put(new JSONArray())
+        ;
+        @SuppressWarnings("boxing")
+        Object[] expectedList = new Object[] { 1, 2, 3, true, false, null, "abc", "def", new JSONObject("{ \"a\": \"b\" }"), new JSONArray()};
+
+        List<Object> actualList = jsonArray.stream()
+                .collect(Collectors.toList());
+        System.out.println(actualList);
+        assertEquals(actualList.size(), expectedList.length);
+        for (int i = 0; i < actualList.size(); ++i) {
+            Object actual = actualList.get(i);
+            Object expected = expectedList[i];
+            if (actual instanceof JSONObject) {
+                assertTrue("Json Object test",((JSONObject) actual).similar(expected));
+            } else if (actual instanceof JSONArray) {
+                assertTrue("Json Array test", ((JSONArray) actual).similar(expected));
+            } else if (JSONObject.NULL.equals(expected)) {
+                assertTrue("Null test", JSONObject.NULL.equals(actual));
+            } else {
+                assertEquals("value test: "+expected, expected, actual);
+            }
         }
     }
 

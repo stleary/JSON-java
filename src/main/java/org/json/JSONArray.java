@@ -231,7 +231,7 @@ public class JSONArray implements Iterable<Object> {
      * @return Stream of array elements
      */
     public Stream<Object> stream() {
-        return IntStream.range(0, length()).mapToObj(this::get);
+        return IntStream.range(0, length()).mapToObj(this::opt);
     }
 
     @Override

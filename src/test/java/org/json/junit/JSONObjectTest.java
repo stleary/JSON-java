@@ -273,18 +273,6 @@ public class JSONObjectTest {
     }
 
     /**
-     * Test Case 2.3.2: stream a null JSONObject
-     */
-    @Test
-    public void test_2_3_2() {
-        JSONObject jsonObject = null;
-
-        assertThrows(NullPointerException.class, () -> {
-            jsonObject.stream();
-        });
-    }
-
-    /**
      * Test Case 4.1.2: Use the stream() method to convert a JSONObject to a JSONArray and vice versa.
      */
     @Test
