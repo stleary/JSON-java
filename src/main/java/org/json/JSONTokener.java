@@ -428,10 +428,6 @@ public class JSONTokener {
         case '"':
         case '\'':
             return this.nextString(c);
-        case '{':
-            throw syntaxError("Nested object not expected here.");
-        case '[':
-            throw syntaxError("Nested array not expected here.");
         }
 
         /*

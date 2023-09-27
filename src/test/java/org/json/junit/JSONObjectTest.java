@@ -2230,7 +2230,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Nested object not expected here. at 2 [character 3 line 1]",
+                "Missing value at 1 [character 2 line 1]",
                 e.getMessage());
         }
         try {
@@ -2239,7 +2239,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Nested array not expected here. at 10 [character 11 line 1]",
+                "Missing value at 9 [character 10 line 1]",
                 e.getMessage());
         }
         try {
