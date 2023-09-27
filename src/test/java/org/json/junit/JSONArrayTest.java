@@ -595,13 +595,17 @@ public class JSONArrayTest {
 
         JSONArray nestedJsonArray = jsonArray.optJSONArray(9);
         assertTrue("Array opt JSONArray", nestedJsonArray != null);
-        assertTrue("Array opt JSONArray default", 
+        assertTrue("Array opt JSONArray null",
                 null == jsonArray.optJSONArray(99));
+        assertTrue("Array opt JSONArray default",
+                "value".equals(jsonArray.optJSONArray(99, new JSONArray("[\"value\"]")).getString(0)));
 
         JSONObject nestedJsonObject = jsonArray.optJSONObject(10);
         assertTrue("Array opt JSONObject", nestedJsonObject != null);
-        assertTrue("Array opt JSONObject default", 
+        assertTrue("Array opt JSONObject null",
                 null == jsonArray.optJSONObject(99));
+        assertTrue("Array opt JSONObject default",
+                "value".equals(jsonArray.optJSONObject(99, new JSONObject("{\"key\":\"value\"}")).getString("key")));
 
         assertTrue("Array opt long",
                 0 == jsonArray.optLong(11));
