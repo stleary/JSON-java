@@ -1383,7 +1383,7 @@ public class JSONArrayTest {
     @Test(expected = JSONException.class)
     public void issue654StackOverflowInputWellFormed() {
         //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
-        final InputStream resourceAsStream = JSONObjectTest.class.getClassLoader().getResourceAsStream("Issue654WellFormedArray.json");
+        final InputStream resourceAsStream = JSONArrayTest.class.getClassLoader().getResourceAsStream("Issue654WellFormedArray.json");
         JSONTokener tokener = new JSONTokener(resourceAsStream);
         JSONArray json_input = new JSONArray(tokener);
         assertNotNull(json_input);
