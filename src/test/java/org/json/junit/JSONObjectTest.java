@@ -2510,6 +2510,8 @@ public class JSONObjectTest {
                 MyEnum.VAL1.equals(jsonObject.optEnum(MyEnum.class, "myKey", MyEnum.VAL1)));
         assertTrue("optJSONArray() should return null ",
                 null==jsonObject.optJSONArray("myKey"));
+        assertTrue("optJSONArray() should return default JSONArray",
+                "value".equals(jsonObject.optJSONArray("myKey", new JSONArray("[\"value\"]")).getString(0)));
         assertTrue("optJSONObject() should return default JSONObject ",
                 jsonObject.optJSONObject("myKey", new JSONObject("{\"testKey\":\"testValue\"}")).getString("testKey").equals("testValue"));
         assertTrue("optLong() should return default long",
@@ -2555,6 +2557,8 @@ public class JSONObjectTest {
                  Integer.valueOf(42).equals(jsonObject.optIntegerObject("myKey", 42)));
          assertTrue("optEnum() should return default Enum",
                  MyEnum.VAL1.equals(jsonObject.optEnum(MyEnum.class, "myKey", MyEnum.VAL1)));
+         assertTrue("optJSONArray() should return default JSONArray",
+                 "value".equals(jsonObject.optJSONArray("myKey", new JSONArray("[\"value\"]")).getString(0)));
          assertTrue("optJSONArray() should return null ",
                  null==jsonObject.optJSONArray("myKey"));
          assertTrue("optJSONObject() should return default JSONObject ",
