@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.jayway.jsonpath:json-path:2.1.0'
     testImplementation 'org.mockito:mockito-core:4.2.0'
 }
