@@ -402,12 +402,7 @@ public class JSONTokener {
      */
     public Object nextValue() throws JSONException {
         char c = this.nextClean();
-        String string;
-
         switch (c) {
-        case '"':
-        case '\'':
-            return this.nextString(c);
         case '{':
             this.back();
             try {
@@ -422,6 +417,17 @@ public class JSONTokener {
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
+        }
+        return nextSimpleValue(c);
+    }
+
+    Object nextSimpleValue(char c) {
+        String string;
+
+        switch (c) {
+        case '"':
+        case '\'':
+            return this.nextString(c);
         }
 
         /*
