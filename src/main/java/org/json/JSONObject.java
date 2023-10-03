@@ -272,6 +272,8 @@ public class JSONObject {
      * @throws NullPointerException
      *            If a key in the map is <code>null</code>
      */
+
+
     public JSONObject(Map<?, ?> m) {
         if (m == null) {
             this.map = new HashMap<String, Object>();
@@ -282,6 +284,7 @@ public class JSONObject {
         	        throw new NullPointerException("Null key.");
         	    }
                 final Object value = e.getValue();
+                // #713 - Added a check for finiteness of the map value.
                 if (value != null) {
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
                 }
@@ -2629,8 +2632,34 @@ public class JSONObject {
         return wrap(object, null);
     }
 
+    // Custom isFiniteNumber method
+    public static boolean isFiniteNumber(Object value) {
+        if (value instanceof Number) {
+            double doubleValue;
+            if (value instanceof Integer) {
+                doubleValue = ((Integer) value).doubleValue();
+            } else if (value instanceof Double) {
+                doubleValue = (Double) value;
+            } else if (value instanceof Float) {
+                doubleValue = ((Float) value).doubleValue();
+            } else {
+                // Handle other Number types if needed
+                return false; // Unsupported Number type
+            }
+
+            // Check if the double value is finite
+            return Double.isFinite(doubleValue);
+        } else {
+            // Value is not a Number
+            return false;
+        }
+    }
     private static Object wrap(Object object, Set<Object> objectsRecord) {
         try {
+            // Calling the isFiniteNumber(Object object) -> to check if the object is Non-finite.
+            if(!isFiniteNumber(object)){
+                throw new RuntimeException("Non-Finite Number encountered");
+            }
             if (NULL.equals(object)) {
                 return NULL;
             }
@@ -2644,6 +2673,8 @@ public class JSONObject {
                     || object instanceof BigDecimal || object instanceof Enum) {
                 return object;
             }
+
+
 
             if (object instanceof Collection) {
                 Collection<?> coll = (Collection<?>) object;
