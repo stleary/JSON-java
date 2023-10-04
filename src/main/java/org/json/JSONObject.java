@@ -2183,13 +2183,11 @@ public class JSONObject {
     @SuppressWarnings("resource")
     public static String quote(String string) {
         StringWriter sw = new StringWriter();
-        synchronized (sw.getBuffer()) {
-            try {
-                return quote(string, sw).toString();
-            } catch (IOException ignored) {
-                // will never happen - we are writing to a string writer
-                return "";
-            }
+        try {
+            return quote(string, sw).toString();
+        } catch (IOException ignored) {
+            // will never happen - we are writing to a string writer
+            return "";
         }
     }
 
@@ -2576,9 +2574,7 @@ public class JSONObject {
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
         StringWriter w = new StringWriter();
-        synchronized (w.getBuffer()) {
-            return this.write(w, indentFactor, 0).toString();
-        }
+        return this.write(w, indentFactor, 0).toString();
     }
 
     /**
