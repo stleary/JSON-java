@@ -283,6 +283,7 @@ public class JSONObject {
         	    }
                 final Object value = e.getValue();
                 if (value != null) {
+                    testValidity(value);
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
                 }
             }
@@ -346,6 +347,8 @@ public class JSONObject {
      * @param bean
      *            An object that has getter methods that should be used to make
      *            a JSONObject.
+     * @throws JSONException
+     *            If a getter returned a non-finite number.
      */
     public JSONObject(Object bean) {
         this();
@@ -1691,6 +1694,8 @@ public class JSONObject {
      *
      * @param bean
      *            the bean
+     * @throws JSONException
+     *            If a getter returned a non-finite number.
      */
     private void populateMap(Object bean) {
         populateMap(bean, Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>()));
@@ -1726,6 +1731,7 @@ public class JSONObject {
 
                             objectsRecord.add(result);
 
+                            testValidity(result);
                             this.map.put(key, wrap(result, objectsRecord));
 
                             objectsRecord.remove(result);
