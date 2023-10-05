@@ -284,7 +284,6 @@ public class JSONObject {
         	        throw new NullPointerException("Null key.");
         	    }
                 final Object value = e.getValue();
-                // #713 - Added a check for finiteness of the map value.
                 if (value != null) {
                     this.map.put(String.valueOf(e.getKey()), wrap(value));
                 }
@@ -2633,36 +2632,35 @@ public class JSONObject {
     }
 
     // Custom isFiniteNumber method
-    public static boolean isFiniteNumber(Object value) {
-        if (value instanceof Number) {
-            double doubleValue;
-            if (value instanceof Integer) {
-                doubleValue = ((Integer) value).doubleValue();
-            } else if (value instanceof Double) {
-                doubleValue = (Double) value;
-            } else if (value instanceof Float) {
-                doubleValue = ((Float) value).doubleValue();
-            } else {
-                // Handle other Number types if needed
-                return false; // Unsupported Number type
-            }
-
-            // Check if the double value is finite
-            return Double.isFinite(doubleValue);
-        } else {
-            // Value is not a Number
-            return false;
-        }
-    }
+//    public static boolean isFiniteNumber(Object value) {
+//        if (value instanceof Number) {
+//            double doubleValue;
+//            if (value instanceof Integer) {
+//                doubleValue = ((Integer) value).doubleValue();
+//            } else if (value instanceof Double) {
+//                doubleValue = (Double) value;
+//            } else if (value instanceof Float) {
+//                doubleValue = ((Float) value).doubleValue();
+//            } else {
+//                // Handle other Number types if needed
+//                return false; // Unsupported Number type
+//            }
+//
+//            // Check if the double value is finite
+//            return Double.isFinite(doubleValue);
+//        } else {
+//            // Value is not a Number
+//            return false;
+//        }
+//    }
     private static Object wrap(Object object, Set<Object> objectsRecord) {
         try {
-            // Calling the isFiniteNumber(Object object) -> to check if the object is Non-finite.
-            if(!isFiniteNumber(object)){
-                throw new RuntimeException("Non-Finite Number encountered");
-            }
             if (NULL.equals(object)) {
                 return NULL;
             }
+
+           testValidity(object);
+
             if (object instanceof JSONObject || object instanceof JSONArray
                     || NULL.equals(object) || object instanceof JSONString
                     || object instanceof Byte || object instanceof Character

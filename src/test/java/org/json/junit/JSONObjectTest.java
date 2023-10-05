@@ -4,13 +4,8 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,26 +28,7 @@ import org.json.JSONPointerException;
 import org.json.JSONString;
 import org.json.JSONTokener;
 import org.json.XML;
-import org.json.junit.data.BrokenToString;
-import org.json.junit.data.ExceptionalBean;
-import org.json.junit.data.Fraction;
-import org.json.junit.data.GenericBean;
-import org.json.junit.data.GenericBeanInt;
-import org.json.junit.data.MyBean;
-import org.json.junit.data.MyBeanCustomName;
-import org.json.junit.data.MyBeanCustomNameSubClass;
-import org.json.junit.data.MyBigNumberBean;
-import org.json.junit.data.MyEnum;
-import org.json.junit.data.MyEnumField;
-import org.json.junit.data.MyJsonString;
-import org.json.junit.data.MyNumber;
-import org.json.junit.data.MyNumberContainer;
-import org.json.junit.data.MyPublicClass;
-import org.json.junit.data.RecursiveBean;
-import org.json.junit.data.RecursiveBeanEquals;
-import org.json.junit.data.Singleton;
-import org.json.junit.data.SingletonEnum;
-import org.json.junit.data.WeirdList;
+import org.json.junit.data.*;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -3627,4 +3603,28 @@ public class JSONObjectTest {
                 .put("b", 2);
         assertFalse(jo1.similar(jo3));
     }
+
+    // Added for issue #713
+    @Test
+    public void jsonObject_map_issue713() {
+        assertThrows(JSONException.class, () -> new JSONObject(Map.of("a", Double.POSITIVE_INFINITY)));
+    }
+
+    @Test
+    public void jsonObject_bean_issue713() {
+        assertThrows(JSONException.class, () -> {
+            MyBean1 myBean = new MyBean1() {
+                public double getA() {
+                    return Double.POSITIVE_INFINITY;
+                }
+            };
+            new JSONObject(myBean);
+        });
+    }
+
+    static abstract class MyBean1 {
+        public abstract double getA();
+    }
+
+
 }
