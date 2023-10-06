@@ -1063,12 +1063,16 @@ public class JSONObjectTest {
                 "\"tooManyZeros\":00,"+
                 "\"negativeInfinite\":-Infinity,"+
                 "\"negativeNaN\":-NaN,"+
+                "\"negativeNaNWithLeadingZeros\":-00NaN,"+
                 "\"negativeFraction\":-.01,"+
                 "\"tooManyZerosFraction\":00.001,"+
                 "\"negativeHexFloat\":-0x1.fffp1,"+
                 "\"hexFloat\":0x1.0P-1074,"+
                 "\"floatIdentifier\":0.1f,"+
-                "\"doubleIdentifier\":0.1d"+
+                "\"doubleIdentifier\":0.1d,"+
+                "\"integerWithLeadingZeros\":000900,"+
+                "\"integerWithAllZeros\":00000,"+
+                "\"compositeWithLeadingZeros\":00800.90d"+
             "}";
         JSONObject jsonObject = new JSONObject(str);
         Object obj;
@@ -1085,10 +1089,17 @@ public class JSONObjectTest {
         obj = jsonObject.get("negativeNaN");
         assertTrue( "negativeNaN currently evaluates to string",
                 obj.equals("-NaN"));
+        obj = jsonObject.get("negativeNaNWithLeadingZeros");
+        assertTrue( "negativeNaNWithLeadingZeros currently evaluates to string",
+                obj.equals("-00NaN"));
         assertTrue( "negativeFraction currently evaluates to double -0.01",
                 jsonObject.get( "negativeFraction" ).equals(BigDecimal.valueOf(-0.01)));
         assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
                 jsonObject.get( "tooManyZerosFraction" ).equals(BigDecimal.valueOf(0.001)));
+        assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
+                jsonObject.getLong( "tooManyZerosFraction" )==0);
+        assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
+                jsonObject.optLong( "tooManyZerosFraction" )==0);
         assertTrue( "negativeHexFloat currently evaluates to double -3.99951171875",
                 jsonObject.get( "negativeHexFloat" ).equals(Double.valueOf(-3.99951171875)));
         assertTrue("hexFloat currently evaluates to double 4.9E-324",
@@ -1097,6 +1108,28 @@ public class JSONObjectTest {
                 jsonObject.get("floatIdentifier").equals(Double.valueOf(0.1)));
         assertTrue("doubleIdentifier currently evaluates to double 0.1",
                 jsonObject.get("doubleIdentifier").equals(Double.valueOf(0.1)));
+        assertTrue("Integer does not evaluate to 900",
+                jsonObject.get("integerWithLeadingZeros").equals(900));
+        assertTrue("Integer does not evaluate to 900",
+                jsonObject.getInt("integerWithLeadingZeros")==900);
+        assertTrue("Integer does not evaluate to 900",
+                jsonObject.optInt("integerWithLeadingZeros")==900);
+        assertTrue("Integer does not evaluate to 0",
+                jsonObject.get("integerWithAllZeros").equals("00000"));
+        assertTrue("Integer does not evaluate to 0",
+                jsonObject.getInt("integerWithAllZeros")==0);
+        assertTrue("Integer does not evaluate to 0",
+                jsonObject.optInt("integerWithAllZeros")==0);
+        assertTrue("Double does not evaluate to 800.90",
+                jsonObject.get("compositeWithLeadingZeros").equals(800.90));
+        assertTrue("Double does not evaluate to 800.90",
+                jsonObject.getDouble("compositeWithLeadingZeros")==800.9d);
+        assertTrue("Integer does not evaluate to 800",
+                jsonObject.optInt("compositeWithLeadingZeros")==800);
+        assertTrue("Long does not evaluate to 800.90",
+                jsonObject.getLong("compositeWithLeadingZeros")==800);
+        assertTrue("Long does not evaluate to 800.90",
+                jsonObject.optLong("compositeWithLeadingZeros")==800);
         Util.checkJSONObjectMaps(jsonObject);
     }
 

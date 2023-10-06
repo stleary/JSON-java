@@ -2379,12 +2379,13 @@ public class JSONObject {
      * returns for this function are BigDecimal, Double, BigInteger, Long, and Integer.
      * When a Double is returned, it should always be a valid Double and not NaN or +-infinity.
      *
-     * @param val value to convert
+     * @param input value to convert
      * @return Number representation of the value.
      * @throws NumberFormatException thrown if the value is not a valid number. A public
      *      caller should catch this and wrap it in a {@link JSONException} if applicable.
      */
-    protected static Number stringToNumber(final String val) throws NumberFormatException {
+    protected static Number stringToNumber(final String input) throws NumberFormatException {
+        String val = input;
         char initial = val.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             // decimal representation
@@ -2411,6 +2412,8 @@ public class JSONObject {
                     }
                 }
             }
+            val = removeLeadingZerosOfNumber(input);
+            initial = val.charAt(0);
             // block items like 00 01 etc. Java number parsers treat these as Octal.
             if(initial == '0' && val.length() > 1) {
                 char at1 = val.charAt(1);
@@ -2885,5 +2888,34 @@ public class JSONObject {
         return new JSONException(
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
+    }
+
+    /**
+     * For a prospective number, remove the leading zeros
+     * @param value prospective number
+     * @return number without leading zeros
+     */
+    private static String removeLeadingZerosOfNumber(String value){
+        char[] chars = value.toCharArray();
+        int leftMostUnsignedIndex = 0;
+        if (chars[0] == '-'){
+            leftMostUnsignedIndex = 1;
+        }
+        int firstNonZeroCharIndex = -1;
+        for (int i=leftMostUnsignedIndex;i<value.length();i++){
+            if (chars[i] != '0'){
+                firstNonZeroCharIndex = i;
+                break;
+            }
+        }
+        if (firstNonZeroCharIndex == -1){
+            return value;
+        }
+        StringBuilder result = new StringBuilder();
+        if (leftMostUnsignedIndex == 1){
+            result.append('-');
+        }
+        result.append(value.substring(firstNonZeroCharIndex));
+        return result.toString();
     }
 }
