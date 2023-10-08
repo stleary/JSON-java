@@ -3627,4 +3627,35 @@ public class JSONObjectTest {
                 .put("b", 2);
         assertFalse(jo1.similar(jo3));
     }
+
+    @Test(expected = JSONException.class)
+    public void testCircleDependencyFirstLevel() {
+        Map<Object, Object> jsonObject = new HashMap<>();
+
+        jsonObject.put("test", jsonObject);
+
+        new JSONObject(jsonObject);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testCircleDependencyMultiplyLevel() {
+        Map<Object, Object> inside = new HashMap<>();
+
+        Map<Object, Object> jsonObject = new HashMap<>();
+        inside.put("test", jsonObject);
+        jsonObject.put("test", inside);
+
+        new JSONObject(jsonObject);
+    }
+
+    @Test
+    public void testDifferentKeySameInstanceNotACircleDependency() {
+        Map<Object, Object> map1 = new HashMap<>();
+        Map<Object, Object> map2 = new HashMap<>();
+
+        map1.put("test1", map2);
+        map1.put("test2", map2);
+
+        new JSONObject(map1);
+    }
 }

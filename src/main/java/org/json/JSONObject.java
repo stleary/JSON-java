@@ -273,17 +273,27 @@ public class JSONObject {
      *            If a key in the map is <code>null</code>
      */
     public JSONObject(Map<?, ?> m) {
+        this(m, Collections.newSetFromMap(new IdentityHashMap<>()));
+    }
+
+    private JSONObject(Map<?, ?> m, Set<Object> objectsRecord) {
         if (m == null) {
             this.map = new HashMap<String, Object>();
         } else {
             this.map = new HashMap<String, Object>(m.size());
-        	for (final Entry<?, ?> e : m.entrySet()) {
-        	    if(e.getKey() == null) {
-        	        throw new NullPointerException("Null key.");
-        	    }
+            for (final Entry<?, ?> e : m.entrySet()) {
+                if(e.getKey() == null) {
+                    throw new NullPointerException("Null key.");
+                }
                 final Object value = e.getValue();
                 if (value != null) {
-                    this.map.put(String.valueOf(e.getKey()), wrap(value));
+                    if (objectsRecord.contains(value)) {
+                        throw new JSONException("Found circular dependency.");
+                    }
+
+                    objectsRecord.add(value);
+                    this.map.put(String.valueOf(e.getKey()), wrap(value, objectsRecord));
+                    objectsRecord.remove(value);
                 }
             }
         }
@@ -2650,7 +2660,7 @@ public class JSONObject {
             }
             if (object instanceof Map) {
                 Map<?, ?> map = (Map<?, ?>) object;
-                return new JSONObject(map);
+                return new JSONObject(map, objectsRecord);
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage
