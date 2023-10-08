@@ -2487,6 +2487,12 @@ public class JSONObject {
         return string;
     }
 
+    public static <T extends Iterable<?>> void testValidity(T objects) {
+        for (Object object : objects) {
+            testValidity(object);
+        }
+    }
+
     /**
      * Throw an exception if the object is a NaN or infinite number.
      *
