@@ -1223,33 +1223,18 @@ public class XMLTest {
 
     @Test
     public void testIndentComplicatedJsonObjectWithArrayAndWithConfig(){
-        try {
-            InputStream jsonStream = null;
-            try {
-                jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.json");
-                final JSONObject object = new JSONObject(new JSONTokener(jsonStream));
-                String actualString = XML.toString(object, null, XMLParserConfiguration.KEEP_STRINGS,2);
-                InputStream xmlStream = null;
-                try {
-                    xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.xml");
-                    int bufferSize = 1024;
-                    char[] buffer = new char[bufferSize];
-                    StringBuilder expected = new StringBuilder();
-                    Reader in = new InputStreamReader(xmlStream, "UTF-8");
-                    for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-                        expected.append(buffer, 0, numRead);
-                    }
-                    assertEquals(expected.toString().replaceAll("\\n|\\r\\n", System.lineSeparator()),
-                            actualString.replaceAll("\\n|\\r\\n", System.lineSeparator()));
-                } finally {
-                    if (xmlStream != null) {
-                        xmlStream.close();
-                    }
+        try (InputStream jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.json")) {
+            final JSONObject object = new JSONObject(new JSONTokener(jsonStream));
+            String actualString = XML.toString(object, null, XMLParserConfiguration.KEEP_STRINGS, 2);
+            try (InputStream xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.xml")) {
+                int bufferSize = 1024;
+                char[] buffer = new char[bufferSize];
+                StringBuilder expected = new StringBuilder();
+                Reader in = new InputStreamReader(xmlStream, "UTF-8");
+                for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                    expected.append(buffer, 0, numRead);
                 }
-            } finally {
-                if (jsonStream != null) {
-                    jsonStream.close();
-                }
+                assertEquals(expected.toString(), actualString);
             }
         } catch (IOException e) {
             fail("file writer error: " +e.getMessage());
