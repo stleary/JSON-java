@@ -9,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -1972,7 +1973,7 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectToStringSuppressWarningOnCastToMap() {
         JSONObject jsonObject = new JSONObject();
-        Map<String, String> map = new HashMap();
+        Map<String, String> map = new HashMap<>();
         map.put("abc", "def");
         jsonObject.put("key", map);
 
@@ -3283,7 +3284,7 @@ public class JSONObjectTest {
     @SuppressWarnings("boxing")
     @Test
     public void testGenericBean() {
-        GenericBean<Integer> bean = new GenericBean(42);
+        GenericBean<Integer> bean = new GenericBean<>(42);
         final JSONObject jo = new JSONObject(bean);
         assertEquals(jo.keySet().toString(), 8, jo.length());
         assertEquals(42, jo.get("genericValue"));
@@ -3626,5 +3627,26 @@ public class JSONObjectTest {
                 })
                 .put("b", 2);
         assertFalse(jo1.similar(jo3));
+    }
+
+    private static final Number[] NON_FINITE_NUMBERS = { Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NaN,
+            Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NaN };
+
+    @Test
+    public void issue713MapConstructorWithNonFiniteNumbers() {
+        for (Number nonFinite : NON_FINITE_NUMBERS) {
+            Map<String, Number> map = new HashMap<>();
+            map.put("a", nonFinite);
+
+            assertThrows(JSONException.class, () -> new JSONObject(map));
+        }
+    }
+
+    @Test
+    public void issue713BeanConstructorWithNonFiniteNumbers() {
+        for (Number nonFinite : NON_FINITE_NUMBERS) {
+            GenericBean<Number> bean = new GenericBean<>(nonFinite);
+            assertThrows(JSONException.class, () -> new JSONObject(bean));
+        }
     }
 }
