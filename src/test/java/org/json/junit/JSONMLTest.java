@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 
 import org.json.*;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * Tests for org.json.JSONML.java
@@ -763,7 +764,7 @@ public class JSONMLTest {
         final JSONObject revertedObject = JSONML.toJSONObject(xml, false);
         final String newJson = revertedObject.toString();
         assertTrue("JSON Objects are not similar",originalObject.similar(revertedObject));
-        assertEquals("original JSON does not equal the new JSON",originalJson, newJson);
+        JSONAssert.assertEquals("original JSON does not equal the new JSON", originalJson, newJson, false);
     }
 
 // these tests do not pass for the following reasons:
