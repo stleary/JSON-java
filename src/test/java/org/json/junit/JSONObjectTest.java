@@ -57,6 +57,7 @@ import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
  * JSONObject, along with JSONArray, are the central classes of the reference app.
@@ -2025,8 +2026,8 @@ public class JSONObjectTest {
                 "\"key3\":\"val3\""+
              "}";
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
-        assertTrue("jsonObject valueToString() incorrect",
-                JSONObject.valueToString(jsonObject).equals(jsonObject.toString()));
+        JSONAssert.assertEquals("jsonObject valueToString() incorrect",
+                                JSONObject.valueToString(jsonObject), jsonObject.toString(), false);
         String jsonArrayStr = 
             "[1,2,3]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
@@ -2036,8 +2037,8 @@ public class JSONObjectTest {
         map.put("key1", "val1");
         map.put("key2", "val2");
         map.put("key3", "val3");
-        assertTrue("map valueToString() incorrect",
-                jsonObject.toString().equals(JSONObject.valueToString(map))); 
+        JSONAssert.assertEquals("map valueToString() incorrect",
+                jsonObject.toString(), JSONObject.valueToString(map), false);
         Collection<Integer> collection = new ArrayList<Integer>();
         collection.add(Integer.valueOf(1));
         collection.add(Integer.valueOf(2));
