@@ -2392,8 +2392,14 @@ public class JSONObject {
      */
     protected static Number stringToNumber(final String input) throws NumberFormatException {
         String val = input;
+        if (val.startsWith(".")){
+            val = "0"+val;
+        }
+        if (val.startsWith("-.")){
+            val = "-0."+val.substring(2);
+        }
         char initial = val.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-') {
+        if ((initial >= '0' && initial <= '9') || initial == '-' ) {
             // decimal representation
             if (isDecimalNotation(val)) {
                 // Use a BigDecimal all the time so we keep the original
@@ -2424,13 +2430,13 @@ public class JSONObject {
             if(initial == '0' && val.length() > 1) {
                 char at1 = val.charAt(1);
                 if(at1 >= '0' && at1 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                    throw new NumberFormatException("val ["+input+"] is not a valid number.");
                 }
             } else if (initial == '-' && val.length() > 2) {
                 char at1 = val.charAt(1);
                 char at2 = val.charAt(2);
                 if(at1 == '0' && at2 >= '0' && at2 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                    throw new NumberFormatException("val ["+input+"] is not a valid number.");
                 }
             }
             // integer representation.
@@ -2450,7 +2456,7 @@ public class JSONObject {
             }
             return bi;
         }
-        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+        throw new NumberFormatException("val ["+input+"] is not a valid number.");
     }
 
     /**
@@ -2486,14 +2492,35 @@ public class JSONObject {
          * produced, then the value will just be a string.
          */
 
-        char initial = string.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-') {
+        if (potentialNumber(string)) {
             try {
                 return stringToNumber(string);
             } catch (Exception ignore) {
             }
         }
         return string;
+    }
+
+
+    private static boolean potentialNumber(String value){
+        if (value == null || value.isEmpty()){
+            return false;
+        }
+        return potentialPositiveNumberStartingAtIndex(value, (value.charAt(0)=='-'?1:0));
+    }
+
+    private static boolean potentialPositiveNumberStartingAtIndex(String value,int index){
+        if (index >= value.length()){
+            return false;
+        }
+        return digitAtIndex(value, (value.charAt(index)=='.'?index+1:index));
+    }
+
+    private static boolean digitAtIndex(String value, int index){
+        if (index >= value.length()){
+            return false;
+        }
+        return value.charAt(index) >= '0' && value.charAt(index) <= '9';
     }
 
     /**
@@ -2902,26 +2929,15 @@ public class JSONObject {
      * @return number without leading zeros
      */
     private static String removeLeadingZerosOfNumber(String value){
-        char[] chars = value.toCharArray();
-        int leftMostUnsignedIndex = 0;
-        if (chars[0] == '-'){
-            leftMostUnsignedIndex = 1;
-        }
-        int firstNonZeroCharIndex = -1;
-        for (int i=leftMostUnsignedIndex;i<value.length();i++){
-            if (chars[i] != '0'){
-                firstNonZeroCharIndex = i;
-                break;
+        if (value.equals("-")){return value;}
+        boolean negativeFirstChar = (value.charAt(0) == '-');
+        int counter = negativeFirstChar ? 1:0;
+        while (counter < value.length()){
+            if (value.charAt(counter) != '0'){
+                return String.format("%s%s", negativeFirstChar?'-':"",value.substring(counter));
             }
+            ++counter;
         }
-        if (firstNonZeroCharIndex == -1){
-            return value;
-        }
-        StringBuilder result = new StringBuilder();
-        if (leftMostUnsignedIndex == 1){
-            result.append('-');
-        }
-        result.append(value.substring(firstNonZeroCharIndex));
-        return result.toString();
+        return String.format("%s%s", negativeFirstChar?'-':"",'0');
     }
 }
