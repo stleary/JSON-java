@@ -2416,17 +2416,16 @@ public class JSONObject {
                     try {
                         Double d = Double.valueOf(val);
                         if(d.isNaN() || d.isInfinite()) {
-                            throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                            throw new NumberFormatException("val ["+input+"] is not a valid number.");
                         }
                         return d;
                     } catch (NumberFormatException ignore) {
-                        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                        throw new NumberFormatException("val ["+input+"] is not a valid number.");
                     }
                 }
             }
             val = removeLeadingZerosOfNumber(input);
             initial = val.charAt(0);
-            // block items like 00 01 etc. Java number parsers treat these as Octal.
             if(initial == '0' && val.length() > 1) {
                 char at1 = val.charAt(1);
                 if(at1 >= '0' && at1 <= '9') {
@@ -2934,10 +2933,12 @@ public class JSONObject {
         int counter = negativeFirstChar ? 1:0;
         while (counter < value.length()){
             if (value.charAt(counter) != '0'){
-                return String.format("%s%s", negativeFirstChar?'-':"",value.substring(counter));
+                if (negativeFirstChar) {return "-".concat(value.substring(counter));}
+                return value.substring(counter);
             }
             ++counter;
         }
-        return String.format("%s%s", negativeFirstChar?'-':"",'0');
+        if (negativeFirstChar) {return "-0";}
+        return "0";
     }
 }
