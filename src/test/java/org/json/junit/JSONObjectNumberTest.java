@@ -23,7 +23,10 @@ public class JSONObjectNumberTest {
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {"{value:50}", 1},
+            {"{value:0050}", 1},
+            {"{value:0050.0000}", 1},
+            {"{value:-0050}", -1},
+            {"{value:-0050.0000}", -1},
             {"{value:50.0}", 1},
             {"{value:5e1}", 1},
             {"{value:5E1}", 1},
@@ -32,6 +35,7 @@ public class JSONObjectNumberTest {
             {"{value:-50}", -1},
             {"{value:-50.0}", -1},
             {"{value:-5e1}", -1},
+            {"{value:-0005e1}", -1},
             {"{value:-5E1}", -1},
             {"{value:-5e1}", -1},
             {"{value:'-50'}", -1}

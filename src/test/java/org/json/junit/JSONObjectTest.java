@@ -4,6 +4,7 @@ package org.json.junit;
 Public Domain.
 */
 
+import static java.lang.Double.NaN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -782,7 +783,7 @@ public class JSONObjectTest {
         jsonObject.accumulate("myArray", -23.45e7);
         // include an unsupported object for coverage
         try {
-            jsonObject.accumulate("myArray", Double.NaN);
+            jsonObject.accumulate("myArray", NaN);
             fail("Expected exception");
         } catch (JSONException ignored) {}
 
@@ -814,7 +815,7 @@ public class JSONObjectTest {
         jsonObject.append("myArray", -23.45e7);
         // include an unsupported object for coverage
         try {
-            jsonObject.append("myArray", Double.NaN);
+            jsonObject.append("myArray", NaN);
             fail("Expected exception");
         } catch (JSONException ignored) {}
 
@@ -839,7 +840,7 @@ public class JSONObjectTest {
     public void jsonObjectDoubleToString() {
         String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68", "null", "null" };
         Double [] doubles = { 1.0, 00001.00000, -23.4, -23.45e67, 
-                Double.NaN, Double.NEGATIVE_INFINITY }; 
+                NaN, Double.NEGATIVE_INFINITY };
         for (int i = 0; i < expectedStrs.length; ++i) {
             String actualStr = JSONObject.doubleToString(doubles[i]);
             assertTrue("value expected ["+expectedStrs[i]+
@@ -894,11 +895,11 @@ public class JSONObjectTest {
         assertTrue("opt doubleKey should be double", 
                 jsonObject.optDouble("doubleKey") == -23.45e7);
         assertTrue("opt doubleKey with Default should be double", 
-                jsonObject.optDouble("doubleStrKey", Double.NaN) == 1);
+                jsonObject.optDouble("doubleStrKey", NaN) == 1);
         assertTrue("opt doubleKey should be Double",
                 Double.valueOf(-23.45e7).equals(jsonObject.optDoubleObject("doubleKey")));
         assertTrue("opt doubleKey with Default should be Double",
-                Double.valueOf(1).equals(jsonObject.optDoubleObject("doubleStrKey", Double.NaN)));
+                Double.valueOf(1).equals(jsonObject.optDoubleObject("doubleStrKey", NaN)));
         assertTrue("opt negZeroKey should be a Double", 
                 jsonObject.opt("negZeroKey") instanceof Double);
         assertTrue("get negZeroKey should be a Double", 
@@ -1064,12 +1065,21 @@ public class JSONObjectTest {
                 "\"tooManyZeros\":00,"+
                 "\"negativeInfinite\":-Infinity,"+
                 "\"negativeNaN\":-NaN,"+
+                "\"negativeNaNWithLeadingZeros\":-00NaN,"+
                 "\"negativeFraction\":-.01,"+
                 "\"tooManyZerosFraction\":00.001,"+
                 "\"negativeHexFloat\":-0x1.fffp1,"+
                 "\"hexFloat\":0x1.0P-1074,"+
                 "\"floatIdentifier\":0.1f,"+
-                "\"doubleIdentifier\":0.1d"+
+                "\"doubleIdentifier\":0.1d,"+
+                "\"doubleIdentifierWithMultipleLeadingZerosBeforeDecimal\":0000000.1d,"+
+                "\"negativeDoubleIdentifierWithMultipleLeadingZerosBeforeDecimal\":-0000000.1d,"+
+                "\"doubleIdentifierWithMultipleLeadingZerosAfterDecimal\":0000000.0001d,"+
+                "\"negativeDoubleIdentifierWithMultipleLeadingZerosAfterDecimal\":-0000000.0001d,"+
+                "\"integerWithLeadingZeros\":000900,"+
+                "\"integerWithAllZeros\":00000,"+
+                "\"compositeWithLeadingZeros\":00800.90d,"+
+                "\"decimalPositiveWithoutNumberBeforeDecimalPoint\":.90,"+
             "}";
         JSONObject jsonObject = new JSONObject(str);
         Object obj;
@@ -1079,17 +1089,24 @@ public class JSONObjectTest {
         assertTrue("hexNumber currently evaluates to string",
                 obj.equals("-0x123"));
         assertTrue( "tooManyZeros currently evaluates to string",
-                jsonObject.get( "tooManyZeros" ).equals("00"));
+                jsonObject.get( "tooManyZeros" ).equals(0));
         obj = jsonObject.get("negativeInfinite");
         assertTrue( "negativeInfinite currently evaluates to string",
                 obj.equals("-Infinity"));
         obj = jsonObject.get("negativeNaN");
         assertTrue( "negativeNaN currently evaluates to string",
                 obj.equals("-NaN"));
+        obj = jsonObject.get("negativeNaNWithLeadingZeros");
+        assertTrue( "negativeNaNWithLeadingZeros currently evaluates to string",
+                obj.equals("-00NaN"));
         assertTrue( "negativeFraction currently evaluates to double -0.01",
                 jsonObject.get( "negativeFraction" ).equals(BigDecimal.valueOf(-0.01)));
         assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
                 jsonObject.get( "tooManyZerosFraction" ).equals(BigDecimal.valueOf(0.001)));
+        assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
+                jsonObject.getLong( "tooManyZerosFraction" )==0);
+        assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
+                jsonObject.optLong( "tooManyZerosFraction" )==0);
         assertTrue( "negativeHexFloat currently evaluates to double -3.99951171875",
                 jsonObject.get( "negativeHexFloat" ).equals(Double.valueOf(-3.99951171875)));
         assertTrue("hexFloat currently evaluates to double 4.9E-324",
@@ -1098,6 +1115,53 @@ public class JSONObjectTest {
                 jsonObject.get("floatIdentifier").equals(Double.valueOf(0.1)));
         assertTrue("doubleIdentifier currently evaluates to double 0.1",
                 jsonObject.get("doubleIdentifier").equals(Double.valueOf(0.1)));
+        assertTrue("doubleIdentifierWithMultipleLeadingZerosBeforeDecimal currently evaluates to double 0.1",
+                jsonObject.get("doubleIdentifierWithMultipleLeadingZerosBeforeDecimal").equals(Double.valueOf(0.1)));
+        assertTrue("negativeDoubleIdentifierWithMultipleLeadingZerosBeforeDecimal currently evaluates to double -0.1",
+                jsonObject.get("negativeDoubleIdentifierWithMultipleLeadingZerosBeforeDecimal").equals(Double.valueOf(-0.1)));
+        assertTrue("doubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double 0.0001",
+                jsonObject.get("doubleIdentifierWithMultipleLeadingZerosAfterDecimal").equals(Double.valueOf(0.0001)));
+        assertTrue("doubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double 0.0001",
+                jsonObject.get("doubleIdentifierWithMultipleLeadingZerosAfterDecimal").equals(Double.valueOf(0.0001)));
+        assertTrue("negativeDoubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double -0.0001",
+                jsonObject.get("negativeDoubleIdentifierWithMultipleLeadingZerosAfterDecimal").equals(Double.valueOf(-0.0001)));
+        assertTrue("Integer does not evaluate to 900",
+                jsonObject.get("integerWithLeadingZeros").equals(900));
+        assertTrue("Integer does not evaluate to 900",
+                jsonObject.getInt("integerWithLeadingZeros")==900);
+        assertTrue("Integer does not evaluate to 900",
+                jsonObject.optInt("integerWithLeadingZeros")==900);
+        assertTrue("Integer does not evaluate to 0",
+                jsonObject.get("integerWithAllZeros").equals(0));
+        assertTrue("Integer does not evaluate to 0",
+                jsonObject.getInt("integerWithAllZeros")==0);
+        assertTrue("Integer does not evaluate to 0",
+                jsonObject.optInt("integerWithAllZeros")==0);
+        assertTrue("Double does not evaluate to 800.90",
+                jsonObject.get("compositeWithLeadingZeros").equals(800.90));
+        assertTrue("Double does not evaluate to 800.90",
+                jsonObject.getDouble("compositeWithLeadingZeros")==800.9d);
+        assertTrue("Integer does not evaluate to 800",
+                jsonObject.optInt("compositeWithLeadingZeros")==800);
+        assertTrue("Long does not evaluate to 800.90",
+                jsonObject.getLong("compositeWithLeadingZeros")==800);
+        assertTrue("Long does not evaluate to 800.90",
+                jsonObject.optLong("compositeWithLeadingZeros")==800);
+        assertEquals("Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match",
+                0.9d,jsonObject.getDouble("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d);
+        assertEquals("Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match",
+                0.9d,jsonObject.optDouble("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d);
+        assertEquals("Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match",
+                0.0d,jsonObject.optLong("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d);
+
+        assertEquals("Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match",
+                0.0001d,jsonObject.getDouble("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d);
+        assertEquals("Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match",
+                0.0001d,jsonObject.optDouble("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d);
+        assertEquals("Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match",
+                0.0d, jsonObject.getLong("doubleIdentifierWithMultipleLeadingZerosAfterDecimal") , 0.0d);
+        assertEquals("Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match",
+                0.0d,jsonObject.optLong("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d);
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -2328,7 +2392,7 @@ public class JSONObjectTest {
         }
         try {
             // test validity of invalid double 
-            JSONObject.testValidity(Double.NaN);
+            JSONObject.testValidity(NaN);
             fail("Expected an exception");
         } catch (JSONException e) { 
             assertTrue("", true);
