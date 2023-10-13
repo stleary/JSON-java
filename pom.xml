@@ -3,7 +3,7 @@
 
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
-    <version>20230618</version>
+    <version>20231013</version>
     <packaging>bundle</packaging>
 
     <name>JSON in Java</name>
@@ -15,7 +15,7 @@
         It also includes the capability to convert between JSON and XML, HTTP
         headers, Cookies, and CDL.
 
-        This is a reference implementation. There is a large number of JSON packages
+        This is a reference implementation. There are a large number of JSON packages
         in Java. Perhaps someday the Java community will standardize on one. Until
         then, choose carefully.
     </description>
