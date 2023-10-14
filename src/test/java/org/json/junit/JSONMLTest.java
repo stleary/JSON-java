@@ -762,7 +762,8 @@ public class JSONMLTest {
         final String xml = JSONML.toString(originalObject);
         final JSONObject revertedObject = JSONML.toJSONObject(xml, false);
         final String newJson = revertedObject.toString();
-        assertTrue("original JSON does not equal the new JSON", originalObject.similar(revertedObject));
+        assertTrue("JSON Objects are not similar", originalObject.similar(revertedObject));
+        assertTrue("JSON Strings are not similar", new JSONObject(originalJson).similar(new JSONObject(newJson)));
     }
 
 // these tests do not pass for the following reasons:
