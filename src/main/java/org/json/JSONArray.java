@@ -331,7 +331,7 @@ public class JSONArray implements Iterable<Object> {
             if (object instanceof Number) {
                 return (Number)object;
             }
-            return JSONObject.stringToNumber(object.toString());
+            return NumberConversionUtil.stringToNumber(object.toString());
         } catch (Exception e) {
             throw wrongValueFormatException(index, "number", object, e);
         }
@@ -1078,7 +1078,7 @@ public class JSONArray implements Iterable<Object> {
         
         if (val instanceof String) {
             try {
-                return JSONObject.stringToNumber((String) val);
+                return NumberConversionUtil.stringToNumber((String) val);
             } catch (Exception e) {
                 return defaultValue;
             }
