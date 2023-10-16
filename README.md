@@ -24,7 +24,7 @@ Project goals include:
 * No external dependencies
 * Fast execution and low memory footprint
 * Maintain backward compatibility
-* Designed and tested to use on Java versions 1.6 - 1.11
+* Designed and tested to use on Java versions 1.8 - 17
 
 The files in this package implement JSON encoders and decoders. The package can also convert between JSON and XML, HTTP headers, Cookies, and CDL.
 
