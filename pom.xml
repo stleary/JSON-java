@@ -172,12 +172,11 @@
                         <configuration>
                             <jvmVersion>9</jvmVersion>
                             <module>
-                                <moduleInfo>
-                                    <name>org.json</name>
-                                    <exports>
-                                        org.json;
-                                    </exports>
-                                </moduleInfo>
+                                <moduleInfoSource>
+                                    module org.json {
+                                        exports org.json;
+                                    }
+                                </moduleInfoSource>
                             </module>
                         </configuration>
                     </execution>
