@@ -1,5 +1,5 @@
 # This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# For more information see: https://docs.github.com/en/actions/learn-github-actions or https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 
 name: Java CI with Maven
 
@@ -47,3 +47,5 @@ jobs:
         with:
           name: Test Report ${{ matrix.java }}
           path: target/site/
+      - name: Package Jar ${{ matrix.java }}
+        run: mvn clean package -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }} -Dmaven.test.skip=true -Dmaven.site.skip=true
