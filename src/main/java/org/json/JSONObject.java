@@ -327,6 +327,7 @@ public class JSONObject {
             }
             final Object value = e.getValue();
             if (value != null) {
+                testValidity(value);
                 wrapValueConsumer.accept(e, value);
             }
         }
@@ -389,6 +390,8 @@ public class JSONObject {
      * @param bean
      *            An object that has getter methods that should be used to make
      *            a JSONObject.
+     * @throws JSONException
+     *            If a getter returned a non-finite number.
      */
     public JSONObject(Object bean) {
         this(bean, JSONParserConfiguration.defaultInstance());
@@ -1743,6 +1746,8 @@ public class JSONObject {
      *            the set to track for circular dependencies
      * @param jsonParserConfiguration
      *            the configuration for the JSON parser
+     * @throws JSONException
+     *            If a getter returned a non-finite number.
      */
     private void populateMap(Object bean, Set<Object> objectsRecord, JSONParserConfiguration jsonParserConfiguration) {
         Class<?> klass = bean.getClass();
@@ -1774,6 +1779,7 @@ public class JSONObject {
 
                             objectsRecord.add(result);
 
+                            testValidity(result);
                             this.map.put(key, wrap(result, objectsRecord, jsonParserConfiguration));
 
                             objectsRecord.remove(result);
@@ -2427,14 +2433,21 @@ public class JSONObject {
      * returns for this function are BigDecimal, Double, BigInteger, Long, and Integer.
      * When a Double is returned, it should always be a valid Double and not NaN or +-infinity.
      *
-     * @param val value to convert
+     * @param input value to convert
      * @return Number representation of the value.
      * @throws NumberFormatException thrown if the value is not a valid number. A public
      *      caller should catch this and wrap it in a {@link JSONException} if applicable.
      */
-    protected static Number stringToNumber(final String val) throws NumberFormatException {
+    protected static Number stringToNumber(final String input) throws NumberFormatException {
+        String val = input;
+        if (val.startsWith(".")){
+            val = "0"+val;
+        }
+        if (val.startsWith("-.")){
+            val = "-0."+val.substring(2);
+        }
         char initial = val.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-') {
+        if ((initial >= '0' && initial <= '9') || initial == '-' ) {
             // decimal representation
             if (isDecimalNotation(val)) {
                 // Use a BigDecimal all the time so we keep the original
@@ -2451,25 +2464,26 @@ public class JSONObject {
                     try {
                         Double d = Double.valueOf(val);
                         if(d.isNaN() || d.isInfinite()) {
-                            throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                            throw new NumberFormatException("val ["+input+"] is not a valid number.");
                         }
                         return d;
                     } catch (NumberFormatException ignore) {
-                        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                        throw new NumberFormatException("val ["+input+"] is not a valid number.");
                     }
                 }
             }
-            // block items like 00 01 etc. Java number parsers treat these as Octal.
+            val = removeLeadingZerosOfNumber(input);
+            initial = val.charAt(0);
             if(initial == '0' && val.length() > 1) {
                 char at1 = val.charAt(1);
                 if(at1 >= '0' && at1 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                    throw new NumberFormatException("val ["+input+"] is not a valid number.");
                 }
             } else if (initial == '-' && val.length() > 2) {
                 char at1 = val.charAt(1);
                 char at2 = val.charAt(2);
                 if(at1 == '0' && at2 >= '0' && at2 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                    throw new NumberFormatException("val ["+input+"] is not a valid number.");
                 }
             }
             // integer representation.
@@ -2489,7 +2503,7 @@ public class JSONObject {
             }
             return bi;
         }
-        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+        throw new NumberFormatException("val ["+input+"] is not a valid number.");
     }
 
     /**
@@ -2525,14 +2539,35 @@ public class JSONObject {
          * produced, then the value will just be a string.
          */
 
-        char initial = string.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-') {
+        if (potentialNumber(string)) {
             try {
                 return stringToNumber(string);
             } catch (Exception ignore) {
             }
         }
         return string;
+    }
+
+
+    private static boolean potentialNumber(String value){
+        if (value == null || value.isEmpty()){
+            return false;
+        }
+        return potentialPositiveNumberStartingAtIndex(value, (value.charAt(0)=='-'?1:0));
+    }
+
+    private static boolean potentialPositiveNumberStartingAtIndex(String value,int index){
+        if (index >= value.length()){
+            return false;
+        }
+        return digitAtIndex(value, (value.charAt(index)=='.'?index+1:index));
+    }
+
+    private static boolean digitAtIndex(String value, int index){
+        if (index >= value.length()){
+            return false;
+        }
+        return value.charAt(index) >= '0' && value.charAt(index) <= '9';
     }
 
     /**
@@ -2949,5 +2984,25 @@ public class JSONObject {
         return new JSONException(
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
+    }
+
+    /**
+     * For a prospective number, remove the leading zeros
+     * @param value prospective number
+     * @return number without leading zeros
+     */
+    private static String removeLeadingZerosOfNumber(String value){
+        if (value.equals("-")){return value;}
+        boolean negativeFirstChar = (value.charAt(0) == '-');
+        int counter = negativeFirstChar ? 1:0;
+        while (counter < value.length()){
+            if (value.charAt(counter) != '0'){
+                if (negativeFirstChar) {return "-".concat(value.substring(counter));}
+                return value.substring(counter);
+            }
+            ++counter;
+        }
+        if (negativeFirstChar) {return "-0";}
+        return "0";
     }
 }

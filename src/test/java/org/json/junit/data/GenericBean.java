@@ -9,7 +9,7 @@ import java.io.StringReader;
  * @param <T>
  *            generic number value
  */
-public class GenericBean<T extends Number & Comparable<T>> implements MyBean {
+public class GenericBean<T extends Number> implements MyBean {
     /**
      * @param genericValue
      *            value to initiate with
