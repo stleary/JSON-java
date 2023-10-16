@@ -37,15 +37,21 @@ jobs:
           mvn site -DgenerateReports=false -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
       - name: Upload Test Results ${{ matrix.java }}
         if: ${{ always() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Test Results ${{ matrix.java }}
           path: target/surefire-reports/
       - name: Upload Test Report ${{ matrix.java }}
         if: ${{ always() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Test Report ${{ matrix.java }}
           path: target/site/
       - name: Package Jar ${{ matrix.java }}
         run: mvn clean package -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }} -Dmaven.test.skip=true -Dmaven.site.skip=true
+      - name: Upload Package Results ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Package Jar ${{ matrix.java }}
+          path: target/*.jar
