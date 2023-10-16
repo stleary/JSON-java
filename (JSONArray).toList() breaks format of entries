@@ -1,0 +1,18 @@
+var body = {};
+var bodyList = [];
+var x = new GlideRecord('table');
+x.addEncodedQuery('query');
+x.query();
+
+while(x.next()) {
+var messageString = x.getDisplayValue('comments_and_work_notes');
+body.messages = messageString.toString().replace(/(\r\n|\n|\r)/gm, "");
+bodyList.push(body);
+}
+
+response.setContentType('application/JSON');
+response.setBody(bodyList);
+var writer = response.getStreamWriter();
+writer.writeString(JSON.stringify(bodyList));
+
+})(request, response);
