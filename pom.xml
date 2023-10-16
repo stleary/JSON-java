@@ -21,12 +21,6 @@
     </description>
     <url>https://github.com/douglascrockford/JSON-java</url>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>9</version>
-    </parent>
-
     <scm>
         <url>https://github.com/douglascrockford/JSON-java.git</url>
         <connection>scm:git:git://github.com/douglascrockford/JSON-java.git</connection>
