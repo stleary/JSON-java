@@ -1,44 +1,27 @@
 package org.json;
 
-public class JSONParserConfiguration {
-    private final boolean circularDependencyValidation;
+public class JSONParserConfiguration extends AbstractConfiguration {
 
-    private JSONParserConfiguration() {
-        circularDependencyValidation = false;
+    private boolean circularDependencyValidated;
+
+    public JSONParserConfiguration() {
+        circularDependencyValidated = true;
     }
 
-    private JSONParserConfiguration(boolean circularDependencyValidation) {
-        this.circularDependencyValidation = circularDependencyValidation;
+    private JSONParserConfiguration(boolean circularDependencyValidated) {
+        this.circularDependencyValidated = circularDependencyValidated;
     }
 
-    public static JSONParserConfiguration defaultInstance() {
-        return new JSONParserConfiguration();
+    public boolean isCircularDependencyValidated() {
+        return circularDependencyValidated;
     }
 
-    public static JSONParserConfiguration.Builder newInstance() {
-        return new Builder();
+    public JSONParserConfiguration withCircularDependencyValidation(boolean circularDependencyValidation) {
+        return with(newInstance -> newInstance.circularDependencyValidated = circularDependencyValidation);
     }
 
-    public boolean isCircularDependencyValidation() {
-        return circularDependencyValidation;
-    }
-
-    public static class Builder {
-        private boolean circularDependencyValidation;
-
-        public boolean isCircularDependencyValidation() {
-            return circularDependencyValidation;
-        }
-
-        public Builder setCircularDependencyValidation(boolean circularDependencyValidation) {
-            this.circularDependencyValidation = circularDependencyValidation;
-            return this;
-        }
-
-        public JSONParserConfiguration build() {
-            return new JSONParserConfiguration(
-                circularDependencyValidation
-            );
-        }
+    @Override
+    protected Object clone() {
+        return new JSONParserConfiguration(circularDependencyValidated);
     }
 }

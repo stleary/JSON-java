@@ -170,7 +170,7 @@ public class JSONObject {
         // retrieval based on associative access.
         // Therefore, an implementation mustn't rely on the order of the item.
         this.map = new HashMap<String, Object>();
-        configuration = JSONParserConfiguration.defaultInstance();
+        configuration = new JSONParserConfiguration();
     }
 
     /**
@@ -276,7 +276,7 @@ public class JSONObject {
      *            If a key in the map is <code>null</code>
      */
     public JSONObject(Map<?, ?> m) {
-        this(m, getCircularDependencySet(), JSONParserConfiguration.defaultInstance());
+        this(m, getCircularDependencySet(), new JSONParserConfiguration());
     }
 
     /**
@@ -303,7 +303,7 @@ public class JSONObject {
         map = new HashMap<>(m.size());
 
         BiConsumer<Entry<?, ?>, Object> wrapValueConsumer;
-        if (configuration.isCircularDependencyValidation()) {
+        if (configuration.isCircularDependencyValidated()) {
             wrapValueConsumer = (entry, object) -> {
                 if (objectsRecord.contains(object)) {
                     throw new JSONException("Found circular dependency.");
@@ -394,7 +394,7 @@ public class JSONObject {
      *            If a getter returned a non-finite number.
      */
     public JSONObject(Object bean) {
-        this(bean, JSONParserConfiguration.defaultInstance());
+        this(bean, new JSONParserConfiguration());
     }
 
     public JSONObject(Object bean, JSONParserConfiguration jsonParserConfiguration) {
@@ -501,7 +501,7 @@ public class JSONObject {
      */
     protected JSONObject(int initialCapacity){
         this.map = new HashMap<String, Object>(initialCapacity);
-        configuration = JSONParserConfiguration.defaultInstance();
+        configuration = new JSONParserConfiguration();
     }
 
     /**
@@ -2705,7 +2705,7 @@ public class JSONObject {
      * @return The wrapped value
      */
     public static Object wrap(Object object) {
-        return wrap(object, JSONParserConfiguration.defaultInstance());
+        return wrap(object, new JSONParserConfiguration());
     }
 
     /**
