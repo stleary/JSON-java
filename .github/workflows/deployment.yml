@@ -1,4 +1,8 @@
-# For more information see: https://docs.github.com/en/actions/learn-github-actions or https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+# For more information see:
+#  * https://docs.github.com/en/actions/learn-github-actions
+#  * https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+#  * https://github.com/actions/setup-java/blob/v3.13.0/docs/advanced-usage.md#Publishing-using-Apache-Maven
+#
 
 name: Deployment workflow
 
@@ -20,14 +24,18 @@ jobs:
             # Use lowest supported LTS Java version
             java-version: '8'
             distribution: 'temurin'
-            server-id: ossrh
-            server-username: MAVEN_USERNAME
-            server-password: MAVEN_PASSWORD
+            server-id: ossrh  # Value of the distributionManagement/repository/id field of the pom.xml
+            server-username: MAVEN_USERNAME # env variable for username in deploy
+            server-password: MAVEN_PASSWORD # env variable for token in deploy
+            gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+            gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+    
         - name: Publish to the Maven Central Repository
           run: mvn --batch-mode deploy
           env:
             MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
             MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+            MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         # - name: Set up Java for publishing to GitHub Packages
         #   uses: actions/setup-java@v3
         #   with:
