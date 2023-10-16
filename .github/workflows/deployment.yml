@@ -1,0 +1,40 @@
+# For more information see: https://docs.github.com/en/actions/learn-github-actions or https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+
+name: Deployment workflow
+
+on:
+    release:
+      types: [published]
+  
+jobs:
+    publish:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        packages: write
+      steps:
+        - uses: actions/checkout@v4
+        - name: Set up Java for publishing to Maven Central Repository
+          uses: actions/setup-java@v3
+          with:
+            # Use lowest supported LTS Java version
+            java-version: '8'
+            distribution: 'temurin'
+            server-id: ossrh
+            server-username: MAVEN_USERNAME
+            server-password: MAVEN_PASSWORD
+        - name: Publish to the Maven Central Repository
+          run: mvn --batch-mode deploy
+          env:
+            MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+            MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+        # - name: Set up Java for publishing to GitHub Packages
+        #   uses: actions/setup-java@v3
+        #   with:
+        #     # Use lowest supported LTS Java version
+        #     java-version: '8'
+        #     distribution: 'temurin'
+        # - name: Publish to GitHub Packages
+        #   run: mvn --batch-mode deploy
+        #   env:
+        #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
