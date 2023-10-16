@@ -33,6 +33,7 @@ import org.json.JSONPointerException;
 import org.json.JSONString;
 import org.json.JSONTokener;
 import org.json.XML;
+import org.json.JSONParserConfiguration;
 import org.json.junit.data.BrokenToString;
 import org.json.junit.data.ExceptionalBean;
 import org.json.junit.data.Fraction;
@@ -3634,11 +3635,11 @@ public class JSONObjectTest {
 
         jsonObject.put("test", jsonObject);
 
-        new JSONObject(jsonObject);
+        new JSONObject(jsonObject, JSONParserConfiguration.newInstance().setCircularDependencyValidation(true).build());
     }
 
-    @Test(expected = JSONException.class)
-    public void testCircleDependencyMultiplyLevel() {
+    @Test(expected = StackOverflowError.class)
+    public void testCircleDependencyMultiplyLevel_notConfigured_expectedStackOverflow() {
         Map<Object, Object> inside = new HashMap<>();
 
         Map<Object, Object> jsonObject = new HashMap<>();
@@ -3646,6 +3647,17 @@ public class JSONObjectTest {
         jsonObject.put("test", inside);
 
         new JSONObject(jsonObject);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testCircleDependencyMultiplyLevel_configured_expectedJSONException() {
+        Map<Object, Object> inside = new HashMap<>();
+
+        Map<Object, Object> jsonObject = new HashMap<>();
+        inside.put("test", jsonObject);
+        jsonObject.put("test", inside);
+
+        new JSONObject(jsonObject, JSONParserConfiguration.newInstance().setCircularDependencyValidation(true).build());
     }
 
     @Test

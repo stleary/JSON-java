@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 /**
@@ -144,6 +145,7 @@ public class JSONObject {
      * The map where the JSONObject's properties are kept.
      */
     private final Map<String, Object> map;
+    private final JSONParserConfiguration configuration;
 
     public Class<? extends Map> getMapType() {
         return map.getClass();
@@ -168,6 +170,7 @@ public class JSONObject {
         // retrieval based on associative access.
         // Therefore, an implementation mustn't rely on the order of the item.
         this.map = new HashMap<String, Object>();
+        configuration = JSONParserConfiguration.defaultInstance();
     }
 
     /**
@@ -273,28 +276,58 @@ public class JSONObject {
      *            If a key in the map is <code>null</code>
      */
     public JSONObject(Map<?, ?> m) {
-        this(m, Collections.newSetFromMap(new IdentityHashMap<>()));
+        this(m, getCircularDependencySet(), JSONParserConfiguration.defaultInstance());
     }
 
-    private JSONObject(Map<?, ?> m, Set<Object> objectsRecord) {
-        if (m == null) {
-            this.map = new HashMap<String, Object>();
-        } else {
-            this.map = new HashMap<String, Object>(m.size());
-            for (final Entry<?, ?> e : m.entrySet()) {
-                if(e.getKey() == null) {
-                    throw new NullPointerException("Null key.");
-                }
-                final Object value = e.getValue();
-                if (value != null) {
-                    if (objectsRecord.contains(value)) {
-                        throw new JSONException("Found circular dependency.");
-                    }
+    /**
+     * The same functionality as {@link JSONObject#JSONObject(Map)} but with the possibility
+     * of passing a {@link JSONParserConfiguration} to overwrite the default.
+     *
+     * @param m
+     *            A map object that can be used to initialize the contents of
+     *            the JSONObject.
+     * @param jsonParserConfiguration the configuration to overwrite the default functionality
+     */
+    public JSONObject(Map<?, ?> m, JSONParserConfiguration jsonParserConfiguration) {
+        this(m, Collections.newSetFromMap(new IdentityHashMap<>()), jsonParserConfiguration);
+    }
 
-                    objectsRecord.add(value);
-                    this.map.put(String.valueOf(e.getKey()), wrap(value, objectsRecord));
-                    objectsRecord.remove(value);
+    private JSONObject(Map<?, ?> m, Set<Object> objectsRecord, JSONParserConfiguration jsonParserConfiguration) {
+        configuration = jsonParserConfiguration;
+
+        if (m == null) {
+            this.map = new HashMap<>();
+            return;
+        }
+
+        map = new HashMap<>(m.size());
+
+        BiConsumer<Entry<?, ?>, Object> wrapValueConsumer;
+        if (configuration.isCircularDependencyValidation()) {
+            wrapValueConsumer = (entry, object) -> {
+                if (objectsRecord.contains(object)) {
+                    throw new JSONException("Found circular dependency.");
                 }
+
+                objectsRecord.add(object);
+                this.map.put(String.valueOf(entry.getKey()), wrap(object, objectsRecord, configuration));
+                objectsRecord.remove(object);
+            };
+        } else {
+            wrapValueConsumer = (entry, object) -> this.map.put(String.valueOf(entry.getKey()), wrap(object, objectsRecord, configuration));
+        }
+
+        parseMap(m, wrapValueConsumer);
+    }
+
+    private void parseMap(Map<?, ?> m, BiConsumer<Entry<?, ?>, Object> wrapValueConsumer) {
+        for (final Entry<?, ?> e : m.entrySet()) {
+            if(e.getKey() == null) {
+                throw new NullPointerException("Null key.");
+            }
+            final Object value = e.getValue();
+            if (value != null) {
+                wrapValueConsumer.accept(e, value);
             }
         }
     }
@@ -358,13 +391,17 @@ public class JSONObject {
      *            a JSONObject.
      */
     public JSONObject(Object bean) {
-        this();
-        this.populateMap(bean);
+        this(bean, JSONParserConfiguration.defaultInstance());
     }
 
-    private JSONObject(Object bean, Set<Object> objectsRecord) {
+    public JSONObject(Object bean, JSONParserConfiguration jsonParserConfiguration) {
         this();
-        this.populateMap(bean, objectsRecord);
+        this.populateMap(bean, getCircularDependencySet(), jsonParserConfiguration);
+    }
+
+    private JSONObject(Object bean, Set<Object> objectsRecord, JSONParserConfiguration jsonParserConfiguration) {
+        this();
+        this.populateMap(bean, objectsRecord, jsonParserConfiguration);
     }
 
     /**
@@ -461,6 +498,7 @@ public class JSONObject {
      */
     protected JSONObject(int initialCapacity){
         this.map = new HashMap<String, Object>(initialCapacity);
+        configuration = JSONParserConfiguration.defaultInstance();
     }
 
     /**
@@ -1701,12 +1739,12 @@ public class JSONObject {
      *
      * @param bean
      *            the bean
+     * @param objectsRecord
+     *            the set to track for circular dependencies
+     * @param jsonParserConfiguration
+     *            the configuration for the JSON parser
      */
-    private void populateMap(Object bean) {
-        populateMap(bean, Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>()));
-    }
-
-    private void populateMap(Object bean, Set<Object> objectsRecord) {
+    private void populateMap(Object bean, Set<Object> objectsRecord, JSONParserConfiguration jsonParserConfiguration) {
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
@@ -1736,7 +1774,7 @@ public class JSONObject {
 
                             objectsRecord.add(result);
 
-                            this.map.put(key, wrap(result, objectsRecord));
+                            this.map.put(key, wrap(result, objectsRecord, jsonParserConfiguration));
 
                             objectsRecord.remove(result);
 
@@ -2632,10 +2670,24 @@ public class JSONObject {
      * @return The wrapped value
      */
     public static Object wrap(Object object) {
-        return wrap(object, null);
+        return wrap(object, JSONParserConfiguration.defaultInstance());
     }
 
-    private static Object wrap(Object object, Set<Object> objectsRecord) {
+    /**
+     * The same functionality as the {@link JSONObject#wrap(Object)} but with the possibility to pass a
+     * {@link JSONParserConfiguration} to overwrite the default functionality.
+     *
+     * @param object
+     *            the object to wrap
+     * @param jsonParserConfiguration
+     *            the configuration for JSON parser
+     * @return the wrapped object
+     */
+    public static Object wrap(Object object, JSONParserConfiguration jsonParserConfiguration) {
+        return wrap(object, getCircularDependencySet(), jsonParserConfiguration);
+    }
+
+    private static Object wrap(Object object, Set<Object> objectsRecord, JSONParserConfiguration jsonParserConfiguration) {
         try {
             if (NULL.equals(object)) {
                 return NULL;
@@ -2660,7 +2712,7 @@ public class JSONObject {
             }
             if (object instanceof Map) {
                 Map<?, ?> map = (Map<?, ?>) object;
-                return new JSONObject(map, objectsRecord);
+                return new JSONObject(map, objectsRecord, jsonParserConfiguration);
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage
@@ -2670,16 +2722,18 @@ public class JSONObject {
                     || object.getClass().getClassLoader() == null) {
                 return object.toString();
             }
-            if (objectsRecord != null) {
-                return new JSONObject(object, objectsRecord);
-            }
-            return new JSONObject(object);
+
+            return new JSONObject(object, objectsRecord, jsonParserConfiguration);
         }
         catch (JSONException exception) {
             throw exception;
         } catch (Exception exception) {
             return null;
         }
+    }
+
+    private static Set<Object> getCircularDependencySet() {
+        return Collections.newSetFromMap(new IdentityHashMap<>());
     }
 
     /**
