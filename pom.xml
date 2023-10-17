@@ -3,7 +3,7 @@
 
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
-    <version>20230618</version>
+    <version>20231013</version>
     <packaging>bundle</packaging>
 
     <name>JSON in Java</name>
@@ -15,7 +15,7 @@
         It also includes the capability to convert between JSON and XML, HTTP
         headers, Cookies, and CDL.
 
-        This is a reference implementation. There is a large number of JSON packages
+        This is a reference implementation. There are a large number of JSON packages
         in Java. Perhaps someday the Java community will standardize on one. Until
         then, choose carefully.
     </description>
@@ -160,34 +160,16 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
-                <version>1.0.0.Final</version>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>add-module-info</goal>
-                        </goals>
-                        <configuration>
-                            <jvmVersion>9</jvmVersion>
-                            <module>
-                                <moduleInfo>
-                                    <name>org.json</name>
-                                    <exports>
-                                        org.json;
-                                    </exports>
-                                </moduleInfo>
-                            </module>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>org.json</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>
