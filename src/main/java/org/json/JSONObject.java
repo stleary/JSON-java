@@ -145,6 +145,9 @@ public class JSONObject {
      */
     private final Map<String, Object> map;
 
+    /**
+     * Returns the class of the underlying Map implementation used by this JSONObject.
+     */
     public Class<? extends Map> getMapType() {
         return map.getClass();
     }
@@ -342,7 +345,7 @@ public class JSONObject {
      * &#64;JSONPropertyIgnore
      * public String getName() { return this.name; }
      * </pre>
-     * <p>
+     * </p>
      *
      * @param bean
      *            An object that has getter methods that should be used to make
@@ -2197,6 +2200,22 @@ public class JSONObject {
         }
     }
 
+    /**
+     * This method takes a string and a writer object as input and returns a writer object after 
+     * writing the string to it with proper escaping of special characters.
+     * If the input string is null or empty, it writes an empty string to the writer object.
+     * Special characters like backslash, double quotes, forward slash, backspace, tab, newline, 
+     * form feed, and carriage return are escaped with a backslash.
+     * Unicode characters below ' ' (space) and between '\u0080' and '\u00a0' and between '\u2000' and 
+     * '\u2100' are escaped with a backslash and 'u' followed by their four-digit hexadecimal representation.
+     * 
+     * @param string the input string to be written to the writer object
+     * @param w the writer object to which the input string is to be written
+     * 
+     * @return the writer object after writing the input string with proper escaping of special characters
+     * 
+     * @throws IOException if an I/O error occurs while writing to the writer object
+     */
     public static Writer quote(String string, Writer w) throws IOException {
         if (string == null || string.isEmpty()) {
             w.write("\"\"");
