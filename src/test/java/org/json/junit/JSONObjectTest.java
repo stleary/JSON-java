@@ -2095,7 +2095,9 @@ public class JSONObjectTest {
              "}";
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
         assertTrue("jsonObject valueToString() incorrect",
-                JSONObject.valueToString(jsonObject).equals(jsonObject.toString()));
+            new JSONObject(JSONObject.valueToString(jsonObject))
+                .similar(new JSONObject(jsonObject.toString()))
+            );
         String jsonArrayStr = 
             "[1,2,3]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
@@ -2106,7 +2108,8 @@ public class JSONObjectTest {
         map.put("key2", "val2");
         map.put("key3", "val3");
         assertTrue("map valueToString() incorrect",
-                jsonObject.toString().equals(JSONObject.valueToString(map))); 
+         new JSONObject(jsonObject.toString())
+         .similar(new JSONObject(JSONObject.valueToString(map))));
         Collection<Integer> collection = new ArrayList<Integer>();
         collection.add(Integer.valueOf(1));
         collection.add(Integer.valueOf(2));
