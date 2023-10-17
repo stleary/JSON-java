@@ -163,6 +163,11 @@ public class JSONPointer {
         //}
     }
 
+    /**
+     * Constructs a new JSONPointer instance with the given reference tokens.
+     *
+     * @param refTokens the reference tokens to use
+     */
     public JSONPointer(List<String> refTokens) {
         this.refTokens = new ArrayList<String>(refTokens);
     }
