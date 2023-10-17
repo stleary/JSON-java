@@ -147,6 +147,8 @@ public class JSONObject {
 
     /**
      * Returns the class of the underlying Map implementation used by this JSONObject.
+     * 
+     * @return The Class of the Map implementation.
      */
     public Class<? extends Map> getMapType() {
         return map.getClass();
@@ -345,7 +347,6 @@ public class JSONObject {
      * &#64;JSONPropertyIgnore
      * public String getName() { return this.name; }
      * </pre>
-     * </p>
      *
      * @param bean
      *            An object that has getter methods that should be used to make

@@ -528,7 +528,7 @@ public class JSONTokener {
     /**
      * Close the underlying reader.
      *
-     * @throws IOException
+     * @throws IOException if the reader fails to close.
      */
     public void close() throws IOException {
         if(reader!=null){
