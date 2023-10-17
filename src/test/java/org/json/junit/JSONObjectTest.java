@@ -3716,38 +3716,38 @@ public class JSONObjectTest {
     }
 
     @Test(expected = JSONException.class)
-    public void testCircleDependencyFirstLevel() {
+    public void testCircleReferenceFirstLevel() {
         Map<Object, Object> jsonObject = new HashMap<>();
 
         jsonObject.put("test", jsonObject);
 
-        new JSONObject(jsonObject, JSONParserConfiguration.newInstance().setCircularDependencyValidation(true).build());
+        new JSONObject(jsonObject, new JSONParserConfiguration());
     }
 
     @Test(expected = StackOverflowError.class)
-    public void testCircleDependencyMultiplyLevel_notConfigured_expectedStackOverflow() {
+    public void testCircleReferenceMultiplyLevel_notConfigured_expectedStackOverflow() {
         Map<Object, Object> inside = new HashMap<>();
 
         Map<Object, Object> jsonObject = new HashMap<>();
         inside.put("test", jsonObject);
         jsonObject.put("test", inside);
 
-        new JSONObject(jsonObject);
+        new JSONObject(jsonObject, new JSONParserConfiguration().withCircularReferenceValidation(false));
     }
 
     @Test(expected = JSONException.class)
-    public void testCircleDependencyMultiplyLevel_configured_expectedJSONException() {
+    public void testCircleReferenceMultiplyLevel_configured_expectedJSONException() {
         Map<Object, Object> inside = new HashMap<>();
 
         Map<Object, Object> jsonObject = new HashMap<>();
         inside.put("test", jsonObject);
         jsonObject.put("test", inside);
 
-        new JSONObject(jsonObject, JSONParserConfiguration.newInstance().setCircularDependencyValidation(true).build());
+        new JSONObject(jsonObject, new JSONParserConfiguration());
     }
 
     @Test
-    public void testDifferentKeySameInstanceNotACircleDependency() {
+    public void testDifferentKeySameInstanceNotACircleReference() {
         Map<Object, Object> map1 = new HashMap<>();
         Map<Object, Object> map2 = new HashMap<>();
 
