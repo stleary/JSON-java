@@ -3721,7 +3721,7 @@ public class JSONObjectTest {
 
         jsonObject.put("test", jsonObject);
 
-        new JSONObject(jsonObject, new JSONParserConfiguration());
+        new JSONObject(jsonObject, JSONParserConfiguration.newInstance().setCircularDependencyValidation(true).build());
     }
 
     @Test(expected = StackOverflowError.class)
@@ -3732,7 +3732,7 @@ public class JSONObjectTest {
         inside.put("test", jsonObject);
         jsonObject.put("test", inside);
 
-        new JSONObject(jsonObject, new JSONParserConfiguration().withCircularDependencyValidation(false));
+        new JSONObject(jsonObject);
     }
 
     @Test(expected = JSONException.class)
@@ -3743,7 +3743,7 @@ public class JSONObjectTest {
         inside.put("test", jsonObject);
         jsonObject.put("test", inside);
 
-        new JSONObject(jsonObject, new JSONParserConfiguration());
+        new JSONObject(jsonObject, JSONParserConfiguration.newInstance().setCircularDependencyValidation(true).build());
     }
 
     @Test

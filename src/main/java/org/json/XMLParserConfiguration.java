@@ -209,7 +209,9 @@ public class XMLParserConfiguration extends ParserConfiguration {
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
     public XMLParserConfiguration withcDataTagName(final String newVal) {
-        return with(newInstance -> newInstance.cDataTagName = newVal);
+        XMLParserConfiguration newConfig = this.clone();
+        newConfig.cDataTagName = newVal;
+        return newConfig;
     }
 
     /**
@@ -234,7 +236,9 @@ public class XMLParserConfiguration extends ParserConfiguration {
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
     public XMLParserConfiguration withConvertNilAttributeToNull(final boolean newVal) {
-        return with(newInstance -> newInstance.convertNilAttributeToNull = newVal);
+        XMLParserConfiguration newConfig = this.clone();
+        newConfig.convertNilAttributeToNull = newVal;
+        return newConfig;
     }
 
     /**
@@ -258,7 +262,10 @@ public class XMLParserConfiguration extends ParserConfiguration {
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
     public XMLParserConfiguration withXsiTypeMap(final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap) {
-        return with(newInstance -> newInstance.xsiTypeMap = Collections.unmodifiableMap(new HashMap<>(xsiTypeMap)));
+        XMLParserConfiguration newConfig = this.clone();
+        Map<String, XMLXsiTypeConverter<?>> cloneXsiTypeMap = new HashMap<String, XMLXsiTypeConverter<?>>(xsiTypeMap);
+        newConfig.xsiTypeMap = Collections.unmodifiableMap(cloneXsiTypeMap);
+        return newConfig;
     }
 
     /**
@@ -277,7 +284,10 @@ public class XMLParserConfiguration extends ParserConfiguration {
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
     public XMLParserConfiguration withForceList(final Set<String> forceList) {
-        return with(newInstance -> newInstance.forceList = Collections.unmodifiableSet(new HashSet<>(forceList)));
+        XMLParserConfiguration newConfig = this.clone();
+        Set<String> cloneForceList = new HashSet<String>(forceList);
+        newConfig.forceList = Collections.unmodifiableSet(cloneForceList);
+        return newConfig;
     }
 
     /**
