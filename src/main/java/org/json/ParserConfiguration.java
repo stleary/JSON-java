@@ -29,11 +29,21 @@ public class ParserConfiguration {
      */
     protected int maxNestingDepth;
 
+    /**
+     * Constructs a new ParserConfiguration object with default values.
+     * By default, keepStrings is set to false and maxNestingDepth is set to the default maximum nesting depth.
+     */
     public ParserConfiguration() {
         this.keepStrings = false;
         this.maxNestingDepth = DEFAULT_MAXIMUM_NESTING_DEPTH;
     }
 
+    /**
+     * Constructs a new ParserConfiguration object with the specified parameters.
+     *
+     * @param keepStrings a boolean indicating whether strings should be guessed into JSON values
+     * @param maxNestingDepth the maximum nesting depth allowed for JSON objects
+     */
     protected ParserConfiguration(final boolean keepStrings, final int maxNestingDepth) {
         this.keepStrings = keepStrings;
         this.maxNestingDepth = maxNestingDepth;
