@@ -1,6 +1,8 @@
 # ignore eclipse project files
 .project
 .classpath
+# ignore vscode files
+.vscode
 # ignore Intellij Idea project files
 .idea
 *.iml

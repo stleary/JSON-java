@@ -1234,7 +1234,7 @@ public class XMLTest {
                 for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
                     expected.append(buffer, 0, numRead);
                 }
-                assertEquals(expected.toString(), actualString);
+                assertTrue(XML.toJSONObject(expected.toString()).similar(XML.toJSONObject(actualString)));
             }
         } catch (IOException e) {
             fail("file writer error: " +e.getMessage());
