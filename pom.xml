@@ -21,12 +21,6 @@
     </description>
     <url>https://github.com/douglascrockford/JSON-java</url>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>9</version>
-    </parent>
-
     <scm>
         <url>https://github.com/douglascrockford/JSON-java.git</url>
         <connection>scm:git:git://github.com/douglascrockford/JSON-java.git</connection>
@@ -51,6 +45,20 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <name>Central Repository OSSRH</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 
     <dependencies>
         <dependency>
