@@ -44,24 +44,24 @@ The org.json package can be built from the command line, Maven, and Gradle. The 
 **Building from the command line**
 
 *Build the class files from the package root directory src/main/java*
-````
+```shell
 javac org/json/*.java
-````
+```
 
 *Create the jar file in the current directory*
-````
+```shell
 jar cf json-java.jar org/json/*.class
-````
+```
 
 *Compile a program that uses the jar (see example code below)*
-````
+```shell
 javac -cp .;json-java.jar Test.java (Windows)
 javac -cp .:json-java.jar Test.java (Unix Systems)
-````
+```
 
 *Test file contents*
 
-````
+```java
 import org.json.JSONObject;
 public class Test {
     public static void main(String args[]){
@@ -69,31 +69,31 @@ public class Test {
        System.out.println(jo.toString());
     }
 }
-````
+```
 
 *Execute the Test file*
-```` 
+```shell 
 java -cp .;json-java.jar Test (Windows)
 java -cp .:json-java.jar Test (Unix Systems)
-````
+```
 
 *Expected output*
 
-````
+```json
 {"abc":"def"}
-````
+```
 
  
 **Tools to build the package and execute the unit tests**
 
 Execute the test suite with Maven:
-```
+```shell
 mvn clean test
 ```
 
 Execute the test suite with Gradlew:
 
-```
+```shell
 gradlew clean build test
 ```
 
