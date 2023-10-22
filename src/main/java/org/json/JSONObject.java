@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 /**
@@ -302,25 +301,8 @@ public class JSONObject {
 
         map = new HashMap<>(m.size());
 
-        BiConsumer<Entry<?, ?>, Object> wrapValueConsumer;
-        if (configuration.isCircularReferenceValidated()) {
-            wrapValueConsumer = (entry, object) -> {
-                if (objectsRecord.contains(object)) {
-                    throw new JSONException("Found circular reference.");
-                }
+        final boolean circularReferenceValidated = configuration.isCircularReferenceValidated();
 
-                objectsRecord.add(object);
-                this.map.put(String.valueOf(entry.getKey()), wrap(object, objectsRecord, configuration));
-                objectsRecord.remove(object);
-            };
-        } else {
-            wrapValueConsumer = (entry, object) -> this.map.put(String.valueOf(entry.getKey()), wrap(object, objectsRecord, configuration));
-        }
-
-        parseMap(m, wrapValueConsumer);
-    }
-
-    private void parseMap(Map<?, ?> m, BiConsumer<Entry<?, ?>, Object> wrapValueConsumer) {
         for (final Entry<?, ?> e : m.entrySet()) {
             if(e.getKey() == null) {
                 throw new NullPointerException("Null key.");
@@ -328,7 +310,17 @@ public class JSONObject {
             final Object value = e.getValue();
             if (value != null) {
                 testValidity(value);
-                wrapValueConsumer.accept(e, value);
+                if (circularReferenceValidated) {
+                    if (objectsRecord.contains(value)) {
+                        throw new JSONException("Found circular reference.");
+                    }
+
+                    objectsRecord.add(value);
+                    this.map.put(String.valueOf(e.getKey()), wrap(value, objectsRecord, configuration));
+                    objectsRecord.remove(value);
+                } else {
+                    this.map.put(String.valueOf(e.getKey()), wrap(value, objectsRecord, configuration));
+                }
             }
         }
     }
