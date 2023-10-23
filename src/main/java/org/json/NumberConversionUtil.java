@@ -3,7 +3,7 @@ package org.json;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class NumberConversionUtil {
+class NumberConversionUtil {
 
     /**
      * Converts a string to a number using the narrowest possible type. Possible
@@ -15,7 +15,7 @@ public class NumberConversionUtil {
      * @throws NumberFormatException thrown if the value is not a valid number. A public
      *      caller should catch this and wrap it in a {@link JSONException} if applicable.
      */
-    public static Number stringToNumber(final String input) throws NumberFormatException {
+    static Number stringToNumber(final String input) throws NumberFormatException {
         String val = input;
         if (val.startsWith(".")){
             val = "0"+val;
@@ -88,7 +88,7 @@ public class NumberConversionUtil {
      * @param value
      * @return
      */
-    public static boolean potentialNumber(String value){
+    static boolean potentialNumber(String value){
         if (value == null || value.isEmpty()){
             return false;
         }

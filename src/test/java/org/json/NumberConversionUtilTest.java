@@ -1,6 +1,5 @@
-package org.json.junit;
+package org.json;
 
-import org.json.NumberConversionUtil;
 import org.junit.Test;
 
 import java.math.BigDecimal;
