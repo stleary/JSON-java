@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir -p target/classes
           javac -version
-          javac -d target/classes/ src/main/java/org/json/*.java
+          javac -source 1.6 -target 1.6 -d target/classes/ src/main/java/org/json/*.java
       - name: Create JAR 1.6
         run: |
           jar cvf "target/org.json-1.6-${{ github.ref_name }}.jar" -C target/classes .
