@@ -10,9 +10,35 @@ on:
     branches: [ master ]
 
 jobs:
+  # old-school build and jar method. No tests run or compiled.
+  build-1_6: 
+    name: Java 1.6
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.6
+      - name: Compile Java 1.6
+        run: |
+          mkdir -p target/classes
+          javac -version
+          javac -source 1.6 -target 1.6 -d target/classes/ src/main/java/org/json/*.java
+      - name: Create java 1.6 JAR
+        run: |
+          jar cvf target/org.json.jar -C target/classes .
+      - name: Upload JAR 1.6
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Create java 1.6 JAR
+          path: target/*.jar
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
+      max-parallel: 2
       matrix:
         # build against supported Java LTS versions:
         java: [ 8, 11, 17, 21 ]
@@ -26,15 +52,15 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: 'maven'
       - name: Compile Java ${{ matrix.java }}
-        run: mvn clean compile -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }} -Dmaven.test.skip=true -Dmaven.site.skip=true -Dmaven.javadoc.skip=true
+        run: mvn clean compile -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true -D maven.javadoc.skip=true
       - name: Run Tests ${{ matrix.java }}
         run: |
-          mvn test -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
+          mvn test -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
       - name: Build Test Report ${{ matrix.java }}
         if: ${{ always() }}
         run: |
-          mvn surefire-report:report-only -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
-          mvn site -DgenerateReports=false -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
+          mvn surefire-report:report-only -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+          mvn site -D generateReports=false -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
       - name: Upload Test Results ${{ matrix.java }}
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
@@ -48,7 +74,7 @@ jobs:
           name: Test Report ${{ matrix.java }}
           path: target/site/
       - name: Package Jar ${{ matrix.java }}
-        run: mvn clean package -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }} -Dmaven.test.skip=true -Dmaven.site.skip=true
+        run: mvn clean package -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true
       - name: Upload Package Results ${{ matrix.java }}
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
