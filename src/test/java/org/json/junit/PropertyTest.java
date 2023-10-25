@@ -8,8 +8,9 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-import org.json.*;
 import org.junit.Test;
+import org.rookout.json.JSONObject;
+import org.rookout.json.Property;
 
 
 /**

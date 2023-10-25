@@ -18,11 +18,11 @@ import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
-import org.json.XMLParserConfiguration;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONException;
+import org.rookout.json.JSONObject;
+import org.rookout.json.XML;
+import org.rookout.json.XMLParserConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

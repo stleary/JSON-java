@@ -6,11 +6,11 @@ Public Domain.
 
 import static org.junit.Assert.*;
 
-import org.json.*;
 import org.junit.Test;
+import org.rookout.json.*;
 
 /**
- * Tests for org.json.JSONML.java
+ * Tests for org.rookout.json.JSONML.java
  *
  * Certain inputs are expected to result in exceptions. These tests are
  * executed first. JSONML provides an API to:
@@ -138,7 +138,7 @@ public class JSONMLTest {
             assertTrue("Expecting an exception", false);
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "JSONArray[0] is not a String (class org.json.JSONArray).",
+                "JSONArray[0] is not a String (class org.rookout.json.JSONArray).",
                 e.getMessage());
         }
     }

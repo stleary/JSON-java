@@ -10,11 +10,11 @@ import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONPointer;
-import org.json.JSONPointerException;
-import org.json.JSONTokener;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONObject;
+import org.rookout.json.JSONPointer;
+import org.rookout.json.JSONPointerException;
+import org.rookout.json.JSONTokener;
 import org.junit.Test;
 
 public class JSONPointerTest {

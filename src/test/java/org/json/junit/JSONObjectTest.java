@@ -27,14 +27,14 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-import org.json.CDL;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
-import org.json.JSONString;
-import org.json.JSONTokener;
-import org.json.XML;
+import org.rookout.json.CDL;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONException;
+import org.rookout.json.JSONObject;
+import org.rookout.json.JSONPointerException;
+import org.rookout.json.JSONString;
+import org.rookout.json.JSONTokener;
+import org.rookout.json.XML;
 import org.json.junit.data.BrokenToString;
 import org.json.junit.data.ExceptionalBean;
 import org.json.junit.data.Fraction;
@@ -3624,7 +3624,7 @@ public class JSONObjectTest {
         jsonObject.put("key3", new JSONObject());
         jsonObject.clear(); //Clears the JSONObject
         assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
-        jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
+        jsonObject.getInt("key1"); //Should throws org.rookout.json.JSONException: JSONObject["asd"] not found
         Util.checkJSONObjectMaps(jsonObject);
     }
 

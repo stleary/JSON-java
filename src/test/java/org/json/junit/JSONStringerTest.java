@@ -9,10 +9,13 @@ import static org.junit.Assert.*;
 import java.math.BigDecimal;
 import java.util.*;
 
-import org.json.*;
 import org.junit.Test;
 
 import com.jayway.jsonpath.*;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONException;
+import org.rookout.json.JSONObject;
+import org.rookout.json.JSONStringer;
 
 
 /**

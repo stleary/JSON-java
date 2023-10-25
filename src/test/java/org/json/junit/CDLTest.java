@@ -7,10 +7,10 @@ Public Domain.
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.CDL;
+import org.rookout.json.JSONException;
+import org.rookout.json.JSONObject;
+import org.rookout.json.JSONArray;
+import org.rookout.json.CDL;
 
 /**
  * Tests for CDL.java.

@@ -8,9 +8,9 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.json.*;
 import org.json.junit.data.MyLocaleBean;
 import org.junit.*;
+import org.rookout.json.JSONObject;
 
 /**
  * Note: This file is saved as UTF-8. Do not save as ASCII or the tests will

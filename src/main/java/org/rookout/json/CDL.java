@@ -1,4 +1,4 @@
-package org.json;
+package org.rookout.json;
 
 /*
 Public Domain.

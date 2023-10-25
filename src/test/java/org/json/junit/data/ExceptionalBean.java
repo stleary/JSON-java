@@ -3,12 +3,14 @@
  */
 package org.json.junit.data;
 
+import org.rookout.json.JSONObject;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Object for testing the exception handling in {@link org.json.JSONObject#populateMap}.
+ * Object for testing the exception handling in {@link JSONObject#populateMap}.
  * 
  * @author John Aylward
  */

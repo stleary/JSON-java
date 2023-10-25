@@ -8,7 +8,8 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.json.*;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONObject;
 
 /**
  * These are helpful utility methods that perform basic comparisons
@@ -24,7 +25,7 @@ public class Util {
      * @param expectedJsonArray created specifically for comparing
      */
     public static void compareActualVsExpectedJsonArrays(JSONArray jsonArray,
-            JSONArray expectedJsonArray) {
+                                                         JSONArray expectedJsonArray) {
         assertTrue("jsonArray lengths should be equal",
                 jsonArray.length() == expectedJsonArray.length());
         for (int i = 0; i < jsonArray.length(); ++i) {

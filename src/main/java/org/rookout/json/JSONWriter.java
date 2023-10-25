@@ -1,4 +1,4 @@
-package org.json;
+package org.rookout.json;
 
 import java.io.IOException;
 import java.util.Collection;

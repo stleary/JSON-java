@@ -9,8 +9,11 @@ import static org.junit.Assert.*;
 import java.io.StringWriter;
 import java.util.*;
 
-import org.json.*;
 import org.junit.Test;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONException;
+import org.rookout.json.JSONObject;
+import org.rookout.json.JSONString;
 
 /**
  * Tests for JSONString implementations, and the difference between

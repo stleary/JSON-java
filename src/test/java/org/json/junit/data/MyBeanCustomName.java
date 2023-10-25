@@ -1,6 +1,6 @@
 package org.json.junit.data;
 
-import org.json.JSONPropertyName;
+import org.rookout.json.JSONPropertyName;
 
 /**
  * Test bean for the {@link JSONPropertyName} annotation.

@@ -1,6 +1,6 @@
 package org.json.junit;
 
-import org.json.JSONObject;
+import org.rookout.json.JSONObject;
 import org.junit.Test;
 
 import java.math.BigDecimal;

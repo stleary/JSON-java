@@ -3,11 +3,11 @@
  */
 package org.json.junit.data;
 
-import org.json.JSONPropertyIgnore;
-import org.json.JSONPropertyName;
+import org.rookout.json.JSONPropertyIgnore;
+import org.rookout.json.JSONPropertyName;
 
 /**
- * Test bean to verify that the {@link org.json.JSONPropertyName} annotation
+ * Test bean to verify that the {@link JSONPropertyName} annotation
  * is inherited.
  */
 public class MyBeanCustomNameSubClass extends MyBeanCustomName {

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.json.JSONObject;
+import org.rookout.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

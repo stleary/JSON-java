@@ -12,8 +12,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONObject;
 import org.json.junit.data.MyEnum;
 import org.json.junit.data.MyEnumClass;
 import org.json.junit.data.MyEnumField;

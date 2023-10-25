@@ -25,12 +25,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
-import org.json.JSONString;
-import org.json.JSONTokener;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONException;
+import org.rookout.json.JSONObject;
+import org.rookout.json.JSONPointerException;
+import org.rookout.json.JSONString;
+import org.rookout.json.JSONTokener;
 import org.json.junit.data.MyJsonString;
 import org.junit.Test;
 
@@ -1377,7 +1377,7 @@ public class JSONArrayTest {
 		jsonArray.put(new JSONArray());
 		jsonArray.clear(); //Clears the JSONArray
 		assertTrue("expected jsonArray.length() == 0", jsonArray.length() == 0); //Check if its length is 0
-		jsonArray.getInt(0); //Should throws org.json.JSONException: JSONArray[0] not found
+		jsonArray.getInt(0); //Should throws org.rookout.json.JSONException: JSONArray[0] not found
         Util.checkJSONArrayMaps(jsonArray);
 	}
 

@@ -1,6 +1,6 @@
 package org.json.junit.data;
 
-import org.json.*;
+import org.rookout.json.JSONString;
 
 /**
  * Used in testing when a JSONString is needed

@@ -8,10 +8,12 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
-import org.json.*;
 import org.junit.Test;
 
 import com.jayway.jsonpath.*;
+import org.rookout.json.CookieList;
+import org.rookout.json.JSONException;
+import org.rookout.json.JSONObject;
 
 /**
  * HTTP cookie specification RFC6265: http://tools.ietf.org/html/rfc6265

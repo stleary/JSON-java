@@ -16,14 +16,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.rookout.json.JSONArray;
+import org.rookout.json.JSONException;
+import org.rookout.json.JSONObject;
+import org.rookout.json.JSONTokener;
 import org.junit.Test;
 
 /**
- * Test specific to the {@link org.json.JSONTokener} class.
+ * Test specific to the {@link JSONTokener} class.
  * @author John Aylward
  *
  */
