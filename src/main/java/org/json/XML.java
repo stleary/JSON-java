@@ -486,8 +486,7 @@ public class XML {
          * produced, then the value will just be a string.
          */
 
-        char initial = string.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-') {
+        if (potentialNumber(string)) {
             try {
                 return stringToNumber(string);
             } catch (Exception ignore) {
@@ -496,10 +495,38 @@ public class XML {
         return string;
     }
 
+    private static boolean potentialNumber(String value){
+        if (value == null || value.isEmpty()){
+            return false;
+        }
+        return potentialPositiveNumberStartingAtIndex(value, (value.charAt(0)=='-'?1:0));
+    }
+
+    private static boolean potentialPositiveNumberStartingAtIndex(String value,int index){
+        if (index >= value.length()){
+            return false;
+        }
+        return digitAtIndex(value, (value.charAt(index)=='.'?index+1:index));
+    }
+
+    private static boolean digitAtIndex(String value, int index){
+        if (index >= value.length()){
+            return false;
+        }
+        return value.charAt(index) >= '0' && value.charAt(index) <= '9';
+    }
+
     /**
      * direct copy of {@link JSONObject#stringToNumber(String)} to maintain Android support.
      */
-    private static Number stringToNumber(final String val) throws NumberFormatException {
+    private static Number stringToNumber(final String input) throws NumberFormatException {
+        String val = input;
+        if (val.startsWith(".")){
+            val = "0"+val;
+        }
+        if (val.startsWith("-.")){
+            val = "-0."+val.substring(2);
+        }
         char initial = val.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             // decimal representation
@@ -518,25 +545,25 @@ public class XML {
                     try {
                         Double d = Double.valueOf(val);
                         if(d.isNaN() || d.isInfinite()) {
-                            throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                            throw new NumberFormatException("val ["+input+"] is not a valid number.");
                         }
                         return d;
                     } catch (NumberFormatException ignore) {
-                        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                        throw new NumberFormatException("val ["+input+"] is not a valid number.");
                     }
                 }
             }
-            // block items like 00 01 etc. Java number parsers treat these as Octal.
+            val = removeLeadingZerosOfNumber(input);
             if(initial == '0' && val.length() > 1) {
                 char at1 = val.charAt(1);
                 if(at1 >= '0' && at1 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                    throw new NumberFormatException("val ["+input+"] is not a valid number.");
                 }
             } else if (initial == '-' && val.length() > 2) {
                 char at1 = val.charAt(1);
                 char at2 = val.charAt(2);
                 if(at1 == '0' && at2 >= '0' && at2 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                    throw new NumberFormatException("val ["+input+"] is not a valid number.");
                 }
             }
             // integer representation.
@@ -556,7 +583,7 @@ public class XML {
             }
             return bi;
         }
-        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+        throw new NumberFormatException("val ["+input+"] is not a valid number.");
     }
 
     /**
@@ -972,5 +999,20 @@ public class XML {
             sb.append(' ');
         }
         return sb.toString();
+    }
+
+    private static String removeLeadingZerosOfNumber(String value){
+        if (value.equals("-")){return value;}
+        boolean negativeFirstChar = (value.charAt(0) == '-');
+        int counter = negativeFirstChar ? 1:0;
+        while (counter < value.length()){
+            if (value.charAt(counter) != '0'){
+                if (negativeFirstChar) {return "-".concat(value.substring(counter));}
+                return value.substring(counter);
+            }
+            ++counter;
+        }
+        if (negativeFirstChar) {return "-0";}
+        return "0";
     }
 }
