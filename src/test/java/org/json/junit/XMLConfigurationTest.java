@@ -557,6 +557,17 @@ public class XMLConfigurationTest {
         assertEquals(actualXML, resultXML);
     }
 
+    @Test
+    public void shouldHandleEmptyNodeValue()
+    {
+        JSONObject inputJSON = new JSONObject();
+        inputJSON.put("Emptyness", "");
+        String expectedXmlWithoutExplicitEndTag = "<Emptyness/>";
+        String expectedXmlWithExplicitEndTag = "<Emptyness></Emptyness>";
+        assertEquals(expectedXmlWithoutExplicitEndTag, XML.toString(inputJSON, null, new XMLParserConfiguration().withCloseEmptyTag(false)));
+        assertEquals(expectedXmlWithExplicitEndTag, XML.toString(inputJSON, null, new XMLParserConfiguration().withCloseEmptyTag(true)));
+    }
+
     /**
      * Investigate exactly how the "content" keyword works
      */

@@ -44,6 +44,13 @@ public class XMLParserConfiguration extends ParserConfiguration {
     private boolean convertNilAttributeToNull;
 
     /**
+     * When creating an XML from JSON Object, an empty tag by default will self-close.
+     * If it has to be closed explicitly, with empty content between start and end tag,
+     * this flag is to be turned on.
+     */
+    private boolean closeEmptyTag;
+
+    /**
      * This will allow type conversion for values in XML if xsi:type attribute is defined
      */
     private Map<String, XMLXsiTypeConverter<?>> xsiTypeMap;
@@ -145,12 +152,13 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
     private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
             final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap, final Set<String> forceList,
-            final int maxNestingDepth) {
+            final int maxNestingDepth, final boolean closeEmptyTag) {
         super(keepStrings, maxNestingDepth);
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
         this.xsiTypeMap = Collections.unmodifiableMap(xsiTypeMap);
         this.forceList = Collections.unmodifiableSet(forceList);
+        this.closeEmptyTag = closeEmptyTag;
     }
 
     /**
@@ -169,7 +177,8 @@ public class XMLParserConfiguration extends ParserConfiguration {
                 this.convertNilAttributeToNull,
                 this.xsiTypeMap,
                 this.forceList,
-                this.maxNestingDepth
+                this.maxNestingDepth,
+                this.closeEmptyTag
         );
     }
 
@@ -302,5 +311,14 @@ public class XMLParserConfiguration extends ParserConfiguration {
     @Override
     public XMLParserConfiguration withMaxNestingDepth(int maxNestingDepth) {
         return super.withMaxNestingDepth(maxNestingDepth);
+    }
+
+    public XMLParserConfiguration withCloseEmptyTag(boolean closeEmptyTag){
+        this.closeEmptyTag = closeEmptyTag;
+        return this;
+    }
+
+    public boolean isCloseEmptyTag() {
+        return this.closeEmptyTag;
     }
 }
