@@ -149,6 +149,7 @@ public class XMLParserConfiguration extends ParserConfiguration {
      *                   xsi:type="integer" as integer,  xsi:type="string" as string
      * @param forceList  <code>new HashSet<String>()</code> to parse the provided tags' values as arrays
      * @param maxNestingDepth <code>int</code> to limit the nesting depth
+     * @param closeEmptyTag <code>boolean</code> to turn on explicit end tag for tag with empty value
      */
     private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
             final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap, final Set<String> forceList,
@@ -313,6 +314,11 @@ public class XMLParserConfiguration extends ParserConfiguration {
         return super.withMaxNestingDepth(maxNestingDepth);
     }
 
+    /**
+     * To enable explicit end tag with empty value.
+     * @param closeEmptyTag
+     * @return same instance of configuration with empty tag config updated
+     */
     public XMLParserConfiguration withCloseEmptyTag(boolean closeEmptyTag){
         this.closeEmptyTag = closeEmptyTag;
         return this;
