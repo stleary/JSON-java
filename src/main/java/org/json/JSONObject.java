@@ -290,7 +290,9 @@ public class JSONObject {
                     testValidity(value);
                     String key = String.valueOf(e.getKey());
                     this.map.put(key, wrap(value));
-                    this.keyList.add(key);
+                    if (isOrdered()) {
+                    	this.keyList.add(key);
+                    }
                 }
             }
         }
