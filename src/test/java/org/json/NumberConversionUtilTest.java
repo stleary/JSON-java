@@ -28,7 +28,7 @@ public class NumberConversionUtilTest {
     }
 
 
-     @Test
+    @Test
     public void shouldParseDecimalFractionNumbersWithZerosAfterDecimalPoint(){
         Number number = NumberConversionUtil.stringToNumber("0.010d");
         assertEquals("Do not match",  0.010d, number.doubleValue(),0.0d);
@@ -56,7 +56,7 @@ public class NumberConversionUtilTest {
     }
 
 
-     @Test
+    @Test
     public void shouldParseMixedDecimalFractionNumbersWithZerosAfterDecimalPoint(){
         Number number = NumberConversionUtil.stringToNumber("200.010d");
         assertEquals("Do not match",  200.010d, number.doubleValue(),0.0d);
@@ -85,7 +85,7 @@ public class NumberConversionUtilTest {
     }
 
 
-     @Test
+    @Test
     public void shouldParseNegativeDecimalFractionNumbersWithZerosAfterDecimalPoint(){
         Number number = NumberConversionUtil.stringToNumber("-0.010d");
         assertEquals("Do not match",  -0.010d, number.doubleValue(),0.0d);
@@ -113,7 +113,7 @@ public class NumberConversionUtilTest {
     }
 
 
-     @Test
+    @Test
     public void shouldParseNegativeMixedDecimalFractionNumbersWithZerosAfterDecimalPoint(){
         Number number = NumberConversionUtil.stringToNumber("-200.010d");
         assertEquals("Do not match",  -200.010d, number.doubleValue(),0.0d);
