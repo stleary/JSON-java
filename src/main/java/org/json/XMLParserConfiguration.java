@@ -320,8 +320,9 @@ public class XMLParserConfiguration extends ParserConfiguration {
      * @return same instance of configuration with empty tag config updated
      */
     public XMLParserConfiguration withCloseEmptyTag(boolean closeEmptyTag){
-        this.closeEmptyTag = closeEmptyTag;
-        return this;
+        XMLParserConfiguration clonedConfiguration = this.clone();
+        clonedConfiguration.closeEmptyTag = closeEmptyTag;
+        return clonedConfiguration;
     }
 
     public boolean isCloseEmptyTag() {
