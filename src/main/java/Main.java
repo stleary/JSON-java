@@ -8,7 +8,7 @@ public class Main {
 	/**
 	 * Construction.
 	 * 
-	 * @param arguments command line arguments
+	 * @param arguments 		command line arguments
 	 * @throws Exception
 	 */
 	public Main(String[] arguments) throws Exception {
@@ -21,7 +21,7 @@ public class Main {
 	/**
 	 * Main entry.
 	 * 
-	 * @param args command line arguments
+	 * @param args 				command line arguments
 	 */
 	public static void main(String[] args) {
 
