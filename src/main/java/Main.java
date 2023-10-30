@@ -13,9 +13,14 @@ public class Main {
 	 */
 	public Main(String[] arguments) throws Exception {
 
-		test1();
+//		test1();
+//		JSONObject.setOrdered(true);
+//		test1();
+		
+		test2();
 		JSONObject.setOrdered(true);
-		test1();
+		test2();
+
 	}
 
 	/**
@@ -75,6 +80,40 @@ public class Main {
         		.put("first", first)
         		.put("second", second)
         		.put("jsonObjects", jsonObjects);
+        
+        System.out.println(test.toString(2));
+    }
+    
+    public void test2() {
+    	
+        JSONObject obj1 = new JSONObject()
+                .put("key1", "abc")
+                .put("key2", 1)
+                .put("key3", "def");
+        
+        JSONObject obj2 = new JSONObject()
+                .put("key21", "ghi")
+                .put("key22", 2)
+                .put("key23", "jlm");
+
+        JSONObject obj3 = new JSONObject()
+                .put("key31", "nop")
+                .put("key32", 3)
+                .put("key33", obj1);
+        List<JSONObject> jsonObjects = new ArrayList<JSONObject>(
+                Arrays.asList(obj1, obj2, obj3)
+        );
+        JSONObject obj4 = new JSONObject()
+                .put("key41", "qrt")
+                .put("key42", 2.0)
+                .put("key43", obj3)
+        		.put("key44", jsonObjects)
+        		.put("key45", new JSONArray(jsonObjects));
+        JSONObject test = new JSONObject()
+        		.put("obj1", obj1)
+        		.put("obj2", obj2)
+        		.put("obj3", obj3)
+        		.put("wholeTree of obj4", obj4);
         
         System.out.println(test.toString(2));
     }
