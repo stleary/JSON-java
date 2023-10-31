@@ -44,6 +44,13 @@ public class XMLParserConfiguration extends ParserConfiguration {
     private boolean convertNilAttributeToNull;
 
     /**
+     * When creating an XML from JSON Object, an empty tag by default will self-close.
+     * If it has to be closed explicitly, with empty content between start and end tag,
+     * this flag is to be turned on.
+     */
+    private boolean closeEmptyTag;
+
+    /**
      * This will allow type conversion for values in XML if xsi:type attribute is defined
      */
     private Map<String, XMLXsiTypeConverter<?>> xsiTypeMap;
@@ -142,15 +149,17 @@ public class XMLParserConfiguration extends ParserConfiguration {
      *                   xsi:type="integer" as integer,  xsi:type="string" as string
      * @param forceList  <code>new HashSet<String>()</code> to parse the provided tags' values as arrays
      * @param maxNestingDepth <code>int</code> to limit the nesting depth
+     * @param closeEmptyTag <code>boolean</code> to turn on explicit end tag for tag with empty value
      */
     private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
             final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap, final Set<String> forceList,
-            final int maxNestingDepth) {
+            final int maxNestingDepth, final boolean closeEmptyTag) {
         super(keepStrings, maxNestingDepth);
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
         this.xsiTypeMap = Collections.unmodifiableMap(xsiTypeMap);
         this.forceList = Collections.unmodifiableSet(forceList);
+        this.closeEmptyTag = closeEmptyTag;
     }
 
     /**
@@ -169,7 +178,8 @@ public class XMLParserConfiguration extends ParserConfiguration {
                 this.convertNilAttributeToNull,
                 this.xsiTypeMap,
                 this.forceList,
-                this.maxNestingDepth
+                this.maxNestingDepth,
+                this.closeEmptyTag
         );
     }
 
@@ -302,5 +312,20 @@ public class XMLParserConfiguration extends ParserConfiguration {
     @Override
     public XMLParserConfiguration withMaxNestingDepth(int maxNestingDepth) {
         return super.withMaxNestingDepth(maxNestingDepth);
+    }
+
+    /**
+     * To enable explicit end tag with empty value.
+     * @param closeEmptyTag
+     * @return same instance of configuration with empty tag config updated
+     */
+    public XMLParserConfiguration withCloseEmptyTag(boolean closeEmptyTag){
+        XMLParserConfiguration clonedConfiguration = this.clone();
+        clonedConfiguration.closeEmptyTag = closeEmptyTag;
+        return clonedConfiguration;
+    }
+
+    public boolean isCloseEmptyTag() {
+        return this.closeEmptyTag;
     }
 }

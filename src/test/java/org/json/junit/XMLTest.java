@@ -1177,6 +1177,26 @@ public class XMLTest {
 
 
     }
+
+    @Test
+    public void shouldCreateExplicitEndTagWithEmptyValueWhenConfigured(){
+        String jsonString = "{outer:{innerOne:\"\", innerTwo:\"two\"}}";
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String expectedXmlString = "<encloser><outer><innerOne></innerOne><innerTwo>two</innerTwo></outer></encloser>";
+        String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(true));
+        assertEquals(expectedXmlString, xmlForm);
+    }
+
+    @Test
+    public void shouldNotCreateExplicitEndTagWithEmptyValueWhenNotConfigured(){
+        String jsonString = "{outer:{innerOne:\"\", innerTwo:\"two\"}}";
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String expectedXmlString = "<encloser><outer><innerOne/><innerTwo>two</innerTwo></outer></encloser>";
+        String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(false));
+        assertEquals(expectedXmlString, xmlForm);
+    }
+
+
     @Test
     public void testIndentSimpleJsonObject(){
         String str = "{    \"employee\": {  \n" +

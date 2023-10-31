@@ -877,12 +877,25 @@ public class XML {
                         }
                     }
                 } else if ("".equals(value)) {
-                    sb.append(indent(indent));
-                    sb.append('<');
-                    sb.append(key);
-                    sb.append("/>");
-                    if(indentFactor > 0){
-                        sb.append("\n");
+                    if (config.isCloseEmptyTag()){
+                        sb.append(indent(indent));
+                        sb.append('<');
+                        sb.append(key);
+                        sb.append(">");
+                        sb.append("</");
+                        sb.append(key);
+                        sb.append(">");
+                        if (indentFactor > 0) {
+                            sb.append("\n");
+                        }
+                    }else {
+                        sb.append(indent(indent));
+                        sb.append('<');
+                        sb.append(key);
+                        sb.append("/>");
+                        if (indentFactor > 0) {
+                            sb.append("\n");
+                        }
                     }
 
                     // Emit a new tag <k>
