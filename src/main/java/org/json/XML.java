@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
 
+import static org.json.NumberConversionUtil.potentialNumber;
+import static org.json.NumberConversionUtil.stringToNumber;
+
 
 /**
  * This provides static methods to convert an XML text into a JSONObject, and to
@@ -495,104 +498,9 @@ public class XML {
         return string;
     }
 
-    private static boolean potentialNumber(String value){
-        if (value == null || value.isEmpty()){
-            return false;
-        }
-        return potentialPositiveNumberStartingAtIndex(value, (value.charAt(0)=='-'?1:0));
-    }
 
-    private static boolean potentialPositiveNumberStartingAtIndex(String value,int index){
-        if (index >= value.length()){
-            return false;
-        }
-        return digitAtIndex(value, (value.charAt(index)=='.'?index+1:index));
-    }
 
-    private static boolean digitAtIndex(String value, int index){
-        if (index >= value.length()){
-            return false;
-        }
-        return value.charAt(index) >= '0' && value.charAt(index) <= '9';
-    }
 
-    /**
-     * direct copy of {@link JSONObject#stringToNumber(String)} to maintain Android support.
-     */
-    private static Number stringToNumber(final String input) throws NumberFormatException {
-        String val = input;
-        if (val.startsWith(".")){
-            val = "0"+val;
-        }
-        if (val.startsWith("-.")){
-            val = "-0."+val.substring(2);
-        }
-        char initial = val.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-') {
-            // decimal representation
-            if (isDecimalNotation(val)) {
-                // Use a BigDecimal all the time so we keep the original
-                // representation. BigDecimal doesn't support -0.0, ensure we
-                // keep that by forcing a decimal.
-                try {
-                    BigDecimal bd = new BigDecimal(val);
-                    if(initial == '-' && BigDecimal.ZERO.compareTo(bd)==0) {
-                        return Double.valueOf(-0.0);
-                    }
-                    return bd;
-                } catch (NumberFormatException retryAsDouble) {
-                    // this is to support "Hex Floats" like this: 0x1.0P-1074
-                    try {
-                        Double d = Double.valueOf(val);
-                        if(d.isNaN() || d.isInfinite()) {
-                            throw new NumberFormatException("val ["+input+"] is not a valid number.");
-                        }
-                        return d;
-                    } catch (NumberFormatException ignore) {
-                        throw new NumberFormatException("val ["+input+"] is not a valid number.");
-                    }
-                }
-            }
-            val = removeLeadingZerosOfNumber(input);
-            if(initial == '0' && val.length() > 1) {
-                char at1 = val.charAt(1);
-                if(at1 >= '0' && at1 <= '9') {
-                    throw new NumberFormatException("val ["+input+"] is not a valid number.");
-                }
-            } else if (initial == '-' && val.length() > 2) {
-                char at1 = val.charAt(1);
-                char at2 = val.charAt(2);
-                if(at1 == '0' && at2 >= '0' && at2 <= '9') {
-                    throw new NumberFormatException("val ["+input+"] is not a valid number.");
-                }
-            }
-            // integer representation.
-            // This will narrow any values to the smallest reasonable Object representation
-            // (Integer, Long, or BigInteger)
-
-            // BigInteger down conversion: We use a similar bitLength compare as
-            // BigInteger#intValueExact uses. Increases GC, but objects hold
-            // only what they need. i.e. Less runtime overhead if the value is
-            // long lived.
-            BigInteger bi = new BigInteger(val);
-            if(bi.bitLength() <= 31){
-                return Integer.valueOf(bi.intValue());
-            }
-            if(bi.bitLength() <= 63){
-                return Long.valueOf(bi.longValue());
-            }
-            return bi;
-        }
-        throw new NumberFormatException("val ["+input+"] is not a valid number.");
-    }
-
-    /**
-     * direct copy of {@link JSONObject#isDecimalNotation(String)} to maintain Android support.
-     */
-    private static boolean isDecimalNotation(final String val) {
-        return val.indexOf('.') > -1 || val.indexOf('e') > -1
-                || val.indexOf('E') > -1 || "-0".equals(val);
-    }
 
 
     /**
@@ -877,12 +785,25 @@ public class XML {
                         }
                     }
                 } else if ("".equals(value)) {
-                    sb.append(indent(indent));
-                    sb.append('<');
-                    sb.append(key);
-                    sb.append("/>");
-                    if(indentFactor > 0){
-                        sb.append("\n");
+                    if (config.isCloseEmptyTag()){
+                        sb.append(indent(indent));
+                        sb.append('<');
+                        sb.append(key);
+                        sb.append(">");
+                        sb.append("</");
+                        sb.append(key);
+                        sb.append(">");
+                        if (indentFactor > 0) {
+                            sb.append("\n");
+                        }
+                    }else {
+                        sb.append(indent(indent));
+                        sb.append('<');
+                        sb.append(key);
+                        sb.append("/>");
+                        if (indentFactor > 0) {
+                            sb.append("\n");
+                        }
                     }
 
                     // Emit a new tag <k>
@@ -1001,18 +922,4 @@ public class XML {
         return sb.toString();
     }
 
-    private static String removeLeadingZerosOfNumber(String value){
-        if (value.equals("-")){return value;}
-        boolean negativeFirstChar = (value.charAt(0) == '-');
-        int counter = negativeFirstChar ? 1:0;
-        while (counter < value.length()){
-            if (value.charAt(counter) != '0'){
-                if (negativeFirstChar) {return "-".concat(value.substring(counter));}
-                return value.substring(counter);
-            }
-            ++counter;
-        }
-        if (negativeFirstChar) {return "-0";}
-        return "0";
-    }
 }

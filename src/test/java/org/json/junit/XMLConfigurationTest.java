@@ -4,11 +4,6 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,6 +21,8 @@ import org.json.XMLParserConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -555,6 +552,37 @@ public class XMLConfigurationTest {
         String resultXML = XML.toString(inputJSON, null,
                 XMLParserConfiguration.KEEP_STRINGS);
         assertEquals(actualXML, resultXML);
+    }
+
+    @Test
+    public void shouldHandleEmptyNodeValue()
+    {
+        JSONObject inputJSON = new JSONObject();
+        inputJSON.put("Emptyness", "");
+        String expectedXmlWithoutExplicitEndTag = "<Emptyness/>";
+        String expectedXmlWithExplicitEndTag = "<Emptyness></Emptyness>";
+        assertEquals(expectedXmlWithoutExplicitEndTag, XML.toString(inputJSON, null,
+                new XMLParserConfiguration().withCloseEmptyTag(false)));
+        assertEquals(expectedXmlWithExplicitEndTag, XML.toString(inputJSON, null,
+                new XMLParserConfiguration().withCloseEmptyTag(true)));
+    }
+
+    @Test
+    public void shouldKeepConfigurationIntactAndUpdateCloseEmptyTagChoice()
+    {
+        XMLParserConfiguration keepStrings = XMLParserConfiguration.KEEP_STRINGS;
+        XMLParserConfiguration keepStringsAndCloseEmptyTag = keepStrings.withCloseEmptyTag(true);
+        XMLParserConfiguration keepDigits = keepStringsAndCloseEmptyTag.withKeepStrings(false);
+        XMLParserConfiguration keepDigitsAndNoCloseEmptyTag = keepDigits.withCloseEmptyTag(false);
+        assertTrue(keepStrings.isKeepStrings());
+        assertFalse(keepStrings.isCloseEmptyTag());
+        assertTrue(keepStringsAndCloseEmptyTag.isKeepStrings());
+        assertTrue(keepStringsAndCloseEmptyTag.isCloseEmptyTag());
+        assertFalse(keepDigits.isKeepStrings());
+        assertTrue(keepDigits.isCloseEmptyTag());
+        assertFalse(keepDigitsAndNoCloseEmptyTag.isKeepStrings());
+        assertFalse(keepDigitsAndNoCloseEmptyTag.isCloseEmptyTag());
+
     }
 
     /**
