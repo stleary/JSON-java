@@ -147,6 +147,7 @@ public class JSONObject {
      * The map where the JSONObject's properties are kept.
      */
     private final Map<String, Object> map;
+    public static final int RECURSION_DEPTH_LIMIT = 1000;
 
     public Class<? extends Map> getMapType() {
         return map.getClass();
@@ -276,6 +277,17 @@ public class JSONObject {
      *            If a key in the map is <code>null</code>
      */
     public JSONObject(Map<?, ?> m) {
+      this(m, 0);
+    }
+
+    /**
+     * Construct a JSONObject from a map with recursion depth.
+     *
+     */
+    protected JSONObject(Map<?, ?> m, int recursionDepth) {
+        if (recursionDepth > RECURSION_DEPTH_LIMIT) {
+          throw new JSONException("JSONObject has reached recursion depth limit of " + RECURSION_DEPTH_LIMIT);
+        }
         if (m == null) {
             this.map = new HashMap<String, Object>();
         } else {
@@ -287,7 +299,7 @@ public class JSONObject {
                 final Object value = e.getValue();
                 if (value != null) {
                     testValidity(value);
-                    this.map.put(String.valueOf(e.getKey()), wrap(value));
+                    this.map.put(String.valueOf(e.getKey()), wrap(value, recursionDepth + 1));
                 }
             }
         }
@@ -2566,7 +2578,15 @@ public class JSONObject {
         return wrap(object, null);
     }
 
+    public static Object wrap(Object object, int recursionDepth) {
+      return wrap(object, null, recursionDepth);
+    }
+
     private static Object wrap(Object object, Set<Object> objectsRecord) {
+      return wrap(object, objectsRecord, 0);
+    }
+
+    private static Object wrap(Object object, Set<Object> objectsRecord, int recursionDepth) {
         try {
             if (NULL.equals(object)) {
                 return NULL;
@@ -2584,14 +2604,14 @@ public class JSONObject {
 
             if (object instanceof Collection) {
                 Collection<?> coll = (Collection<?>) object;
-                return new JSONArray(coll);
+                return new JSONArray(coll, recursionDepth);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);
             }
             if (object instanceof Map) {
                 Map<?, ?> map = (Map<?, ?>) object;
-                return new JSONObject(map);
+                return new JSONObject(map, recursionDepth);
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage

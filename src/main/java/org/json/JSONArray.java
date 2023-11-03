@@ -149,11 +149,18 @@ public class JSONArray implements Iterable<Object> {
      *            A Collection.
      */
     public JSONArray(Collection<?> collection) {
+      this(collection, 0);
+    }
+
+    protected JSONArray(Collection<?> collection, int recursionDepth) {
+        if (recursionDepth > JSONObject.RECURSION_DEPTH_LIMIT) {
+          throw new JSONException("JSONArray has reached recursion depth limit of " + JSONObject.RECURSION_DEPTH_LIMIT);
+        }
         if (collection == null) {
             this.myArrayList = new ArrayList<Object>();
         } else {
             this.myArrayList = new ArrayList<Object>(collection.size());
-            this.addAll(collection, true);
+            this.addAll(collection, true, recursionDepth);
         }
     }
 
@@ -205,7 +212,7 @@ public class JSONArray implements Iterable<Object> {
             throw new JSONException(
                     "JSONArray initial value should be a string or collection or array.");
         }
-        this.addAll(array, true);
+        this.addAll(array, true, 0);
     }
 
     /**
@@ -1779,13 +1786,15 @@ public class JSONArray implements Iterable<Object> {
      * @param wrap
      *            {@code true} to call {@link JSONObject#wrap(Object)} for each item,
      *            {@code false} to add the items directly
+     * @param recursionDepth
+     *            variable to keep the count of how nested the object creation is happening.
      *            
      */
-    private void addAll(Collection<?> collection, boolean wrap) {
+    private void addAll(Collection<?> collection, boolean wrap, int recursionDepth) {
         this.myArrayList.ensureCapacity(this.myArrayList.size() + collection.size());
         if (wrap) {
             for (Object o: collection){
-                this.put(JSONObject.wrap(o));
+                this.put(JSONObject.wrap(o, recursionDepth + 1));
             }
         } else {
             for (Object o: collection){
@@ -1815,6 +1824,10 @@ public class JSONArray implements Iterable<Object> {
         }
     }
     
+    private void addAll(Object array, boolean wrap) throws JSONException {
+      this.addAll(array, wrap, 0);
+    }
+
     /**
      * Add an array's elements to the JSONArray.
      *
@@ -1825,19 +1838,21 @@ public class JSONArray implements Iterable<Object> {
      * @param wrap
      *            {@code true} to call {@link JSONObject#wrap(Object)} for each item,
      *            {@code false} to add the items directly
+     * @param recursionDepth
+     *            Variable to keep the count of how nested the object creation is happening.
      *
      * @throws JSONException
      *            If not an array or if an array value is non-finite number.
      * @throws NullPointerException
      *            Thrown if the array parameter is null.
      */
-    private void addAll(Object array, boolean wrap) throws JSONException {
+    private void addAll(Object array, boolean wrap, int recursionDepth) throws JSONException {
         if (array.getClass().isArray()) {
             int length = Array.getLength(array);
             this.myArrayList.ensureCapacity(this.myArrayList.size() + length);
             if (wrap) {
                 for (int i = 0; i < length; i += 1) {
-                    this.put(JSONObject.wrap(Array.get(array, i)));
+                    this.put(JSONObject.wrap(Array.get(array, i), recursionDepth + 1));
                 }
             } else {
                 for (int i = 0; i < length; i += 1) {
@@ -1850,7 +1865,7 @@ public class JSONArray implements Iterable<Object> {
             // JSONArray
             this.myArrayList.addAll(((JSONArray)array).myArrayList);
         } else if (array instanceof Collection) {
-            this.addAll((Collection<?>)array, wrap);
+            this.addAll((Collection<?>)array, wrap, recursionDepth);
         } else if (array instanceof Iterable) {
             this.addAll((Iterable<?>)array, wrap);
         } else {

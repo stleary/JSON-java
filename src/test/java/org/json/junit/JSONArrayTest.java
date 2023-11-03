@@ -1417,4 +1417,25 @@ public class JSONArrayTest {
                 .put(2);
         assertFalse(ja1.similar(ja3));
     }
+
+    @Test(expected = JSONException.class)
+    public void testRecursiveDepth() {
+      HashMap<String, Object> map = new HashMap<>();
+      map.put("t", map);
+      new JSONArray().put(map);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testRecursiveDepthAtPosition() {
+      HashMap<String, Object> map = new HashMap<>();
+      map.put("t", map);
+      new JSONArray().put(0, map);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testRecursiveDepthArray() {
+      ArrayList<Object> array = new ArrayList<>();
+      array.add(array);
+      new JSONArray(array);
+    }
 }

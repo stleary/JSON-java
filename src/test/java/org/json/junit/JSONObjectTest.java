@@ -3718,4 +3718,21 @@ public class JSONObjectTest {
             assertThrows(JSONException.class, () -> new JSONObject(bean));
         }
     }
+
+    @Test(expected = JSONException.class)
+    public void issue743SerializationMap() {
+      HashMap<String, Object> map = new HashMap<>();
+      map.put("t", map);
+      JSONObject object = new JSONObject(map);
+      String jsonString = object.toString();
+    }
+
+    @Test(expected = JSONException.class)
+    public void testCircularReferenceMultipleLevel() {
+      HashMap<String, Object> inside = new HashMap<>();
+      HashMap<String, Object> jsonObject = new HashMap<>();
+      inside.put("inside", jsonObject);
+      jsonObject.put("test", inside);
+      new JSONObject(jsonObject);
+    }
 }
