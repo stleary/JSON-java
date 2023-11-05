@@ -498,6 +498,23 @@ public class JSONObjectTest {
         )));
     }
 
+    /**
+     * In this test the map contains 1 entry with valid value but null key.
+     * Trying to convert the map into a JSONObject using constructor.
+     * The expected output is NullPointerException, due to the null key in the map.
+     * author: Aditya Purohit.
+     */
+    @Test(expected = NullPointerException.class) // Assert
+    public void testJsonObjectByNullKeyInMap() {
+
+        // Arrange
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put(null,"value1");
+
+        // Act
+        JSONObject jsonObject = new JSONObject(map);
+    }
+
     
     /**
      * Verifies that the put Map has backwards compatibility with RAW types pre-java5.
