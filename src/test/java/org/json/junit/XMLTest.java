@@ -281,6 +281,22 @@ public class XMLTest {
     }
 
     /**
+     * Trying to convert the xml string into a JSONObject using static method toJSONObject.
+     * The expected output is JSONException, due to the missing semicolon.
+     * author: Aditya Purohit.
+     */
+    @Test(expected = JSONException.class)
+    public void testUnclosedEscape(){
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<root>"+
+                        "<mySymbol>&amp</mySymbol>"+
+                        "</root>";
+
+        JSONObject jsonObject = XML.toJSONObject(xmlStr);
+    }
+
+    /**
      * Tests to verify that supported escapes in XML are converted to actual values.
      */
     @Test
