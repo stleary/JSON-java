@@ -226,6 +226,23 @@ public class JSONArrayTest {
     }
 
     /**
+     * Trying to convert a string into a JSONArray using constructor with two commas to represent null element.
+     * The expected output should have a null element in array.
+     * author: Aditya Purohit.
+     */
+    @Test
+    public void testNullArrayElement() {
+        // Arrange
+        String str = "[1,,2]";
+
+        // Act
+        JSONArray jsonArray = new JSONArray(str);
+
+        // Assert
+        assertEquals("[1,null,2]",jsonArray.toString());
+    }
+
+    /**
      * Tests consecutive calls to putAll with array and collection.
      */
     @Test
