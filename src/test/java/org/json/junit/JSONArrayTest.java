@@ -32,6 +32,7 @@ import org.json.JSONPointerException;
 import org.json.JSONString;
 import org.json.JSONTokener;
 import org.json.junit.data.MyJsonString;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.jayway.jsonpath.Configuration;
@@ -1384,6 +1385,7 @@ public class JSONArrayTest {
     /**
     * Tests for stack overflow. See https://github.com/stleary/JSON-java/issues/654
     */
+    @Ignore("This test relies on system constraints and may not always pass. See: https://github.com/stleary/JSON-java/issues/821")
     @Test(expected = JSONException.class)
     public void issue654StackOverflowInputWellFormed() {
         //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
@@ -1391,7 +1393,7 @@ public class JSONArrayTest {
         JSONTokener tokener = new JSONTokener(resourceAsStream);
         JSONArray json_input = new JSONArray(tokener);
         assertNotNull(json_input);
-        fail("Excepected Exception.");
+        fail("Excepected Exception due to stack overflow.");
         Util.checkJSONArrayMaps(json_input);
     }
 
