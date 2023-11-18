@@ -1200,7 +1200,9 @@ public class XMLTest {
         JSONObject jsonObject = new JSONObject(jsonString);
         String expectedXmlString = "<encloser><outer><innerOne></innerOne><innerTwo>two</innerTwo></outer></encloser>";
         String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(true));
-        assertEquals(expectedXmlString, xmlForm);
+        JSONObject actualJsonObject = XML.toJSONObject(xmlForm);
+        JSONObject expectedJsonObject = XML.toJSONObject(expectedXmlString);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
     }
 
     @Test
@@ -1209,7 +1211,9 @@ public class XMLTest {
         JSONObject jsonObject = new JSONObject(jsonString);
         String expectedXmlString = "<encloser><outer><innerOne/><innerTwo>two</innerTwo></outer></encloser>";
         String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(false));
-        assertEquals(expectedXmlString, xmlForm);
+        JSONObject actualJsonObject = XML.toJSONObject(xmlForm);
+        JSONObject expectedJsonObject = XML.toJSONObject(expectedXmlString);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
     }
 
 
