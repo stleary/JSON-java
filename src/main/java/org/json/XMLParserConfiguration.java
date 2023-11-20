@@ -61,9 +61,11 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
     private Set<String> forceList;
 
+    private boolean shouldTrimWhiteSpace;
+
     /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert
-     * values), and the CDATA Tag Name is "content".
+     * values), and the CDATA Tag Name is "content". Trims whitespace.
      */
     public XMLParserConfiguration () {
         super();
@@ -71,6 +73,7 @@ public class XMLParserConfiguration extends ParserConfiguration {
         this.convertNilAttributeToNull = false;
         this.xsiTypeMap = Collections.emptyMap();
         this.forceList = Collections.emptySet();
+        this.shouldTrimWhiteSpace = true;
     }
 
     /**
@@ -153,13 +156,14 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
     private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
             final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap, final Set<String> forceList,
-            final int maxNestingDepth, final boolean closeEmptyTag) {
+            final int maxNestingDepth, final boolean closeEmptyTag, final boolean shouldTrimWhiteSpace) {
         super(keepStrings, maxNestingDepth);
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
         this.xsiTypeMap = Collections.unmodifiableMap(xsiTypeMap);
         this.forceList = Collections.unmodifiableSet(forceList);
         this.closeEmptyTag = closeEmptyTag;
+        this.shouldTrimWhiteSpace = shouldTrimWhiteSpace;
     }
 
     /**
@@ -179,7 +183,8 @@ public class XMLParserConfiguration extends ParserConfiguration {
                 this.xsiTypeMap,
                 this.forceList,
                 this.maxNestingDepth,
-                this.closeEmptyTag
+                this.closeEmptyTag,
+                this.shouldTrimWhiteSpace
         );
     }
 
@@ -325,7 +330,23 @@ public class XMLParserConfiguration extends ParserConfiguration {
         return clonedConfiguration;
     }
 
+    /**
+     * Sets whether whitespace should be trimmed inside of tags. *NOTE* Do not use this if
+     * you expect your XML tags to have names that are the same as cDataTagName as this is unsupported.
+     * cDataTagName should be set to a distinct value in these cases.
+     * @param shouldTrimWhiteSpace boolean to set trimming on or off. Off is default.
+     * @return same instance of configuration with empty tag config updated
+     */
+    public XMLParserConfiguration withShouldTrimWhitespace(boolean shouldTrimWhiteSpace){
+        XMLParserConfiguration clonedConfiguration = this.clone();
+        clonedConfiguration.shouldTrimWhiteSpace = shouldTrimWhiteSpace;
+        return clonedConfiguration;
+    }
+
     public boolean isCloseEmptyTag() {
         return this.closeEmptyTag;
+    }
+    public boolean shouldTrimWhiteSpace() {
+        return this.shouldTrimWhiteSpace;
     }
 }

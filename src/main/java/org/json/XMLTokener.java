@@ -20,6 +20,8 @@ public class XMLTokener extends JSONTokener {
     */
    public static final java.util.HashMap<String, Character> entity;
 
+   private static XMLParserConfiguration configuration = XMLParserConfiguration.ORIGINAL;;
+
    static {
        entity = new java.util.HashMap<String, Character>(8);
        entity.put("amp",  XML.AMP);
@@ -43,6 +45,15 @@ public class XMLTokener extends JSONTokener {
      */
     public XMLTokener(String s) {
         super(s);
+    }
+
+    public XMLTokener(Reader r, XMLParserConfiguration configuration) {
+        super(r);
+        XMLTokener.configuration = configuration;
+    }
+    public XMLTokener(String s, XMLParserConfiguration configuration) {
+        super(s);
+        XMLTokener.configuration = configuration;
     }
 
     /**
@@ -83,7 +94,7 @@ public class XMLTokener extends JSONTokener {
         StringBuilder sb;
         do {
             c = next();
-        } while (Character.isWhitespace(c));
+        } while (Character.isWhitespace(c) && configuration.shouldTrimWhiteSpace());
         if (c == 0) {
             return null;
         }
@@ -97,7 +108,9 @@ public class XMLTokener extends JSONTokener {
             }
             if (c == '<') {
                 back();
-                return sb.toString().trim();
+                if (configuration.shouldTrimWhiteSpace()) {
+                    return sb.toString().trim();
+                } else return sb.toString();
             }
             if (c == '&') {
                 sb.append(nextEntity(c));
