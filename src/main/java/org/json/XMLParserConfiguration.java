@@ -156,14 +156,13 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
     private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
             final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap, final Set<String> forceList,
-            final int maxNestingDepth, final boolean closeEmptyTag, final boolean shouldTrimWhiteSpace) {
+            final int maxNestingDepth, final boolean closeEmptyTag) {
         super(keepStrings, maxNestingDepth);
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
         this.xsiTypeMap = Collections.unmodifiableMap(xsiTypeMap);
         this.forceList = Collections.unmodifiableSet(forceList);
         this.closeEmptyTag = closeEmptyTag;
-        this.shouldTrimWhiteSpace = shouldTrimWhiteSpace;
     }
 
     /**
@@ -176,16 +175,17 @@ public class XMLParserConfiguration extends ParserConfiguration {
         // item, a new map instance should be created and if possible each value in the
         // map should be cloned as well. If the values of the map are known to also
         // be immutable, then a shallow clone of the map is acceptable.
-        return new XMLParserConfiguration(
+        final XMLParserConfiguration config = new XMLParserConfiguration(
                 this.keepStrings,
                 this.cDataTagName,
                 this.convertNilAttributeToNull,
                 this.xsiTypeMap,
                 this.forceList,
                 this.maxNestingDepth,
-                this.closeEmptyTag,
-                this.shouldTrimWhiteSpace
+                this.closeEmptyTag
         );
+        config.shouldTrimWhiteSpace = this.shouldTrimWhiteSpace;
+        return config;
     }
 
     /**
