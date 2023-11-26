@@ -847,14 +847,14 @@ public class XML {
 
 
         string = (object == null) ? "null" : escape(object.toString());
-
+        String indentationSuffix = (indentFactor > 0) ? "\n" : "";
         if(tagName == null){
-            return indent(indent) + "\"" + string + "\"" + ((indentFactor > 0) ? "\n" : "");
+            return indent(indent) + "\"" + string + "\"" + indentationSuffix;
         } else if(string.length() == 0){
-            return indent(indent) + "<" + tagName + "/>" + ((indentFactor > 0) ? "\n" : "");
+            return indent(indent) + "<" + tagName + "/>" + indentationSuffix;
         } else {
             return indent(indent) + "<" + tagName
-                    + ">" + string + "</" + tagName + ">" + ((indentFactor > 0) ? "\n" : "");
+                    + ">" + string + "</" + tagName + ">" + indentationSuffix;
         }
     }
 
