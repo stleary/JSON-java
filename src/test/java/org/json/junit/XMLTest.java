@@ -1288,7 +1288,7 @@ public class XMLTest {
         final int maxNestingDepth = 42;
 
         try {
-            XML.toJSONObject(wayTooLongMalformedXML, XMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            XML.toJSONObject(wayTooLongMalformedXML, XML.ORIGINAL_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -1310,7 +1310,7 @@ public class XMLTest {
         final int maxNestingDepth = 1;
 
         try {
-            XML.toJSONObject(perfectlyFineXML, XMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            XML.toJSONObject(perfectlyFineXML, XML.ORIGINAL_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -1332,7 +1332,7 @@ public class XMLTest {
         final int maxNestingDepth = 3;
 
         try {
-            XML.toJSONObject(perfectlyFineXML, XMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            XML.toJSONObject(perfectlyFineXML, XML.ORIGINAL_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("XML document should be parsed as its maximum depth fits the maxNestingDepth " +

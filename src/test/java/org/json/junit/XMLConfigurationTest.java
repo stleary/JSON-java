@@ -491,7 +491,7 @@ public class XMLConfigurationTest {
             "xmlns:xsi\":\"http://www.w3.org/2001/XMLSchema-instance\"}}";
         JSONObject jsonObject = new JSONObject(xmlStr);
         String finalStr = XML.toString(jsonObject, null,
-                XMLParserConfiguration.ORIGINAL);
+                XML.ORIGINAL_PARSER_CONFIG);
         JSONObject finalJsonObject = XML.toJSONObject(finalStr);
         String expectedStr = "<addresses><address><name/><nocontent/>"+
                 "<outer><array>1</array></outer><outer><array>2</array>"+
@@ -500,7 +500,7 @@ public class XMLConfigurationTest {
                 "spaceSchemaLocation><xmlns:xsi>http://www.w3.org/2001/XMLSche"+
                 "ma-instance</xmlns:xsi></addresses>";
         JSONObject expectedJsonObject = XML.toJSONObject(expectedStr, 
-                XMLParserConfiguration.ORIGINAL);
+                XML.ORIGINAL_PARSER_CONFIG);
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
     }
 
@@ -1082,7 +1082,7 @@ public class XMLConfigurationTest {
 
     @Test
     public void testMaxNestingDepthIsSet() {
-        XMLParserConfiguration xmlParserConfiguration = XMLParserConfiguration.ORIGINAL;
+        XMLParserConfiguration xmlParserConfiguration = XML.ORIGINAL_PARSER_CONFIG;
 
         assertEquals(xmlParserConfiguration.getMaxNestingDepth(), XMLParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH);
 

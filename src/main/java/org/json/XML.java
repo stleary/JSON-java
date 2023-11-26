@@ -6,8 +6,6 @@ Public Domain.
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Iterator;
 
 import static org.json.NumberConversionUtil.potentialNumber;
@@ -57,6 +55,10 @@ public class XML {
     public static final String NULL_ATTR = "xsi:nil";
 
     public static final String TYPE_ATTR = "xsi:type";
+
+    /** Original Configuration of the XML Parser. */
+    public static final XMLParserConfiguration ORIGINAL_PARSER_CONFIG
+        = new XMLParserConfiguration();
 
     /**
      * Creates an iterator for navigating Code Points in a string instead of
@@ -521,7 +523,7 @@ public class XML {
      * @throws JSONException Thrown if there is an errors while parsing the string
      */
     public static JSONObject toJSONObject(String string) throws JSONException {
-        return toJSONObject(string, XMLParserConfiguration.ORIGINAL);
+        return toJSONObject(string, ORIGINAL_PARSER_CONFIG);
     }
 
     /**
@@ -541,7 +543,7 @@ public class XML {
      * @throws JSONException Thrown if there is an errors while parsing the string
      */
     public static JSONObject toJSONObject(Reader reader) throws JSONException {
-        return toJSONObject(reader, XMLParserConfiguration.ORIGINAL);
+        return toJSONObject(reader, ORIGINAL_PARSER_CONFIG);
     }
 
     /**
@@ -569,7 +571,7 @@ public class XML {
         if(keepStrings) {
             return toJSONObject(reader, XMLParserConfiguration.KEEP_STRINGS);
         }
-        return toJSONObject(reader, XMLParserConfiguration.ORIGINAL);
+        return toJSONObject(reader, ORIGINAL_PARSER_CONFIG);
     }
 
     /**
@@ -664,7 +666,7 @@ public class XML {
      * @throws JSONException Thrown if there is an error parsing the string
      */
     public static String toString(Object object) throws JSONException {
-        return toString(object, null, XMLParserConfiguration.ORIGINAL);
+        return toString(object, null, ORIGINAL_PARSER_CONFIG);
     }
 
     /**
@@ -678,7 +680,7 @@ public class XML {
      * @throws JSONException Thrown if there is an error parsing the string
      */
     public static String toString(final Object object, final String tagName) {
-        return toString(object, tagName, XMLParserConfiguration.ORIGINAL);
+        return toString(object, tagName, ORIGINAL_PARSER_CONFIG);
     }
 
     /**
@@ -869,7 +871,7 @@ public class XML {
      * @throws JSONException Thrown if there is an error parsing the string
      */
     public static String toString(Object object, int indentFactor){
-        return toString(object, null, XMLParserConfiguration.ORIGINAL, indentFactor);
+        return toString(object, null, ORIGINAL_PARSER_CONFIG, indentFactor);
     }
 
     /**
@@ -885,7 +887,7 @@ public class XML {
      * @throws JSONException Thrown if there is an error parsing the string
      */
     public static String toString(final Object object, final String tagName, int indentFactor) {
-        return toString(object, tagName, XMLParserConfiguration.ORIGINAL, indentFactor);
+        return toString(object, tagName, ORIGINAL_PARSER_CONFIG, indentFactor);
     }
 
     /**
