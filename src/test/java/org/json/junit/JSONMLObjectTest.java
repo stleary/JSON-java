@@ -25,7 +25,7 @@ import org.junit.Test;
  *  Convert a string -> JSONObject -> string -> JSONArray -> string
  *
  */
-public class JSONMLTest {
+public class JSONMLObjectTest {
 
     /**
      * Attempts to transform a null XML string to JSON.
@@ -34,7 +34,7 @@ public class JSONMLTest {
     @Test(expected=NullPointerException.class)
     public void nullXMLException() {
         String xmlStr = null;
-        JSONML.toJSONArray(xmlStr);
+        JSONMLArray.toJSONArray(xmlStr);
     }
 
     /**
@@ -45,7 +45,7 @@ public class JSONMLTest {
     public void emptyXMLException() {
         String xmlStr = "";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -64,7 +64,7 @@ public class JSONMLTest {
          * Tries to convert a null JSONArray to XML.
          */
         JSONArray jsonArray= null;
-        JSONML.toString(jsonArray);
+        JSONMLArray.toString(jsonArray);
     }
 
     /**
@@ -78,7 +78,7 @@ public class JSONMLTest {
          */
         JSONArray jsonArray = new JSONArray();
         try {
-            JSONML.toString(jsonArray);
+            JSONMLArray.toString(jsonArray);
             assertTrue("Expecting an exception", false);
         } catch (JSONException e) {
             assertTrue("Expecting an exception message",
@@ -98,7 +98,7 @@ public class JSONMLTest {
          */
         String xmlStr = "{ \"this is\": \"not xml\"}";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -134,7 +134,7 @@ public class JSONMLTest {
             "]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
         try {
-            JSONML.toString(jsonArray);
+            JSONMLArray.toString(jsonArray);
             assertTrue("Expecting an exception", false);
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -170,7 +170,7 @@ public class JSONMLTest {
             "]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
         try {
-            JSONML.toString(jsonArray);
+            JSONMLArray.toString(jsonArray);
             assertTrue("Expecting an exception", false);
         } catch (JSONException e) {
             assertTrue("Expecting an exception message",
@@ -201,7 +201,7 @@ public class JSONMLTest {
             "    </address>\n"+
             "</addresses>";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -226,7 +226,7 @@ public class JSONMLTest {
             "    </address>\n"+
             "</addresses>";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -256,7 +256,7 @@ public class JSONMLTest {
             "    </address>\n"+
             "</addresses>";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -286,7 +286,7 @@ public class JSONMLTest {
             "    </address>\n"+
             "</addresses>";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -316,7 +316,7 @@ public class JSONMLTest {
             "   </>\n"+
             "</addresses>";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             assertTrue("Expecting an exception", false);
         } catch (JSONException e) {
             assertTrue("Expecting an exception message",
@@ -346,7 +346,7 @@ public class JSONMLTest {
             "    </address\n"+
             "</addresses>";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -376,7 +376,7 @@ public class JSONMLTest {
             "   </address>\n"+
             "</addresses>";
         try {
-            JSONML.toJSONArray(xmlStr);
+            JSONMLArray.toJSONArray(xmlStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
@@ -425,10 +425,10 @@ public class JSONMLTest {
                     "\">\""+
                 "]"+
             "]";
-        JSONArray jsonArray = JSONML.toJSONArray(xmlStr);
+        JSONArray jsonArray = JSONMLArray.toJSONArray(xmlStr);
         JSONArray expectedJsonArray = new JSONArray(expectedStr);
-        String xmlToStr = JSONML.toString(jsonArray);
-        JSONArray finalJsonArray = JSONML.toJSONArray(xmlToStr);
+        String xmlToStr = JSONMLArray.toString(jsonArray);
+        JSONArray finalJsonArray = JSONMLArray.toJSONArray(xmlToStr);
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
         Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
     }
@@ -635,32 +635,32 @@ public class JSONMLTest {
             "]";
 
         // make a JSONObject and make sure it looks as expected
-        JSONObject jsonObject = JSONML.toJSONObject(xmlStr);
+        JSONObject jsonObject = JSONMLObject.toJSONObject(xmlStr);
         JSONObject expectedJsonObject = new JSONObject(expectedJSONObjectStr);
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
 
         // restore the XML, then make another JSONObject and make sure it
         // looks as expected
-        String jsonObjectXmlToStr = JSONML.toString(jsonObject);
-        JSONObject finalJsonObject = JSONML.toJSONObject(jsonObjectXmlToStr);
+        String jsonObjectXmlToStr = JSONMLObject.toString(jsonObject);
+        JSONObject finalJsonObject = JSONMLObject.toJSONObject(jsonObjectXmlToStr);
         Util.compareActualVsExpectedJsonObjects(finalJsonObject, expectedJsonObject);
 
         // create a JSON array from the original string and make sure it
         // looks as expected
-        JSONArray jsonArray = JSONML.toJSONArray(xmlStr);
+        JSONArray jsonArray = JSONMLArray.toJSONArray(xmlStr);
         JSONArray expectedJsonArray = new JSONArray(expectedJSONArrayStr);
         Util.compareActualVsExpectedJsonArrays(jsonArray,expectedJsonArray);
 
         // restore the XML, then make another JSONArray and make sure it
         // looks as expected
-        String jsonArrayXmlToStr = JSONML.toString(jsonArray);
-        JSONArray finalJsonArray = JSONML.toJSONArray(jsonArrayXmlToStr);
+        String jsonArrayXmlToStr = JSONMLArray.toString(jsonArray);
+        JSONArray finalJsonArray = JSONMLArray.toJSONArray(jsonArrayXmlToStr);
         Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
 
         // lastly, confirm the restored JSONObject XML and JSONArray XML look
         // reasonably similar
-        JSONObject jsonObjectFromObject = JSONML.toJSONObject(jsonObjectXmlToStr);
-        JSONObject jsonObjectFromArray = JSONML.toJSONObject(jsonArrayXmlToStr);
+        JSONObject jsonObjectFromObject = JSONMLObject.toJSONObject(jsonObjectXmlToStr);
+        JSONObject jsonObjectFromArray = JSONMLObject.toJSONObject(jsonArrayXmlToStr);
         Util.compareActualVsExpectedJsonObjects(jsonObjectFromObject, jsonObjectFromArray);
     }
 
@@ -694,10 +694,10 @@ public class JSONMLTest {
                     "[\"street\",\"Baker street 5\"]"+
                 "]"+
             "]";
-        JSONArray jsonArray = JSONML.toJSONArray(xmlStr);
+        JSONArray jsonArray = JSONMLArray.toJSONArray(xmlStr);
         JSONArray expectedJsonArray = new JSONArray(expectedStr);
-        String xmlToStr = JSONML.toString(jsonArray);
-        JSONArray finalJsonArray = JSONML.toJSONArray(xmlToStr);
+        String xmlToStr = JSONMLArray.toString(jsonArray);
+        JSONArray finalJsonArray = JSONMLArray.toJSONArray(xmlToStr);
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
         Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
     }
@@ -710,7 +710,7 @@ public class JSONMLTest {
     public void testToJSONArray_jsonOutput() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
         final String expectedJsonString = "[\"root\",[\"id\",1],[\"id\",1],[\"id\",0],[\"id\",0],[\"item\",{\"id\":1}],[\"title\",true]]";
-        final JSONArray actualJsonOutput = JSONML.toJSONArray(originalXml, false);
+        final JSONArray actualJsonOutput = JSONMLArray.toJSONArray(originalXml, false);
         assertEquals(expectedJsonString, actualJsonOutput.toString());
     }
 
@@ -720,7 +720,7 @@ public class JSONMLTest {
     @Test
     public void testToJSONArray_reversibility() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final String revertedXml = JSONML.toString(JSONML.toJSONArray(originalXml, false));
+        final String revertedXml = JSONMLArray.toString(JSONMLArray.toJSONArray(originalXml, false));
         assertNotEquals(revertedXml, originalXml);
     }
 
@@ -732,10 +732,10 @@ public class JSONMLTest {
     public void testToJSONArray_reversibility2() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
         final String expectedJsonString = "[\"root\",[\"id\",\"01\"],[\"id\",\"1\"],[\"id\",\"00\"],[\"id\",\"0\"],[\"item\",{\"id\":\"01\"}],[\"title\",\"True\"]]";
-        final JSONArray json = JSONML.toJSONArray(originalXml,true);
+        final JSONArray json = JSONMLArray.toJSONArray(originalXml,true);
         assertEquals(expectedJsonString, json.toString());
 
-        final String reverseXml = JSONML.toString(json);
+        final String reverseXml = JSONMLArray.toString(json);
         assertEquals(originalXml, reverseXml);
     }
 
@@ -745,8 +745,8 @@ public class JSONMLTest {
     @Test
     public void testToJSONArray_reversibility3() {
         final String originalXml = "<readResult><errors someAttr=\"arrtValue\"><code>400</code></errors><errors><code>402</code></errors></readResult>";
-        final JSONArray jsonArray = JSONML.toJSONArray(originalXml, false);
-        final String revertedXml = JSONML.toString(jsonArray);
+        final JSONArray jsonArray = JSONMLArray.toJSONArray(originalXml, false);
+        final String revertedXml = JSONMLArray.toString(jsonArray);
         assertEquals(revertedXml, originalXml);
     }
 
@@ -757,10 +757,10 @@ public class JSONMLTest {
     @Test
     public void testToJSONObject_reversibility() {
         final String originalXml = "<readResult><errors someAttr=\"arrtValue\"><code>400</code></errors><errors><code>402</code></errors></readResult>";
-        final JSONObject originalObject=JSONML.toJSONObject(originalXml,false);
+        final JSONObject originalObject= JSONMLObject.toJSONObject(originalXml,false);
         final String originalJson = originalObject.toString();
-        final String xml = JSONML.toString(originalObject);
-        final JSONObject revertedObject = JSONML.toJSONObject(xml, false);
+        final String xml = JSONMLObject.toString(originalObject);
+        final JSONObject revertedObject = JSONMLObject.toJSONObject(xml, false);
         final String newJson = revertedObject.toString();
         assertTrue("JSON Objects are not similar", originalObject.similar(revertedObject));
         assertTrue("JSON Strings are not similar", new JSONObject(originalJson).similar(new JSONObject(newJson)));
@@ -811,7 +811,7 @@ public class JSONMLTest {
     @Test (timeout = 6000)
     public void testIssue484InfinteLoop1() {
         try {
-            JSONML.toJSONObject("??*^M??|?CglR^F??`??>?w??PIlr^E??D^X^]?$?-^R?o??O?*??{OD?^FY??`2a????NM?b^Tq?:O?>S$^K?J?^FB.gUK?m^H??zE??^??!v]?^A???^[^A??^U?c??????h???s???g^Z???`?q^Dbi??:^QZl?)?}1^??k?0??:$V?$?Ovs(}J??^V????2;^QgQ?^_^A?^D?^U?Tg?K?`?h%c?hmGA?<!C*^P^Y?^X9?~?t?)??,z^XA???S}?Q??.q?j????]");
+            JSONMLObject.toJSONObject("??*^M??|?CglR^F??`??>?w??PIlr^E??D^X^]?$?-^R?o??O?*??{OD?^FY??`2a????NM?b^Tq?:O?>S$^K?J?^FB.gUK?m^H??zE??^??!v]?^A???^[^A??^U?c??????h???s???g^Z???`?q^Dbi??:^QZl?)?}1^??k?0??:$V?$?Ovs(}J??^V????2;^QgQ?^_^A?^D?^U?Tg?K?`?h%c?hmGA?<!C*^P^Y?^X9?~?t?)??,z^XA???S}?Q??.q?j????]");
             fail("Exception expected for invalid JSON.");
         } catch (JSONException ex) {
             assertEquals("Exception string did not match: ",
@@ -825,7 +825,7 @@ public class JSONMLTest {
         try {
             String input = "??*\n" +
                     "??|?CglR??`??>?w??PIlr??D?$?-?o??O?*??{OD?Y??`2a????NM?bq?:O?>S$?J?B.gUK?m\b??zE???!v]???????c??????h???s???g???`?qbi??:Zl?)?}1^??k?0??:$V?$?Ovs(}J??????2;gQ????Tg?K?`?h%c?hmGA?<!C*?9?~?t?)??,zA???S}?Q??.q?j????]";
-         JSONML.toJSONObject(input);
+         JSONMLObject.toJSONObject(input);
             fail("Exception expected for invalid JSON.");
         } catch (JSONException ex) {
             assertEquals("Exception string did not match: ",
@@ -841,7 +841,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 42;
 
         try {
-            JSONML.toJSONArray(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONMLArray.toJSONArray(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -864,7 +864,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 1;
 
         try {
-            JSONML.toJSONArray(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONMLArray.toJSONArray(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -886,7 +886,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 3;
 
         try {
-            JSONML.toJSONArray(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONMLArray.toJSONArray(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("XML document should be parsed as its maximum depth fits the maxNestingDepth " +
@@ -900,7 +900,7 @@ public class JSONMLTest {
         final String wayTooLongMalformedXML = new String(new char[6000]).replace("\0", "<a>");
 
         try {
-            JSONML.toJSONObject(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL);
+            JSONMLObject.toJSONObject(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL);
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -917,7 +917,7 @@ public class JSONMLTest {
             new String(new char[actualDepth]).replace("\0", "</a>");
 
         try {
-            JSONML.toJSONObject(deeperThanDefaultMax, JSONMLParserConfiguration.ORIGINAL
+            JSONMLObject.toJSONObject(deeperThanDefaultMax, JSONMLParserConfiguration.ORIGINAL
                 .withMaxNestingDepth(JSONMLParserConfiguration.UNDEFINED_MAXIMUM_NESTING_DEPTH));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -934,7 +934,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 42;
 
         try {
-            JSONML.toJSONObject(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONMLObject.toJSONObject(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -956,7 +956,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 1;
 
         try {
-            JSONML.toJSONObject(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONMLObject.toJSONObject(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -978,7 +978,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 3;
 
         try {
-            JSONML.toJSONObject(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONMLObject.toJSONObject(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("XML document should be parsed as its maximum depth fits the maxNestingDepth " +
