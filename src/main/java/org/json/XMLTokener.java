@@ -19,14 +19,32 @@ public class XMLTokener extends JSONTokener {
     * amp, apos, gt, lt, quot.
     */
    public static final java.util.HashMap<String, Character> entity;
+    /** The Character '&amp;'. */
+    public static final Character AMP = '&';
+    /** The Character '''. */
+    public static final Character APOS = '\'';
+    /** The Character '!'. */
+    public static final Character BANG = '!';
+    /** The Character '='. */
+    public static final Character EQ = '=';
+    /** The Character <pre>{@code '>'. }</pre>*/
+    public static final Character GT = '>';
+    /** The Character '&lt;'. */
+    public static final Character LT = '<';
+    /** The Character '?'. */
+    public static final Character QUEST = '?';
+    /** The Character '"'. */
+    public static final Character QUOT = '"';
+    /** The Character '/'. */
+    public static final Character SLASH = '/';
 
-   static {
+    static {
        entity = new java.util.HashMap<String, Character>(8);
-       entity.put("amp",  XML.AMP);
-       entity.put("apos", XML.APOS);
-       entity.put("gt",   XML.GT);
-       entity.put("lt",   XML.LT);
-       entity.put("quot", XML.QUOT);
+       entity.put("amp",  AMP);
+       entity.put("apos", APOS);
+       entity.put("gt",   GT);
+       entity.put("lt",   LT);
+       entity.put("quot", QUOT);
    }
 
     /**
@@ -88,7 +106,7 @@ public class XMLTokener extends JSONTokener {
             return null;
         }
         if (c == '<') {
-            return XML.LT;
+            return LT;
         }
         sb = new StringBuilder();
         for (;;) {
@@ -187,17 +205,17 @@ public class XMLTokener extends JSONTokener {
         case 0:
             throw syntaxError("Misshaped meta tag");
         case '<':
-            return XML.LT;
+            return LT;
         case '>':
-            return XML.GT;
+            return GT;
         case '/':
-            return XML.SLASH;
+            return SLASH;
         case '=':
-            return XML.EQ;
+            return EQ;
         case '!':
-            return XML.BANG;
+            return BANG;
         case '?':
-            return XML.QUEST;
+            return QUEST;
         case '"':
         case '\'':
             q = c;
@@ -258,15 +276,15 @@ public class XMLTokener extends JSONTokener {
         case '<':
             throw syntaxError("Misplaced '<'");
         case '>':
-            return XML.GT;
+            return GT;
         case '/':
-            return XML.SLASH;
+            return SLASH;
         case '=':
-            return XML.EQ;
+            return EQ;
         case '!':
-            return XML.BANG;
+            return BANG;
         case '?':
-            return XML.QUEST;
+            return QUEST;
 
 // Quoted string
 

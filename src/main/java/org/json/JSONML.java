@@ -74,10 +74,10 @@ public class JSONML {
                 throw x.syntaxError("Bad XML");
             }
             token = x.nextContent();
-            if (token == XML.LT) {
+            if (token == XMLTokener.LT) {
                 token = x.nextToken();
                 if (token instanceof Character) {
-                    if (token == XML.SLASH) {
+                    if (token == XMLTokener.SLASH) {
 
 // Close tag </
 
@@ -87,11 +87,11 @@ public class JSONML {
                                     "Expected a closing name instead of '" +
                                     token + "'.");
                         }
-                        if (x.nextToken() != XML.GT) {
+                        if (x.nextToken() != XMLTokener.GT) {
                             throw x.syntaxError("Misshaped close tag");
                         }
                         return token;
-                    } else if (token == XML.BANG) {
+                    } else if (token == XMLTokener.BANG) {
 
 // <!
 
@@ -117,14 +117,14 @@ public class JSONML {
                                 token = x.nextMeta();
                                 if (token == null) {
                                     throw x.syntaxError("Missing '>' after '<!'.");
-                                } else if (token == XML.LT) {
+                                } else if (token == XMLTokener.LT) {
                                     i += 1;
-                                } else if (token == XML.GT) {
+                                } else if (token == XMLTokener.GT) {
                                     i -= 1;
                                 }
                             } while (i > 0);
                         }
-                    } else if (token == XML.QUEST) {
+                    } else if (token == XMLTokener.QUEST) {
 
 // <?
 
@@ -172,7 +172,7 @@ public class JSONML {
                             throw x.syntaxError("Reserved attribute.");
                         }
                         token = x.nextToken();
-                        if (token == XML.EQ) {
+                        if (token == XMLTokener.EQ) {
                             token = x.nextToken();
                             if (!(token instanceof String)) {
                                 throw x.syntaxError("Missing value");
@@ -189,8 +189,8 @@ public class JSONML {
 
 // Empty tag <.../>
 
-                    if (token == XML.SLASH) {
-                        if (x.nextToken() != XML.GT) {
+                    if (token == XMLTokener.SLASH) {
+                        if (x.nextToken() != XMLTokener.GT) {
                             throw x.syntaxError("Misshaped tag");
                         }
                         if (ja == null) {
@@ -203,7 +203,7 @@ public class JSONML {
 // Content, between <...> and </...>
 
                     } else {
-                        if (token != XML.GT) {
+                        if (token != XMLTokener.GT) {
                             throw x.syntaxError("Misshaped tag");
                         }
 
