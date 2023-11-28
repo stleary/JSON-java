@@ -90,7 +90,7 @@ class NumberConversionUtil {
      * @return true if the character is a numeric digit, false otherwise.
      */
     private static boolean isNumericChar(char c) {
-        return (c >= '0' && c <= '9');
+        return (c <= '9' && c >= '0');
     }
 
     /**
