@@ -3735,4 +3735,41 @@ public class JSONObjectTest {
       jsonObject.put("test", inside);
       new JSONObject(jsonObject);
     }
+
+    @Test
+    public void issue743SerializationMapWith999Objects() {
+        HashMap<String, Object> map  = buildNestedMap(999);
+        JSONObject object = new JSONObject(map);
+        String jsonString = object.toString();
+    }
+
+    @Test
+    public void issue743SerializationMapWith1000Objects() {
+      HashMap<String, Object> map  = buildNestedMap(1000);
+      JSONObject object = new JSONObject(map);
+      String jsonString = object.toString();
+    }
+
+    @Test(expected = JSONException.class)
+    public void issue743SerializationMapWith1001Objects() {
+        HashMap<String, Object> map  = buildNestedMap(1001);
+        JSONObject object = new JSONObject(map);
+        String jsonString = object.toString();
+    }
+
+    /**
+     * Method to build nested map of max maxDepth
+     *
+     * @param maxDepth
+     * @return
+     */
+    public static HashMap<String, Object> buildNestedMap(int maxDepth) {
+        if (maxDepth <= 0) {
+            return new HashMap<>();
+        }
+        HashMap<String, Object> nestedMap = new HashMap<>();
+        nestedMap.put("t", buildNestedMap(maxDepth - 1));
+        return nestedMap;
+    }
+
 }

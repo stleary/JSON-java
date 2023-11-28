@@ -1438,4 +1438,56 @@ public class JSONArrayTest {
       array.add(array);
       new JSONArray(array);
     }
+
+    @Test
+    public void testRecursiveDepthAtPosition999Object() {
+        HashMap<String, Object> map = JSONObjectTest.buildNestedMap(999);
+        new JSONArray().put(0, map);
+    }
+
+    @Test
+    public void testRecursiveDepthAtPosition1000Object() {
+        HashMap<String, Object> map = JSONObjectTest.buildNestedMap(1000);
+        new JSONArray().put(0, map);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testRecursiveDepthAtPosition1001Object() {
+        HashMap<String, Object> map = JSONObjectTest.buildNestedMap(1001);
+        new JSONArray().put(0, map);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testRecursiveDepthArrayLimitedMaps() {
+        ArrayList<Object> array = new ArrayList<>();
+        array.add(array);
+        new JSONArray(array);
+    }
+
+    @Test
+    public void testRecursiveDepthArrayFor999Levels() {
+        ArrayList<Object> array = buildNestedArray(999);
+        new JSONArray(array);
+    }
+
+    @Test
+    public void testRecursiveDepthArrayFor1000Levels() {
+        ArrayList<Object> array = buildNestedArray(1000);
+        new JSONArray(array);
+    }
+
+    @Test(expected = JSONException.class)
+    public void testRecursiveDepthArrayFor1001Levels() {
+        ArrayList<Object> array = buildNestedArray(1001);
+        new JSONArray(array);
+    }
+
+    public static ArrayList<Object> buildNestedArray(int maxDepth) {
+        if (maxDepth <= 0) {
+            return new ArrayList<>();
+        }
+        ArrayList<Object> nestedArray = new ArrayList<>();
+        nestedArray.add(buildNestedArray(maxDepth - 1));
+        return nestedArray;
+    }
 }
