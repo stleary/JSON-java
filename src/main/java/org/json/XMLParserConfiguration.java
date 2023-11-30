@@ -61,6 +61,13 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
     private Set<String> forceList;
 
+
+    /**
+     * Flag to indicate whether white space should be trimmed when parsing XML.
+     * The default behaviour is to trim white space. When this is set to false, inputting XML
+     * with tags that are the same as the value of cDataTagName is unsupported. It is recommended to set cDataTagName
+     * to a distinct value in this case.
+     */
     private boolean shouldTrimWhiteSpace;
 
     /**
