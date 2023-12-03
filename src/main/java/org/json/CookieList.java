@@ -46,19 +46,19 @@ public class CookieList {
      * @throws JSONException if a called function fails
      */
     public static String toString(JSONObject jo) throws JSONException {
-        boolean             b = false;
+        boolean             isEndOfPair = false;
         final StringBuilder sb = new StringBuilder();
         // Don't use the new entrySet API to maintain Android support
         for (final String key : jo.keySet()) {
             final Object value = jo.opt(key);
             if (!JSONObject.NULL.equals(value)) {
-                if (b) {
+                if (isEndOfPair) {
                     sb.append(';');
                 }
                 sb.append(Cookie.escape(key));
                 sb.append("=");
                 sb.append(Cookie.escape(value.toString()));
-                b = true;
+                isEndOfPair = true;
             }
         }
         return sb.toString();
