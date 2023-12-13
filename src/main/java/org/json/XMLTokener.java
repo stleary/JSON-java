@@ -20,7 +20,7 @@ public class XMLTokener extends JSONTokener {
     */
    public static final java.util.HashMap<String, Character> entity;
 
-   private XMLParserConfiguration configuration = XMLParserConfiguration.ORIGINAL;;
+   private XMLParserConfiguration configuration = XMLParserConfiguration.ORIGINAL;
 
    static {
        entity = new java.util.HashMap<String, Character>(8);
@@ -47,12 +47,13 @@ public class XMLTokener extends JSONTokener {
         super(s);
     }
 
+    /**
+     * Construct an XMLTokener from a Reader and an XMLParserConfiguration.
+     * @param r A source reader.
+     * @param configuration the configuration that can be used to set certain flags
+     */
     public XMLTokener(Reader r, XMLParserConfiguration configuration) {
         super(r);
-        this.configuration = configuration;
-    }
-    public XMLTokener(String s, XMLParserConfiguration configuration) {
-        super(s);
         this.configuration = configuration;
     }
 
