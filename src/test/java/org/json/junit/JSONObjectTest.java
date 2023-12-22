@@ -32,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointerException;
+import org.json.JSONParserConfiguration;
 import org.json.JSONString;
 import org.json.JSONTokener;
 import org.json.XML;
@@ -3737,8 +3738,8 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void issue743SerializationMapWith999Objects() {
-        HashMap<String, Object> map  = buildNestedMap(999);
+    public void issue743SerializationMapWith512Objects() {
+        HashMap<String, Object> map  = buildNestedMap(JSONParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH);
         JSONObject object = new JSONObject(map);
         String jsonString = object.toString();
     }
@@ -3746,7 +3747,8 @@ public class JSONObjectTest {
     @Test
     public void issue743SerializationMapWith1000Objects() {
       HashMap<String, Object> map  = buildNestedMap(1000);
-      JSONObject object = new JSONObject(map);
+      JSONParserConfiguration parserConfiguration = new JSONParserConfiguration(1000);
+      JSONObject object = new JSONObject(map, parserConfiguration);
       String jsonString = object.toString();
     }
 

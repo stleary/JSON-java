@@ -147,7 +147,6 @@ public class JSONObject {
      * The map where the JSONObject's properties are kept.
      */
     private final Map<String, Object> map;
-    public static final int RECURSION_DEPTH_LIMIT = 1000;
 
     public Class<? extends Map> getMapType() {
         return map.getClass();
@@ -277,16 +276,20 @@ public class JSONObject {
      *            If a key in the map is <code>null</code>
      */
     public JSONObject(Map<?, ?> m) {
-      this(m, 0);
+      this(m, 0, new JSONParserConfiguration());
+    }
+
+    public JSONObject(Map<?, ?> m, JSONParserConfiguration jsonParserConfiguration) {
+        this(m, 0, jsonParserConfiguration);
     }
 
     /**
      * Construct a JSONObject from a map with recursion depth.
      *
      */
-    protected JSONObject(Map<?, ?> m, int recursionDepth) {
-        if (recursionDepth > RECURSION_DEPTH_LIMIT) {
-          throw new JSONException("JSONObject has reached recursion depth limit of " + RECURSION_DEPTH_LIMIT);
+    protected JSONObject(Map<?, ?> m, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
+        if (recursionDepth > jsonParserConfiguration.getMaxNestingDepth()) {
+          throw new JSONException("JSONObject has reached recursion depth limit of " + jsonParserConfiguration.getMaxNestingDepth());
         }
         if (m == null) {
             this.map = new HashMap<String, Object>();
@@ -299,7 +302,7 @@ public class JSONObject {
                 final Object value = e.getValue();
                 if (value != null) {
                     testValidity(value);
-                    this.map.put(String.valueOf(e.getKey()), wrap(value, recursionDepth + 1));
+                    this.map.put(String.valueOf(e.getKey()), wrap(value, recursionDepth + 1, jsonParserConfiguration));
                 }
             }
         }
@@ -2578,15 +2581,15 @@ public class JSONObject {
         return wrap(object, null);
     }
 
-    public static Object wrap(Object object, int recursionDepth) {
-      return wrap(object, null, recursionDepth);
+    public static Object wrap(Object object, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
+      return wrap(object, null, recursionDepth, jsonParserConfiguration);
     }
 
     private static Object wrap(Object object, Set<Object> objectsRecord) {
-      return wrap(object, objectsRecord, 0);
+      return wrap(object, objectsRecord, 0, new JSONParserConfiguration());
     }
 
-    private static Object wrap(Object object, Set<Object> objectsRecord, int recursionDepth) {
+    private static Object wrap(Object object, Set<Object> objectsRecord, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
         try {
             if (NULL.equals(object)) {
                 return NULL;
@@ -2604,14 +2607,14 @@ public class JSONObject {
 
             if (object instanceof Collection) {
                 Collection<?> coll = (Collection<?>) object;
-                return new JSONArray(coll, recursionDepth);
+                return new JSONArray(coll, recursionDepth, jsonParserConfiguration);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);
             }
             if (object instanceof Map) {
                 Map<?, ?> map = (Map<?, ?>) object;
-                return new JSONObject(map, recursionDepth);
+                return new JSONObject(map, recursionDepth, jsonParserConfiguration);
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null ? objectPackage

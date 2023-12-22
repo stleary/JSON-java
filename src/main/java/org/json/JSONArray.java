@@ -149,18 +149,22 @@ public class JSONArray implements Iterable<Object> {
      *            A Collection.
      */
     public JSONArray(Collection<?> collection) {
-      this(collection, 0);
+      this(collection, 0, new JSONParserConfiguration());
     }
 
-    protected JSONArray(Collection<?> collection, int recursionDepth) {
-        if (recursionDepth > JSONObject.RECURSION_DEPTH_LIMIT) {
-          throw new JSONException("JSONArray has reached recursion depth limit of " + JSONObject.RECURSION_DEPTH_LIMIT);
+    public JSONArray(Collection<?> collection, JSONParserConfiguration jsonParserConfiguration) {
+        this(collection, 0, jsonParserConfiguration);
+    }
+
+    protected JSONArray(Collection<?> collection, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
+        if (recursionDepth > jsonParserConfiguration.getMaxNestingDepth()) {
+          throw new JSONException("JSONArray has reached recursion depth limit of " + jsonParserConfiguration.getMaxNestingDepth());
         }
         if (collection == null) {
             this.myArrayList = new ArrayList<Object>();
         } else {
             this.myArrayList = new ArrayList<Object>(collection.size());
-            this.addAll(collection, true, recursionDepth);
+            this.addAll(collection, true, recursionDepth, jsonParserConfiguration);
         }
     }
 
@@ -1345,7 +1349,27 @@ public class JSONArray implements Iterable<Object> {
      *             If a key in the map is <code>null</code>
      */
     public JSONArray put(int index, Map<?, ?> value) throws JSONException {
-        this.put(index, new JSONObject(value));
+        this.put(index, new JSONObject(value, new JSONParserConfiguration()));
+        return this;
+    }
+
+    /**
+     * Put a value in the JSONArray, where the value will be a JSONObject that
+     * is produced from a Map.
+     *
+     * @param index
+     *          The subscript
+     * @param value
+     *          The Map value.
+     * @param jsonParserConfiguration
+     *          Configuration for recursive depth
+     * @return
+     * @throws JSONException
+     *          If the index is negative or if the value is an invalid
+     *          number.
+     */
+    public JSONArray put(int index, Map<?, ?> value, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
+        this.put(index, new JSONObject(value, jsonParserConfiguration));
         return this;
     }
 
@@ -1790,11 +1814,11 @@ public class JSONArray implements Iterable<Object> {
      *            variable to keep the count of how nested the object creation is happening.
      *            
      */
-    private void addAll(Collection<?> collection, boolean wrap, int recursionDepth) {
+    private void addAll(Collection<?> collection, boolean wrap, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
         this.myArrayList.ensureCapacity(this.myArrayList.size() + collection.size());
         if (wrap) {
             for (Object o: collection){
-                this.put(JSONObject.wrap(o, recursionDepth + 1));
+                this.put(JSONObject.wrap(o, recursionDepth + 1, jsonParserConfiguration));
             }
         } else {
             for (Object o: collection){
@@ -1823,7 +1847,14 @@ public class JSONArray implements Iterable<Object> {
             }
         }
     }
-    
+
+    /**
+     * Add an array's elements to the JSONArray.
+     *
+     * @param array
+     * @param wrap
+     * @throws JSONException
+     */
     private void addAll(Object array, boolean wrap) throws JSONException {
       this.addAll(array, wrap, 0);
     }
@@ -1836,23 +1867,37 @@ public class JSONArray implements Iterable<Object> {
      *            JSONArray, Collection, or Iterable, an exception will be
      *            thrown.
      * @param wrap
+     * @param recursionDepth
+     */
+    private void addAll(Object array, boolean wrap, int recursionDepth) {
+        addAll(array, wrap, recursionDepth, new JSONParserConfiguration());
+    }
+    /**
+     * Add an array's elements to the JSONArray.
+     *`
+     * @param array
+     *            Array. If the parameter passed is null, or not an array,
+     *            JSONArray, Collection, or Iterable, an exception will be
+     *            thrown.
+     * @param wrap
      *            {@code true} to call {@link JSONObject#wrap(Object)} for each item,
      *            {@code false} to add the items directly
      * @param recursionDepth
      *            Variable to keep the count of how nested the object creation is happening.
-     *
+     * @param recursionDepth
+     *            Variable to pass parser custom configuration for json parsing.
      * @throws JSONException
      *            If not an array or if an array value is non-finite number.
      * @throws NullPointerException
      *            Thrown if the array parameter is null.
      */
-    private void addAll(Object array, boolean wrap, int recursionDepth) throws JSONException {
+    private void addAll(Object array, boolean wrap, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         if (array.getClass().isArray()) {
             int length = Array.getLength(array);
             this.myArrayList.ensureCapacity(this.myArrayList.size() + length);
             if (wrap) {
                 for (int i = 0; i < length; i += 1) {
-                    this.put(JSONObject.wrap(Array.get(array, i), recursionDepth + 1));
+                    this.put(JSONObject.wrap(Array.get(array, i), recursionDepth + 1, jsonParserConfiguration));
                 }
             } else {
                 for (int i = 0; i < length; i += 1) {

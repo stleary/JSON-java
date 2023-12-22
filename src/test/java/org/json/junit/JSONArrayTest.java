@@ -28,6 +28,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.json.JSONPointerException;
 import org.json.JSONString;
 import org.json.JSONTokener;
@@ -1440,15 +1441,15 @@ public class JSONArrayTest {
     }
 
     @Test
-    public void testRecursiveDepthAtPosition999Object() {
-        HashMap<String, Object> map = JSONObjectTest.buildNestedMap(999);
+    public void testRecursiveDepthAtPositionDefaultObject() {
+        HashMap<String, Object> map = JSONObjectTest.buildNestedMap(JSONParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH);
         new JSONArray().put(0, map);
     }
 
     @Test
     public void testRecursiveDepthAtPosition1000Object() {
         HashMap<String, Object> map = JSONObjectTest.buildNestedMap(1000);
-        new JSONArray().put(0, map);
+        new JSONArray().put(0, map, new JSONParserConfiguration(1000));
     }
 
     @Test(expected = JSONException.class)
@@ -1465,15 +1466,16 @@ public class JSONArrayTest {
     }
 
     @Test
-    public void testRecursiveDepthArrayFor999Levels() {
-        ArrayList<Object> array = buildNestedArray(999);
-        new JSONArray(array);
+    public void testRecursiveDepthArrayForDefaultLevels() {
+        ArrayList<Object> array = buildNestedArray(JSONParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH);
+        new JSONArray(array, new JSONParserConfiguration());
     }
 
     @Test
     public void testRecursiveDepthArrayFor1000Levels() {
         ArrayList<Object> array = buildNestedArray(1000);
-        new JSONArray(array);
+        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration(1000);
+        new JSONArray(array, parserConfiguration);
     }
 
     @Test(expected = JSONException.class)
