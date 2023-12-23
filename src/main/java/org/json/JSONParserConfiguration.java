@@ -6,24 +6,20 @@ package org.json;
 public class JSONParserConfiguration extends ParserConfiguration {
 
   /**
-   * We can override the default maximum nesting depth if needed.
-   */
-  public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = ParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH;
-
-  /**
    * Configuration with the default values.
    */
   public JSONParserConfiguration() {
-    this.maxNestingDepth = DEFAULT_MAXIMUM_NESTING_DEPTH;
-  }
-
-  public JSONParserConfiguration(int maxNestingDepth) {
-    this.maxNestingDepth = maxNestingDepth;
+    super();
   }
 
   @Override
   protected JSONParserConfiguration clone() {
-    return new JSONParserConfiguration(DEFAULT_MAXIMUM_NESTING_DEPTH);
+    return new JSONParserConfiguration();
+  }
+
+  @Override
+  public JSONParserConfiguration withMaxNestingDepth(final int maxNestingDepth) {
+    return super.withMaxNestingDepth(maxNestingDepth);
   }
 
 }
