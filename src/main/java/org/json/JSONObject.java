@@ -279,6 +279,15 @@ public class JSONObject {
       this(m, 0, new JSONParserConfiguration());
     }
 
+    /**
+     * Construct a JSONObject from a Map with custom json parse configurations.
+     *
+     * @param m
+     *            A map object that can be used to initialize the contents of
+     *            the JSONObject.
+     * @param jsonParserConfiguration
+     *            Variable to pass parser custom configuration for json parsing.
+     */
     public JSONObject(Map<?, ?> m, JSONParserConfiguration jsonParserConfiguration) {
         this(m, 0, jsonParserConfiguration);
     }
@@ -287,7 +296,7 @@ public class JSONObject {
      * Construct a JSONObject from a map with recursion depth.
      *
      */
-    protected JSONObject(Map<?, ?> m, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
+    private JSONObject(Map<?, ?> m, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
         if (recursionDepth > jsonParserConfiguration.getMaxNestingDepth()) {
           throw new JSONException("JSONObject has reached recursion depth limit of " + jsonParserConfiguration.getMaxNestingDepth());
         }
@@ -2581,7 +2590,23 @@ public class JSONObject {
         return wrap(object, null);
     }
 
-    public static Object wrap(Object object, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
+    /**
+     * Wrap an object, if necessary. If the object is <code>null</code>, return the NULL
+     * object. If it is an array or collection, wrap it in a JSONArray. If it is
+     * a map, wrap it in a JSONObject. If it is a standard property (Double,
+     * String, et al) then it is already wrapped. Otherwise, if it comes from
+     * one of the java packages, turn it into a string. And if it doesn't, try
+     * to wrap it in a JSONObject. If the wrapping fails, then null is returned.
+     *
+     * @param object
+     *            The object to wrap
+     * @param recursionDepth
+     *            Variable for tracking the count of nested object creations.
+     * @param jsonParserConfiguration
+     *            Variable to pass parser custom configuration for json parsing.
+     * @return The wrapped value
+     */
+    static Object wrap(Object object, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
       return wrap(object, null, recursionDepth, jsonParserConfiguration);
     }
 

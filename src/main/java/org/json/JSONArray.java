@@ -152,11 +152,29 @@ public class JSONArray implements Iterable<Object> {
       this(collection, 0, new JSONParserConfiguration());
     }
 
+    /**
+     * Construct a JSONArray from a Collection.
+     *
+     * @param collection
+     *            A Collection.
+     * @param jsonParserConfiguration
+     *            Configuration object for the JSON parser
+     */
     public JSONArray(Collection<?> collection, JSONParserConfiguration jsonParserConfiguration) {
         this(collection, 0, jsonParserConfiguration);
     }
 
-    protected JSONArray(Collection<?> collection, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
+    /**
+     * Construct a JSONArray from a collection with recursion depth.
+     *
+     * @param collection
+     *             A Collection.
+     * @param recursionDepth
+     *             Variable for tracking the count of nested object creations.
+     * @param jsonParserConfiguration
+     *             Configuration object for the JSON parser
+     */
+    JSONArray(Collection<?> collection, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
         if (recursionDepth > jsonParserConfiguration.getMaxNestingDepth()) {
           throw new JSONException("JSONArray has reached recursion depth limit of " + jsonParserConfiguration.getMaxNestingDepth());
         }
@@ -1362,7 +1380,7 @@ public class JSONArray implements Iterable<Object> {
      * @param value
      *          The Map value.
      * @param jsonParserConfiguration
-     *          Configuration for recursive depth
+     *          Configuration object for the JSON parser
      * @return
      * @throws JSONException
      *          If the index is negative or if the value is an invalid
@@ -1811,8 +1829,7 @@ public class JSONArray implements Iterable<Object> {
      *            {@code true} to call {@link JSONObject#wrap(Object)} for each item,
      *            {@code false} to add the items directly
      * @param recursionDepth
-     *            variable to keep the count of how nested the object creation is happening.
-     *            
+     *            Variable for tracking the count of nested object creations.
      */
     private void addAll(Collection<?> collection, boolean wrap, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
         this.myArrayList.ensureCapacity(this.myArrayList.size() + collection.size());
@@ -1852,8 +1869,14 @@ public class JSONArray implements Iterable<Object> {
      * Add an array's elements to the JSONArray.
      *
      * @param array
+     *          Array. If the parameter passed is null, or not an array,
+     *          JSONArray, Collection, or Iterable, an exception will be
+     *          thrown.
      * @param wrap
+     *          {@code true} to call {@link JSONObject#wrap(Object)} for each item,
+     *          {@code false} to add the items directly
      * @throws JSONException
+     *          If not an array or if an array value is non-finite number.
      */
     private void addAll(Object array, boolean wrap) throws JSONException {
       this.addAll(array, wrap, 0);
@@ -1867,7 +1890,10 @@ public class JSONArray implements Iterable<Object> {
      *            JSONArray, Collection, or Iterable, an exception will be
      *            thrown.
      * @param wrap
+     *          {@code true} to call {@link JSONObject#wrap(Object)} for each item,
+     *          {@code false} to add the items directly
      * @param recursionDepth
+     *          Variable for tracking the count of nested object creations.
      */
     private void addAll(Object array, boolean wrap, int recursionDepth) {
         addAll(array, wrap, recursionDepth, new JSONParserConfiguration());
@@ -1883,8 +1909,8 @@ public class JSONArray implements Iterable<Object> {
      *            {@code true} to call {@link JSONObject#wrap(Object)} for each item,
      *            {@code false} to add the items directly
      * @param recursionDepth
-     *            Variable to keep the count of how nested the object creation is happening.
-     * @param recursionDepth
+     *            Variable for tracking the count of nested object creations.
+     * @param jsonParserConfiguration
      *            Variable to pass parser custom configuration for json parsing.
      * @throws JSONException
      *            If not an array or if an array value is non-finite number.
