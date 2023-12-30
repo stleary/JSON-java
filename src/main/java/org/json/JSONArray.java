@@ -1359,7 +1359,8 @@ public class JSONArray implements Iterable<Object> {
      *            The subscript.
      * @param value
      *            The Map value.
-     * @return this.
+     * @return
+     *             reference to self
      * @throws JSONException
      *             If the index is negative or if the value is an invalid
      *             number.
@@ -1381,7 +1382,7 @@ public class JSONArray implements Iterable<Object> {
      *          The Map value.
      * @param jsonParserConfiguration
      *          Configuration object for the JSON parser
-     * @return
+     * @return reference to self
      * @throws JSONException
      *          If the index is negative or if the value is an invalid
      *          number.
