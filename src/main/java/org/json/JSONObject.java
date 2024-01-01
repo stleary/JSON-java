@@ -1865,6 +1865,10 @@ public class JSONObject {
             }
         }
 
+        //If the superclass is Object, no annotations will be found any more
+        if (c.getSuperclass().equals(Object.class))
+            return null;
+
         try {
             return getAnnotation(
                     c.getSuperclass().getMethod(m.getName(), m.getParameterTypes()),
@@ -1918,6 +1922,10 @@ public class JSONObject {
                 continue;
             }
         }
+
+        //If the superclass is Object, no annotations will be found any more
+        if (c.getSuperclass().equals(Object.class))
+            return -1;
 
         try {
             int d = getAnnotationDepth(
