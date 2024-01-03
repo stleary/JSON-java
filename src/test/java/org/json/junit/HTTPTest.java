@@ -4,25 +4,27 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.json.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 /**
  * Unit tests for JSON-Java HTTP.java. See RFC7230.
  */
-public class HTTPTest {
+class HTTPTest {
 
     /**
      * Attempt to call HTTP.toJSONObject() with a null string
      * Expects a NUllPointerException.
      */
-    @Test(expected=NullPointerException.class)
-    public void nullHTTPException() {
-        String httpStr = null;
-        HTTP.toJSONObject(httpStr);
+    @Test
+    void nullHTTPException() {
+        assertThrows(NullPointerException.class, () -> {
+            String httpStr = null;
+            HTTP.toJSONObject(httpStr);
+        });
     }
 
     /**
@@ -30,15 +32,14 @@ public class HTTPTest {
      * an empty object. Expects a JSONException.
      */
     @Test
-    public void notEnoughHTTPException() {
+    void notEnoughHTTPException() {
         String httpStr = "{}";
         JSONObject jsonObject = new JSONObject(httpStr);
         try {
             HTTP.toString(jsonObject);
-            assertTrue("Expected to throw exception", false);
+            assertTrue(false, "Expected to throw exception");
         } catch (JSONException e) {
-            assertTrue("Expecting an exception message",
-                    "Not enough material for an HTTP header.".equals(e.getMessage()));
+            assertEquals("Not enough material for an HTTP header.", e.getMessage(), "Expecting an exception message");
         }
     }
 
@@ -48,7 +49,7 @@ public class HTTPTest {
      * and HTTP-Version.
      */
     @Test
-    public void emptyStringHTTPRequest() {
+    void emptyStringHTTPRequest() {
         String httpStr = "";
         String expectedHTTPStr = "{\"Request-URI\":\"\",\"Method\":\"\",\"HTTP-Version\":\"\"}";
         JSONObject jsonObject = HTTP.toJSONObject(httpStr);
@@ -61,7 +62,7 @@ public class HTTPTest {
      * and HTTP-Version.
      */
     @Test
-    public void simpleHTTPRequest() {
+    void simpleHTTPRequest() {
         String httpStr = "GET /hello.txt HTTP/1.1";
         String expectedHTTPStr = 
             "{\"Request-URI\":\"/hello.txt\",\"Method\":\"GET\",\"HTTP-Version\":\"HTTP/1.1\"}";
@@ -75,7 +76,7 @@ public class HTTPTest {
      * HTTP-Version, Status-Code, and Reason.
      */
     @Test
-    public void simpleHTTPResponse() {
+    void simpleHTTPResponse() {
         String httpStr = "HTTP/1.1 200 OK";
         String expectedHTTPStr = 
             "{\"HTTP-Version\":\"HTTP/1.1\",\"Status-Code\":\"200\",\"Reason-Phrase\":\"OK\"}";
@@ -89,7 +90,7 @@ public class HTTPTest {
      * request headers. 
      */
     @Test
-    public void extendedHTTPRequest() {
+    void extendedHTTPRequest() {
         String httpStr = 
             "POST /enlighten/calais.asmx HTTP/1.1\n"+
             "Host: api.opencalais.com\n"+
@@ -119,7 +120,7 @@ public class HTTPTest {
      * response headers. 
      */
     @Test
-    public void extendedHTTPResponse() {
+    void extendedHTTPResponse() {
         String httpStr = 
             "HTTP/1.1 200 OK\n"+
             "Content-Type: text/xml; charset=utf-8\n"+
@@ -140,7 +141,7 @@ public class HTTPTest {
      * response headers, then convert it back into an HTTP string.
      */
     @Test
-    public void convertHTTPRequestToString() {
+    void convertHTTPRequestToString() {
         String httpStr = 
             "POST /enlighten/calais.asmx HTTP/1.1\n"+
             "Host: api.opencalais.com\n"+
@@ -173,7 +174,7 @@ public class HTTPTest {
      * response headers, then convert it back into an HTTP string.
      */
     @Test
-    public void convertHTTPResponseToString() {
+    void convertHTTPResponseToString() {
         String httpStr = 
                 "HTTP/1.1 200 OK\n"+
                 "Content-Type: text/xml; charset=utf-8\n"+

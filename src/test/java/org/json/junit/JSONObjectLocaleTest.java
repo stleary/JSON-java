@@ -4,20 +4,20 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.*;
 
 import org.json.*;
 import org.json.junit.data.MyLocaleBean;
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Note: This file is saved as UTF-8. Do not save as ASCII or the tests will
  * fail.
  *
  */
-public class JSONObjectLocaleTest {
+class JSONObjectLocaleTest {
     /**
      * JSONObject built from a bean with locale-specific keys.
      * In the Turkish alphabet, there are 2 versions of the letter "i".
@@ -32,7 +32,7 @@ public class JSONObjectLocaleTest {
      * regardless of the locale currently in effect.
      */
     @Test
-    public void jsonObjectByLocaleBean() {
+    void jsonObjectByLocaleBean() {
 
         MyLocaleBean myLocaleBean = new MyLocaleBean();
 
@@ -42,9 +42,9 @@ public class JSONObjectLocaleTest {
          */
         Locale.setDefault(new Locale("en"));
         JSONObject jsonen = new JSONObject(myLocaleBean);
-        assertEquals("expected size 2, found: " +jsonen.length(), 2, jsonen.length());
-        assertEquals("expected jsonen[i] == beanI", "beanI", jsonen.getString("i"));
-        assertEquals("expected jsonen[id] == beanId", "beanId", jsonen.getString("id"));
+        assertEquals(2, jsonen.length(), "expected size 2, found: " +jsonen.length());
+        assertEquals("beanI", jsonen.getString("i"), "expected jsonen[i] == beanI");
+        assertEquals("beanId", jsonen.getString("id"), "expected jsonen[id] == beanId");
 
         /**
          * Without the JSON-Java change, these keys would be stored internally as
@@ -53,8 +53,8 @@ public class JSONObjectLocaleTest {
          */
         Locale.setDefault(new Locale("tr"));
         JSONObject jsontr = new JSONObject(myLocaleBean);
-        assertEquals("expected size 2, found: " +jsontr.length(), 2, jsontr.length());
-        assertEquals("expected jsontr[i] == beanI", "beanI", jsontr.getString("i"));
-        assertEquals("expected jsontr[id] == beanId", "beanId", jsontr.getString("id"));
+        assertEquals(2, jsontr.length(), "expected size 2, found: " +jsontr.length());
+        assertEquals("beanI", jsontr.getString("i"), "expected jsontr[i] == beanI");
+        assertEquals("beanId", jsontr.getString("id"), "expected jsontr[id] == beanId");
     }
 }

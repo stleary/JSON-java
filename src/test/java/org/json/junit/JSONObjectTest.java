@@ -5,14 +5,7 @@ Public Domain.
 */
 
 import static java.lang.Double.NaN;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,8 +50,8 @@ import org.json.junit.data.RecursiveBeanEquals;
 import org.json.junit.data.Singleton;
 import org.json.junit.data.SingletonEnum;
 import org.json.junit.data.WeirdList;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -80,7 +73,7 @@ public class JSONObjectTest {
      * Tests that the similar method is working as expected.
      */
     @Test
-    public void verifySimilar() {
+    void verifySimilar() {
         final String string1 = "HasSameRef";
         final String string2 = "HasDifferentRef";
         JSONObject obj1 = new JSONObject()
@@ -108,17 +101,17 @@ public class JSONObjectTest {
                 .put("key2", 2.0)
                 .put("key3", new String(string2));
         
-        assertFalse("obj1-obj2 Should eval to false", obj1.similar(obj2));
-        assertTrue("obj1-obj3 Should eval to true", obj1.similar(obj3));
-        assertTrue("obj1-obj4 Should eval to true", obj1.similar(obj4));
-        assertFalse("obj1-obj5 Should eval to false", obj1.similar(obj5));
+        assertFalse(obj1.similar(obj2), "obj1-obj2 Should eval to false");
+        assertTrue(obj1.similar(obj3), "obj1-obj3 Should eval to true");
+        assertTrue(obj1.similar(obj4), "obj1-obj4 Should eval to true");
+        assertFalse(obj1.similar(obj5), "obj1-obj5 Should eval to false");
         // verify that a double and big decimal are "similar"
-        assertTrue("should eval to true",new JSONObject().put("a",1.1d).similar(new JSONObject("{\"a\":1.1}")));
+        assertTrue(new JSONObject().put("a",1.1d).similar(new JSONObject("{\"a\":1.1}")),"should eval to true");
         // Confirm #618 is fixed (compare should not exit early if similar numbers are found)
         // Note that this test may not work if the JSONObject map entry order changes
         JSONObject first = new JSONObject("{\"a\": 1, \"b\": 2, \"c\": 3}");
         JSONObject second = new JSONObject("{\"a\": 1, \"b\": 2.0, \"c\": 4}");
-        assertFalse("first-second should eval to false", first.similar(second));
+        assertFalse(first.similar(second), "first-second should eval to false");
         List<JSONObject> jsonObjects = new ArrayList<JSONObject>(
                 Arrays.asList(obj1, obj2, obj3, obj4, obj5)
         );
@@ -126,7 +119,7 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void timeNumberParsing() {
+    void timeNumberParsing() {
         // test data to use
         final String[] testData = new String[] {
                 null,
@@ -195,13 +188,15 @@ public class JSONObjectTest {
      * Nothing good is expected to happen.
      * Expects NullPointerException
      */
-    @Test(expected=NullPointerException.class)
-    public void jsonObjectByNullBean() {
-        JSONObject jsonObject = new JSONObject((MyBean)null);
-        assertNull("Expected an exception", jsonObject);
-        Util.checkJSONObjectMaps(jsonObject);
+    @Test
+    void jsonObjectByNullBean() {
+        assertThrows(NullPointerException.class, () -> {
+            JSONObject jsonObject = new JSONObject((MyBean)null);
+            assertNull(jsonObject, "Expected an exception");
+            Util.checkJSONObjectMaps(jsonObject);
+        });
     }
-    
+
     /**
      * The JSON parser is permissive of unambiguous unquoted keys and values.
      * Such JSON text should be allowed, even if it does not strictly conform
@@ -209,23 +204,23 @@ public class JSONObjectTest {
      * conforming JSON text.  
      */
     @Test
-    public void unquotedText() {
+    void unquotedText() {
         String str = "{key1:value1, key2:42, 1.2 : 3.4, -7e5 : something!}";
         JSONObject jsonObject = new JSONObject(str);
         String textStr = jsonObject.toString();
-        assertTrue("expected key1", textStr.contains("\"key1\""));
-        assertTrue("expected value1", textStr.contains("\"value1\""));
-        assertTrue("expected key2", textStr.contains("\"key2\""));
-        assertTrue("expected 42", textStr.contains("42"));
-        assertTrue("expected 1.2", textStr.contains("\"1.2\""));
-        assertTrue("expected 3.4", textStr.contains("3.4"));
-        assertTrue("expected -7E+5", textStr.contains("\"-7E+5\""));
-        assertTrue("expected something!", textStr.contains("\"something!\""));
+        assertTrue(textStr.contains("\"key1\""), "expected key1");
+        assertTrue(textStr.contains("\"value1\""), "expected value1");
+        assertTrue(textStr.contains("\"key2\""), "expected key2");
+        assertTrue(textStr.contains("42"), "expected 42");
+        assertTrue(textStr.contains("\"1.2\""), "expected 1.2");
+        assertTrue(textStr.contains("3.4"), "expected 3.4");
+        assertTrue(textStr.contains("\"-7E+5\""), "expected -7E+5");
+        assertTrue(textStr.contains("\"something!\""), "expected something!");
         Util.checkJSONObjectMaps(jsonObject);
     }
-    
+
     @Test
-    public void testLongFromString(){
+    void longFromString(){
         String str = "26315000000253009";
         JSONObject json = new JSONObject();
         json.put("key", str);
@@ -249,14 +244,14 @@ public class JSONObjectTest {
                 + actualString + " expected " + str;
         Util.checkJSONObjectMaps(json);
     }
-    
+
     /**
      * A JSONObject can be created with no content
      */
     @Test
-    public void emptyJsonObject() {
+    void emptyJsonObject() {
         JSONObject jsonObject = new JSONObject();
-        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
+        assertTrue(jsonObject.isEmpty(), "jsonObject should be empty");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -266,7 +261,7 @@ public class JSONObjectTest {
      * names list.
      */
     @Test
-    public void jsonObjectByNames() {
+    void jsonObjectByNames() {
         String str = 
             "{"+
                 "\"trueKey\":true,"+
@@ -283,11 +278,11 @@ public class JSONObjectTest {
         // validate JSON
         JSONObject jsonObjectByName = new JSONObject(jsonObject, keys);
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObjectByName.toString());
-        assertTrue("expected 4 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 4);
-        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(jsonObjectByName.query("/falseKey")));
-        assertTrue("expected \"nullKey\":null", JSONObject.NULL.equals(jsonObjectByName.query("/nullKey")));
-        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(jsonObjectByName.query("/stringKey")));
-        assertTrue("expected \"doubleKey\":-23.45e67", new BigDecimal("-23.45e67").equals(jsonObjectByName.query("/doubleKey")));
+        assertEquals(4, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 4 top level items");
+        assertEquals(Boolean.FALSE, jsonObjectByName.query("/falseKey"), "expected \"falseKey\":false");
+        assertEquals(JSONObject.NULL, jsonObjectByName.query("/nullKey"), "expected \"nullKey\":null");
+        assertEquals("hello world!", jsonObjectByName.query("/stringKey"), "expected \"stringKey\":\"hello world!\"");
+        assertEquals(new BigDecimal("-23.45e67"), jsonObjectByName.query("/doubleKey"), "expected \"doubleKey\":-23.45e67");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(jsonObject, jsonObjectByName)));
     }
 
@@ -298,10 +293,10 @@ public class JSONObjectTest {
      * has full coverage from other tests.
      */
     @Test
-    public void jsonObjectByNullMap() {
+    void jsonObjectByNullMap() {
         Map<String, Object> map = null;
         JSONObject jsonObject = new JSONObject(map);
-        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
+        assertTrue(jsonObject.isEmpty(), "jsonObject should be empty");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -310,7 +305,7 @@ public class JSONObjectTest {
      * In this test all of the map entries are valid JSON types.
      */
     @Test
-    public void jsonObjectByMap() {
+    void jsonObjectByMap() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("trueKey", Boolean.valueOf(true));
         map.put("falseKey", Boolean.valueOf(false));
@@ -322,12 +317,12 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected \"trueKey\":true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
-        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
-        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(jsonObject.query("/stringKey")));
-        assertTrue("expected \"escapeStringKey\":\"h\be\tllo w\u1234orld!\"", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/escapeStringKey")));
-        assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(jsonObject.query("/doubleKey")));
+        assertEquals(6, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 6 top level items");
+        assertEquals(Boolean.TRUE, jsonObject.query("/trueKey"), "expected \"trueKey\":true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/falseKey"), "expected \"falseKey\":false");
+        assertEquals("hello world!", jsonObject.query("/stringKey"), "expected \"stringKey\":\"hello world!\"");
+        assertEquals("h\be\tllo w\u1234orld!", jsonObject.query("/escapeStringKey"), "expected \"escapeStringKey\":\"h\be\tllo w\u1234orld!\"");
+        assertEquals(Double.valueOf("-23.45e67"), jsonObject.query("/doubleKey"), "expected \"doubleKey\":-23.45e67");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -335,7 +330,7 @@ public class JSONObjectTest {
      * Verifies that the constructor has backwards compatability with RAW types pre-java5.
      */
     @Test
-    public void verifyConstructor() {
+    void verifyConstructor() {
         
         final JSONObject expected = new JSONObject("{\"myKey\":10}");
         
@@ -356,27 +351,27 @@ public class JSONObjectTest {
         JSONObject jaObjObj = new JSONObject(myCObjObj);
 
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaRaw));
+                expected.similar(jaRaw),
+                "The RAW Collection should give me the same as the Typed Collection");
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaStrObj));
+                expected.similar(jaStrObj),
+                "The RAW Collection should give me the same as the Typed Collection");
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaStrInt));
+                expected.similar(jaStrInt),
+                "The RAW Collection should give me the same as the Typed Collection");
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaObjObj));
+                expected.similar(jaObjObj),
+                "The RAW Collection should give me the same as the Typed Collection");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(
                 Arrays.asList(jaRaw, jaStrObj, jaStrInt, jaObjObj))
         );
     }
-    
+
     /**
      * Tests Number serialization.
      */
     @Test
-    public void verifyNumberOutput(){
+    void verifyNumberOutput(){
         /**
          * MyNumberContainer is a POJO, so call JSONObject(bean), 
          * which builds a map of getter names/values
@@ -390,7 +385,7 @@ public class JSONObjectTest {
         JSONObject jsonObject0 = new JSONObject(new MyNumberContainer());
         String actual = jsonObject0.toString();
         String expected = "{\"myNumber\":{\"number\":42}}";
-        assertEquals("Equal", expected , actual);
+        assertEquals(expected , actual, "Equal");
         
         /**
          * JSONObject.put() handles objects differently than the 
@@ -404,7 +399,7 @@ public class JSONObjectTest {
         jsonObject1.put("myNumber", new MyNumber());
         actual = jsonObject1.toString();
         expected = "{\"myNumber\":42}";
-        assertEquals("Equal", expected , actual);
+        assertEquals(expected , actual, "Equal");
 
         /**
          * Calls the JSONObject(Map) ctor, which calls wrap() for values.
@@ -417,7 +412,7 @@ public class JSONObjectTest {
         JSONObject jsonObject2 = new JSONObject(Collections.singletonMap("myNumber", new AtomicInteger(42)));
         actual = jsonObject2.toString();
         expected = "{\"myNumber\":\"42\"}";
-        assertEquals("Equal", expected , actual);
+        assertEquals(expected , actual, "Equal");
 
         /**
          * JSONObject.put() inserts the AtomicInteger directly into the
@@ -429,7 +424,7 @@ public class JSONObjectTest {
         jsonObject3.put("myNumber", new AtomicInteger(42));
         actual = jsonObject3.toString();
         expected = "{\"myNumber\":42}";
-        assertEquals("Equal", expected , actual);
+        assertEquals(expected , actual, "Equal");
 
         /**
          * Calls the JSONObject(Map) ctor, which calls wrap() for values.
@@ -441,8 +436,8 @@ public class JSONObjectTest {
         JSONObject jsonObject4 = new JSONObject(Collections.singletonMap("myNumber", new Fraction(4,2)));
         assertEquals(1, jsonObject4.length());
         assertEquals(2, ((JSONObject)(jsonObject4.get("myNumber"))).length());
-        assertEquals("Numerator", BigInteger.valueOf(4) , jsonObject4.query("/myNumber/numerator"));
-        assertEquals("Denominator", BigInteger.valueOf(2) , jsonObject4.query("/myNumber/denominator"));
+        assertEquals(BigInteger.valueOf(4) , jsonObject4.query("/myNumber/numerator"), "Numerator");
+        assertEquals(BigInteger.valueOf(2) , jsonObject4.query("/myNumber/denominator"), "Denominator");
 
         /**
          * JSONObject.put() inserts the Fraction directly into the
@@ -456,7 +451,7 @@ public class JSONObjectTest {
         jsonObject5.put("myNumber", new Fraction(4,2));
         actual = jsonObject5.toString();
         expected = "{\"myNumber\":\"4/2\"}"; // valid JSON, bug fixed
-        assertEquals("Equal", expected , actual);
+        assertEquals(expected , actual, "Equal");
 
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jsonObject0, jsonObject1, jsonObject2, jsonObject3, jsonObject4, jsonObject5
@@ -467,7 +462,7 @@ public class JSONObjectTest {
      * Verifies that the put Collection has backwards compatibility with RAW types pre-java5.
      */
     @Test
-    public void verifyPutCollection() {
+    void verifyPutCollection() {
         
         final JSONObject expected = new JSONObject("{\"myCollection\":[10]}");
 
@@ -487,26 +482,26 @@ public class JSONObjectTest {
         jaInt.put("myCollection", myCInt);
 
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaRaw));
+                expected.similar(jaRaw),
+                "The RAW Collection should give me the same as the Typed Collection");
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaObj));
+                expected.similar(jaObj),
+                "The RAW Collection should give me the same as the Typed Collection");
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaInt));
+                expected.similar(jaInt),
+                "The RAW Collection should give me the same as the Typed Collection");
 
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jaRaw, jaObj, jaInt
         )));
     }
 
-    
+
     /**
      * Verifies that the put Map has backwards compatibility with RAW types pre-java5.
      */
     @Test
-    public void verifyPutMap() {
+    void verifyPutMap() {
         
         final JSONObject expected = new JSONObject("{\"myMap\":{\"myKey\":10}}");
 
@@ -531,17 +526,17 @@ public class JSONObjectTest {
         jaObjObj.put("myMap", myCObjObj);
 
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaRaw));
+                expected.similar(jaRaw),
+                "The RAW Collection should give me the same as the Typed Collection");
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaStrObj));
+                expected.similar(jaStrObj),
+                "The RAW Collection should give me the same as the Typed Collection");
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaStrInt));
+                expected.similar(jaStrInt),
+                "The RAW Collection should give me the same as the Typed Collection");
         assertTrue(
-                "The RAW Collection should give me the same as the Typed Collection",
-                expected.similar(jaObjObj));
+                expected.similar(jaObjObj),
+                "The RAW Collection should give me the same as the Typed Collection");
 
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jaRaw, jaStrObj, jaStrInt, jaStrObj
@@ -555,7 +550,7 @@ public class JSONObjectTest {
      * The actual conversion is kind of interesting.
      */
     @Test
-    public void jsonObjectByMapWithUnsupportedValues() {
+    void jsonObjectByMapWithUnsupportedValues() {
         Map<String, Object> jsonMap = new HashMap<String, Object>();
         // Just insert some random objects
         jsonMap.put("key1", new CDL());
@@ -565,9 +560,9 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected 0 key1 items", ((Map<?,?>)(JsonPath.read(doc, "$.key1"))).size() == 0);
-        assertTrue("expected \"key2\":java.lang.Exception","java.lang.Exception".equals(jsonObject.query("/key2")));
+        assertEquals(2, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 2 top level items");
+        assertEquals(0, ((Map<?, ?>)(JsonPath.read(doc, "$.key1"))).size(), "expected 0 key1 items");
+        assertEquals("java.lang.Exception", jsonObject.query("/key2"), "expected \"key2\":java.lang.Exception");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -576,7 +571,7 @@ public class JSONObjectTest {
      * In this test one of the map values is null 
      */
     @Test
-    public void jsonObjectByMapWithNullValue() {
+    void jsonObjectByMapWithNullValue() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("trueKey", Boolean.valueOf(true));
         map.put("falseKey", Boolean.valueOf(false));
@@ -589,13 +584,13 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected \"trueKey\":true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
-        assertTrue("expected \"falseKey\":false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
-        assertTrue("expected \"stringKey\":\"hello world!\"", "hello world!".equals(jsonObject.query("/stringKey")));
-        assertTrue("expected \"escapeStringKey\":\"h\be\tllo w\u1234orld!\"", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/escapeStringKey")));
-        assertTrue("expected \"intKey\":42", Long.valueOf("42").equals(jsonObject.query("/intKey")));
-        assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(jsonObject.query("/doubleKey")));
+        assertEquals(6, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 6 top level items");
+        assertEquals(Boolean.TRUE, jsonObject.query("/trueKey"), "expected \"trueKey\":true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/falseKey"), "expected \"falseKey\":false");
+        assertEquals("hello world!", jsonObject.query("/stringKey"), "expected \"stringKey\":\"hello world!\"");
+        assertEquals("h\be\tllo w\u1234orld!", jsonObject.query("/escapeStringKey"), "expected \"escapeStringKey\":\"h\be\tllo w\u1234orld!\"");
+        assertEquals(Long.valueOf("42"), jsonObject.query("/intKey"), "expected \"intKey\":42");
+        assertEquals(Double.valueOf("-23.45e67"), jsonObject.query("/doubleKey"), "expected \"doubleKey\":-23.45e67");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -605,7 +600,7 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void jsonObjectByBean1() {
+    void jsonObjectByBean1() {
         /**
          * Default access classes have to be mocked since JSONObject, which is
          * not in the same package, cannot call MyBean methods by reflection.
@@ -625,18 +620,17 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 8 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 8);
-        assertTrue("expected 0 items in stringReaderKey", ((Map<?, ?>) (JsonPath.read(doc, "$.stringReaderKey"))).size() == 0);
-        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
-        assertTrue("expected hello world!","hello world!".equals(jsonObject.query("/stringKey")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/escapeStringKey")));
-        assertTrue("expected 42", Integer.valueOf("42").equals(jsonObject.query("/intKey")));
-        assertTrue("expected -23.45e7", Double.valueOf("-23.45e7").equals(jsonObject.query("/doubleKey")));
+        assertEquals(8, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 8 top level items");
+        assertEquals(0, ((Map<?, ?>)(JsonPath.read(doc, "$.stringReaderKey"))).size(), "expected 0 items in stringReaderKey");
+        assertEquals(Boolean.TRUE, jsonObject.query("/trueKey"), "expected true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/falseKey"), "expected false");
+        assertEquals("hello world!", jsonObject.query("/stringKey"), "expected hello world!");
+        assertEquals("h\be\tllo w\u1234orld!", jsonObject.query("/escapeStringKey"), "expected h\be\tllo w\u1234orld!");
+        assertEquals(Integer.valueOf("42"), jsonObject.query("/intKey"), "expected 42");
+        assertEquals(Double.valueOf("-23.45e7"), jsonObject.query("/doubleKey"), "expected -23.45e7");
         // sorry, mockito artifact
-        assertTrue("expected 2 mockitoInterceptor items", ((Map<?,?>)(JsonPath.read(doc, "$.mockitoInterceptor"))).size() == 2);
-        assertTrue("expected 0 mockitoInterceptor.serializationSupport items",
-                ((Map<?,?>)(JsonPath.read(doc, "$.mockitoInterceptor.serializationSupport"))).size() == 0);
+        assertEquals(2, ((Map<?, ?>)(JsonPath.read(doc, "$.mockitoInterceptor"))).size(), "expected 2 mockitoInterceptor items");
+        assertEquals(0, ((Map<?, ?>)(JsonPath.read(doc, "$.mockitoInterceptor.serializationSupport"))).size(), "expected 0 mockitoInterceptor.serializationSupport items");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -644,86 +638,86 @@ public class JSONObjectTest {
      * JSONObject built from a bean that has custom field names.
      */
     @Test
-    public void jsonObjectByBean2() {
+    void jsonObjectByBean2() {
         JSONObject jsonObject = new JSONObject(new MyBeanCustomName());
         assertNotNull(jsonObject);
-        assertEquals("Wrong number of keys found:",
-                5,
-                jsonObject.keySet().size());
-        assertFalse("Normal field name (someString) processing did not work",
-                jsonObject.has("someString"));
-        assertFalse("Normal field name (myDouble) processing did not work",
-                jsonObject.has("myDouble"));
-        assertFalse("Normal field name (someFloat) processing did not work",
-                jsonObject.has("someFloat"));
-        assertFalse("Ignored field not found!",
-                jsonObject.has("ignoredInt"));
+        assertEquals(5,
+                jsonObject.keySet().size(),
+                "Wrong number of keys found:");
+        assertFalse(jsonObject.has("someString"),
+                "Normal field name (someString) processing did not work");
+        assertFalse(jsonObject.has("myDouble"),
+                "Normal field name (myDouble) processing did not work");
+        assertFalse(jsonObject.has("someFloat"),
+                "Normal field name (someFloat) processing did not work");
+        assertFalse(jsonObject.has("ignoredInt"),
+                "Ignored field not found!");
         // getSomeInt() has no user-defined annotation
-        assertTrue("Normal field name (someInt) should have been found",
-                jsonObject.has("someInt"));
+        assertTrue(jsonObject.has("someInt"),
+                "Normal field name (someInt) should have been found");
         // the user-defined annotation does not replace any value, so someLong should be found
-        assertTrue("Normal field name (someLong) should have been found",
-                jsonObject.has("someLong"));
+        assertTrue(jsonObject.has("someLong"),
+                "Normal field name (someLong) should have been found");
         // myStringField replaces someString property name via user-defined annotation
-        assertTrue("Overridden String field name (myStringField) should have been found",
-                jsonObject.has("myStringField"));
+        assertTrue(jsonObject.has("myStringField"),
+                "Overridden String field name (myStringField) should have been found");
         // weird name replaces myDouble property name via user-defined annotation
-        assertTrue("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) should have been found",
-                jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"));
+        assertTrue(jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"),
+                "Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) should have been found");
         // InterfaceField replaces someFloat property name via user-defined annotation
-        assertTrue("Overridden String field name (InterfaceField) should have been found",
-                jsonObject.has("InterfaceField"));
+        assertTrue(jsonObject.has("InterfaceField"),
+                "Overridden String field name (InterfaceField) should have been found");
         Util.checkJSONObjectMaps(jsonObject);
     }
-    
+
     /**
      * JSONObject built from a bean that has custom field names inherited from a parent class.
      */
     @Test
-    public void jsonObjectByBean3() {
+    void jsonObjectByBean3() {
         JSONObject jsonObject = new JSONObject(new MyBeanCustomNameSubClass());
         assertNotNull(jsonObject);
-        assertEquals("Wrong number of keys found:",
-                7,
-                jsonObject.keySet().size());
-        assertFalse("Normal int field name (someInt) found, but was overridden",
-                jsonObject.has("someInt"));
-        assertFalse("Normal field name (myDouble) processing did not work",
-                jsonObject.has("myDouble"));
+        assertEquals(7,
+                jsonObject.keySet().size(),
+                "Wrong number of keys found:");
+        assertFalse(jsonObject.has("someInt"),
+                "Normal int field name (someInt) found, but was overridden");
+        assertFalse(jsonObject.has("myDouble"),
+                "Normal field name (myDouble) processing did not work");
         // myDouble was replaced by weird name, and then replaced again by AMoreNormalName via user-defined annotation
-        assertFalse("Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) should not be FOUND!",
-                jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"));
-        assertFalse("Normal field name (someFloat) found, but was overridden",
-                jsonObject.has("someFloat"));
-        assertFalse("Ignored field found! but was overridden",
-                jsonObject.has("ignoredInt"));
+        assertFalse(jsonObject.has("Some Weird NAme that Normally Wouldn't be possible!"),
+                "Overridden String field name (Some Weird NAme that Normally Wouldn't be possible!) should not be FOUND!");
+        assertFalse(jsonObject.has("someFloat"),
+                "Normal field name (someFloat) found, but was overridden");
+        assertFalse(jsonObject.has("ignoredInt"),
+                "Ignored field found! but was overridden");
         // shouldNotBeJSON property name was first ignored, then replaced by ShouldBeIgnored via user-defined annotations
-        assertFalse("Ignored field at the same level as forced name should not have been found",
-                jsonObject.has("ShouldBeIgnored"));
+        assertFalse(jsonObject.has("ShouldBeIgnored"),
+                "Ignored field at the same level as forced name should not have been found");
         // able property name was replaced by Getable via user-defined annotation
-        assertFalse("Normally ignored field (able) with explicit property name should not have been found",
-                jsonObject.has("able"));
+        assertFalse(jsonObject.has("able"),
+                "Normally ignored field (able) with explicit property name should not have been found");
         // property name someInt was replaced by newIntFieldName via user-defined annotation
-        assertTrue("Overridden int field name (newIntFieldName) should have been found",
-                jsonObject.has("newIntFieldName"));
+        assertTrue(jsonObject.has("newIntFieldName"),
+                "Overridden int field name (newIntFieldName) should have been found");
         // property name someLong was not replaced via user-defined annotation
-        assertTrue("Normal field name (someLong) should have been found",
-                jsonObject.has("someLong"));
+        assertTrue(jsonObject.has("someLong"),
+                "Normal field name (someLong) should have been found");
         // property name someString was replaced by myStringField via user-defined annotation
-        assertTrue("Overridden String field name (myStringField) should have been found",
-                jsonObject.has("myStringField"));
+        assertTrue(jsonObject.has("myStringField"),
+                "Overridden String field name (myStringField) should have been found");
         // property name myDouble was replaced by a weird name, followed by AMoreNormalName via user-defined annotations
-        assertTrue("Overridden double field name (AMoreNormalName) should have been found",
-                jsonObject.has("AMoreNormalName"));
+        assertTrue(jsonObject.has("AMoreNormalName"),
+                "Overridden double field name (AMoreNormalName) should have been found");
         // property name someFloat was replaced by InterfaceField via user-defined annotation
-        assertTrue("Overridden String field name (InterfaceField) should have been found",
-                jsonObject.has("InterfaceField"));
+        assertTrue(jsonObject.has("InterfaceField"),
+                "Overridden String field name (InterfaceField) should have been found");
         // property name ignoredInt was replaced by none, followed by forcedInt via user-defined annotations
-        assertTrue("Forced field should have been found!",
-                jsonObject.has("forcedInt"));
+        assertTrue(jsonObject.has("forcedInt"),
+                "Forced field should have been found!");
         // property name able was replaced by Getable via user-defined annotation
-        assertTrue("Overridden boolean field name (Getable) should have been found",
-                jsonObject.has("Getable"));
+        assertTrue(jsonObject.has("Getable"),
+                "Overridden boolean field name (Getable) should have been found");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -734,7 +728,7 @@ public class JSONObjectTest {
      * data members, which have been added to the class.
      */
     @Test
-    public void jsonObjectByObjectAndNames() {
+    void jsonObjectByObjectAndNames() {
         String[] keys = {"publicString", "publicInt"};
         // just need a class that has public data members
         MyPublicClass myPublicClass = new MyPublicClass();
@@ -742,9 +736,9 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected \"publicString\":\"abc\"", "abc".equals(jsonObject.query("/publicString")));
-        assertTrue("expected \"publicInt\":42", Integer.valueOf(42).equals(jsonObject.query("/publicInt")));
+        assertEquals(2, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 2 top level items");
+        assertEquals("abc", jsonObject.query("/publicString"), "expected \"publicString\":\"abc\"");
+        assertEquals(Integer.valueOf(42), jsonObject.query("/publicInt"), "expected \"publicInt\":42");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -753,29 +747,29 @@ public class JSONObjectTest {
      * The test resource bundle is uncomplicated, but provides adequate test coverage.
      */
     @Test
-    public void jsonObjectByResourceBundle() {
+    void jsonObjectByResourceBundle() {
         JSONObject jsonObject = new
                 JSONObject("org.json.junit.data.StringsResourceBundle",
                         Locale.getDefault());
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 2 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 2);
-        assertTrue("expected 2 greetings items", ((Map<?,?>)(JsonPath.read(doc, "$.greetings"))).size() == 2);
-        assertTrue("expected \"hello\":\"Hello, \"", "Hello, ".equals(jsonObject.query("/greetings/hello")));
-        assertTrue("expected \"world\":\"World!\"", "World!".equals(jsonObject.query("/greetings/world")));
-        assertTrue("expected 2 farewells items", ((Map<?,?>)(JsonPath.read(doc, "$.farewells"))).size() == 2);
-        assertTrue("expected \"later\":\"Later, \"", "Later, ".equals(jsonObject.query("/farewells/later")));
-        assertTrue("expected \"world\":\"World!\"", "Alligator!".equals(jsonObject.query("/farewells/gator")));
+        assertEquals(2, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 2 top level items");
+        assertEquals(2, ((Map<?, ?>)(JsonPath.read(doc, "$.greetings"))).size(), "expected 2 greetings items");
+        assertEquals("Hello, ", jsonObject.query("/greetings/hello"), "expected \"hello\":\"Hello, \"");
+        assertEquals("World!", jsonObject.query("/greetings/world"), "expected \"world\":\"World!\"");
+        assertEquals(2, ((Map<?, ?>)(JsonPath.read(doc, "$.farewells"))).size(), "expected 2 farewells items");
+        assertEquals("Later, ", jsonObject.query("/farewells/later"), "expected \"later\":\"Later, \"");
+        assertEquals("Alligator!", jsonObject.query("/farewells/gator"), "expected \"world\":\"World!\"");
         Util.checkJSONObjectMaps(jsonObject);
     }
-    
+
     /**
      * Exercise the JSONObject.accumulate() method
      */
     @SuppressWarnings("boxing")
     @Test
-    public void jsonObjectAccumulate() {
+    void jsonObjectAccumulate() {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.accumulate("myArray", true);
@@ -792,14 +786,14 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
-        assertTrue("expected 6 myArray items", ((List<?>)(JsonPath.read(doc, "$.myArray"))).size() == 6);
-        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/myArray/0")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/myArray/1")));
-        assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/myArray/2")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/myArray/3")));
-        assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/myArray/4")));
-        assertTrue("expected -23.45e7", Double.valueOf(-23.45e7).equals(jsonObject.query("/myArray/5")));
+        assertEquals(1, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 1 top level item");
+        assertEquals(6, ((List<?>)(JsonPath.read(doc, "$.myArray"))).size(), "expected 6 myArray items");
+        assertEquals(Boolean.TRUE, jsonObject.query("/myArray/0"), "expected true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/myArray/1"), "expected false");
+        assertEquals("hello world!", jsonObject.query("/myArray/2"), "expected hello world!");
+        assertEquals("h\be\tllo w\u1234orld!", jsonObject.query("/myArray/3"), "expected h\be\tllo w\u1234orld!");
+        assertEquals(Integer.valueOf(42), jsonObject.query("/myArray/4"), "expected 42");
+        assertEquals(Double.valueOf(-23.45e7), jsonObject.query("/myArray/5"), "expected -23.45e7");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -808,7 +802,7 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void jsonObjectAppend() {
+    void jsonObjectAppend() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.append("myArray", true);
         jsonObject.append("myArray", false);
@@ -824,14 +818,14 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
-        assertTrue("expected 6 myArray items", ((List<?>)(JsonPath.read(doc, "$.myArray"))).size() == 6);
-        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/myArray/0")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/myArray/1")));
-        assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/myArray/2")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/myArray/3")));
-        assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/myArray/4")));
-        assertTrue("expected -23.45e7", Double.valueOf(-23.45e7).equals(jsonObject.query("/myArray/5")));
+        assertEquals(1, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 1 top level item");
+        assertEquals(6, ((List<?>)(JsonPath.read(doc, "$.myArray"))).size(), "expected 6 myArray items");
+        assertEquals(Boolean.TRUE, jsonObject.query("/myArray/0"), "expected true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/myArray/1"), "expected false");
+        assertEquals("hello world!", jsonObject.query("/myArray/2"), "expected hello world!");
+        assertEquals("h\be\tllo w\u1234orld!", jsonObject.query("/myArray/3"), "expected h\be\tllo w\u1234orld!");
+        assertEquals(Integer.valueOf(42), jsonObject.query("/myArray/4"), "expected 42");
+        assertEquals(Double.valueOf(-23.45e7), jsonObject.query("/myArray/5"), "expected -23.45e7");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -840,15 +834,14 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void jsonObjectDoubleToString() {
+    void jsonObjectDoubleToString() {
         String [] expectedStrs = {"1", "1", "-23.4", "-2.345E68", "null", "null" };
         Double [] doubles = { 1.0, 00001.00000, -23.4, -23.45e67, 
                 NaN, Double.NEGATIVE_INFINITY };
         for (int i = 0; i < expectedStrs.length; ++i) {
             String actualStr = JSONObject.doubleToString(doubles[i]);
-            assertTrue("value expected ["+expectedStrs[i]+
-                    "] found ["+actualStr+ "]",
-                    expectedStrs[i].equals(actualStr));
+            assertEquals(expectedStrs[i], actualStr, "value expected [" + expectedStrs[i] +
+                    "] found [" + actualStr + "]");
         }
     }
 
@@ -856,7 +849,7 @@ public class JSONObjectTest {
      * Exercise some JSONObject get[type] and opt[type] methods
      */
     @Test
-    public void jsonObjectValues() {
+    void jsonObjectValues() {
         String str = 
             "{"+
                 "\"trueKey\":true,"+
@@ -877,119 +870,85 @@ public class JSONObjectTest {
                 "\"objectKey\":{\"myKey\":\"myVal\"}"+
             "}";
         JSONObject jsonObject = new JSONObject(str);
-        assertTrue("trueKey should be true", jsonObject.getBoolean("trueKey"));
-        assertTrue("opt trueKey should be true", jsonObject.optBoolean("trueKey"));
-        assertTrue("opt trueKey should be true", jsonObject.optBooleanObject("trueKey"));
-        assertTrue("falseKey should be false", !jsonObject.getBoolean("falseKey"));
-        assertTrue("trueStrKey should be true", jsonObject.getBoolean("trueStrKey"));
-        assertTrue("trueStrKey should be true", jsonObject.optBoolean("trueStrKey"));
-        assertTrue("trueStrKey should be true", jsonObject.optBooleanObject("trueStrKey"));
-        assertTrue("falseStrKey should be false", !jsonObject.getBoolean("falseStrKey"));
-        assertTrue("stringKey should be string",
-            jsonObject.getString("stringKey").equals("hello world!"));
-        assertTrue("doubleKey should be double", 
-                jsonObject.getDouble("doubleKey") == -23.45e7);
-        assertTrue("doubleStrKey should be double", 
-                jsonObject.getDouble("doubleStrKey") == 1);
-        assertTrue("doubleKey can be float", 
-                jsonObject.getFloat("doubleKey") == -23.45e7f);
-        assertTrue("doubleStrKey can be float", 
-                jsonObject.getFloat("doubleStrKey") == 1f);
-        assertTrue("opt doubleKey should be double", 
-                jsonObject.optDouble("doubleKey") == -23.45e7);
-        assertTrue("opt doubleKey with Default should be double", 
-                jsonObject.optDouble("doubleStrKey", NaN) == 1);
-        assertTrue("opt doubleKey should be Double",
-                Double.valueOf(-23.45e7).equals(jsonObject.optDoubleObject("doubleKey")));
-        assertTrue("opt doubleKey with Default should be Double",
-                Double.valueOf(1).equals(jsonObject.optDoubleObject("doubleStrKey", NaN)));
-        assertTrue("opt negZeroKey should be a Double", 
-                jsonObject.opt("negZeroKey") instanceof Double);
-        assertTrue("get negZeroKey should be a Double", 
-                jsonObject.get("negZeroKey") instanceof Double);
-        assertTrue("optNumber negZeroKey should return Double",
-                jsonObject.optNumber("negZeroKey") instanceof Double);
-        assertTrue("optNumber negZeroStrKey should return Double",
-                jsonObject.optNumber("negZeroStrKey") instanceof Double);
-        assertTrue("opt negZeroKey should be double", 
-                Double.compare(jsonObject.optDouble("negZeroKey"), -0.0d) == 0);
-        assertTrue("opt negZeroStrKey with Default should be double", 
-                Double.compare(jsonObject.optDouble("negZeroStrKey"), -0.0d) == 0);
-        assertTrue("opt negZeroKey should be Double",
-                Double.valueOf(-0.0d).equals(jsonObject.optDoubleObject("negZeroKey")));
-        assertTrue("opt negZeroStrKey with Default should be Double",
-                Double.valueOf(-0.0d).equals(jsonObject.optDoubleObject("negZeroStrKey")));
-        assertTrue("optNumber negZeroKey should be -0.0", 
-                Double.compare(jsonObject.optNumber("negZeroKey").doubleValue(), -0.0d) == 0);
-        assertTrue("optNumber negZeroStrKey should be -0.0", 
-                Double.compare(jsonObject.optNumber("negZeroStrKey").doubleValue(), -0.0d) == 0);
-        assertTrue("optFloat doubleKey should be float", 
-                jsonObject.optFloat("doubleKey") == -23.45e7f);
-        assertTrue("optFloat doubleKey with Default should be float", 
-                jsonObject.optFloat("doubleStrKey", Float.NaN) == 1f);
-        assertTrue("optFloat doubleKey should be Float",
-                Float.valueOf(-23.45e7f).equals(jsonObject.optFloatObject("doubleKey")));
-        assertTrue("optFloat doubleKey with Default should be Float",
-                Float.valueOf(1f).equals(jsonObject.optFloatObject("doubleStrKey", Float.NaN)));
-        assertTrue("intKey should be int", 
-                jsonObject.optInt("intKey") == 42);
-        assertTrue("opt intKey should be int", 
-                jsonObject.optInt("intKey", 0) == 42);
-        assertTrue("intKey should be Integer",
-                Integer.valueOf(42).equals(jsonObject.optIntegerObject("intKey")));
-        assertTrue("opt intKey should be Integer",
-                Integer.valueOf(42).equals(jsonObject.optIntegerObject("intKey", 0)));
-        assertTrue("opt intKey with default should be int", 
-                jsonObject.getInt("intKey") == 42);
-        assertTrue("intStrKey should be int", 
-                jsonObject.getInt("intStrKey") == 43);
-        assertTrue("longKey should be long", 
-                jsonObject.getLong("longKey") == 1234567890123456789L);
-        assertTrue("opt longKey should be long", 
-                jsonObject.optLong("longKey") == 1234567890123456789L);
-        assertTrue("opt longKey with default should be long", 
-                jsonObject.optLong("longKey", 0) == 1234567890123456789L);
-        assertTrue("opt longKey should be Long",
-                Long.valueOf(1234567890123456789L).equals(jsonObject.optLongObject("longKey")));
-        assertTrue("opt longKey with default should be Long",
-                Long.valueOf(1234567890123456789L).equals(jsonObject.optLongObject("longKey", 0L)));
-        assertTrue("longStrKey should be long", 
-                jsonObject.getLong("longStrKey") == 987654321098765432L);
-        assertTrue("optNumber int should return Integer",
-                jsonObject.optNumber("intKey") instanceof Integer);
-        assertTrue("optNumber long should return Long",
-                jsonObject.optNumber("longKey") instanceof Long);
-        assertTrue("optNumber double should return BigDecimal",
-                jsonObject.optNumber("doubleKey") instanceof BigDecimal);
-        assertTrue("optNumber Str int should return Integer",
-                jsonObject.optNumber("intStrKey") instanceof Integer);
-        assertTrue("optNumber Str long should return Long",
-                jsonObject.optNumber("longStrKey") instanceof Long);
-        assertTrue("optNumber Str double should return BigDecimal",
-                jsonObject.optNumber("doubleStrKey") instanceof BigDecimal);
-        assertTrue("optNumber BigDecimalStrKey should return BigDecimal",
-                jsonObject.optNumber("BigDecimalStrKey") instanceof BigDecimal);
-        assertTrue("xKey should not exist",
-                jsonObject.isNull("xKey"));
-        assertTrue("stringKey should exist",
-                jsonObject.has("stringKey"));
-        assertTrue("opt stringKey should string",
-                jsonObject.optString("stringKey").equals("hello world!"));
-        assertTrue("opt stringKey with default should string",
-                jsonObject.optString("stringKey", "not found").equals("hello world!"));
+        assertTrue(jsonObject.getBoolean("trueKey"), "trueKey should be true");
+        assertTrue(jsonObject.optBoolean("trueKey"), "opt trueKey should be true");
+        assertTrue(jsonObject.optBooleanObject("trueKey"), "opt trueKey should be true");
+        assertFalse(jsonObject.getBoolean("falseKey"), "falseKey should be false");
+        assertTrue(jsonObject.getBoolean("trueStrKey"), "trueStrKey should be true");
+        assertTrue(jsonObject.optBoolean("trueStrKey"), "trueStrKey should be true");
+        assertTrue(jsonObject.optBooleanObject("trueStrKey"), "trueStrKey should be true");
+        assertFalse(jsonObject.getBoolean("falseStrKey"), "falseStrKey should be false");
+        assertEquals("hello world!", jsonObject.getString("stringKey"), "stringKey should be string");
+        assertEquals(jsonObject.getDouble("doubleKey"), -23.45e7, "doubleKey should be double");
+        assertEquals(1, jsonObject.getDouble("doubleStrKey"), "doubleStrKey should be double");
+        assertEquals(jsonObject.getFloat("doubleKey"), -23.45e7f, "doubleKey can be float");
+        assertEquals(1f, jsonObject.getFloat("doubleStrKey"), "doubleStrKey can be float");
+        assertEquals(jsonObject.optDouble("doubleKey"), -23.45e7, "opt doubleKey should be double");
+        assertEquals(1, jsonObject.optDouble("doubleStrKey", NaN), "opt doubleKey with Default should be double");
+        assertEquals(Double.valueOf(-23.45e7), jsonObject.optDoubleObject("doubleKey"), "opt doubleKey should be Double");
+        assertEquals(Double.valueOf(1), jsonObject.optDoubleObject("doubleStrKey", NaN), "opt doubleKey with Default should be Double");
+        assertTrue(jsonObject.opt("negZeroKey") instanceof Double, 
+                "opt negZeroKey should be a Double");
+        assertTrue(jsonObject.get("negZeroKey") instanceof Double, 
+                "get negZeroKey should be a Double");
+        assertTrue(jsonObject.optNumber("negZeroKey") instanceof Double,
+                "optNumber negZeroKey should return Double");
+        assertTrue(jsonObject.optNumber("negZeroStrKey") instanceof Double,
+                "optNumber negZeroStrKey should return Double");
+        assertEquals(0, Double.compare(jsonObject.optDouble("negZeroKey"), -0.0d), "opt negZeroKey should be double");
+        assertEquals(0, Double.compare(jsonObject.optDouble("negZeroStrKey"), -0.0d), "opt negZeroStrKey with Default should be double");
+        assertEquals(Double.valueOf(-0.0d), jsonObject.optDoubleObject("negZeroKey"), "opt negZeroKey should be Double");
+        assertEquals(Double.valueOf(-0.0d), jsonObject.optDoubleObject("negZeroStrKey"), "opt negZeroStrKey with Default should be Double");
+        assertEquals(0, Double.compare(jsonObject.optNumber("negZeroKey").doubleValue(), -0.0d), "optNumber negZeroKey should be -0.0");
+        assertEquals(0, Double.compare(jsonObject.optNumber("negZeroStrKey").doubleValue(), -0.0d), "optNumber negZeroStrKey should be -0.0");
+        assertEquals(jsonObject.optFloat("doubleKey"), -23.45e7f, "optFloat doubleKey should be float");
+        assertEquals(1f, jsonObject.optFloat("doubleStrKey", Float.NaN), "optFloat doubleKey with Default should be float");
+        assertEquals(Float.valueOf(-23.45e7f), jsonObject.optFloatObject("doubleKey"), "optFloat doubleKey should be Float");
+        assertEquals(Float.valueOf(1f), jsonObject.optFloatObject("doubleStrKey", Float.NaN), "optFloat doubleKey with Default should be Float");
+        assertEquals(42, jsonObject.optInt("intKey"), "intKey should be int");
+        assertEquals(42, jsonObject.optInt("intKey", 0), "opt intKey should be int");
+        assertEquals(Integer.valueOf(42), jsonObject.optIntegerObject("intKey"), "intKey should be Integer");
+        assertEquals(Integer.valueOf(42), jsonObject.optIntegerObject("intKey", 0), "opt intKey should be Integer");
+        assertEquals(42, jsonObject.getInt("intKey"), "opt intKey with default should be int");
+        assertEquals(43, jsonObject.getInt("intStrKey"), "intStrKey should be int");
+        assertEquals(1234567890123456789L, jsonObject.getLong("longKey"), "longKey should be long");
+        assertEquals(1234567890123456789L, jsonObject.optLong("longKey"), "opt longKey should be long");
+        assertEquals(1234567890123456789L, jsonObject.optLong("longKey", 0), "opt longKey with default should be long");
+        assertEquals(Long.valueOf(1234567890123456789L), jsonObject.optLongObject("longKey"), "opt longKey should be Long");
+        assertEquals(Long.valueOf(1234567890123456789L), jsonObject.optLongObject("longKey", 0L), "opt longKey with default should be Long");
+        assertEquals(987654321098765432L, jsonObject.getLong("longStrKey"), "longStrKey should be long");
+        assertTrue(jsonObject.optNumber("intKey") instanceof Integer,
+                "optNumber int should return Integer");
+        assertTrue(jsonObject.optNumber("longKey") instanceof Long,
+                "optNumber long should return Long");
+        assertTrue(jsonObject.optNumber("doubleKey") instanceof BigDecimal,
+                "optNumber double should return BigDecimal");
+        assertTrue(jsonObject.optNumber("intStrKey") instanceof Integer,
+                "optNumber Str int should return Integer");
+        assertTrue(jsonObject.optNumber("longStrKey") instanceof Long,
+                "optNumber Str long should return Long");
+        assertTrue(jsonObject.optNumber("doubleStrKey") instanceof BigDecimal,
+                "optNumber Str double should return BigDecimal");
+        assertTrue(jsonObject.optNumber("BigDecimalStrKey") instanceof BigDecimal,
+                "optNumber BigDecimalStrKey should return BigDecimal");
+        assertTrue(jsonObject.isNull("xKey"),
+                "xKey should not exist");
+        assertTrue(jsonObject.has("stringKey"),
+                "stringKey should exist");
+        assertEquals("hello world!", jsonObject.optString("stringKey"), "opt stringKey should string");
+        assertEquals("hello world!", jsonObject.optString("stringKey", "not found"), "opt stringKey with default should string");
         JSONArray jsonArray = jsonObject.getJSONArray("arrayKey");
-        assertTrue("arrayKey should be JSONArray", 
-                jsonArray.getInt(0) == 0 &&
+        assertTrue(jsonArray.getInt(0) == 0 &&
                 jsonArray.getInt(1) == 1 &&
-                jsonArray.getInt(2) == 2);
+                jsonArray.getInt(2) == 2, 
+                "arrayKey should be JSONArray");
         jsonArray = jsonObject.optJSONArray("arrayKey");
-        assertTrue("opt arrayKey should be JSONArray", 
-                jsonArray.getInt(0) == 0 &&
+        assertTrue(jsonArray.getInt(0) == 0 &&
                 jsonArray.getInt(1) == 1 &&
-                jsonArray.getInt(2) == 2);
+                jsonArray.getInt(2) == 2, 
+                "opt arrayKey should be JSONArray");
         JSONObject jsonObjectInner = jsonObject.getJSONObject("objectKey");
-        assertTrue("objectKey should be JSONObject", 
-                jsonObjectInner.get("myKey").equals("myVal"));
+        assertEquals("myVal", jsonObjectInner.get("myKey"), "objectKey should be JSONObject");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -997,32 +956,30 @@ public class JSONObjectTest {
      * Check whether JSONObject handles large or high precision numbers correctly
      */
     @Test
-    public void stringToValueNumbersTest() {
-        assertTrue("-0 Should be a Double!",JSONObject.stringToValue("-0")  instanceof Double);
-        assertTrue("-0.0 Should be a Double!",JSONObject.stringToValue("-0.0") instanceof Double);
-        assertTrue("'-' Should be a String!",JSONObject.stringToValue("-") instanceof String);
-        assertTrue( "0.2 should be a BigDecimal!",
-                JSONObject.stringToValue( "0.2" ) instanceof BigDecimal );
-        assertTrue( "Doubles should be BigDecimal, even when incorrectly converting floats!",
-                JSONObject.stringToValue( Double.valueOf( "0.2f" ).toString() ) instanceof BigDecimal );
+    void stringToValueNumbersTest() {
+        assertTrue(JSONObject.stringToValue("-0")  instanceof Double,"-0 Should be a Double!");
+        assertTrue(JSONObject.stringToValue("-0.0") instanceof Double,"-0.0 Should be a Double!");
+        assertTrue(JSONObject.stringToValue("-") instanceof String,"'-' Should be a String!");
+        assertTrue( JSONObject.stringToValue( "0.2" ) instanceof BigDecimal,
+                "0.2 should be a BigDecimal!" );
+        assertTrue( JSONObject.stringToValue( Double.valueOf( "0.2f" ).toString() ) instanceof BigDecimal,
+                "Doubles should be BigDecimal, even when incorrectly converting floats!" );
         /**
          * This test documents a need for BigDecimal conversion.
          */
         Object obj = JSONObject.stringToValue( "299792.457999999984" );
-        assertTrue( "does not evaluate to 299792.457999999984 BigDecimal!",
-                 obj.equals(new BigDecimal("299792.457999999984")) );
-        assertTrue( "1 should be an Integer!",
-                JSONObject.stringToValue( "1" ) instanceof Integer );
-        assertTrue( "Integer.MAX_VALUE should still be an Integer!",
-                JSONObject.stringToValue( Integer.valueOf( Integer.MAX_VALUE ).toString() ) instanceof Integer );
-        assertTrue( "Large integers should be a Long!",
-                JSONObject.stringToValue( Long.valueOf(((long)Integer.MAX_VALUE) + 1 ) .toString() ) instanceof Long );
-        assertTrue( "Long.MAX_VALUE should still be an Integer!",
-                JSONObject.stringToValue( Long.valueOf( Long.MAX_VALUE ).toString() ) instanceof Long );
+        assertEquals(obj, new BigDecimal("299792.457999999984"), "does not evaluate to 299792.457999999984 BigDecimal!");
+        assertTrue( JSONObject.stringToValue( "1" ) instanceof Integer,
+                "1 should be an Integer!" );
+        assertTrue( JSONObject.stringToValue( Integer.valueOf( Integer.MAX_VALUE ).toString() ) instanceof Integer,
+                "Integer.MAX_VALUE should still be an Integer!" );
+        assertTrue( JSONObject.stringToValue( Long.valueOf(((long)Integer.MAX_VALUE) + 1 ) .toString() ) instanceof Long,
+                "Large integers should be a Long!" );
+        assertTrue( JSONObject.stringToValue( Long.valueOf( Long.MAX_VALUE ).toString() ) instanceof Long,
+                "Long.MAX_VALUE should still be an Integer!" );
 
         String str = new BigInteger( Long.valueOf( Long.MAX_VALUE ).toString() ).add( BigInteger.ONE ).toString();
-        assertTrue( "Really large integers currently evaluate to BigInteger",
-                JSONObject.stringToValue(str).equals(new BigInteger("9223372036854775808")));
+        assertEquals(JSONObject.stringToValue(str), new BigInteger("9223372036854775808"), "Really large integers currently evaluate to BigInteger");
     }
 
     /**
@@ -1031,7 +988,7 @@ public class JSONObjectTest {
      * will change if those types are supported.
      */
     @Test
-    public void jsonValidNumberValuesNeitherLongNorIEEE754Compatible() {
+    void jsonValidNumberValuesNeitherLongNorIEEE754Compatible() {
         // Valid JSON Numbers, probably should return BigDecimal or BigInteger objects
         String str = 
             "{"+
@@ -1042,17 +999,13 @@ public class JSONObjectTest {
             "}";
         JSONObject jsonObject = new JSONObject(str);
         // Comes back as a double, but loses precision
-        assertTrue( "numberWithDecimals currently evaluates to double 299792.458",
-                jsonObject.get( "numberWithDecimals" ).equals( new BigDecimal( "299792.457999999984" ) ) );
+        assertEquals(jsonObject.get("numberWithDecimals"), new BigDecimal( "299792.457999999984" ), "numberWithDecimals currently evaluates to double 299792.458");
         Object obj = jsonObject.get( "largeNumber" );
-        assertTrue("largeNumber currently evaluates to BigInteger",
-                new BigInteger("12345678901234567890").equals(obj));
+        assertEquals(new BigInteger("12345678901234567890"), obj, "largeNumber currently evaluates to BigInteger");
         // comes back as a double but loses precision
-        assertEquals( "preciseNumber currently evaluates to double 0.2",
-                0.2, jsonObject.getDouble( "preciseNumber" ), 0.0);
+        assertEquals( 0.2, jsonObject.getDouble( "preciseNumber" ), 0.0, "preciseNumber currently evaluates to double 0.2");
         obj = jsonObject.get( "largeExponent" );
-        assertTrue("largeExponent should evaluate as a BigDecimal",
-                new BigDecimal("-23.45e2327").equals(obj));
+        assertEquals(new BigDecimal("-23.45e2327"), obj, "largeExponent should evaluate as a BigDecimal");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -1060,7 +1013,7 @@ public class JSONObjectTest {
      * This test documents how JSON-Java handles invalid numeric input.
      */
     @Test
-    public void jsonInvalidNumberValues() {
+    void jsonInvalidNumberValues() {
             // Number-notations supported by Java and invalid as JSON
         String str = 
             "{"+
@@ -1087,84 +1040,48 @@ public class JSONObjectTest {
         JSONObject jsonObject = new JSONObject(str);
         Object obj;
         obj = jsonObject.get( "hexNumber" );
-        assertFalse( "hexNumber must not be a number (should throw exception!?)",
-                 obj instanceof Number );
-        assertTrue("hexNumber currently evaluates to string",
-                obj.equals("-0x123"));
-        assertTrue( "tooManyZeros currently evaluates to string",
-                jsonObject.get( "tooManyZeros" ).equals(0));
+        assertFalse( obj instanceof Number,
+                 "hexNumber must not be a number (should throw exception!?)" );
+        assertEquals("-0x123", obj, "hexNumber currently evaluates to string");
+        assertEquals(0, jsonObject.get("tooManyZeros"), "tooManyZeros currently evaluates to string");
         obj = jsonObject.get("negativeInfinite");
-        assertTrue( "negativeInfinite currently evaluates to string",
-                obj.equals("-Infinity"));
+        assertEquals("-Infinity", obj, "negativeInfinite currently evaluates to string");
         obj = jsonObject.get("negativeNaN");
-        assertTrue( "negativeNaN currently evaluates to string",
-                obj.equals("-NaN"));
+        assertEquals("-NaN", obj, "negativeNaN currently evaluates to string");
         obj = jsonObject.get("negativeNaNWithLeadingZeros");
-        assertTrue( "negativeNaNWithLeadingZeros currently evaluates to string",
-                obj.equals("-00NaN"));
-        assertTrue( "negativeFraction currently evaluates to double -0.01",
-                jsonObject.get( "negativeFraction" ).equals(BigDecimal.valueOf(-0.01)));
-        assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
-                jsonObject.get( "tooManyZerosFraction" ).equals(BigDecimal.valueOf(0.001)));
-        assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
-                jsonObject.getLong( "tooManyZerosFraction" )==0);
-        assertTrue( "tooManyZerosFraction currently evaluates to double 0.001",
-                jsonObject.optLong( "tooManyZerosFraction" )==0);
-        assertTrue( "negativeHexFloat currently evaluates to double -3.99951171875",
-                jsonObject.get( "negativeHexFloat" ).equals(Double.valueOf(-3.99951171875)));
-        assertTrue("hexFloat currently evaluates to double 4.9E-324",
-                jsonObject.get("hexFloat").equals(Double.valueOf(4.9E-324)));
-        assertTrue("floatIdentifier currently evaluates to double 0.1",
-                jsonObject.get("floatIdentifier").equals(Double.valueOf(0.1)));
-        assertTrue("doubleIdentifier currently evaluates to double 0.1",
-                jsonObject.get("doubleIdentifier").equals(Double.valueOf(0.1)));
-        assertTrue("doubleIdentifierWithMultipleLeadingZerosBeforeDecimal currently evaluates to double 0.1",
-                jsonObject.get("doubleIdentifierWithMultipleLeadingZerosBeforeDecimal").equals(Double.valueOf(0.1)));
-        assertTrue("negativeDoubleIdentifierWithMultipleLeadingZerosBeforeDecimal currently evaluates to double -0.1",
-                jsonObject.get("negativeDoubleIdentifierWithMultipleLeadingZerosBeforeDecimal").equals(Double.valueOf(-0.1)));
-        assertTrue("doubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double 0.0001",
-                jsonObject.get("doubleIdentifierWithMultipleLeadingZerosAfterDecimal").equals(Double.valueOf(0.0001)));
-        assertTrue("doubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double 0.0001",
-                jsonObject.get("doubleIdentifierWithMultipleLeadingZerosAfterDecimal").equals(Double.valueOf(0.0001)));
-        assertTrue("negativeDoubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double -0.0001",
-                jsonObject.get("negativeDoubleIdentifierWithMultipleLeadingZerosAfterDecimal").equals(Double.valueOf(-0.0001)));
-        assertTrue("Integer does not evaluate to 900",
-                jsonObject.get("integerWithLeadingZeros").equals(900));
-        assertTrue("Integer does not evaluate to 900",
-                jsonObject.getInt("integerWithLeadingZeros")==900);
-        assertTrue("Integer does not evaluate to 900",
-                jsonObject.optInt("integerWithLeadingZeros")==900);
-        assertTrue("Integer does not evaluate to 0",
-                jsonObject.get("integerWithAllZeros").equals(0));
-        assertTrue("Integer does not evaluate to 0",
-                jsonObject.getInt("integerWithAllZeros")==0);
-        assertTrue("Integer does not evaluate to 0",
-                jsonObject.optInt("integerWithAllZeros")==0);
-        assertTrue("Double does not evaluate to 800.90",
-                jsonObject.get("compositeWithLeadingZeros").equals(800.90));
-        assertTrue("Double does not evaluate to 800.90",
-                jsonObject.getDouble("compositeWithLeadingZeros")==800.9d);
-        assertTrue("Integer does not evaluate to 800",
-                jsonObject.optInt("compositeWithLeadingZeros")==800);
-        assertTrue("Long does not evaluate to 800.90",
-                jsonObject.getLong("compositeWithLeadingZeros")==800);
-        assertTrue("Long does not evaluate to 800.90",
-                jsonObject.optLong("compositeWithLeadingZeros")==800);
-        assertEquals("Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match",
-                0.9d,jsonObject.getDouble("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d);
-        assertEquals("Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match",
-                0.9d,jsonObject.optDouble("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d);
-        assertEquals("Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match",
-                0.0d,jsonObject.optLong("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d);
+        assertEquals("-00NaN", obj, "negativeNaNWithLeadingZeros currently evaluates to string");
+        assertEquals(jsonObject.get("negativeFraction"), BigDecimal.valueOf(-0.01), "negativeFraction currently evaluates to double -0.01");
+        assertEquals(jsonObject.get("tooManyZerosFraction"), BigDecimal.valueOf(0.001), "tooManyZerosFraction currently evaluates to double 0.001");
+        assertEquals(0, jsonObject.getLong("tooManyZerosFraction"), "tooManyZerosFraction currently evaluates to double 0.001");
+        assertEquals(0, jsonObject.optLong("tooManyZerosFraction"), "tooManyZerosFraction currently evaluates to double 0.001");
+        assertEquals(jsonObject.get("negativeHexFloat"), Double.valueOf(-3.99951171875), "negativeHexFloat currently evaluates to double -3.99951171875");
+        assertEquals(jsonObject.get("hexFloat"), Double.valueOf(4.9E-324), "hexFloat currently evaluates to double 4.9E-324");
+        assertEquals(jsonObject.get("floatIdentifier"), Double.valueOf(0.1), "floatIdentifier currently evaluates to double 0.1");
+        assertEquals(jsonObject.get("doubleIdentifier"), Double.valueOf(0.1), "doubleIdentifier currently evaluates to double 0.1");
+        assertEquals(jsonObject.get("doubleIdentifierWithMultipleLeadingZerosBeforeDecimal"), Double.valueOf(0.1), "doubleIdentifierWithMultipleLeadingZerosBeforeDecimal currently evaluates to double 0.1");
+        assertEquals(jsonObject.get("negativeDoubleIdentifierWithMultipleLeadingZerosBeforeDecimal"), Double.valueOf(-0.1), "negativeDoubleIdentifierWithMultipleLeadingZerosBeforeDecimal currently evaluates to double -0.1");
+        assertEquals(jsonObject.get("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"), Double.valueOf(0.0001), "doubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double 0.0001");
+        assertEquals(jsonObject.get("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"), Double.valueOf(0.0001), "doubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double 0.0001");
+        assertEquals(jsonObject.get("negativeDoubleIdentifierWithMultipleLeadingZerosAfterDecimal"), Double.valueOf(-0.0001), "negativeDoubleIdentifierWithMultipleLeadingZerosAfterDecimal currently evaluates to double -0.0001");
+        assertEquals(900, jsonObject.get("integerWithLeadingZeros"), "Integer does not evaluate to 900");
+        assertEquals(900, jsonObject.getInt("integerWithLeadingZeros"), "Integer does not evaluate to 900");
+        assertEquals(900, jsonObject.optInt("integerWithLeadingZeros"), "Integer does not evaluate to 900");
+        assertEquals(0, jsonObject.get("integerWithAllZeros"), "Integer does not evaluate to 0");
+        assertEquals(0, jsonObject.getInt("integerWithAllZeros"), "Integer does not evaluate to 0");
+        assertEquals(0, jsonObject.optInt("integerWithAllZeros"), "Integer does not evaluate to 0");
+        assertEquals(800.90, jsonObject.get("compositeWithLeadingZeros"), "Double does not evaluate to 800.90");
+        assertEquals(800.9d, jsonObject.getDouble("compositeWithLeadingZeros"), "Double does not evaluate to 800.90");
+        assertEquals(800, jsonObject.optInt("compositeWithLeadingZeros"), "Integer does not evaluate to 800");
+        assertEquals(800, jsonObject.getLong("compositeWithLeadingZeros"), "Long does not evaluate to 800.90");
+        assertEquals(800, jsonObject.optLong("compositeWithLeadingZeros"), "Long does not evaluate to 800.90");
+        assertEquals(0.9d,jsonObject.getDouble("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d,  "Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match");
+        assertEquals(0.9d,jsonObject.optDouble("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d,  "Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match");
+        assertEquals(0.0d,jsonObject.optLong("decimalPositiveWithoutNumberBeforeDecimalPoint"),  0.0d,  "Get long of decimalPositiveWithoutNumberBeforeDecimalPoint does not match");
 
-        assertEquals("Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match",
-                0.0001d,jsonObject.getDouble("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d);
-        assertEquals("Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match",
-                0.0001d,jsonObject.optDouble("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d);
-        assertEquals("Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match",
-                0.0d, jsonObject.getLong("doubleIdentifierWithMultipleLeadingZerosAfterDecimal") , 0.0d);
-        assertEquals("Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match",
-                0.0d,jsonObject.optLong("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d);
+        assertEquals(0.0001d,jsonObject.getDouble("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d,  "Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match");
+        assertEquals(0.0001d,jsonObject.optDouble("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d,  "Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match");
+        assertEquals(0.0d, jsonObject.getLong("doubleIdentifierWithMultipleLeadingZerosAfterDecimal") , 0.0d, "Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match");
+        assertEquals(0.0d,jsonObject.optLong("doubleIdentifierWithMultipleLeadingZerosAfterDecimal"),  0.0d,  "Get long of doubleIdentifierWithMultipleLeadingZerosAfterDecimal does not match");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -1172,7 +1089,7 @@ public class JSONObjectTest {
      * Tests how JSONObject get[type] handles incorrect types
      */
     @Test
-    public void jsonObjectNonAndWrongValues() {
+    void jsonObjectNonAndWrongValues() {
         String str = 
             "{"+
                 "\"trueKey\":true,"+
@@ -1194,128 +1111,127 @@ public class JSONObjectTest {
             jsonObject.getBoolean("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.", e.getMessage());
+            assertEquals("JSONObject[\"nonKey\"] not found.", e.getMessage(), "expecting an exception message");
         }
         try {
             jsonObject.getBoolean("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a Boolean (class java.lang.String : hello world!).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"stringKey\"] is not a Boolean (class java.lang.String : hello world!).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getString("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.",
-                    e.getMessage());
+            assertEquals("JSONObject[\"nonKey\"] not found.",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getString("trueKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"trueKey\"] is not a string (class java.lang.Boolean : true).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"trueKey\"] is not a string (class java.lang.Boolean : true).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getDouble("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.",
-                    e.getMessage());
+            assertEquals("JSONObject[\"nonKey\"] not found.",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getDouble("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a double (class java.lang.String : hello world!).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"stringKey\"] is not a double (class java.lang.String : hello world!).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getFloat("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.",
-                    e.getMessage());
+            assertEquals("JSONObject[\"nonKey\"] not found.",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getFloat("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message",
-                    "JSONObject[\"stringKey\"] is not a float (class java.lang.String : hello world!).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"stringKey\"] is not a float (class java.lang.String : hello world!).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getInt("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message",
-                    "JSONObject[\"nonKey\"] not found.",
-                    e.getMessage());
+            assertEquals("JSONObject[\"nonKey\"] not found.",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getInt("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a int (class java.lang.String : hello world!).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"stringKey\"] is not a int (class java.lang.String : hello world!).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getLong("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.",
-                    e.getMessage());
+            assertEquals("JSONObject[\"nonKey\"] not found.",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getLong("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a long (class java.lang.String : hello world!).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"stringKey\"] is not a long (class java.lang.String : hello world!).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getJSONArray("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.",
-                    e.getMessage());
+            assertEquals("JSONObject[\"nonKey\"] not found.",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getJSONArray("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a JSONArray (class java.lang.String : hello world!).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"stringKey\"] is not a JSONArray (class java.lang.String : hello world!).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getJSONObject("nonKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"nonKey\"] not found.",
-                    e.getMessage());
+            assertEquals("JSONObject[\"nonKey\"] not found.",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             jsonObject.getJSONObject("stringKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "JSONObject[\"stringKey\"] is not a JSONObject (class java.lang.String : hello world!).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"stringKey\"] is not a JSONObject (class java.lang.String : hello world!).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         Util.checkJSONObjectMaps(jsonObject);
     }
@@ -1326,25 +1242,22 @@ public class JSONObjectTest {
      * parsed again. On the second parse, it has become an int.
      */
     @Test
-    public void unexpectedDoubleToIntConversion() {
+    void unexpectedDoubleToIntConversion() {
         String key30 = "key30";
         String key31 = "key31";
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(key30, Double.valueOf(3.0));
         jsonObject.put(key31, Double.valueOf(3.1));
 
-        assertTrue("3.0 should remain a double",
-                jsonObject.getDouble(key30) == 3); 
-        assertTrue("3.1 should remain a double",
-                jsonObject.getDouble(key31) == 3.1); 
+        assertEquals(3, jsonObject.getDouble(key30), "3.0 should remain a double");
+        assertEquals(3.1, jsonObject.getDouble(key31), "3.1 should remain a double"); 
  
         // turns 3.0 into 3.
         String serializedString = jsonObject.toString();
         JSONObject deserialized = new JSONObject(serializedString);
-        assertTrue("3.0 is now an int", deserialized.get(key30) instanceof Integer);
-        assertTrue("3.0 can still be interpreted as a double",
-                deserialized.getDouble(key30) == 3.0);
-        assertTrue("3.1 remains a double", deserialized.getDouble(key31) == 3.1);
+        assertTrue(deserialized.get(key30) instanceof Integer, "3.0 is now an int");
+        assertEquals(3.0, deserialized.getDouble(key30), "3.0 can still be interpreted as a double");
+        assertEquals(3.1, deserialized.getDouble(key31), "3.1 remains a double");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -1354,7 +1267,7 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void bigNumberOperations() {
+    void bigNumberOperations() {
         /**
          * JSONObject tries to parse BigInteger as a bean, but it only has
          * one getter, getLowestBitSet(). The value is lost and an unhelpful
@@ -1363,11 +1276,10 @@ public class JSONObjectTest {
         BigInteger bigInteger = new BigInteger("123456789012345678901234567890");
         JSONObject jsonObject0 = new JSONObject(bigInteger);
         Object obj = jsonObject0.get("lowestSetBit");
-        assertTrue("JSONObject only has 1 value", jsonObject0.length() == 1);
-        assertTrue("JSONObject parses BigInteger as the Integer lowestBitSet",
-                obj instanceof Integer);
-        assertTrue("this bigInteger lowestBitSet happens to be 1",
-                obj.equals(1));
+        assertEquals(1, jsonObject0.length(), "JSONObject only has 1 value");
+        assertTrue(obj instanceof Integer,
+                "JSONObject parses BigInteger as the Integer lowestBitSet");
+        assertEquals(1, obj, "this bigInteger lowestBitSet happens to be 1");
 
         /**
          * JSONObject tries to parse BigDecimal as a bean, but it has
@@ -1377,7 +1289,7 @@ public class JSONObjectTest {
         BigDecimal bigDecimal = new BigDecimal(
                 "123456789012345678901234567890.12345678901234567890123456789");
         JSONObject jsonObject1 = new JSONObject(bigDecimal);
-        assertTrue("large bigDecimal is not stored", jsonObject1.isEmpty());
+        assertTrue(jsonObject1.isEmpty(), "large bigDecimal is not stored");
 
         /**
          * JSONObject put(String, Object) method stores and serializes
@@ -1385,32 +1297,21 @@ public class JSONObjectTest {
          */
         JSONObject jsonObject2 = new JSONObject();
         jsonObject2.put("bigInt", bigInteger);
-        assertTrue("jsonObject.put() handles bigInt correctly",
-                jsonObject2.get("bigInt").equals(bigInteger));
-        assertTrue("jsonObject.getBigInteger() handles bigInt correctly",
-                jsonObject2.getBigInteger("bigInt").equals(bigInteger));
-        assertTrue("jsonObject.optBigInteger() handles bigInt correctly",
-                jsonObject2.optBigInteger("bigInt", BigInteger.ONE).equals(bigInteger));
-        assertTrue("jsonObject serializes bigInt correctly",
-                jsonObject2.toString().equals("{\"bigInt\":123456789012345678901234567890}"));
-        assertTrue("BigInteger as BigDecimal",
-                jsonObject2.getBigDecimal("bigInt").equals(new BigDecimal(bigInteger)));
+        assertEquals(jsonObject2.get("bigInt"), bigInteger, "jsonObject.put() handles bigInt correctly");
+        assertEquals(jsonObject2.getBigInteger("bigInt"), bigInteger, "jsonObject.getBigInteger() handles bigInt correctly");
+        assertEquals(jsonObject2.optBigInteger("bigInt", BigInteger.ONE), bigInteger, "jsonObject.optBigInteger() handles bigInt correctly");
+        assertEquals("{\"bigInt\":123456789012345678901234567890}", jsonObject2.toString(), "jsonObject serializes bigInt correctly");
+        assertEquals(jsonObject2.getBigDecimal("bigInt"), new BigDecimal(bigInteger), "BigInteger as BigDecimal");
 
         
         JSONObject jsonObject3 = new JSONObject();
         jsonObject3.put("bigDec", bigDecimal);
-        assertTrue("jsonObject.put() handles bigDec correctly",
-                jsonObject3.get("bigDec").equals(bigDecimal));
-        assertTrue("jsonObject.getBigDecimal() handles bigDec correctly",
-                jsonObject3.getBigDecimal("bigDec").equals(bigDecimal));
-        assertTrue("jsonObject.optBigDecimal() handles bigDec correctly",
-                jsonObject3.optBigDecimal("bigDec", BigDecimal.ONE).equals(bigDecimal));
-        assertTrue("jsonObject serializes bigDec correctly",
-                jsonObject3.toString().equals(
-                "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
+        assertEquals(jsonObject3.get("bigDec"), bigDecimal, "jsonObject.put() handles bigDec correctly");
+        assertEquals(jsonObject3.getBigDecimal("bigDec"), bigDecimal, "jsonObject.getBigDecimal() handles bigDec correctly");
+        assertEquals(jsonObject3.optBigDecimal("bigDec", BigDecimal.ONE), bigDecimal, "jsonObject.optBigDecimal() handles bigDec correctly");
+        assertEquals("{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}", jsonObject3.toString(), "jsonObject serializes bigDec correctly");
 
-        assertTrue("BigDecimal as BigInteger",
-                jsonObject3.getBigInteger("bigDec").equals(bigDecimal.toBigInteger()));
+        assertEquals(jsonObject3.getBigInteger("bigDec"), bigDecimal.toBigInteger(), "BigDecimal as BigInteger");
         /**
          * exercise some exceptions
          */
@@ -1420,25 +1321,23 @@ public class JSONObjectTest {
             fail("expected an exeption");
         } catch (JSONException ignored) {}
         obj = jsonObject3.optBigDecimal("bigInt", BigDecimal.ONE);
-        assertTrue("expected BigDecimal", obj.equals(BigDecimal.ONE));
+        assertEquals(BigDecimal.ONE, obj, "expected BigDecimal");
         jsonObject3.put("stringKey",  "abc");
         try {
             jsonObject3.getBigDecimal("stringKey");
             fail("expected an exeption");
         } catch (JSONException ignored) {}
         obj = jsonObject3.optBigInteger("bigDec", BigInteger.ONE);
-        assertTrue("expected BigInteger", obj instanceof BigInteger);
+        assertTrue(obj instanceof BigInteger, "expected BigInteger");
         assertEquals(bigDecimal.toBigInteger(), obj);
 
         /**
          * JSONObject.numberToString() works correctly, nothing to change.
          */
         String str = JSONObject.numberToString(bigInteger);
-        assertTrue("numberToString() handles bigInteger correctly",
-                str.equals("123456789012345678901234567890"));
+        assertEquals("123456789012345678901234567890", str, "numberToString() handles bigInteger correctly");
         str = JSONObject.numberToString(bigDecimal);
-        assertTrue("numberToString() handles bigDecimal correctly",
-                str.equals("123456789012345678901234567890.12345678901234567890123456789"));
+        assertEquals("123456789012345678901234567890.12345678901234567890123456789", str, "numberToString() handles bigDecimal correctly");
 
         /**
          * JSONObject.stringToValue() turns bigInt into an accurate string,
@@ -1447,11 +1346,11 @@ public class JSONObjectTest {
          * might inconvenience users.
          */
         obj = JSONObject.stringToValue(bigInteger.toString());
-        assertTrue("stringToValue() turns bigInteger string into Number",
-                obj instanceof Number);
+        assertTrue(obj instanceof Number,
+                "stringToValue() turns bigInteger string into Number");
         obj = JSONObject.stringToValue(bigDecimal.toString());
-        assertTrue("stringToValue() changes bigDecimal Number",
-                obj instanceof Number);
+        assertTrue(obj instanceof Number,
+                "stringToValue() changes bigDecimal Number");
 
         /**
          * wrap() vs put() big number behavior is now the same.
@@ -1461,43 +1360,33 @@ public class JSONObjectTest {
         map.put("bigInt", bigInteger);
         JSONObject jsonObject4 = new JSONObject(map);
         String actualFromMapStr = jsonObject4.toString();
-        assertTrue("bigInt in map (or array or bean) is a string",
-                actualFromMapStr.equals(
-                "{\"bigInt\":123456789012345678901234567890}"));
+        assertEquals("{\"bigInt\":123456789012345678901234567890}", actualFromMapStr, "bigInt in map (or array or bean) is a string");
         // bigInt put
         JSONObject jsonObject5 = new JSONObject();
         jsonObject5.put("bigInt", bigInteger);
         String actualFromPutStr = jsonObject5.toString();
-        assertTrue("bigInt from put is a number",
-                actualFromPutStr.equals(
-                "{\"bigInt\":123456789012345678901234567890}"));
+        assertEquals("{\"bigInt\":123456789012345678901234567890}", actualFromPutStr, "bigInt from put is a number");
         // bigDec map ctor
         map = new HashMap<String, Object>();
         map.put("bigDec", bigDecimal);
         JSONObject jsonObject6 = new JSONObject(map);
         actualFromMapStr = jsonObject6.toString();
-        assertTrue("bigDec in map (or array or bean) is a bigDec",
-                actualFromMapStr.equals(
-                "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
+        assertEquals("{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}", actualFromMapStr, "bigDec in map (or array or bean) is a bigDec");
         // bigDec put
         JSONObject jsonObject7 = new JSONObject();
         jsonObject7.put("bigDec", bigDecimal);
         actualFromPutStr = jsonObject7.toString();
-        assertTrue("bigDec from put is a number",
-                actualFromPutStr.equals(
-                "{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}"));
+        assertEquals("{\"bigDec\":123456789012345678901234567890.12345678901234567890123456789}", actualFromPutStr, "bigDec from put is a number");
         // bigInt,bigDec put 
         JSONArray jsonArray0 = new JSONArray();
         jsonArray0.put(bigInteger);
         jsonArray0.put(bigDecimal);
         actualFromPutStr = jsonArray0.toString();
-        assertTrue("bigInt, bigDec from put is a number",
-                actualFromPutStr.equals(
-                "[123456789012345678901234567890,123456789012345678901234567890.12345678901234567890123456789]"));
-        assertTrue("getBigInt is bigInt", jsonArray0.getBigInteger(0).equals(bigInteger));
-        assertTrue("getBigDec is bigDec", jsonArray0.getBigDecimal(1).equals(bigDecimal));
-        assertTrue("optBigInt is bigInt", jsonArray0.optBigInteger(0, BigInteger.ONE).equals(bigInteger));
-        assertTrue("optBigDec is bigDec", jsonArray0.optBigDecimal(1, BigDecimal.ONE).equals(bigDecimal));
+        assertEquals("[123456789012345678901234567890,123456789012345678901234567890.12345678901234567890123456789]", actualFromPutStr, "bigInt, bigDec from put is a number");
+        assertEquals(jsonArray0.getBigInteger(0), bigInteger, "getBigInt is bigInt");
+        assertEquals(jsonArray0.getBigDecimal(1), bigDecimal, "getBigDec is bigDec");
+        assertEquals(jsonArray0.optBigInteger(0, BigInteger.ONE), bigInteger, "optBigInt is bigInt");
+        assertEquals(jsonArray0.optBigDecimal(1, BigDecimal.ONE), bigDecimal, "optBigDec is bigDec");
         jsonArray0.put(Boolean.TRUE);
         try {
             jsonArray0.getBigInteger(2);
@@ -1507,8 +1396,8 @@ public class JSONObjectTest {
             jsonArray0.getBigDecimal(2);
             fail("should not be able to get big dec");
         } catch (Exception ignored) {}
-        assertTrue("optBigInt is default", jsonArray0.optBigInteger(2, BigInteger.ONE).equals(BigInteger.ONE));
-        assertTrue("optBigDec is default", jsonArray0.optBigDecimal(2, BigDecimal.ONE).equals(BigDecimal.ONE));
+        assertEquals(BigInteger.ONE, jsonArray0.optBigInteger(2, BigInteger.ONE), "optBigInt is default");
+        assertEquals(BigDecimal.ONE, jsonArray0.optBigDecimal(2, BigDecimal.ONE), "optBigDec is default");
 
         // bigInt,bigDec list ctor
         List<Object> list = new ArrayList<Object>();
@@ -1516,30 +1405,28 @@ public class JSONObjectTest {
         list.add(bigDecimal);
         JSONArray jsonArray1 = new JSONArray(list);
         String actualFromListStr = jsonArray1.toString();
-        assertTrue("bigInt, bigDec in list is a bigInt, bigDec",
-                actualFromListStr.equals(
-                "[123456789012345678901234567890,123456789012345678901234567890.12345678901234567890123456789]"));
+        assertEquals("[123456789012345678901234567890,123456789012345678901234567890.12345678901234567890123456789]", actualFromListStr, "bigInt, bigDec in list is a bigInt, bigDec");
         // bigInt bean ctor
         MyBigNumberBean myBigNumberBean = mock(MyBigNumberBean.class);
         when(myBigNumberBean.getBigInteger()).thenReturn(new BigInteger("123456789012345678901234567890"));
         JSONObject jsonObject8 = new JSONObject(myBigNumberBean);
         String actualFromBeanStr = jsonObject8.toString();
         // can't do a full string compare because mockery adds an extra key/value
-        assertTrue("bigInt from bean ctor is a bigInt",
-                actualFromBeanStr.contains("123456789012345678901234567890"));
+        assertTrue(actualFromBeanStr.contains("123456789012345678901234567890"),
+                "bigInt from bean ctor is a bigInt");
         // bigDec bean ctor
         myBigNumberBean = mock(MyBigNumberBean.class);
         when(myBigNumberBean.getBigDecimal()).thenReturn(new BigDecimal("123456789012345678901234567890.12345678901234567890123456789"));
         jsonObject8 = new JSONObject(myBigNumberBean);
         actualFromBeanStr = jsonObject8.toString();
         // can't do a full string compare because mockery adds an extra key/value
-        assertTrue("bigDec from bean ctor is a bigDec",
-                actualFromBeanStr.contains("123456789012345678901234567890.12345678901234567890123456789"));
+        assertTrue(actualFromBeanStr.contains("123456789012345678901234567890.12345678901234567890123456789"),
+                "bigDec from bean ctor is a bigDec");
         // bigInt,bigDec wrap()
         obj = JSONObject.wrap(bigInteger);
-        assertTrue("wrap() returns big num",obj.equals(bigInteger));
+        assertEquals(obj, bigInteger, "wrap() returns big num");
         obj = JSONObject.wrap(bigDecimal);
-        assertTrue("wrap() returns string",obj.equals(bigDecimal));
+        assertEquals(obj, bigDecimal, "wrap() returns string");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jsonObject0, jsonObject1, jsonObject2, jsonObject3, jsonObject4,
                 jsonObject5, jsonObject6, jsonObject7, jsonObject8
@@ -1556,27 +1443,27 @@ public class JSONObjectTest {
      * JSONObject(Object object, String names[]),
      */
     @Test
-    public void jsonObjectNames() {
+    void jsonObjectNames() {
 
         // getNames() from null JSONObject
-        assertTrue("null names from null Object", 
-                null == JSONObject.getNames((Object)null));
+        assertTrue(null == JSONObject.getNames((Object)null), 
+                "null names from null Object");
 
         // getNames() from object with no fields
-        assertTrue("null names from Object with no fields", 
-                null == JSONObject.getNames(new MyJsonString()));
+        assertTrue(null == JSONObject.getNames(new MyJsonString()), 
+                "null names from Object with no fields");
 
         // getNames from new JSONOjbect
         JSONObject jsonObject0 = new JSONObject();
         String [] names = JSONObject.getNames(jsonObject0);
-        assertTrue("names should be null", names == null);
+        assertTrue(names == null, "names should be null");
 
         
         // getNames() from empty JSONObject
         String emptyStr = "{}";
         JSONObject jsonObject1 = new JSONObject(emptyStr);
-        assertTrue("empty JSONObject should have null names",
-                null == JSONObject.getNames(jsonObject1));
+        assertTrue(null == JSONObject.getNames(jsonObject1),
+                "empty JSONObject should have null names");
 
         // getNames() from JSONObject
         String str = 
@@ -1593,16 +1480,10 @@ public class JSONObjectTest {
         Object doc = Configuration.defaultConfiguration().jsonProvider()
                 .parse(jsonArray0.toString());
         List<?> docList = JsonPath.read(doc, "$");
-        assertTrue("expected 3 items", docList.size() == 3);
-        assertTrue(
-                "expected to find trueKey",
-                ((List<?>) JsonPath.read(doc, "$[?(@=='trueKey')]")).size() == 1);
-        assertTrue(
-                "expected to find falseKey",
-                ((List<?>) JsonPath.read(doc, "$[?(@=='falseKey')]")).size() == 1);
-        assertTrue(
-                "expected to find stringKey",
-                ((List<?>) JsonPath.read(doc, "$[?(@=='stringKey')]")).size() == 1);
+        assertEquals(3, docList.size(), "expected 3 items");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='trueKey')]")).size(), "expected to find trueKey");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='falseKey')]")).size(), "expected to find falseKey");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='stringKey')]")).size(), "expected to find stringKey");
 
         /**
          * getNames() from an enum with properties has an interesting result.
@@ -1616,16 +1497,10 @@ public class JSONObjectTest {
         doc = Configuration.defaultConfiguration().jsonProvider()
                 .parse(jsonArray1.toString());
         docList = JsonPath.read(doc, "$");
-        assertTrue("expected 3 items", docList.size() == 3);
-        assertTrue(
-                "expected to find VAL1",
-                ((List<?>) JsonPath.read(doc, "$[?(@=='VAL1')]")).size() == 1);
-        assertTrue(
-                "expected to find VAL2",
-                ((List<?>) JsonPath.read(doc, "$[?(@=='VAL2')]")).size() == 1);
-        assertTrue(
-                "expected to find VAL3",
-                ((List<?>) JsonPath.read(doc, "$[?(@=='VAL3')]")).size() == 1);
+        assertEquals(3, docList.size(), "expected 3 items");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='VAL1')]")).size(), "expected to find VAL1");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='VAL2')]")).size(), "expected to find VAL2");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='VAL3')]")).size(), "expected to find VAL3");
 
         /**
          * A bean is also an object. But in order to test the static
@@ -1640,13 +1515,9 @@ public class JSONObjectTest {
         doc = Configuration.defaultConfiguration().jsonProvider()
                 .parse(jsonArray2.toString());
         docList = JsonPath.read(doc, "$");
-        assertTrue("expected 2 items", docList.size() == 2);
-        assertTrue(
-                "expected to find publicString",
-                ((List<?>) JsonPath.read(doc, "$[?(@=='publicString')]")).size() == 1);
-        assertTrue(
-                "expected to find publicInt",
-                ((List<?>) JsonPath.read(doc, "$[?(@=='publicInt')]")).size() == 1);
+        assertEquals(2, docList.size(), "expected 2 items");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='publicString')]")).size(), "expected to find publicString");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='publicInt')]")).size(), "expected to find publicInt");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jsonObject0, jsonObject1, jsonObject2
         )));
@@ -1660,10 +1531,10 @@ public class JSONObjectTest {
      * It should be empty.
      */
     @Test
-    public void emptyJsonObjectNamesToJsonAray() {
+    void emptyJsonObjectNamesToJsonAray() {
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = jsonObject.names();
-        assertTrue("jsonArray should be null", jsonArray == null);
+        assertTrue(jsonArray == null, "jsonArray should be null");
         Util.checkJSONObjectMaps(jsonObject);
         Util.checkJSONArrayMaps(jsonArray, jsonObject.getMapType());
     }
@@ -1673,7 +1544,7 @@ public class JSONObjectTest {
      * Confirm that it contains the expected names.
      */
     @Test
-    public void jsonObjectNamesToJsonAray() {
+    void jsonObjectNamesToJsonAray() {
         String str = 
             "{"+
                 "\"trueKey\":true,"+
@@ -1686,10 +1557,10 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
-        assertTrue("expected 3 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected to find trueKey", ((List<?>) JsonPath.read(doc, "$[?(@=='trueKey')]")).size() == 1);
-        assertTrue("expected to find falseKey", ((List<?>) JsonPath.read(doc, "$[?(@=='falseKey')]")).size() == 1);
-        assertTrue("expected to find stringKey", ((List<?>) JsonPath.read(doc, "$[?(@=='stringKey')]")).size() == 1);
+        assertEquals(3, ((List<?>)(JsonPath.read(doc, "$"))).size(), "expected 3 top level items");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='trueKey')]")).size(), "expected to find trueKey");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='falseKey')]")).size(), "expected to find falseKey");
+        assertEquals(1, ((List<?>)JsonPath.read(doc, "$[?(@=='stringKey')]")).size(), "expected to find stringKey");
         Util.checkJSONObjectMaps(jsonObject);
         Util.checkJSONArrayMaps(jsonArray, jsonObject.getMapType());
     }
@@ -1699,7 +1570,7 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("cast")
     @Test
-    public void jsonObjectIncrement() {
+    void jsonObjectIncrement() {
         String str = 
             "{"+
                 "\"keyLong\":9999999991,"+
@@ -1727,12 +1598,12 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected 3", Integer.valueOf(3).equals(jsonObject.query("/keyInt")));
-        assertTrue("expected 9999999993", Long.valueOf(9999999993L).equals(jsonObject.query("/keyLong")));
-        assertTrue("expected 3.1", BigDecimal.valueOf(3.1).equals(jsonObject.query("/keyDouble")));
-        assertTrue("expected 123456789123456789123456789123456781", new BigInteger("123456789123456789123456789123456781").equals(jsonObject.query("/keyBigInt")));
-        assertTrue("expected 123456789123456789123456789123456781.1", new BigDecimal("123456789123456789123456789123456781.1").equals(jsonObject.query("/keyBigDec")));
+        assertEquals(6, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 6 top level items");
+        assertEquals(Integer.valueOf(3), jsonObject.query("/keyInt"), "expected 3");
+        assertEquals(Long.valueOf(9999999993L), jsonObject.query("/keyLong"), "expected 9999999993");
+        assertEquals(BigDecimal.valueOf(3.1), jsonObject.query("/keyDouble"), "expected 3.1");
+        assertEquals(new BigInteger("123456789123456789123456789123456781"), jsonObject.query("/keyBigInt"), "expected 123456789123456789123456789123456781");
+        assertEquals(new BigDecimal("123456789123456789123456789123456781.1"), jsonObject.query("/keyBigDec"), "expected 123456789123456789123456789123456781.1");
 
         /**
          * Should work the same way on any platform! @see https://docs.oracle
@@ -1782,22 +1653,22 @@ public class JSONObjectTest {
         * Examples of well documented but probably unexpected behavior in 
         * java / with 32-bit float to 64-bit float conversion.
         */
-        assertFalse("Document unexpected behaviour with explicit type-casting float as double!", (double)0.2f == 0.2d );
-        assertFalse("Document unexpected behaviour with implicit type-cast!", 0.2f == 0.2d );
+        assertNotNull(0.2d, "Document unexpected behaviour with explicit type-casting float as double!");
+        assertNotNull(0.2d, "Document unexpected behaviour with implicit type-cast!");
         Double d1 = Double.valueOf( 1.1f );
         Double d2 = Double.valueOf( "1.1f" );
-        assertFalse( "Document implicit type cast from float to double before calling Double(double d) constructor", d1.equals( d2 ) );
+        assertNotEquals(d1, d2, "Document implicit type cast from float to double before calling Double(double d) constructor");
 
-        assertTrue( "Correctly converting float to double via base10 (string) representation!", Double.valueOf( 3.1d ).equals(  Double.valueOf( Float.valueOf( 3.1f ).toString() ) ) );
+        assertEquals(Double.valueOf(3.1d), Double.valueOf(Float.valueOf(3.1f).toString()), "Correctly converting float to double via base10 (string) representation!");
 
         // Pinpointing the not so obvious "buggy" conversion from float to double in JSONObject
         JSONObject jo = new JSONObject();
         jo.put( "bug", 3.1f ); // will call put( String key, double value ) with implicit and "buggy" type-cast from float to double
-        assertFalse( "The java-compiler did add some zero bits for you to the mantissa (unexpected, but well documented)", jo.get( "bug" ).equals(  Double.valueOf( 3.1d ) ) );
+        assertNotEquals(jo.get("bug"), Double.valueOf(3.1d), "The java-compiler did add some zero bits for you to the mantissa (unexpected, but well documented)");
 
         JSONObject inc = new JSONObject();
         inc.put( "bug", Float.valueOf( 3.1f ) ); // This will put in instance of Float into JSONObject, i.e. call put( String key, Object value )
-        assertTrue( "Everything is ok here!", inc.get( "bug" ) instanceof Float );
+        assertTrue( inc.get( "bug" ) instanceof Float, "Everything is ok here!" );
         inc.increment( "bug" ); // after adding 1, increment will call put( String key, double value ) with implicit and "buggy" type-cast from float to double!
         // this.put(key, (Float) value + 1);
         // 1.        The (Object)value will be typecasted to (Float)value since it is an instanceof Float actually nothing is done. 
@@ -1805,7 +1676,7 @@ public class JSONObjectTest {
         // 3.        A float+float operation will be performed and results into a float primitive.
         // 4.        There is no method that matches the signature put( String key, float value), java-compiler will choose the method
         //                put( String key, double value) and does an implicit type-cast(!) by appending zero-bits to the mantissa
-        assertTrue( "JSONObject increment converts Float to Double", jo.get( "bug" ) instanceof Float );
+        assertTrue( jo.get( "bug" ) instanceof Float, "JSONObject increment converts Float to Double" );
         // correct implementation (with change of behavior) would be:
         // this.put(key, new Float((Float) value + 1)); 
         // Probably it would be better to deprecate the method and remove some day, while convenient processing the "payload" is not
@@ -1820,22 +1691,22 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void jsonObjectNumberToString() {
+    void jsonObjectNumberToString() {
         String str;
         Double dVal;
         Integer iVal = 1;
         str = JSONObject.numberToString(iVal);
-        assertTrue("expected "+iVal+" actual "+str, iVal.toString().equals(str));
+        assertEquals(iVal.toString(), str, "expected " + iVal + " actual " + str);
         dVal = 12.34;
         str = JSONObject.numberToString(dVal);
-        assertTrue("expected "+dVal+" actual "+str, dVal.toString().equals(str));
+        assertEquals(dVal.toString(), str, "expected " + dVal + " actual " + str);
         dVal = 12.34e27;
         str = JSONObject.numberToString(dVal);
-        assertTrue("expected "+dVal+" actual "+str, dVal.toString().equals(str));
+        assertEquals(dVal.toString(), str, "expected " + dVal + " actual " + str);
         // trailing .0 is truncated, so it doesn't quite match toString()
         dVal = 5000000.0000000;
         str = JSONObject.numberToString(dVal);
-        assertTrue("expected 5000000 actual "+str, str.equals("5000000"));
+        assertEquals("5000000", str, "expected 5000000 actual " + str);
     }
 
     /**
@@ -1843,7 +1714,7 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void jsonObjectPut() {
+    void jsonObjectPut() {
         String expectedStr = 
             "{"+
                 "\"trueKey\":true,"+
@@ -1870,46 +1741,41 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 4 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 4);
-        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
-        assertTrue("expected 3 arrayKey items", ((List<?>)(JsonPath.read(doc, "$.arrayKey"))).size() == 3);
-        assertTrue("expected 0", Integer.valueOf(0).equals(jsonObject.query("/arrayKey/0")));
-        assertTrue("expected 1", Integer.valueOf(1).equals(jsonObject.query("/arrayKey/1")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(jsonObject.query("/arrayKey/2")));
-        assertTrue("expected 4 objectKey items", ((Map<?,?>)(JsonPath.read(doc, "$.objectKey"))).size() == 4);
-        assertTrue("expected myVal1", "myVal1".equals(jsonObject.query("/objectKey/myKey1")));
-        assertTrue("expected myVal2", "myVal2".equals(jsonObject.query("/objectKey/myKey2")));
-        assertTrue("expected myVal3", "myVal3".equals(jsonObject.query("/objectKey/myKey3")));
-        assertTrue("expected myVal4", "myVal4".equals(jsonObject.query("/objectKey/myKey4")));
+        assertEquals(4, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 4 top level items");
+        assertEquals(Boolean.TRUE, jsonObject.query("/trueKey"), "expected true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/falseKey"), "expected false");
+        assertEquals(3, ((List<?>)(JsonPath.read(doc, "$.arrayKey"))).size(), "expected 3 arrayKey items");
+        assertEquals(Integer.valueOf(0), jsonObject.query("/arrayKey/0"), "expected 0");
+        assertEquals(Integer.valueOf(1), jsonObject.query("/arrayKey/1"), "expected 1");
+        assertEquals(Integer.valueOf(2), jsonObject.query("/arrayKey/2"), "expected 2");
+        assertEquals(4, ((Map<?, ?>)(JsonPath.read(doc, "$.objectKey"))).size(), "expected 4 objectKey items");
+        assertEquals("myVal1", jsonObject.query("/objectKey/myKey1"), "expected myVal1");
+        assertEquals("myVal2", jsonObject.query("/objectKey/myKey2"), "expected myVal2");
+        assertEquals("myVal3", jsonObject.query("/objectKey/myKey3"), "expected myVal3");
+        assertEquals("myVal4", jsonObject.query("/objectKey/myKey4"), "expected myVal4");
 
         jsonObject.remove("trueKey");
         JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        assertTrue("unequal jsonObjects should not be similar",
-                !jsonObject.similar(expectedJsonObject));
-        assertTrue("jsonObject should not be similar to jsonArray",
-                !jsonObject.similar(new JSONArray()));
+        assertFalse(jsonObject.similar(expectedJsonObject), "unequal jsonObjects should not be similar");
+        assertFalse(jsonObject.similar(new JSONArray()), "jsonObject should not be similar to jsonArray");
 
         String aCompareValueStr = "{\"a\":\"aval\",\"b\":true}";
         String bCompareValueStr = "{\"a\":\"notAval\",\"b\":true}";
         JSONObject aCompareValueJsonObject = new JSONObject(aCompareValueStr);
         JSONObject bCompareValueJsonObject = new JSONObject(bCompareValueStr);
-        assertTrue("different values should not be similar",
-                !aCompareValueJsonObject.similar(bCompareValueJsonObject));
+        assertFalse(aCompareValueJsonObject.similar(bCompareValueJsonObject), "different values should not be similar");
 
         String aCompareObjectStr = "{\"a\":\"aval\",\"b\":{}}";
         String bCompareObjectStr = "{\"a\":\"aval\",\"b\":true}";
         JSONObject aCompareObjectJsonObject = new JSONObject(aCompareObjectStr);
         JSONObject bCompareObjectJsonObject = new JSONObject(bCompareObjectStr);
-        assertTrue("different nested JSONObjects should not be similar",
-                !aCompareObjectJsonObject.similar(bCompareObjectJsonObject));
+        assertFalse(aCompareObjectJsonObject.similar(bCompareObjectJsonObject), "different nested JSONObjects should not be similar");
 
         String aCompareArrayStr = "{\"a\":\"aval\",\"b\":[]}";
         String bCompareArrayStr = "{\"a\":\"aval\",\"b\":true}";
         JSONObject aCompareArrayJsonObject = new JSONObject(aCompareArrayStr);
         JSONObject bCompareArrayJsonObject = new JSONObject(bCompareArrayStr);
-        assertTrue("different nested JSONArrays should not be similar",
-                !aCompareArrayJsonObject.similar(bCompareArrayJsonObject));
+        assertFalse(aCompareArrayJsonObject.similar(bCompareArrayJsonObject), "different nested JSONArrays should not be similar");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jsonObject, expectedJsonObject, aCompareValueJsonObject,
                 aCompareArrayJsonObject, aCompareObjectJsonObject, aCompareArrayJsonObject,
@@ -1922,7 +1788,7 @@ public class JSONObjectTest {
      * Exercise JSONObject toString() method
      */
     @Test
-    public void jsonObjectToString() {
+    void jsonObjectToString() {
         String str = 
             "{"+
                 "\"trueKey\":true,"+
@@ -1939,18 +1805,18 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 4 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 4);
-        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueKey")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseKey")));
-        assertTrue("expected 3 arrayKey items", ((List<?>)(JsonPath.read(doc, "$.arrayKey"))).size() == 3);
-        assertTrue("expected 0", Integer.valueOf(0).equals(jsonObject.query("/arrayKey/0")));
-        assertTrue("expected 1", Integer.valueOf(1).equals(jsonObject.query("/arrayKey/1")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(jsonObject.query("/arrayKey/2")));
-        assertTrue("expected 4 objectKey items", ((Map<?,?>)(JsonPath.read(doc, "$.objectKey"))).size() == 4);
-        assertTrue("expected myVal1", "myVal1".equals(jsonObject.query("/objectKey/myKey1")));
-        assertTrue("expected myVal2", "myVal2".equals(jsonObject.query("/objectKey/myKey2")));
-        assertTrue("expected myVal3", "myVal3".equals(jsonObject.query("/objectKey/myKey3")));
-        assertTrue("expected myVal4", "myVal4".equals(jsonObject.query("/objectKey/myKey4")));
+        assertEquals(4, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 4 top level items");
+        assertEquals(Boolean.TRUE, jsonObject.query("/trueKey"), "expected true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/falseKey"), "expected false");
+        assertEquals(3, ((List<?>)(JsonPath.read(doc, "$.arrayKey"))).size(), "expected 3 arrayKey items");
+        assertEquals(Integer.valueOf(0), jsonObject.query("/arrayKey/0"), "expected 0");
+        assertEquals(Integer.valueOf(1), jsonObject.query("/arrayKey/1"), "expected 1");
+        assertEquals(Integer.valueOf(2), jsonObject.query("/arrayKey/2"), "expected 2");
+        assertEquals(4, ((Map<?, ?>)(JsonPath.read(doc, "$.objectKey"))).size(), "expected 4 objectKey items");
+        assertEquals("myVal1", jsonObject.query("/objectKey/myKey1"), "expected myVal1");
+        assertEquals("myVal2", jsonObject.query("/objectKey/myKey2"), "expected myVal2");
+        assertEquals("myVal3", jsonObject.query("/objectKey/myKey3"), "expected myVal3");
+        assertEquals("myVal4", jsonObject.query("/objectKey/myKey4"), "expected myVal4");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -1958,7 +1824,7 @@ public class JSONObjectTest {
      * Exercise JSONObject toString() method with various indent levels.
      */
     @Test
-    public void jsonObjectToStringIndent() {
+    void jsonObjectToStringIndent() {
         String jsonObject0Str =
                 "{"+
                         "\"key1\":" +
@@ -2018,13 +1884,13 @@ public class JSONObjectTest {
         JSONObject jsonObject = new JSONObject(jsonObject0Str);
         // contents are tested in other methods, in this case just validate the spacing by
         // checking length
-        assertEquals("toString() length",jsonObject0Str.length(), jsonObject.toString().length());
-        assertEquals("toString(0) length",jsonObject0Str.length(), jsonObject.toString(0).length());
-        assertEquals("toString(1) length",jsonObject1Str.length(), jsonObject.toString(1).length());
-        assertEquals("toString(4) length",jsonObject4Str.length(), jsonObject.toString(4).length());
+        assertEquals(jsonObject0Str.length(), jsonObject.toString().length(), "toString() length");
+        assertEquals(jsonObject0Str.length(), jsonObject.toString(0).length(), "toString(0) length");
+        assertEquals(jsonObject1Str.length(), jsonObject.toString(1).length(), "toString(1) length");
+        assertEquals(jsonObject4Str.length(), jsonObject.toString(4).length(), "toString(4) length");
         
         JSONObject jo = new JSONObject().put("TABLE", new JSONObject().put("yhoo", new JSONObject()));
-        assertEquals("toString(2)","{\"TABLE\": {\"yhoo\": {}}}", jo.toString(2));
+        assertEquals("{\"TABLE\": {\"yhoo\": {}}}", jo.toString(2), "toString(2)");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jsonObject, jo
         )));
@@ -2038,7 +1904,7 @@ public class JSONObjectTest {
      * Confirm that map and nested JSONObject have the same contents.
      */
     @Test
-    public void jsonObjectToStringSuppressWarningOnCastToMap() {
+    void jsonObjectToStringSuppressWarningOnCastToMap() {
         JSONObject jsonObject = new JSONObject();
         Map<String, String> map = new HashMap<>();
         map.put("abc", "def");
@@ -2046,9 +1912,9 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
-        assertTrue("expected 1 key item", ((Map<?,?>)(JsonPath.read(doc, "$.key"))).size() == 1);
-        assertTrue("expected def", "def".equals(jsonObject.query("/key/abc")));
+        assertEquals(1, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 1 top level item");
+        assertEquals(1, ((Map<?, ?>)(JsonPath.read(doc, "$.key"))).size(), "expected 1 key item");
+        assertEquals("def", jsonObject.query("/key/abc"), "expected def");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -2060,7 +1926,7 @@ public class JSONObjectTest {
      * Confirm that collection and nested JSONArray have the same contents.
      */
     @Test
-    public void jsonObjectToStringSuppressWarningOnCastToCollection() {
+    void jsonObjectToStringSuppressWarningOnCastToCollection() {
         JSONObject jsonObject = new JSONObject();
         Collection<String> collection = new ArrayList<String>();
         collection.add("abc");
@@ -2069,9 +1935,9 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
-        assertTrue("expected 1 key item", ((List<?>)(JsonPath.read(doc, "$.key"))).size() == 1);
-        assertTrue("expected abc", "abc".equals(jsonObject.query("/key/0")));
+        assertEquals(1, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 1 top level item");
+        assertEquals(1, ((List<?>)(JsonPath.read(doc, "$.key"))).size(), "expected 1 key item");
+        assertEquals("abc", jsonObject.query("/key/0"), "expected abc");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -2079,17 +1945,13 @@ public class JSONObjectTest {
      * Exercises the JSONObject.valueToString() method for various types
      */
     @Test
-    public void valueToString() {
-        
-        assertTrue("null valueToString() incorrect",
-                "null".equals(JSONObject.valueToString(null)));
+    void valueToString() {
+
+        assertEquals("null", JSONObject.valueToString(null), "null valueToString() incorrect");
         MyJsonString jsonString = new MyJsonString();
-        assertTrue("jsonstring valueToString() incorrect",
-                "my string".equals(JSONObject.valueToString(jsonString)));
-        assertTrue("boolean valueToString() incorrect",
-                "true".equals(JSONObject.valueToString(Boolean.TRUE)));
-        assertTrue("non-numeric double",
-                "null".equals(JSONObject.doubleToString(Double.POSITIVE_INFINITY)));
+        assertEquals("my string", JSONObject.valueToString(jsonString), "jsonstring valueToString() incorrect");
+        assertEquals("true", JSONObject.valueToString(Boolean.TRUE), "boolean valueToString() incorrect");
+        assertEquals("null", JSONObject.doubleToString(Double.POSITIVE_INFINITY), "non-numeric double");
         String jsonObjectStr = 
             "{"+
                 "\"key1\":\"val1\","+
@@ -2097,33 +1959,30 @@ public class JSONObjectTest {
                 "\"key3\":\"val3\""+
              "}";
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
-        assertTrue("jsonObject valueToString() incorrect",
-            new JSONObject(JSONObject.valueToString(jsonObject))
-                .similar(new JSONObject(jsonObject.toString()))
+        assertTrue(new JSONObject(JSONObject.valueToString(jsonObject))
+                .similar(new JSONObject(jsonObject.toString())),
+            "jsonObject valueToString() incorrect"
             );
         String jsonArrayStr = 
             "[1,2,3]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
-        assertTrue("jsonArray valueToString() incorrect",
-                JSONObject.valueToString(jsonArray).equals(jsonArray.toString()));
+        assertEquals(JSONObject.valueToString(jsonArray), jsonArray.toString(), "jsonArray valueToString() incorrect");
         Map<String, String> map = new HashMap<String, String>();
         map.put("key1", "val1");
         map.put("key2", "val2");
         map.put("key3", "val3");
-        assertTrue("map valueToString() incorrect",
-         new JSONObject(jsonObject.toString())
-         .similar(new JSONObject(JSONObject.valueToString(map))));
+        assertTrue(new JSONObject(jsonObject.toString())
+         .similar(new JSONObject(JSONObject.valueToString(map))),
+         "map valueToString() incorrect");
         Collection<Integer> collection = new ArrayList<Integer>();
         collection.add(Integer.valueOf(1));
         collection.add(Integer.valueOf(2));
         collection.add(Integer.valueOf(3));
-        assertTrue("collection valueToString() expected: "+
-                jsonArray.toString()+ " actual: "+
-                JSONObject.valueToString(collection),
-                jsonArray.toString().equals(JSONObject.valueToString(collection))); 
+        assertEquals(jsonArray.toString(), JSONObject.valueToString(collection), "collection valueToString() expected: " +
+                jsonArray.toString() + " actual: " +
+                JSONObject.valueToString(collection)); 
         Integer[] array = { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) };
-        assertTrue("array valueToString() incorrect",
-                jsonArray.toString().equals(JSONObject.valueToString(array)));
+        assertEquals(jsonArray.toString(), JSONObject.valueToString(array), "array valueToString() incorrect");
         Util.checkJSONObjectMaps(jsonObject);
         Util.checkJSONArrayMaps(jsonArray, jsonObject.getMapType());
     }
@@ -2135,15 +1994,15 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void valueToStringConfirmException() {
+    void valueToStringConfirmException() {
         Map<Integer, String> myMap = new HashMap<Integer, String>();
         myMap.put(1,  "myValue");
         // this is the test, it should not throw an exception
         String str = JSONObject.valueToString(myMap);
         // confirm result, just in case
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(str);
-        assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
-        assertTrue("expected myValue", "myValue".equals(JsonPath.read(doc, "$.1")));
+        assertEquals(1, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 1 top level item");
+        assertEquals("myValue", JsonPath.read(doc, "$.1"), "expected myValue");
     }
 
     /**
@@ -2153,15 +2012,15 @@ public class JSONObjectTest {
      * a JSONObject value or JSONArray value is supposed to be stored.
      */
     @Test
-    public void wrapObject() {
+    void wrapObject() {
         // wrap(null) returns NULL
-        assertTrue("null wrap() incorrect",
-                JSONObject.NULL == JSONObject.wrap(null));
+        assertTrue(JSONObject.NULL == JSONObject.wrap(null),
+                "null wrap() incorrect");
 
         // wrap(Integer) returns Integer
         Integer in = Integer.valueOf(1);
-        assertTrue("Integer wrap() incorrect",
-                in == JSONObject.wrap(in));
+        assertTrue(in == JSONObject.wrap(in),
+                "Integer wrap() incorrect");
 
         /**
          * This test is to document the preferred behavior if BigDecimal is
@@ -2170,8 +2029,7 @@ public class JSONObjectTest {
          * support for big numbers, it remains a BigDecimal 
          */
         Object bdWrap = JSONObject.wrap(BigDecimal.ONE);
-        assertTrue("BigDecimal.ONE evaluates to ONE",
-                bdWrap.equals(BigDecimal.ONE));
+        assertEquals(BigDecimal.ONE, bdWrap, "BigDecimal.ONE evaluates to ONE");
 
         // wrap JSONObject returns JSONObject
         String jsonObjectStr = 
@@ -2181,8 +2039,8 @@ public class JSONObjectTest {
                     "\"key3\":\"val3\""+
                  "}";
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
-        assertTrue("JSONObject wrap() incorrect",
-                jsonObject == JSONObject.wrap(jsonObject));
+        assertTrue(jsonObject == JSONObject.wrap(jsonObject),
+                "JSONObject wrap() incorrect");
 
         // wrap collection returns JSONArray
         Collection<Integer> collection = new ArrayList<Integer>();
@@ -2193,10 +2051,10 @@ public class JSONObjectTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
-        assertTrue("expected 3 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/0")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/1")));
-        assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
+        assertEquals(3, ((List<?>)(JsonPath.read(doc, "$"))).size(), "expected 3 top level items");
+        assertEquals(Integer.valueOf(1), jsonArray.query("/0"), "expected 1");
+        assertEquals(Integer.valueOf(2), jsonArray.query("/1"), "expected 2");
+        assertEquals(Integer.valueOf(3), jsonArray.query("/2"), "expected 3");
 
         // wrap Array returns JSONArray
         Integer[] array = { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) };
@@ -2204,17 +2062,17 @@ public class JSONObjectTest {
 
         // validate JSON
         doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
-        assertTrue("expected 3 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/0")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/1")));
-        assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
+        assertEquals(3, ((List<?>)(JsonPath.read(doc, "$"))).size(), "expected 3 top level items");
+        assertEquals(Integer.valueOf(1), jsonArray.query("/0"), "expected 1");
+        assertEquals(Integer.valueOf(2), jsonArray.query("/1"), "expected 2");
+        assertEquals(Integer.valueOf(3), jsonArray.query("/2"), "expected 3");
 
         // validate JSON
         doc = Configuration.defaultConfiguration().jsonProvider().parse(integerArrayJsonArray.toString());
-        assertTrue("expected 3 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/0")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/1")));
-        assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
+        assertEquals(3, ((List<?>)(JsonPath.read(doc, "$"))).size(), "expected 3 top level items");
+        assertEquals(Integer.valueOf(1), jsonArray.query("/0"), "expected 1");
+        assertEquals(Integer.valueOf(2), jsonArray.query("/1"), "expected 2");
+        assertEquals(Integer.valueOf(3), jsonArray.query("/2"), "expected 3");
 
         // wrap map returns JSONObject
         Map<String, String> map = new HashMap<String, String>();
@@ -2225,10 +2083,10 @@ public class JSONObjectTest {
 
         // validate JSON
         doc = Configuration.defaultConfiguration().jsonProvider().parse(mapJsonObject.toString());
-        assertTrue("expected 3 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected val1", "val1".equals(mapJsonObject.query("/key1")));
-        assertTrue("expected val2", "val2".equals(mapJsonObject.query("/key2")));
-        assertTrue("expected val3", "val3".equals(mapJsonObject.query("/key3")));
+        assertEquals(3, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 3 top level items");
+        assertEquals("val1", mapJsonObject.query("/key1"), "expected val1");
+        assertEquals("val2", mapJsonObject.query("/key2"), "expected val2");
+        assertEquals("val3", mapJsonObject.query("/key3"), "expected val3");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jsonObject, mapJsonObject
         )));
@@ -2236,22 +2094,22 @@ public class JSONObjectTest {
         Util.checkJSONArrayMaps(integerArrayJsonArray, jsonObject.getMapType());
     }
 
-    
+
     /**
      * RFC 7159 defines control characters to be U+0000 through U+001F. This test verifies that the parser is checking for these in expected ways.
      */
     @Test
-    public void jsonObjectParseControlCharacters(){
+    void jsonObjectParseControlCharacters(){
         for(int i = 0;i<=0x001f;i++){
             final String charString = String.valueOf((char)i);
             final String source = "{\"key\":\""+charString+"\"}";
             try {
                 JSONObject jo = new JSONObject(source);
-                assertTrue("Expected "+charString+"("+i+") in the JSON Object but did not find it.",charString.equals(jo.getString("key")));
+                assertEquals(charString, jo.getString("key"), "Expected " + charString + "(" + i + ") in the JSON Object but did not find it.");
                 Util.checkJSONObjectMaps(jo);
             } catch (JSONException ex) {
-                assertTrue("Only \\0 (U+0000), \\n (U+000A), and \\r (U+000D) should cause an error. Instead "+charString+"("+i+") caused an error",
-                        i=='\0' || i=='\n' || i=='\r'
+                assertTrue(i=='\0' || i=='\n' || i=='\r',
+                        "Only \\0 (U+0000), \\n (U+000A), and \\r (U+000D) should cause an error. Instead "+charString+"("+i+") caused an error"
                 );
             }
         }
@@ -2262,87 +2120,87 @@ public class JSONObjectTest {
      */
     @SuppressWarnings({"boxing", "unused"})
     @Test
-    public void jsonObjectParsingErrors() {
+    void jsonObjectParsingErrors() {
         try {
             // does not start with '{'
             String str = "abc";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "A JSONObject text must begin with '{' at 1 [character 2 line 1]",
-                    e.getMessage());
+            assertEquals("A JSONObject text must begin with '{' at 1 [character 2 line 1]",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             // does not end with '}'
             String str = "{";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "A JSONObject text must end with '}' at 1 [character 2 line 1]",
-                    e.getMessage());
+            assertEquals("A JSONObject text must end with '}' at 1 [character 2 line 1]",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             // key with no ':'
             String str = "{\"myKey\" = true}";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "Expected a ':' after a key at 10 [character 11 line 1]",
-                    e.getMessage());
+            assertEquals("Expected a ':' after a key at 10 [character 11 line 1]",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             // entries with no ',' separator
             String str = "{\"myKey\":true \"myOtherKey\":false}";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "Expected a ',' or '}' at 15 [character 16 line 1]",
-                    e.getMessage());
+            assertEquals("Expected a ',' or '}' at 15 [character 16 line 1]",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             // key is a nested map
             String str = "{{\"foo\": \"bar\"}: \"baz\"}";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                "Missing value at 1 [character 2 line 1]",
-                e.getMessage());
+            assertEquals("Missing value at 1 [character 2 line 1]",
+                e.getMessage(),
+                "Expecting an exception message");
         }
         try {
             // key is a nested array containing a map
             String str = "{\"a\": 1, [{\"foo\": \"bar\"}]: \"baz\"}";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                "Missing value at 9 [character 10 line 1]",
-                e.getMessage());
+            assertEquals("Missing value at 9 [character 10 line 1]",
+                e.getMessage(),
+                "Expecting an exception message");
         }
         try {
             // key contains }
             String str = "{foo}: 2}";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                "Expected a ':' after a key at 5 [character 6 line 1]",
-                e.getMessage());
+            assertEquals("Expected a ':' after a key at 5 [character 6 line 1]",
+                e.getMessage(),
+                "Expecting an exception message");
         }
         try {
             // key contains ]
             String str = "{foo]: 2}";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                "Expected a ':' after a key at 5 [character 6 line 1]",
-                e.getMessage());
+            assertEquals("Expected a ':' after a key at 5 [character 6 line 1]",
+                e.getMessage(),
+                "Expecting an exception message");
         }
         try {
             // \0 after ,
             String str = "{\"myKey\":true, \0\"myOtherKey\":false}";
-            assertNull("Expected an exception",new JSONObject(str));
+            assertNull(new JSONObject(str),"Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "A JSONObject text must end with '}' at 15 [character 16 line 1]",
-                    e.getMessage());
+            assertEquals("A JSONObject text must end with '}' at 15 [character 16 line 1]",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             // append to wrong key
@@ -2351,9 +2209,9 @@ public class JSONObjectTest {
             jsonObject.append("myKey", "hello");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message",
-                    "JSONObject[\"myKey\"] is not a JSONArray (null).",
-                    e.getMessage());
+            assertEquals("JSONObject[\"myKey\"] is not a JSONArray (null).",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             // increment wrong key
@@ -2362,9 +2220,9 @@ public class JSONObjectTest {
             jsonObject.increment("myKey");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message",
-                    "Unable to increment [\"myKey\"].",
-                    e.getMessage());
+            assertEquals("Unable to increment [\"myKey\"].",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             // invalid key
@@ -2373,18 +2231,18 @@ public class JSONObjectTest {
             jsonObject.get(null);
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message",
-                    "Null key.",
-                    e.getMessage());
+            assertEquals("Null key.",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
         try {
             // invalid numberToString()
             JSONObject.numberToString((Number)null);
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertEquals("Expecting an exception message", 
-                    "Null pointer",
-                    e.getMessage());
+            assertEquals("Null pointer",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
 
         try {
@@ -2394,21 +2252,21 @@ public class JSONObjectTest {
             jsonObject.putOnce("hello", "world!");
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("", true);
+            assertTrue(true, "");
         }
         try {
             // test validity of invalid double 
             JSONObject.testValidity(NaN);
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("", true);
+            assertTrue(true, "");
         }
         try {
             // test validity of invalid float 
             JSONObject.testValidity(Float.NEGATIVE_INFINITY);
             fail("Expected an exception");
         } catch (JSONException e) { 
-            assertTrue("", true);
+            assertTrue(true, "");
         }
         try {
             // test exception message when including a duplicate key (level 0)
@@ -2421,9 +2279,9 @@ public class JSONObjectTest {
             new JSONObject(str);
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
-                    e.getMessage());
+            assertEquals("Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    e.getMessage(),
+                    "Expecting an expection message");
         }
         try {
             // test exception message when including a duplicate key (level 0) holding an object
@@ -2440,9 +2298,9 @@ public class JSONObjectTest {
             new JSONObject(str);
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
-                    e.getMessage());
+            assertEquals("Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    e.getMessage(),
+                    "Expecting an expection message");
         }
         try {
             // test exception message when including a duplicate key (level 0) holding an array
@@ -2461,9 +2319,9 @@ public class JSONObjectTest {
             new JSONObject(str);
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
-                    e.getMessage());
+            assertEquals("Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    e.getMessage(),
+                    "Expecting an expection message");
         }
         try {
             // test exception message when including a duplicate key (level 1)
@@ -2481,9 +2339,9 @@ public class JSONObjectTest {
             new JSONObject(str);
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
-                    e.getMessage());
+            assertEquals("Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    e.getMessage(),
+                    "Expecting an expection message");
         }
         try {
             // test exception message when including a duplicate key (level 1) holding an object
@@ -2505,9 +2363,9 @@ public class JSONObjectTest {
             new JSONObject(str);
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
-                    e.getMessage());
+            assertEquals("Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    e.getMessage(),
+                    "Expecting an expection message");
         }
         try {
             // test exception message when including a duplicate key (level 1) holding an array
@@ -2531,9 +2389,9 @@ public class JSONObjectTest {
             new JSONObject(str);
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
-                    e.getMessage());
+            assertEquals("Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    e.getMessage(),
+                    "Expecting an expection message");
         }
         try {
             // test exception message when including a duplicate key in object (level 0) within an array
@@ -2550,9 +2408,9 @@ public class JSONObjectTest {
             new JSONArray(str);
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr01\" at 124 [character 17 line 8]",
-                    e.getMessage());
+            assertEquals("Duplicate key \"attr01\" at 124 [character 17 line 8]",
+                    e.getMessage(),
+                    "Expecting an expection message");
         }
         try {
             // test exception message when including a duplicate key in object (level 1) within an array
@@ -2575,9 +2433,9 @@ public class JSONObjectTest {
             new JSONArray(str);
             fail("Expected an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr02-01\" at 269 [character 24 line 13]",
-                    e.getMessage());
+            assertEquals("Duplicate key \"attr02-01\" at 269 [character 24 line 13]",
+                    e.getMessage(),
+                    "Expecting an expection message");
         }
     }
 
@@ -2585,14 +2443,14 @@ public class JSONObjectTest {
      * Confirm behavior when putOnce() is called with null parameters
      */
     @Test
-    public void jsonObjectPutOnceNull() {
+    void jsonObjectPutOnceNull() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.putOnce(null, null);
-        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
+        assertTrue(jsonObject.isEmpty(), "jsonObject should be empty");
         jsonObject.putOnce("", null);
-        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
+        assertTrue(jsonObject.isEmpty(), "jsonObject should be empty");
         jsonObject.putOnce(null, "");
-        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
+        assertTrue(jsonObject.isEmpty(), "jsonObject should be empty");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
@@ -2600,129 +2458,99 @@ public class JSONObjectTest {
      * Exercise JSONObject opt(key, default) method.
      */
     @Test
-    public void jsonObjectOptDefault() {
+    void jsonObjectOptDefault() {
 
         String str = "{\"myKey\": \"myval\", \"hiKey\": null}";
         JSONObject jsonObject = new JSONObject(str);
 
-        assertTrue("optBigDecimal() should return default BigDecimal",
-                BigDecimal.TEN.compareTo(jsonObject.optBigDecimal("myKey", BigDecimal.TEN))==0);
-        assertTrue("optBigInteger() should return default BigInteger",
-                BigInteger.TEN.compareTo(jsonObject.optBigInteger("myKey",BigInteger.TEN ))==0);
-        assertTrue("optBoolean() should return default boolean",
-                 jsonObject.optBoolean("myKey", true));
-        assertTrue("optBooleanObject() should return default Boolean",
-                 jsonObject.optBooleanObject("myKey", true));
-        assertTrue("optInt() should return default int",
-                42 == jsonObject.optInt("myKey", 42));
-        assertTrue("optIntegerObject() should return default Integer",
-                Integer.valueOf(42).equals(jsonObject.optIntegerObject("myKey", 42)));
-        assertTrue("optEnum() should return default Enum",
-                MyEnum.VAL1.equals(jsonObject.optEnum(MyEnum.class, "myKey", MyEnum.VAL1)));
-        assertTrue("optJSONArray() should return null ",
-                null==jsonObject.optJSONArray("myKey"));
-        assertTrue("optJSONArray() should return default JSONArray",
-                "value".equals(jsonObject.optJSONArray("myKey", new JSONArray("[\"value\"]")).getString(0)));
-        assertTrue("optJSONObject() should return default JSONObject ",
-                jsonObject.optJSONObject("myKey", new JSONObject("{\"testKey\":\"testValue\"}")).getString("testKey").equals("testValue"));
-        assertTrue("optLong() should return default long",
-                42l == jsonObject.optLong("myKey", 42l));
-        assertTrue("optLongObject() should return default Long",
-                Long.valueOf(42l).equals(jsonObject.optLongObject("myKey", 42l)));
-        assertTrue("optDouble() should return default double",
-                42.3d == jsonObject.optDouble("myKey", 42.3d));
-        assertTrue("optDoubleObject() should return default Double",
-                Double.valueOf(42.3d).equals(jsonObject.optDoubleObject("myKey", 42.3d)));
-        assertTrue("optFloat() should return default float",
-                42.3f == jsonObject.optFloat("myKey", 42.3f));
-        assertTrue("optFloatObject() should return default Float",
-                Float.valueOf(42.3f).equals(jsonObject.optFloatObject("myKey", 42.3f)));
-        assertTrue("optNumber() should return default Number",
-                42l == jsonObject.optNumber("myKey", Long.valueOf(42)).longValue());
-        assertTrue("optString() should return default string",
-                "hi".equals(jsonObject.optString("hiKey", "hi")));
+        assertEquals(0, BigDecimal.TEN.compareTo(jsonObject.optBigDecimal("myKey", BigDecimal.TEN)), "optBigDecimal() should return default BigDecimal");
+        assertEquals(0, BigInteger.TEN.compareTo(jsonObject.optBigInteger("myKey", BigInteger.TEN)), "optBigInteger() should return default BigInteger");
+        assertTrue(jsonObject.optBoolean("myKey", true),
+                 "optBoolean() should return default boolean");
+        assertTrue(jsonObject.optBooleanObject("myKey", true),
+                 "optBooleanObject() should return default Boolean");
+        assertEquals(42, jsonObject.optInt("myKey", 42), "optInt() should return default int");
+        assertEquals(Integer.valueOf(42), jsonObject.optIntegerObject("myKey", 42), "optIntegerObject() should return default Integer");
+        assertEquals(MyEnum.VAL1, jsonObject.optEnum(MyEnum.class, "myKey", MyEnum.VAL1), "optEnum() should return default Enum");
+        assertTrue(null==jsonObject.optJSONArray("myKey"),
+                "optJSONArray() should return null ");
+        assertEquals("value", jsonObject.optJSONArray("myKey", new JSONArray("[\"value\"]")).getString(0), "optJSONArray() should return default JSONArray");
+        assertEquals("testValue", jsonObject.optJSONObject("myKey", new JSONObject("{\"testKey\":\"testValue\"}")).getString("testKey"), "optJSONObject() should return default JSONObject ");
+        assertEquals(42l, jsonObject.optLong("myKey", 42l), "optLong() should return default long");
+        assertEquals(Long.valueOf(42l), jsonObject.optLongObject("myKey", 42l), "optLongObject() should return default Long");
+        assertEquals(42.3d, jsonObject.optDouble("myKey", 42.3d), "optDouble() should return default double");
+        assertEquals(Double.valueOf(42.3d), jsonObject.optDoubleObject("myKey", 42.3d), "optDoubleObject() should return default Double");
+        assertEquals(42.3f, jsonObject.optFloat("myKey", 42.3f), "optFloat() should return default float");
+        assertEquals(Float.valueOf(42.3f), jsonObject.optFloatObject("myKey", 42.3f), "optFloatObject() should return default Float");
+        assertEquals(42l, jsonObject.optNumber("myKey", Long.valueOf(42)).longValue(), "optNumber() should return default Number");
+        assertEquals("hi", jsonObject.optString("hiKey", "hi"), "optString() should return default string");
         Util.checkJSONObjectMaps(jsonObject);
     }
-    
+
     /**
      * Exercise JSONObject opt(key, default) method when the key doesn't exist.
      */
     @Test
-    public void jsonObjectOptNoKey() {
+    void jsonObjectOptNoKey() {
 
          JSONObject jsonObject = new JSONObject();
          
          assertNull(jsonObject.opt(null));
 
-         assertTrue("optBigDecimal() should return default BigDecimal",
-                 BigDecimal.TEN.compareTo(jsonObject.optBigDecimal("myKey", BigDecimal.TEN))==0);
-         assertTrue("optBigInteger() should return default BigInteger",
-                 BigInteger.TEN.compareTo(jsonObject.optBigInteger("myKey",BigInteger.TEN ))==0);
-         assertTrue("optBoolean() should return default boolean",
-                  jsonObject.optBoolean("myKey", true));
-         assertTrue("optBooleanObject() should return default Boolean",
-                  jsonObject.optBooleanObject("myKey", true));
-         assertTrue("optInt() should return default int",
-                 42 == jsonObject.optInt("myKey", 42));
-         assertTrue("optIntegerObject() should return default Integer",
-                 Integer.valueOf(42).equals(jsonObject.optIntegerObject("myKey", 42)));
-         assertTrue("optEnum() should return default Enum",
-                 MyEnum.VAL1.equals(jsonObject.optEnum(MyEnum.class, "myKey", MyEnum.VAL1)));
-         assertTrue("optJSONArray() should return default JSONArray",
-                 "value".equals(jsonObject.optJSONArray("myKey", new JSONArray("[\"value\"]")).getString(0)));
-         assertTrue("optJSONArray() should return null ",
-                 null==jsonObject.optJSONArray("myKey"));
-         assertTrue("optJSONObject() should return default JSONObject ",
-                jsonObject.optJSONObject("myKey", new JSONObject("{\"testKey\":\"testValue\"}")).getString("testKey").equals("testValue"));
-         assertTrue("optLong() should return default long",
-                 42l == jsonObject.optLong("myKey", 42l));
-         assertTrue("optLongObject() should return default Long",
-                 Long.valueOf(42l).equals(jsonObject.optLongObject("myKey", 42l)));
-         assertTrue("optDouble() should return default double",
-                 42.3d == jsonObject.optDouble("myKey", 42.3d));
-         assertTrue("optDoubleObject() should return default Double",
-                 Double.valueOf(42.3d).equals(jsonObject.optDoubleObject("myKey", 42.3d)));
-         assertTrue("optFloat() should return default float",
-                 42.3f == jsonObject.optFloat("myKey", 42.3f));
-         assertTrue("optFloatObject() should return default Float",
-                 Float.valueOf(42.3f).equals(jsonObject.optFloatObject("myKey", 42.3f)));
-         assertTrue("optNumber() should return default Number",
-                 42l == jsonObject.optNumber("myKey", Long.valueOf(42)).longValue());
-         assertTrue("optString() should return default string",
-                 "hi".equals(jsonObject.optString("hiKey", "hi")));
+        assertEquals(0, BigDecimal.TEN.compareTo(jsonObject.optBigDecimal("myKey", BigDecimal.TEN)), "optBigDecimal() should return default BigDecimal");
+        assertEquals(0, BigInteger.TEN.compareTo(jsonObject.optBigInteger("myKey", BigInteger.TEN)), "optBigInteger() should return default BigInteger");
+         assertTrue(jsonObject.optBoolean("myKey", true),
+                  "optBoolean() should return default boolean");
+         assertTrue(jsonObject.optBooleanObject("myKey", true),
+                  "optBooleanObject() should return default Boolean");
+        assertEquals(42, jsonObject.optInt("myKey", 42), "optInt() should return default int");
+        assertEquals(Integer.valueOf(42), jsonObject.optIntegerObject("myKey", 42), "optIntegerObject() should return default Integer");
+        assertEquals(MyEnum.VAL1, jsonObject.optEnum(MyEnum.class, "myKey", MyEnum.VAL1), "optEnum() should return default Enum");
+        assertEquals("value", jsonObject.optJSONArray("myKey", new JSONArray("[\"value\"]")).getString(0), "optJSONArray() should return default JSONArray");
+         assertTrue(null==jsonObject.optJSONArray("myKey"),
+                 "optJSONArray() should return null ");
+        assertEquals("testValue", jsonObject.optJSONObject("myKey", new JSONObject("{\"testKey\":\"testValue\"}")).getString("testKey"), "optJSONObject() should return default JSONObject ");
+        assertEquals(42l, jsonObject.optLong("myKey", 42l), "optLong() should return default long");
+        assertEquals(Long.valueOf(42l), jsonObject.optLongObject("myKey", 42l), "optLongObject() should return default Long");
+        assertEquals(42.3d, jsonObject.optDouble("myKey", 42.3d), "optDouble() should return default double");
+        assertEquals(Double.valueOf(42.3d), jsonObject.optDoubleObject("myKey", 42.3d), "optDoubleObject() should return default Double");
+        assertEquals(42.3f, jsonObject.optFloat("myKey", 42.3f), "optFloat() should return default float");
+        assertEquals(Float.valueOf(42.3f), jsonObject.optFloatObject("myKey", 42.3f), "optFloatObject() should return default Float");
+        assertEquals(42l, jsonObject.optNumber("myKey", Long.valueOf(42)).longValue(), "optNumber() should return default Number");
+        assertEquals("hi", jsonObject.optString("hiKey", "hi"), "optString() should return default string");
          Util.checkJSONObjectMaps(jsonObject);
     }
-    
+
     /**
      * Verifies that the opt methods properly convert string values.
      */
     @Test
-    public void jsonObjectOptStringConversion() {
+    void jsonObjectOptStringConversion() {
         JSONObject jo = new JSONObject("{\"int\":\"123\",\"true\":\"true\",\"false\":\"false\"}");
-        assertTrue("unexpected optBoolean value",jo.optBoolean("true",false)==true);
-        assertTrue("unexpected optBooleanObject value",Boolean.valueOf(true).equals(jo.optBooleanObject("true",false)));
-        assertTrue("unexpected optBoolean value",jo.optBoolean("false",true)==false);
-        assertTrue("unexpected optBooleanObject value",Boolean.valueOf(false).equals(jo.optBooleanObject("false",true)));
-        assertTrue("unexpected optInt value",jo.optInt("int",0)==123);
-        assertTrue("unexpected optIntegerObject value",Integer.valueOf(123).equals(jo.optIntegerObject("int",0)));
-        assertTrue("unexpected optLong value",jo.optLong("int",0)==123l);
-        assertTrue("unexpected optLongObject value",Long.valueOf(123l).equals(jo.optLongObject("int",0L)));
-        assertTrue("unexpected optDouble value",jo.optDouble("int",0.0d)==123.0d);
-        assertTrue("unexpected optDoubleObject value",Double.valueOf(123.0d).equals(jo.optDoubleObject("int",0.0d)));
-        assertTrue("unexpected optFloat value",jo.optFloat("int",0.0f)==123.0f);
-        assertTrue("unexpected optFloatObject value",Float.valueOf(123.0f).equals(jo.optFloatObject("int",0.0f)));
-        assertTrue("unexpected optBigInteger value",jo.optBigInteger("int",BigInteger.ZERO).compareTo(new BigInteger("123"))==0);
-        assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
-        assertTrue("unexpected optBigDecimal value",jo.optBigDecimal("int",BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
-        assertTrue("unexpected optNumber value",jo.optNumber("int",BigInteger.ZERO).longValue()==123l);
+        assertTrue(jo.optBoolean("true", false), "unexpected optBoolean value");
+        assertEquals(Boolean.valueOf(true), jo.optBooleanObject("true", false), "unexpected optBooleanObject value");
+        assertFalse(jo.optBoolean("false", true), "unexpected optBoolean value");
+        assertEquals(Boolean.valueOf(false), jo.optBooleanObject("false", true), "unexpected optBooleanObject value");
+        assertEquals(123, jo.optInt("int", 0), "unexpected optInt value");
+        assertEquals(Integer.valueOf(123), jo.optIntegerObject("int", 0), "unexpected optIntegerObject value");
+        assertEquals(123l, jo.optLong("int", 0), "unexpected optLong value");
+        assertEquals(Long.valueOf(123l), jo.optLongObject("int", 0L), "unexpected optLongObject value");
+        assertEquals(123.0d, jo.optDouble("int", 0.0d), "unexpected optDouble value");
+        assertEquals(Double.valueOf(123.0d), jo.optDoubleObject("int", 0.0d), "unexpected optDoubleObject value");
+        assertEquals(123.0f, jo.optFloat("int", 0.0f), "unexpected optFloat value");
+        assertEquals(Float.valueOf(123.0f), jo.optFloatObject("int", 0.0f), "unexpected optFloatObject value");
+        assertEquals(0, jo.optBigInteger("int", BigInteger.ZERO).compareTo(new BigInteger("123")), "unexpected optBigInteger value");
+        assertEquals(0, jo.optBigDecimal("int", BigDecimal.ZERO).compareTo(new BigDecimal("123")), "unexpected optBigDecimal value");
+        assertEquals(0, jo.optBigDecimal("int", BigDecimal.ZERO).compareTo(new BigDecimal("123")), "unexpected optBigDecimal value");
+        assertEquals(123l, jo.optNumber("int", BigInteger.ZERO).longValue(), "unexpected optNumber value");
         Util.checkJSONObjectMaps(jo);
     }
-    
+
     /**
      * Verifies that the opt methods properly convert string values to numbers and coerce them consistently.
      */
     @Test
-    public void jsonObjectOptCoercion() {
+    void jsonObjectOptCoercion() {
         JSONObject jo = new JSONObject("{\"largeNumberStr\":\"19007199254740993.35481234487103587486413587843213584\"}");
         // currently the parser doesn't recognize BigDecimal, to we have to put it manually
         jo.put("largeNumber", new BigDecimal("19007199254740993.35481234487103587486413587843213584"));
@@ -2764,12 +2592,12 @@ public class JSONObjectTest {
         assertEquals(2147483647, (int)Double.parseDouble("19007199254740993.35481234487103587486413587843213584"));
         Util.checkJSONObjectMaps(jo);
     }
-    
+
     /**
      * Verifies that the optBigDecimal method properly converts values to BigDecimal and coerce them consistently.
      */
     @Test
-    public void jsonObjectOptBigDecimal() {
+    void jsonObjectOptBigDecimal() {
         JSONObject jo = new JSONObject().put("int", 123).put("long", 654L)
                 .put("float", 1.234f).put("double", 2.345d)
                 .put("bigInteger", new BigInteger("1234"))
@@ -2787,12 +2615,12 @@ public class JSONObjectTest {
         assertEquals(jo.optBigDecimal("double", null),jo.getBigDecimal("double"));
         Util.checkJSONObjectMaps(jo);
     }
-    
+
     /**
      * Verifies that the optBigDecimal method properly converts values to BigDecimal and coerce them consistently.
      */
     @Test
-    public void jsonObjectOptBigInteger() {
+    void jsonObjectOptBigInteger() {
         JSONObject jo = new JSONObject().put("int", 123).put("long", 654L)
                 .put("float", 1.234f).put("double", 2.345d)
                 .put("bigInteger", new BigInteger("1234"))
@@ -2813,17 +2641,17 @@ public class JSONObjectTest {
      * Confirm behavior when JSONObject put(key, null object) is called
      */
     @Test
-    public void jsonObjectputNull() {
+    void jsonObjectputNull() {
 
         // put null should remove the item.
         String str = "{\"myKey\": \"myval\"}";
         JSONObject jsonObjectRemove = new JSONObject(str);
         jsonObjectRemove.remove("myKey");
-        assertTrue("jsonObject should be empty", jsonObjectRemove.isEmpty());
+        assertTrue(jsonObjectRemove.isEmpty(), "jsonObject should be empty");
 
         JSONObject jsonObjectPutNull = new JSONObject(str);
         jsonObjectPutNull.put("myKey", (Object) null);
-        assertTrue("jsonObject should be empty", jsonObjectPutNull.isEmpty());
+        assertTrue(jsonObjectPutNull.isEmpty(), "jsonObject should be empty");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jsonObjectRemove, jsonObjectPutNull
         )));
@@ -2835,41 +2663,33 @@ public class JSONObjectTest {
      * quotes, the quotes are properly escaped.
      */
     @Test
-    public void jsonObjectQuote() {
+    void jsonObjectQuote() {
         String str;
         str = "";
         String quotedStr;
         quotedStr = JSONObject.quote(str);
-        assertTrue("quote() expected escaped quotes, found "+quotedStr,
-                "\"\"".equals(quotedStr));
+        assertEquals("\"\"", quotedStr, "quote() expected escaped quotes, found " + quotedStr);
         str = "\"\"";
         quotedStr = JSONObject.quote(str);
-        assertTrue("quote() expected escaped quotes, found "+quotedStr,
-                "\"\\\"\\\"\"".equals(quotedStr));
+        assertEquals("\"\\\"\\\"\"", quotedStr, "quote() expected escaped quotes, found " + quotedStr);
         str = "</";
         quotedStr = JSONObject.quote(str);
-        assertTrue("quote() expected escaped frontslash, found "+quotedStr,
-                "\"<\\/\"".equals(quotedStr));
+        assertEquals("\"<\\/\"", quotedStr, "quote() expected escaped frontslash, found " + quotedStr);
         str = "AB\bC";
         quotedStr = JSONObject.quote(str);
-        assertTrue("quote() expected escaped backspace, found "+quotedStr,
-                "\"AB\\bC\"".equals(quotedStr));
+        assertEquals("\"AB\\bC\"", quotedStr, "quote() expected escaped backspace, found " + quotedStr);
         str = "ABC\n";
         quotedStr = JSONObject.quote(str);
-        assertTrue("quote() expected escaped newline, found "+quotedStr,
-                "\"ABC\\n\"".equals(quotedStr));
+        assertEquals("\"ABC\\n\"", quotedStr, "quote() expected escaped newline, found " + quotedStr);
         str = "AB\fC";
         quotedStr = JSONObject.quote(str);
-        assertTrue("quote() expected escaped formfeed, found "+quotedStr,
-                "\"AB\\fC\"".equals(quotedStr));
+        assertEquals("\"AB\\fC\"", quotedStr, "quote() expected escaped formfeed, found " + quotedStr);
         str = "\r";
         quotedStr = JSONObject.quote(str);
-        assertTrue("quote() expected escaped return, found "+quotedStr,
-                "\"\\r\"".equals(quotedStr));
+        assertEquals("\"\\r\"", quotedStr, "quote() expected escaped return, found " + quotedStr);
         str = "\u1234\u0088";
         quotedStr = JSONObject.quote(str);
-        assertTrue("quote() expected escaped unicode, found "+quotedStr,
-                "\"\u1234\\u0088\"".equals(quotedStr));
+        assertEquals("\"\u1234\\u0088\"", quotedStr, "quote() expected escaped unicode, found " + quotedStr);
     }
 
     /**
@@ -2877,27 +2697,26 @@ public class JSONObjectTest {
      * empty string
      */
     @Test
-    public void stringToValue() {
+    void stringToValue() {
         String str = "";
         String valueStr = (String)(JSONObject.stringToValue(str));
-        assertTrue("stringToValue() expected empty String, found "+valueStr,
-                "".equals(valueStr));
+        assertEquals("", valueStr, "stringToValue() expected empty String, found " + valueStr);
     }
 
     /**
      * Confirm behavior when toJSONArray is called with a null value
      */
     @Test
-    public void toJSONArray() {
-        assertTrue("toJSONArray() with null names should be null",
-                null == new JSONObject().toJSONArray(null));
+    void toJSONArray() {
+        assertTrue(null == new JSONObject().toJSONArray(null),
+                "toJSONArray() with null names should be null");
     }
 
     /**
      * Exercise the JSONObject write() method
      */
     @Test
-    public void write() throws IOException {
+    void write() throws IOException {
         String str = "{\"key1\":\"value1\",\"key2\":[1,2,3]}";
         String expectedStr = str;
         JSONObject jsonObject = new JSONObject(str);
@@ -2905,20 +2724,20 @@ public class JSONObjectTest {
         try {
             String actualStr = jsonObject.write(stringWriter).toString();
             // key order may change. verify length and individual key content
-            assertEquals("length", expectedStr.length(), actualStr.length());
-            assertTrue("key1", actualStr.contains("\"key1\":\"value1\""));
-            assertTrue("key2", actualStr.contains("\"key2\":[1,2,3]"));
+            assertEquals(expectedStr.length(), actualStr.length(), "length");
+            assertTrue(actualStr.contains("\"key1\":\"value1\""), "key1");
+            assertTrue(actualStr.contains("\"key2\":[1,2,3]"), "key2");
         } finally {
             stringWriter.close();
         }
         Util.checkJSONObjectMaps(jsonObject);
     }
-    
+
     /**
      * Confirms that exceptions thrown when writing values are wrapped properly.
      */
     @Test
-    public void testJSONWriterException() {
+    void jSONWriterException() {
         final JSONObject jsonObject = new JSONObject();
 
         jsonObject.put("someKey",new BrokenToString());
@@ -3020,7 +2839,7 @@ public class JSONObjectTest {
      * Exercise the JSONObject write(Writer, int, int) method
      */
     @Test
-    public void write3Param() throws IOException {
+    void write3Param() throws IOException {
         String str0 = "{\"key1\":\"value1\",\"key2\":[1,false,3.14]}";
         String str2 =
                 "{\n" +
@@ -3036,9 +2855,9 @@ public class JSONObjectTest {
         try {
             String actualStr = jsonObject.write(stringWriter,0,0).toString();
             
-            assertEquals("length", str0.length(), actualStr.length());
-            assertTrue("key1", actualStr.contains("\"key1\":\"value1\""));
-            assertTrue("key2", actualStr.contains("\"key2\":[1,false,3.14]"));
+            assertEquals(str0.length(), actualStr.length(), "length");
+            assertTrue(actualStr.contains("\"key1\":\"value1\""), "key1");
+            assertTrue(actualStr.contains("\"key2\":[1,false,3.14]"), "key2");
         } finally {
             try {
                 stringWriter.close();
@@ -3049,13 +2868,13 @@ public class JSONObjectTest {
         try {
             String actualStr = jsonObject.write(stringWriter,2,1).toString();
 
-            assertEquals("length", str2.length(), actualStr.length());
-            assertTrue("key1", actualStr.contains("   \"key1\": \"value1\""));
-            assertTrue("key2", actualStr.contains("   \"key2\": [\n" +
+            assertEquals(str2.length(), actualStr.length(), "length");
+            assertTrue(actualStr.contains("   \"key1\": \"value1\""), "key1");
+            assertTrue(actualStr.contains("   \"key2\": [\n" +
                             "     1,\n" +
                             "     false,\n" +
                             "     3.14\n" +
-                            "   ]")
+                            "   ]"), "key2"
             );
         } finally {
             try {
@@ -3100,11 +2919,10 @@ public class JSONObjectTest {
      * Exercise the JSONObject equals() method
      */
     @Test
-    public void equals() {
+    void equals() {
         String str = "{\"key\":\"value\"}";
         JSONObject aJsonObject = new JSONObject(str);
-        assertTrue("Same JSONObject should be equal to itself",
-                aJsonObject.equals(aJsonObject));
+        assertEquals(aJsonObject, aJsonObject, "Same JSONObject should be equal to itself");
         Util.checkJSONObjectMaps(aJsonObject);
     }
 
@@ -3113,7 +2931,7 @@ public class JSONObjectTest {
      * in how they are handled by JSON-java.
      */
     @Test
-    public void jsonObjectNullOperations() {
+    void jsonObjectNullOperations() {
         /**
          * The Javadoc for JSONObject.NULL states:
          *      "JSONObject.NULL is equivalent to the value that JavaScript calls null,
@@ -3149,24 +2967,22 @@ public class JSONObjectTest {
         Object obj = JSONObject.NULL;
         jsonObjectJONull.put("key", obj);
         Object value = jsonObjectJONull.opt("key");
-        assertTrue("opt() JSONObject.NULL should find JSONObject.NULL",
-                obj.equals(value));
+        assertEquals(obj, value, "opt() JSONObject.NULL should find JSONObject.NULL");
         value = jsonObjectJONull.get("key");
-        assertTrue("get() JSONObject.NULL should find JSONObject.NULL",
-                obj.equals(value));
+        assertEquals(obj, value, "get() JSONObject.NULL should find JSONObject.NULL");
         if (value == null) {
             value = "";
         }
         String string = value instanceof String ? (String)value : null;
-        assertTrue("XML toString() should convert JSONObject.NULL to null",
-                string == null);
+        assertTrue(string == null,
+                "XML toString() should convert JSONObject.NULL to null");
 
         // now try it with null
         JSONObject jsonObjectNull = new JSONObject();
         obj = null;
         jsonObjectNull.put("key", obj);
         value = jsonObjectNull.opt("key");
-        assertNull("opt() null should find null", value);
+        assertNull(value, "opt() null should find null");
         // what is this trying to do? It appears to test absolutely nothing...
 //        if (value == null) {
 //            value = "";
@@ -3187,41 +3003,46 @@ public class JSONObjectTest {
          * as <key>null</key> and null will be emitted as ""
          */
         String sJONull = XML.toString(jsonObjectJONull);
-        assertTrue("JSONObject.NULL should emit a null value", 
-                "<key>null</key>".equals(sJONull));
+        assertEquals("<key>null</key>", sJONull, "JSONObject.NULL should emit a null value");
         String sNull = XML.toString(jsonObjectNull);
-        assertTrue("null should emit an empty string", "".equals(sNull));
+        assertEquals("", sNull, "null should emit an empty string");
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jsonObjectJONull, jsonObjectNull
         )));
     }
-    
-    @Test(expected = JSONPointerException.class)
-    public void queryWithNoResult() {
-        new JSONObject().query("/a/b");
-    }
-    
+
     @Test
-    public void optQueryWithNoResult() {
-        assertNull(new JSONObject().optQuery("/a/b"));
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void optQueryWithSyntaxError() {
-        new JSONObject().optQuery("invalid");
+    void queryWithNoResult() {
+        assertThrows(JSONPointerException.class, () -> {
+            new JSONObject().query("/a/b");
+        });
     }
 
-    @Test(expected = JSONException.class)
-    public void invalidEscapeSequence() {
-      String json = "{ \"\\url\": \"value\" }";
-      assertNull("Expected an exception",new JSONObject(json));
+    @Test
+    void optQueryWithNoResult() {
+        assertNull(new JSONObject().optQuery("/a/b"));
+    }
+
+    @Test
+    void optQueryWithSyntaxError() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new JSONObject().optQuery("invalid");
+        });
+    }
+
+    @Test
+    void invalidEscapeSequence() {
+        assertThrows(JSONException.class, () -> {
+            String json = "{ \"\\url\": \"value\" }";
+            assertNull(new JSONObject(json), "Expected an exception");
+        });
     }
 
     /**
      * Exercise JSONObject toMap() method.
      */
     @Test
-    public void toMap() {
+    void toMap() {
         String jsonObjectStr =
                 "{" +
                 "\"key1\":" +
@@ -3244,66 +3065,66 @@ public class JSONObjectTest {
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
         Map<?,?> map = jsonObject.toMap();
 
-        assertTrue("Map should not be null", map != null);
-        assertTrue("Map should have 3 elements", map.size() == 3);
+        assertTrue(map != null, "Map should not be null");
+        assertEquals(3, map.size(), "Map should have 3 elements");
 
         List<?> key1List = (List<?>)map.get("key1");
-        assertTrue("key1 should not be null", key1List != null);
-        assertTrue("key1 list should have 3 elements", key1List.size() == 3);
-        assertTrue("key1 value 1 should be 1", key1List.get(0).equals(Integer.valueOf(1)));
-        assertTrue("key1 value 2 should be 2", key1List.get(1).equals(Integer.valueOf(2)));
+        assertTrue(key1List != null, "key1 should not be null");
+        assertEquals(3, key1List.size(), "key1 list should have 3 elements");
+        assertEquals(key1List.get(0), Integer.valueOf(1), "key1 value 1 should be 1");
+        assertEquals(key1List.get(1), Integer.valueOf(2), "key1 value 2 should be 2");
 
         Map<?,?> key1Value3Map = (Map<?,?>)key1List.get(2);
-        assertTrue("Map should not be null", key1Value3Map != null);
-        assertTrue("Map should have 1 element", key1Value3Map.size() == 1);
-        assertTrue("Map key3 should be true", key1Value3Map.get("key3").equals(Boolean.TRUE));
+        assertTrue(key1Value3Map != null, "Map should not be null");
+        assertEquals(1, key1Value3Map.size(), "Map should have 1 element");
+        assertEquals(Boolean.TRUE, key1Value3Map.get("key3"), "Map key3 should be true");
 
         Map<?,?> key2Map = (Map<?,?>)map.get("key2");
-        assertTrue("key2 should not be null", key2Map != null);
-        assertTrue("key2 map should have 3 elements", key2Map.size() == 3);
-        assertTrue("key2 map key 1 should be val1", key2Map.get("key1").equals("val1"));
-        assertTrue("key2 map key 3 should be 42", key2Map.get("key3").equals(Integer.valueOf(42)));
+        assertTrue(key2Map != null, "key2 should not be null");
+        assertEquals(3, key2Map.size(), "key2 map should have 3 elements");
+        assertEquals("val1", key2Map.get("key1"), "key2 map key 1 should be val1");
+        assertEquals(key2Map.get("key3"), Integer.valueOf(42), "key2 map key 3 should be 42");
 
         Map<?,?> key2Val2Map = (Map<?,?>)key2Map.get("key2");
-        assertTrue("key2 map key 2 should not be null", key2Val2Map != null);
-        assertTrue("key2 map key 2 should have an entry", key2Val2Map.containsKey("key2"));
-        assertTrue("key2 map key 2 value should be null", key2Val2Map.get("key2") == null);
+        assertTrue(key2Val2Map != null, "key2 map key 2 should not be null");
+        assertTrue(key2Val2Map.containsKey("key2"), "key2 map key 2 should have an entry");
+        assertTrue(key2Val2Map.get("key2") == null, "key2 map key 2 value should be null");
 
         List<?> key3List = (List<?>)map.get("key3");
-        assertTrue("key3 should not be null", key3List != null);
-        assertTrue("key3 list should have 3 elements", key3List.size() == 2);
+        assertTrue(key3List != null, "key3 should not be null");
+        assertEquals(2, key3List.size(), "key3 list should have 3 elements");
 
         List<?> key3Val1List = (List<?>)key3List.get(0);
-        assertTrue("key3 list val 1 should not be null", key3Val1List != null);
-        assertTrue("key3 list val 1 should have 2 elements", key3Val1List.size() == 2);
-        assertTrue("key3 list val 1 list element 1 should be value1", key3Val1List.get(0).equals("value1"));
-        assertTrue("key3 list val 1 list element 2 should be 2.1", key3Val1List.get(1).equals(new BigDecimal("2.1")));
+        assertTrue(key3Val1List != null, "key3 list val 1 should not be null");
+        assertEquals(2, key3Val1List.size(), "key3 list val 1 should have 2 elements");
+        assertEquals("value1", key3Val1List.get(0), "key3 list val 1 list element 1 should be value1");
+        assertEquals(key3Val1List.get(1), new BigDecimal("2.1"), "key3 list val 1 list element 2 should be 2.1");
 
         List<?> key3Val2List = (List<?>)key3List.get(1);
-        assertTrue("key3 list val 2 should not be null", key3Val2List != null);
-        assertTrue("key3 list val 2 should have 1 element", key3Val2List.size() == 1);
-        assertTrue("key3 list val 2 list element 1 should be null", key3Val2List.get(0) == null);
+        assertTrue(key3Val2List != null, "key3 list val 2 should not be null");
+        assertEquals(1, key3Val2List.size(), "key3 list val 2 should have 1 element");
+        assertTrue(key3Val2List.get(0) == null, "key3 list val 2 list element 1 should be null");
 
         // Assert that toMap() is a deep copy
         jsonObject.getJSONArray("key3").getJSONArray(0).put(0, "still value 1");
-        assertTrue("key3 list val 1 list element 1 should be value1", key3Val1List.get(0).equals("value1"));
+        assertEquals("value1", key3Val1List.get(0), "key3 list val 1 list element 1 should be value1");
 
         // assert that the new map is mutable
-        assertTrue("Removing a key should succeed", map.remove("key3") != null);
-        assertTrue("Map should have 2 elements", map.size() == 2);
+        assertTrue(map.remove("key3") != null, "Removing a key should succeed");
+        assertEquals(2, map.size(), "Map should have 2 elements");
         Util.checkJSONObjectMaps(jsonObject);
     }
-    
+
     /**
      * test that validates a singleton can be serialized as a bean.
      */
     @SuppressWarnings("boxing")
     @Test
-    public void testSingletonBean() {
+    void singletonBean() {
         final JSONObject jo = new JSONObject(Singleton.getInstance());
-        assertEquals(jo.keySet().toString(), 1, jo.length());
+        assertEquals(1, jo.length(), jo.keySet().toString());
         assertEquals(0, jo.get("someInt"));
-        assertEquals(null, jo.opt("someString"));
+        assertNull(jo.opt("someString"));
         
         // Update the singleton values
         Singleton.getInstance().setSomeInt(42);
@@ -3315,7 +3136,7 @@ public class JSONObjectTest {
 
         // ensure our original jo hasn't changed.
         assertEquals(0, jo.get("someInt"));
-        assertEquals(null, jo.opt("someString"));
+        assertNull(jo.opt("someString"));
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jo, jo2
         )));
@@ -3326,11 +3147,11 @@ public class JSONObjectTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void testSingletonEnumBean() {
+    void singletonEnumBean() {
         final JSONObject jo = new JSONObject(SingletonEnum.getInstance());
-        assertEquals(jo.keySet().toString(), 1, jo.length());
+        assertEquals(1, jo.length(), jo.keySet().toString());
         assertEquals(0, jo.get("someInt"));
-        assertEquals(null, jo.opt("someString"));
+        assertNull(jo.opt("someString"));
         
         // Update the singleton values
         SingletonEnum.getInstance().setSomeInt(42);
@@ -3342,49 +3163,47 @@ public class JSONObjectTest {
 
         // ensure our original jo hasn't changed.
         assertEquals(0, jo.get("someInt"));
-        assertEquals(null, jo.opt("someString"));
+        assertNull(jo.opt("someString"));
         Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(
                 jo, jo2
         )));
     }
-    
+
     /**
      * Test to validate that a generic class can be serialized as a bean.
      */
     @SuppressWarnings("boxing")
     @Test
-    public void testGenericBean() {
+    void genericBean() {
         GenericBean<Integer> bean = new GenericBean<>(42);
         final JSONObject jo = new JSONObject(bean);
-        assertEquals(jo.keySet().toString(), 8, jo.length());
+        assertEquals(8, jo.length(), jo.keySet().toString());
         assertEquals(42, jo.get("genericValue"));
-        assertEquals("Expected the getter to only be called once",
-                1, bean.genericGetCounter);
+        assertEquals(1, bean.genericGetCounter, "Expected the getter to only be called once");
         assertEquals(0, bean.genericSetCounter);
         Util.checkJSONObjectMaps(jo);
     }
-    
+
     /**
      * Test to validate that a generic class can be serialized as a bean.
      */
     @SuppressWarnings("boxing")
     @Test
-    public void testGenericIntBean() {
+    void genericIntBean() {
         GenericBeanInt bean = new GenericBeanInt(42);
         final JSONObject jo = new JSONObject(bean);
-        assertEquals(jo.keySet().toString(), 10, jo.length());
+        assertEquals(10, jo.length(), jo.keySet().toString());
         assertEquals(42, jo.get("genericValue"));
-        assertEquals("Expected the getter to only be called once",
-                1, bean.genericGetCounter);
+        assertEquals(1, bean.genericGetCounter, "Expected the getter to only be called once");
         assertEquals(0, bean.genericSetCounter);
         Util.checkJSONObjectMaps(jo);
     }
-    
+
     /**
      * Test to verify <code>key</code> limitations in the JSONObject bean serializer.
      */
     @Test
-    public void testWierdListBean() {
+    void wierdListBean() {
         @SuppressWarnings("boxing")
         WeirdList bean = new WeirdList(42, 43, 44);
         final JSONObject jo = new JSONObject(bean);
@@ -3393,18 +3212,17 @@ public class JSONObjectTest {
         // getInt(int) should also be ignored based on parameter count
         // add(Integer) should be ignore as it doesn't start with get/is and also has a parameter
         // getALL should be mapped
-        assertEquals("Expected 1 key to be mapped. Instead found: "+jo.keySet().toString(),
-                1, jo.length());
+        assertEquals(1, jo.length(), "Expected 1 key to be mapped. Instead found: "+jo.keySet().toString());
         assertNotNull(jo.get("ALL"));
         Util.checkJSONObjectMaps(jo);
     }
-    
+
     /**
      * Sample test case from https://github.com/stleary/JSON-java/issues/531
      * which verifies that no regression in double/BigDecimal support is present.
      */
     @Test
-    public void testObjectToBigDecimal() {  
+    void objectToBigDecimal() {  
         double value = 1412078745.01074;  
         Reader reader = new StringReader("[{\"value\": " + value + "}]");
         JSONTokener tokener = new JSONTokener(reader);
@@ -3418,137 +3236,175 @@ public class JSONObjectTest {
         Util.checkJSONObjectMaps(jsonObject);
         Util.checkJSONArrayMaps(array, jsonObject.getMapType());
      }
-    
+
     /**
      * Tests the exception portions of populateMap.
      */
     @Test
-    public void testExceptionalBean() {
+    void exceptionalBean() {
         ExceptionalBean bean = new ExceptionalBean();
         final JSONObject jo = new JSONObject(bean);
-        assertEquals("Expected 1 key to be mapped. Instead found: "+jo.keySet().toString(),
-                1, jo.length());
+        assertEquals(1, jo.length(), "Expected 1 key to be mapped. Instead found: "+jo.keySet().toString());
         assertTrue(jo.get("closeable") instanceof JSONObject);
         assertTrue(jo.getJSONObject("closeable").has("string"));
         Util.checkJSONObjectMaps(jo);
     }
-    
-    @Test(expected=NullPointerException.class)
-    public void testPutNullBoolean() {
-        // null put key 
-        JSONObject jsonObject = new JSONObject("{}");
-        jsonObject.put(null, false);
-        fail("Expected an exception");
-    }
-    @Test(expected=NullPointerException.class)
-    public void testPutNullCollection() {
-        // null put key 
-        JSONObject jsonObject = new JSONObject("{}");
-        jsonObject.put(null, Collections.emptySet());
-        fail("Expected an exception");
-    }
-    @Test(expected=NullPointerException.class)
-    public void testPutNullDouble() {
-        // null put key 
-        JSONObject jsonObject = new JSONObject("{}");
-        jsonObject.put(null, 0.0d);
-        fail("Expected an exception");
-    }
-    @Test(expected=NullPointerException.class)
-    public void testPutNullFloat() {
-        // null put key 
-        JSONObject jsonObject = new JSONObject("{}");
-        jsonObject.put(null, 0.0f);
-        fail("Expected an exception");
-    }
-    @Test(expected=NullPointerException.class)
-    public void testPutNullInt() {
-        // null put key 
-        JSONObject jsonObject = new JSONObject("{}");
-        jsonObject.put(null, 0);
-        fail("Expected an exception");
-    }
-    @Test(expected=NullPointerException.class)
-    public void testPutNullLong() {
-        // null put key 
-        JSONObject jsonObject = new JSONObject("{}");
-        jsonObject.put(null, 0L);
-        fail("Expected an exception");
-    }
-    @Test(expected=NullPointerException.class)
-    public void testPutNullMap() {
-        // null put key 
-        JSONObject jsonObject = new JSONObject("{}");
-        jsonObject.put(null, Collections.emptyMap());
-        fail("Expected an exception");
-    }
-    @Test(expected=NullPointerException.class)
-    public void testPutNullObject() {
-        // null put key 
-        JSONObject jsonObject = new JSONObject("{}");
-        jsonObject.put(null, new Object());
-        fail("Expected an exception");
-    }
-    @Test(expected=JSONException.class)
-    public void testSelfRecursiveObject() {
-        // A -> A ...
-        RecursiveBean ObjA = new RecursiveBean("ObjA");
-        ObjA.setRef(ObjA);
-        new JSONObject(ObjA);
-        fail("Expected an exception");
-    }
-    @Test(expected=JSONException.class)
-    public void testLongSelfRecursiveObject() {
-        // B -> A -> A ...
-        RecursiveBean ObjA = new RecursiveBean("ObjA");
-        RecursiveBean ObjB = new RecursiveBean("ObjB");
-        ObjB.setRef(ObjA);
-        ObjA.setRef(ObjA);
-        new JSONObject(ObjB);
-        fail("Expected an exception");
-    }
-    @Test(expected=JSONException.class)
-    public void testSimpleRecursiveObject() {
-        // B -> A -> B ...
-        RecursiveBean ObjA = new RecursiveBean("ObjA");
-        RecursiveBean ObjB = new RecursiveBean("ObjB");
-        ObjB.setRef(ObjA);
-        ObjA.setRef(ObjB);
-        new JSONObject(ObjA);
-        fail("Expected an exception");
-    }
-    @Test(expected=JSONException.class)
-    public void testLongRecursiveObject() {
-        // D -> C -> B -> A -> D ...
-        RecursiveBean ObjA = new RecursiveBean("ObjA");
-        RecursiveBean ObjB = new RecursiveBean("ObjB");
-        RecursiveBean ObjC = new RecursiveBean("ObjC");
-        RecursiveBean ObjD = new RecursiveBean("ObjD");
-        ObjC.setRef(ObjB);
-        ObjB.setRef(ObjA);
-        ObjD.setRef(ObjC);
-        ObjA.setRef(ObjD);
-        new JSONObject(ObjB);
-        fail("Expected an exception");
-    }
-    @Test(expected=JSONException.class)
-    public void testRepeatObjectRecursive() {
-        // C -> B -> A -> D -> C ...
-        //        -> D -> C ...
-        RecursiveBean ObjA = new RecursiveBean("ObjA");
-        RecursiveBean ObjB = new RecursiveBean("ObjB");
-        RecursiveBean ObjC = new RecursiveBean("ObjC");
-        RecursiveBean ObjD = new RecursiveBean("ObjD");
-        ObjC.setRef(ObjB);
-        ObjB.setRef(ObjA);
-        ObjB.setRef2(ObjD);
-        ObjA.setRef(ObjD);
-        ObjD.setRef(ObjC);
-        new JSONObject(ObjC);
-        fail("Expected an exception");
-    }
+
     @Test
-    public void testRepeatObjectNotRecursive() {
+    void putNullBoolean() {
+        assertThrows(NullPointerException.class, () -> {
+            // null put key 
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.put(null, false);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void putNullCollection() {
+        assertThrows(NullPointerException.class, () -> {
+            // null put key 
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.put(null, Collections.emptySet());
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void putNullDouble() {
+        assertThrows(NullPointerException.class, () -> {
+            // null put key 
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.put(null, 0.0d);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void putNullFloat() {
+        assertThrows(NullPointerException.class, () -> {
+            // null put key 
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.put(null, 0.0f);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void putNullInt() {
+        assertThrows(NullPointerException.class, () -> {
+            // null put key 
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.put(null, 0);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void putNullLong() {
+        assertThrows(NullPointerException.class, () -> {
+            // null put key 
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.put(null, 0L);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void putNullMap() {
+        assertThrows(NullPointerException.class, () -> {
+            // null put key 
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.put(null, Collections.emptyMap());
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void putNullObject() {
+        assertThrows(NullPointerException.class, () -> {
+            // null put key 
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.put(null, new Object());
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void selfRecursiveObject() {
+        assertThrows(JSONException.class, () -> {
+            // A -> A ...
+            RecursiveBean ObjA = new RecursiveBean("ObjA");
+            ObjA.setRef(ObjA);
+            new JSONObject(ObjA);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void longSelfRecursiveObject() {
+        assertThrows(JSONException.class, () -> {
+            // B -> A -> A ...
+            RecursiveBean ObjA = new RecursiveBean("ObjA");
+            RecursiveBean ObjB = new RecursiveBean("ObjB");
+            ObjB.setRef(ObjA);
+            ObjA.setRef(ObjA);
+            new JSONObject(ObjB);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void simpleRecursiveObject() {
+        assertThrows(JSONException.class, () -> {
+            // B -> A -> B ...
+            RecursiveBean ObjA = new RecursiveBean("ObjA");
+            RecursiveBean ObjB = new RecursiveBean("ObjB");
+            ObjB.setRef(ObjA);
+            ObjA.setRef(ObjB);
+            new JSONObject(ObjA);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void longRecursiveObject() {
+        assertThrows(JSONException.class, () -> {
+            // D -> C -> B -> A -> D ...
+            RecursiveBean ObjA = new RecursiveBean("ObjA");
+            RecursiveBean ObjB = new RecursiveBean("ObjB");
+            RecursiveBean ObjC = new RecursiveBean("ObjC");
+            RecursiveBean ObjD = new RecursiveBean("ObjD");
+            ObjC.setRef(ObjB);
+            ObjB.setRef(ObjA);
+            ObjD.setRef(ObjC);
+            ObjA.setRef(ObjD);
+            new JSONObject(ObjB);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void repeatObjectRecursive() {
+        assertThrows(JSONException.class, () -> {
+            // C -> B -> A -> D -> C ...
+            //        -> D -> C ...
+            RecursiveBean ObjA = new RecursiveBean("ObjA");
+            RecursiveBean ObjB = new RecursiveBean("ObjB");
+            RecursiveBean ObjC = new RecursiveBean("ObjC");
+            RecursiveBean ObjD = new RecursiveBean("ObjD");
+            ObjC.setRef(ObjB);
+            ObjB.setRef(ObjA);
+            ObjB.setRef2(ObjD);
+            ObjA.setRef(ObjD);
+            ObjD.setRef(ObjC);
+            new JSONObject(ObjC);
+            fail("Expected an exception");
+        });
+    }
+
+    @Test
+    void repeatObjectNotRecursive() {
         // C -> B -> A
         //        -> A
         RecursiveBean ObjA = new RecursiveBean("ObjA");
@@ -3564,8 +3420,9 @@ public class JSONObjectTest {
                 j0, j1, j2
         )));
     }
+
     @Test
-    public void testLongRepeatObjectNotRecursive() {
+    void longRepeatObjectNotRecursive() {
         // C -> B -> A -> D -> E
         //        -> D -> E
         RecursiveBean ObjA = new RecursiveBean("ObjA");
@@ -3587,15 +3444,19 @@ public class JSONObjectTest {
                 j0, j1, j2, j3, j4
         )));
     }
-    @Test(expected=JSONException.class)
-    public void testRecursiveEquals() {
-        RecursiveBeanEquals a = new RecursiveBeanEquals("same");
-        a.setRef(a);
-        JSONObject j0 = new JSONObject(a);
-        Util.checkJSONObjectMaps(j0);
-    }
+
     @Test
-    public void testNotRecursiveEquals() {
+    void recursiveEquals() {
+        assertThrows(JSONException.class, () -> {
+            RecursiveBeanEquals a = new RecursiveBeanEquals("same");
+            a.setRef(a);
+            JSONObject j0 = new JSONObject(a);
+            Util.checkJSONObjectMaps(j0);
+        });
+    }
+
+    @Test
+    void notRecursiveEquals() {
         RecursiveBeanEquals a = new RecursiveBeanEquals("same");
         RecursiveBeanEquals b = new RecursiveBeanEquals("same");
         RecursiveBeanEquals c = new RecursiveBeanEquals("same");
@@ -3607,80 +3468,90 @@ public class JSONObjectTest {
 
 
     @Test
-    public void testIssue548ObjectWithEmptyJsonArray() {
+    void issue548ObjectWithEmptyJsonArray() {
         JSONObject jsonObject = new JSONObject("{\"empty_json_array\": []}");
-        assertTrue("missing expected key 'empty_json_array'", jsonObject.has("empty_json_array"));
-        assertNotNull("'empty_json_array' should be an array", jsonObject.getJSONArray("empty_json_array"));
-        assertEquals("'empty_json_array' should have a length of 0", 0, jsonObject.getJSONArray("empty_json_array").length());
+        assertTrue(jsonObject.has("empty_json_array"), "missing expected key 'empty_json_array'");
+        assertNotNull(jsonObject.getJSONArray("empty_json_array"), "'empty_json_array' should be an array");
+        assertEquals(0, jsonObject.getJSONArray("empty_json_array").length(), "'empty_json_array' should have a length of 0");
         Util.checkJSONObjectMaps(jsonObject);
     }
 
     /**
     * Tests if calling JSONObject clear() method actually makes the JSONObject empty
     */
-    @Test(expected = JSONException.class)
-    public void jsonObjectClearMethodTest() {
-        //Adds random stuff to the JSONObject
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("key1", 123);
-        jsonObject.put("key2", "456");
-        jsonObject.put("key3", new JSONObject());
-        jsonObject.clear(); //Clears the JSONObject
-        assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
-        jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
-        Util.checkJSONObjectMaps(jsonObject);
+    @Test
+    void jsonObjectClearMethodTest() {
+        assertThrows(JSONException.class, () -> {
+            //Adds random stuff to the JSONObject
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("key1", 123);
+            jsonObject.put("key2", "456");
+            jsonObject.put("key3", new JSONObject());
+            jsonObject.clear(); //Clears the JSONObject
+            assertEquals(0, jsonObject.length(), "expected jsonObject.length() == 0"); //Check if its length is 0
+            jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
+            Util.checkJSONObjectMaps(jsonObject);
+        });
     }
 
     /**
     * Tests for stack overflow. See https://github.com/stleary/JSON-java/issues/654
     */
-    @Test(expected = JSONException.class)
-    public void issue654StackOverflowInput() {
-        //String base64Bytes ="eyJHWiI6Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7c3t7e3t7e3vPAAAAAAAAAHt7e3t7e3t7e3t7e3t7e3t7e3t7e1ste3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e88AAAAAAAAAe3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7f3syMv//e3t7e3t7e3t7e3t7e3sx//////8=";
-        //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
-        String input = "{\"GZ\":[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{s{{{{{{{";
-        JSONObject json_input = new JSONObject(input);
-        assertNotNull(json_input);
-        fail("Excepected Exception.");
-        Util.checkJSONObjectMaps(json_input);
+    @Test
+    void issue654StackOverflowInput() {
+        assertThrows(JSONException.class, () -> {
+            //String base64Bytes ="eyJHWiI6Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMCkwLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3sJe3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTApMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7ewl7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7c3t7e3t7e3vPAAAAAAAAAHt7e3t7e3t7e3t7e3t7e3t7e3t7e1ste3t7e3t7e3t7e3t7e3t7e3t7e3t7CXt7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3tbLTAtMCx7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e1stMC0wLHt7e3t7e3t7e3t7e3t7e3t7e88AAAAAAAAAe3t7e3t7e3t7e3t7e3t7e3t7e3t7Wy0wLTAse3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7f3syMv//e3t7e3t7e3t7e3t7e3sx//////8=";
+            //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
+            String input = "{\"GZ\":[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{  {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{    {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0)0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{{{{{{{{{{{{{{{{{{{{[-0-0,{{{{{{{{{{s{{{{{{{";
+            JSONObject json_input = new JSONObject(input);
+            assertNotNull(json_input);
+            fail("Excepected Exception.");
+            Util.checkJSONObjectMaps(json_input);
+        });
     }
 
     /**
     * Tests for incorrect object/array nesting. See https://github.com/stleary/JSON-java/issues/654
     */
-    @Test(expected = JSONException.class)
-    public void issue654IncorrectNestingNoKey1() {
-        JSONObject json_input = new JSONObject("{{\"a\":0}}");
-        assertNotNull(json_input);
-        fail("Expected Exception.");
+    @Test
+    void issue654IncorrectNestingNoKey1() {
+        assertThrows(JSONException.class, () -> {
+            JSONObject json_input = new JSONObject("{{\"a\":0}}");
+            assertNotNull(json_input);
+            fail("Expected Exception.");
+        });
     }
 
     /**
     * Tests for incorrect object/array nesting. See https://github.com/stleary/JSON-java/issues/654
     */
-    @Test(expected = JSONException.class)
-    public void issue654IncorrectNestingNoKey2() {
-        JSONObject json_input = new JSONObject("{[\"a\"]}");
-        assertNotNull(json_input);
-        fail("Excepected Exception.");
+    @Test
+    void issue654IncorrectNestingNoKey2() {
+        assertThrows(JSONException.class, () -> {
+            JSONObject json_input = new JSONObject("{[\"a\"]}");
+            assertNotNull(json_input);
+            fail("Excepected Exception.");
+        });
     }
-    
+
     /**
     * Tests for stack overflow. See https://github.com/stleary/JSON-java/issues/654
     */
-    @Ignore("This test relies on system constraints and may not always pass. See: https://github.com/stleary/JSON-java/issues/821")
-    @Test(expected = JSONException.class)
-    public void issue654StackOverflowInputWellFormed() {
-        //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
-        final InputStream resourceAsStream = JSONObjectTest.class.getClassLoader().getResourceAsStream("Issue654WellFormedObject.json");
-        JSONTokener tokener = new JSONTokener(resourceAsStream);
-        JSONObject json_input = new JSONObject(tokener);
-        assertNotNull(json_input);
-        fail("Excepected Exception due to stack overflow.");
+    @Disabled("This test relies on system constraints and may not always pass. See: https://github.com/stleary/JSON-java/issues/821")
+    @Test
+    void issue654StackOverflowInputWellFormed() {
+        assertThrows(JSONException.class, () -> {
+            //String input = new String(java.util.Base64.getDecoder().decode(base64Bytes));
+            final InputStream resourceAsStream = JSONObjectTest.class.getClassLoader().getResourceAsStream("Issue654WellFormedObject.json");
+            JSONTokener tokener = new JSONTokener(resourceAsStream);
+            JSONObject json_input = new JSONObject(tokener);
+            assertNotNull(json_input);
+            fail("Excepected Exception due to stack overflow.");
+        });
     }
 
     @Test
-    public void testIssue682SimilarityOfJSONString() {
+    void issue682SimilarityOfJSONString() {
         JSONObject jo1 = new JSONObject()
                 .put("a", new MyJsonString())
                 .put("b", 2);
@@ -3704,7 +3575,7 @@ public class JSONObjectTest {
             Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NaN };
 
     @Test
-    public void issue713MapConstructorWithNonFiniteNumbers() {
+    void issue713MapConstructorWithNonFiniteNumbers() {
         for (Number nonFinite : NON_FINITE_NUMBERS) {
             Map<String, Number> map = new HashMap<>();
             map.put("a", nonFinite);
@@ -3714,50 +3585,56 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void issue713BeanConstructorWithNonFiniteNumbers() {
+    void issue713BeanConstructorWithNonFiniteNumbers() {
         for (Number nonFinite : NON_FINITE_NUMBERS) {
             GenericBean<Number> bean = new GenericBean<>(nonFinite);
             assertThrows(JSONException.class, () -> new JSONObject(bean));
         }
     }
 
-    @Test(expected = JSONException.class)
-    public void issue743SerializationMap() {
-      HashMap<String, Object> map = new HashMap<>();
-      map.put("t", map);
-      JSONObject object = new JSONObject(map);
-      String jsonString = object.toString();
-    }
-
-    @Test(expected = JSONException.class)
-    public void testCircularReferenceMultipleLevel() {
-      HashMap<String, Object> inside = new HashMap<>();
-      HashMap<String, Object> jsonObject = new HashMap<>();
-      inside.put("inside", jsonObject);
-      jsonObject.put("test", inside);
-      new JSONObject(jsonObject);
+    @Test
+    void issue743SerializationMap() {
+        assertThrows(JSONException.class, () -> {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("t", map);
+            JSONObject object = new JSONObject(map);
+            String jsonString = object.toString();
+        });
     }
 
     @Test
-    public void issue743SerializationMapWith512Objects() {
+    void circularReferenceMultipleLevel() {
+        assertThrows(JSONException.class, () -> {
+            HashMap<String, Object> inside = new HashMap<>();
+            HashMap<String, Object> jsonObject = new HashMap<>();
+            inside.put("inside", jsonObject);
+            jsonObject.put("test", inside);
+            new JSONObject(jsonObject);
+        });
+    }
+
+    @Test
+    void issue743SerializationMapWith512Objects() {
         HashMap<String, Object> map  = buildNestedMap(ParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH);
         JSONObject object = new JSONObject(map);
         String jsonString = object.toString();
     }
 
     @Test
-    public void issue743SerializationMapWith1000Objects() {
+    void issue743SerializationMapWith1000Objects() {
       HashMap<String, Object> map  = buildNestedMap(1000);
       JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withMaxNestingDepth(1000);
       JSONObject object = new JSONObject(map, parserConfiguration);
       String jsonString = object.toString();
     }
 
-    @Test(expected = JSONException.class)
-    public void issue743SerializationMapWith1001Objects() {
-        HashMap<String, Object> map  = buildNestedMap(1001);
-        JSONObject object = new JSONObject(map);
-        String jsonString = object.toString();
+    @Test
+    void issue743SerializationMapWith1001Objects() {
+        assertThrows(JSONException.class, () -> {
+            HashMap<String, Object> map = buildNestedMap(1001);
+            JSONObject object = new JSONObject(map);
+            String jsonString = object.toString();
+        });
     }
 
     /**

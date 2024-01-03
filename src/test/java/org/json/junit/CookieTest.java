@@ -4,10 +4,10 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.json.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -23,16 +23,18 @@ import org.junit.Test;
  * <p>
  * A JSON-Java encoded cookie escapes '+', '%', '=', ';' with %hh values.
  */
-public class CookieTest {
+class CookieTest {
 
     /**
      * Attempts to create a JSONObject from a null string.
      * Expects a NullPointerException.
      */
-    @Test(expected=NullPointerException.class)
-    public void nullCookieException() {
-        String cookieStr = null;
-        Cookie.toJSONObject(cookieStr);
+    @Test
+    void nullCookieException() {
+        assertThrows(NullPointerException.class, () -> {
+            String cookieStr = null;
+            Cookie.toJSONObject(cookieStr);
+        });
     }
 
     /**
@@ -41,15 +43,15 @@ public class CookieTest {
      * Expects a JSONException.
      */
     @Test
-    public void malFormedNameValueException() {
+    void malFormedNameValueException() {
         String cookieStr = "thisCookieHasNoEqualsChar";
         try {
             Cookie.toJSONObject(cookieStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "Expected '=' and instead saw '' at 25 [character 26 line 1]",
-                    e.getMessage());
+            assertEquals("Expected '=' and instead saw '' at 25 [character 26 line 1]",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
     }
 
@@ -59,12 +61,12 @@ public class CookieTest {
      * Expects a JSONException.
      */
     @Test
-    public void booleanAttribute() {
+    void booleanAttribute() {
         String cookieStr = "this=Cookie;myAttribute";
             JSONObject jo = Cookie.toJSONObject(cookieStr);
-            assertTrue("has key 'name'", jo.has("name"));
-            assertTrue("has key 'value'", jo.has("value"));
-            assertTrue("has key 'myAttribute'", jo.has("myattribute"));
+            assertTrue(jo.has("name"), "has key 'name'");
+            assertTrue(jo.has("value"), "has key 'value'");
+            assertTrue(jo.has("myattribute"), "has key 'myAttribute'");
     }
 
     /**
@@ -73,17 +75,18 @@ public class CookieTest {
      * Expects a JSONException
      */
     @Test
-    public void emptyStringCookieException() {
+    void emptyStringCookieException() {
         String cookieStr = "";
         try {
             Cookie.toJSONObject(cookieStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "Cookies must have a 'name'",
-                    e.getMessage());
+            assertEquals("Cookies must have a 'name'",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
     }
+
     /**
      * 
      * Attempts to create a JSONObject from an cookie string where the name is blank.<br>
@@ -91,15 +94,15 @@ public class CookieTest {
      * Expects a JSONException
      */
     @Test
-    public void emptyNameCookieException() {
+    void emptyNameCookieException() {
         String cookieStr = " = value ";
         try {
             Cookie.toJSONObject(cookieStr);
             fail("Expecting an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "Cookies must have a 'name'",
-                    e.getMessage());
+            assertEquals("Cookies must have a 'name'",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
     }
 
@@ -107,7 +110,7 @@ public class CookieTest {
      * Cookie from a simple name/value pair with no delimiter
      */
     @Test
-    public void simpleCookie() {
+    void simpleCookie() {
         String cookieStr = "SID=31d4d96e407aad42";
         String expectedCookieStr = "{\"name\":\"SID\",\"value\":\"31d4d96e407aad42\"}";
         JSONObject jsonObject = Cookie.toJSONObject(cookieStr);
@@ -121,7 +124,7 @@ public class CookieTest {
      * as a boolean.
      */
     @Test
-    public void multiPartCookie() {
+    void multiPartCookie() {
         String cookieStr = 
             "PH=deleted;  "+
             " expires=Wed, 19-Mar-2014 17:53:53 GMT;"+
@@ -148,7 +151,7 @@ public class CookieTest {
      * This test confirms both behaviors.
      */
     @Test
-    public void convertCookieToString() {
+    void convertCookieToString() {
         String cookieStr = 
             "PH=deleted;  "+
             " expires=Wed, 19-Mar-2014 17:53:53 GMT;"+
@@ -188,7 +191,7 @@ public class CookieTest {
      * behavior. 
      */
     @Test
-    public void convertEncodedCookieToString() {
+    void convertEncodedCookieToString() {
         String cookieStr = 
             "PH=deleted;  "+
             " expires=Wed,+19-Mar-2014+17:53:53+GMT;"+
@@ -209,7 +212,7 @@ public class CookieTest {
         Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
         Util.compareActualVsExpectedJsonObjects(finalJsonObject,expectedJsonObject);
     }
-    
+
     /**
      * A public API method performs a URL encoding for selected chars
      * in a string. Control chars, '+', '%', '=', ';' are all encoded 
@@ -217,12 +220,12 @@ public class CookieTest {
      * This test confirms that behavior. 
      */
     @Test
-    public void escapeString() {
+    void escapeString() {
         String str = "   +%\r\n\t\b%=;;;   ";
         String expectedStr = "%2b%25%0d%0a%09%08%25%3d%3b%3b%3b";
         String actualStr = Cookie.escape(str);
-        assertTrue("expect escape() to encode correctly. Actual: " +actualStr+
-                " expected: " +expectedStr, expectedStr.equals(actualStr));
+        assertEquals(expectedStr, actualStr, "expect escape() to encode correctly. Actual: " + actualStr +
+                " expected: " + expectedStr);
     }
 
     /**
@@ -232,11 +235,11 @@ public class CookieTest {
      * This test confirms that behavior. 
      */
     @Test
-    public void unescapeString() {
+    void unescapeString() {
         String str = " +%2b%25%0d%0a%09%08%25%3d%3b%3b%3b+ ";
         String expectedStr = "  +%\r\n\t\b%=;;;  ";
         String actualStr = Cookie.unescape(str);
-        assertTrue("expect unescape() to decode correctly. Actual: " +actualStr+
-                " expected: " +expectedStr, expectedStr.equals(actualStr));
+        assertEquals(expectedStr, actualStr, "expect unescape() to decode correctly. Actual: " + actualStr +
+                " expected: " + expectedStr);
     }
 }

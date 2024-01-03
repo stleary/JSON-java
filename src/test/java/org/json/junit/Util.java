@@ -4,7 +4,8 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.*;
 
@@ -25,8 +26,7 @@ public class Util {
      */
     public static void compareActualVsExpectedJsonArrays(JSONArray jsonArray,
             JSONArray expectedJsonArray) {
-        assertTrue("jsonArray lengths should be equal",
-                jsonArray.length() == expectedJsonArray.length());
+        assertEquals(jsonArray.length(), expectedJsonArray.length(), "jsonArray lengths should be equal");
         for (int i = 0; i < jsonArray.length(); ++i) {
             Object value = jsonArray.get(i);
             Object expectedValue = expectedJsonArray.get(i);
@@ -42,8 +42,7 @@ public class Util {
      */
     public static void compareActualVsExpectedJsonObjects(
             JSONObject jsonObject, JSONObject expectedJsonObject) {
-        assertTrue("jsonObjects should have the same length",
-                jsonObject.length() == expectedJsonObject.length());
+        assertEquals(jsonObject.length(), expectedJsonObject.length(), "jsonObjects should have the same length");
         Iterator<String> keys = jsonObject.keys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -82,17 +81,17 @@ public class Util {
              */
             if (!(value instanceof Number && expectedValue instanceof Number)) {
                 // Non-Number and non-matching types
-                assertEquals("object types should be equal ",
-                    expectedValue.getClass().toString(),
-                    value.getClass().toString()
+                assertEquals(expectedValue.getClass().toString(),
+                    value.getClass().toString(),
+                    "object types should be equal "
                 );
             }
             /**
              * Same types or both Numbers, compare by toString()
              */
-            assertEquals("values should be equal",
-                expectedValue.toString(),
-                value.toString()
+            assertEquals(expectedValue.toString(),
+                value.toString(),
+                "values should be equal"
             );
         }
     }

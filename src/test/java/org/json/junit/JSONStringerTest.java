@@ -4,13 +4,13 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import org.json.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.jayway.jsonpath.*;
 
@@ -18,23 +18,21 @@ import com.jayway.jsonpath.*;
 /**
  * Tests for JSON-Java JSONStringer and JSONWriter.
  */
-public class JSONStringerTest {
+class JSONStringerTest {
 
     /**
      * Object with a null key.
      * Expects a JSONException.
      */
     @Test
-    public void nullKeyException() {
+    void nullKeyException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object();
         try {
             jsonStringer.key(null);
-            assertTrue("Expected an exception", false);
+            assertTrue(false, "Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Null key.".
-                    equals(e.getMessage()));
+            assertEquals("Null key.", e.getMessage(), "Expected an exception message");
         }
     }
 
@@ -43,15 +41,13 @@ public class JSONStringerTest {
      * Expects a JSONException.
      */
     @Test
-    public void outOfSequenceException() {
+    void outOfSequenceException() {
         JSONStringer jsonStringer = new JSONStringer();
         try {
             jsonStringer.key("hi");
-            assertTrue("Expected an exception", false);
+            assertTrue(false, "Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced key.".
-                    equals(e.getMessage()));
+            assertEquals("Misplaced key.", e.getMessage(), "Expected an exception message");
         }
     }
 
@@ -60,16 +56,14 @@ public class JSONStringerTest {
      * Expects a JSONException
      */
     @Test
-    public void missplacedArrayException() {
+    void missplacedArrayException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object().endObject();
         try {
             jsonStringer.array();
-            assertTrue("Expected an exception", false);
+            assertTrue(false, "Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced array.".
-                    equals(e.getMessage()));
+            assertEquals("Misplaced array.", e.getMessage(), "Expected an exception message");
         }
     }
 
@@ -78,16 +72,14 @@ public class JSONStringerTest {
      * Expects a JSONException
      */
     @Test
-    public void missplacedEndArrayException() {
+    void missplacedEndArrayException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object();
         try {
             jsonStringer.endArray();
-            assertTrue("Expected an exception", false);
+            assertTrue(false, "Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced endArray.".
-                    equals(e.getMessage()));
+            assertEquals("Misplaced endArray.", e.getMessage(), "Expected an exception message");
         }
     }
 
@@ -96,16 +88,14 @@ public class JSONStringerTest {
      * Expects a JSONException
      */
     @Test
-    public void missplacedEndObjectException() {
+    void missplacedEndObjectException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.array();
         try {
             jsonStringer.endObject();
-            assertTrue("Expected an exception", false);
+            assertTrue(false, "Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced endObject.".
-                    equals(e.getMessage()));
+            assertEquals("Misplaced endObject.", e.getMessage(), "Expected an exception message");
         }
     }
 
@@ -114,16 +104,14 @@ public class JSONStringerTest {
      * Expects a JSONException.
      */
     @Test
-    public void missplacedObjectException() {
+    void missplacedObjectException() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object().endObject();
         try {
             jsonStringer.object();
-            assertTrue("Expected an exception", false);
+            assertTrue(false, "Expected an exception");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Misplaced object.".
-                    equals(e.getMessage()));
+            assertEquals("Misplaced object.", e.getMessage(), "Expected an exception message");
         }
     }
 
@@ -132,7 +120,7 @@ public class JSONStringerTest {
      * Expects a JSONException
      */
     @Test
-    public void exceedNestDepthException() {
+    void exceedNestDepthException() {
         try {
             JSONStringer s = new JSONStringer();
             s.object().
@@ -216,9 +204,7 @@ public class JSONStringerTest {
             key("k").object().key("k").object().key("k").object().key("k").object().key("k").object();
             fail("Expected an exception message");
         } catch (JSONException e) {
-            assertTrue("Expected an exception message",
-                    "Nesting too deep.".
-                    equals(e.getMessage()));
+            assertEquals("Nesting too deep.", e.getMessage(), "Expected an exception message");
         }
     }
 
@@ -227,7 +213,7 @@ public class JSONStringerTest {
      * then convert to JSONObject
      */
     @Test
-    public void simpleObjectString() {
+    void simpleObjectString() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object();
         jsonStringer.key("trueValue").value(true);
@@ -243,14 +229,14 @@ public class JSONStringerTest {
 
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 7 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 7);
-        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueValue")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseValue")));
-        assertTrue("expected null", JSONObject.NULL.equals(jsonObject.query("/nullValue")));
-        assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/stringValue")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/complexStringValue")));
-        assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/intValue")));
-        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
+        assertEquals(7, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 7 top level items");
+        assertEquals(Boolean.TRUE, jsonObject.query("/trueValue"), "expected true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/falseValue"), "expected false");
+        assertEquals(JSONObject.NULL, jsonObject.query("/nullValue"), "expected null");
+        assertEquals("hello world!", jsonObject.query("/stringValue"), "expected hello world!");
+        assertEquals("h\be\tllo w\u1234orld!", jsonObject.query("/complexStringValue"), "expected h\be\tllo w\u1234orld!");
+        assertEquals(Integer.valueOf(42), jsonObject.query("/intValue"), "expected 42");
+        assertEquals(BigDecimal.valueOf(-23.45e67), jsonObject.query("/doubleValue"), "expected -23.45e67");
     }
 
     /**
@@ -258,7 +244,7 @@ public class JSONStringerTest {
      * then convert to JSONArray
      */
     @Test
-    public void simpleArrayString() {
+    void simpleArrayString() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.array();
         jsonStringer.value(true);
@@ -273,13 +259,13 @@ public class JSONStringerTest {
 
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
-        assertTrue("expected 6 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected true", Boolean.TRUE.equals(jsonArray.query("/0")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonArray.query("/1")));
-        assertTrue("expected null", JSONObject.NULL.equals(jsonArray.query("/2")));
-        assertTrue("expected hello world!", "hello world!".equals(jsonArray.query("/3")));
-        assertTrue("expected 42", Integer.valueOf(42).equals(jsonArray.query("/4")));
-        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonArray.query("/5")));
+        assertEquals(6, ((List<?>)(JsonPath.read(doc, "$"))).size(), "expected 6 top level items");
+        assertEquals(Boolean.TRUE, jsonArray.query("/0"), "expected true");
+        assertEquals(Boolean.FALSE, jsonArray.query("/1"), "expected false");
+        assertEquals(JSONObject.NULL, jsonArray.query("/2"), "expected null");
+        assertEquals("hello world!", jsonArray.query("/3"), "expected hello world!");
+        assertEquals(Integer.valueOf(42), jsonArray.query("/4"), "expected 42");
+        assertEquals(BigDecimal.valueOf(-23.45e67), jsonArray.query("/5"), "expected -23.45e67");
     }
 
     /**
@@ -288,7 +274,7 @@ public class JSONStringerTest {
      * returned values..
      */
     @Test
-    public void complexObjectString() {
+    void complexObjectString() {
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object().
             key("trueValue").value(true).
@@ -326,32 +312,32 @@ public class JSONStringerTest {
 
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 8 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 8);
-        assertTrue("expected 4 object2 items", ((Map<?,?>)(JsonPath.read(doc, "$.object2"))).size() == 4);
-        assertTrue("expected 5 array1 items", ((List<?>)(JsonPath.read(doc, "$.object2.array1"))).size() == 5);
-        assertTrue("expected 4 array[2] items", ((Map<?,?>)(JsonPath.read(doc, "$.object2.array1[2]"))).size() == 4);
-        assertTrue("expected 4 array1[2].array2 items", ((List<?>)(JsonPath.read(doc, "$.object2.array1[2].array2"))).size() == 4);
-        assertTrue("expected true", Boolean.TRUE.equals(jsonObject.query("/trueValue")));
-        assertTrue("expected false", Boolean.FALSE.equals(jsonObject.query("/falseValue")));
-        assertTrue("expected null", JSONObject.NULL.equals(jsonObject.query("/nullValue")));
-        assertTrue("expected hello world!", "hello world!".equals(jsonObject.query("/stringValue")));
-        assertTrue("expected 42", Integer.valueOf(42).equals(jsonObject.query("/intValue")));
-        assertTrue("expected -23.45e67", BigDecimal.valueOf(-23.45e67).equals(jsonObject.query("/doubleValue")));
-        assertTrue("expected h\be\tllo w\u1234orld!", "h\be\tllo w\u1234orld!".equals(jsonObject.query("/complexStringValue")));
-        assertTrue("expected v1", "v1".equals(jsonObject.query("/object2/k1")));
-        assertTrue("expected v2", "v2".equals(jsonObject.query("/object2/k2")));
-        assertTrue("expected v3", "v3".equals(jsonObject.query("/object2/k3")));
-        assertTrue("expected 1", Integer.valueOf(1).equals(jsonObject.query("/object2/array1/0")));
-        assertTrue("expected 2", Integer.valueOf(2).equals(jsonObject.query("/object2/array1/1")));
-        assertTrue("expected v4", "v4".equals(jsonObject.query("/object2/array1/2/k4")));
-        assertTrue("expected v5", "v5".equals(jsonObject.query("/object2/array1/2/k5")));
-        assertTrue("expected v6", "v6".equals(jsonObject.query("/object2/array1/2/k6")));
-        assertTrue("expected 5", Integer.valueOf(5).equals(jsonObject.query("/object2/array1/2/array2/0")));
-        assertTrue("expected 6", Integer.valueOf(6).equals(jsonObject.query("/object2/array1/2/array2/1")));
-        assertTrue("expected 7", Integer.valueOf(7).equals(jsonObject.query("/object2/array1/2/array2/2")));
-        assertTrue("expected 8", Integer.valueOf(8).equals(jsonObject.query("/object2/array1/2/array2/3")));
-        assertTrue("expected 3", Integer.valueOf(3).equals(jsonObject.query("/object2/array1/3")));
-        assertTrue("expected 4", Integer.valueOf(4).equals(jsonObject.query("/object2/array1/4")));
+        assertEquals(8, ((Map<?, ?>)(JsonPath.read(doc, "$"))).size(), "expected 8 top level items");
+        assertEquals(4, ((Map<?, ?>)(JsonPath.read(doc, "$.object2"))).size(), "expected 4 object2 items");
+        assertEquals(5, ((List<?>)(JsonPath.read(doc, "$.object2.array1"))).size(), "expected 5 array1 items");
+        assertEquals(4, ((Map<?, ?>)(JsonPath.read(doc, "$.object2.array1[2]"))).size(), "expected 4 array[2] items");
+        assertEquals(4, ((List<?>)(JsonPath.read(doc, "$.object2.array1[2].array2"))).size(), "expected 4 array1[2].array2 items");
+        assertEquals(Boolean.TRUE, jsonObject.query("/trueValue"), "expected true");
+        assertEquals(Boolean.FALSE, jsonObject.query("/falseValue"), "expected false");
+        assertEquals(JSONObject.NULL, jsonObject.query("/nullValue"), "expected null");
+        assertEquals("hello world!", jsonObject.query("/stringValue"), "expected hello world!");
+        assertEquals(Integer.valueOf(42), jsonObject.query("/intValue"), "expected 42");
+        assertEquals(BigDecimal.valueOf(-23.45e67), jsonObject.query("/doubleValue"), "expected -23.45e67");
+        assertEquals("h\be\tllo w\u1234orld!", jsonObject.query("/complexStringValue"), "expected h\be\tllo w\u1234orld!");
+        assertEquals("v1", jsonObject.query("/object2/k1"), "expected v1");
+        assertEquals("v2", jsonObject.query("/object2/k2"), "expected v2");
+        assertEquals("v3", jsonObject.query("/object2/k3"), "expected v3");
+        assertEquals(Integer.valueOf(1), jsonObject.query("/object2/array1/0"), "expected 1");
+        assertEquals(Integer.valueOf(2), jsonObject.query("/object2/array1/1"), "expected 2");
+        assertEquals("v4", jsonObject.query("/object2/array1/2/k4"), "expected v4");
+        assertEquals("v5", jsonObject.query("/object2/array1/2/k5"), "expected v5");
+        assertEquals("v6", jsonObject.query("/object2/array1/2/k6"), "expected v6");
+        assertEquals(Integer.valueOf(5), jsonObject.query("/object2/array1/2/array2/0"), "expected 5");
+        assertEquals(Integer.valueOf(6), jsonObject.query("/object2/array1/2/array2/1"), "expected 6");
+        assertEquals(Integer.valueOf(7), jsonObject.query("/object2/array1/2/array2/2"), "expected 7");
+        assertEquals(Integer.valueOf(8), jsonObject.query("/object2/array1/2/array2/3"), "expected 8");
+        assertEquals(Integer.valueOf(3), jsonObject.query("/object2/array1/3"), "expected 3");
+        assertEquals(Integer.valueOf(4), jsonObject.query("/object2/array1/4"), "expected 4");
     }
 
 }

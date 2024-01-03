@@ -1,173 +1,175 @@
 package org.json;
 
-import org.junit.Test;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
 
-public class NumberConversionUtilTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class NumberConversionUtilTest {
 
     @Test
-    public void shouldParseDecimalFractionNumbersWithMultipleLeadingZeros(){
+    void shouldParseDecimalFractionNumbersWithMultipleLeadingZeros(){
         Number number = NumberConversionUtil.stringToNumber("00.10d");
-        assertEquals("Do not match",  0.10d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  0.10f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  0, number.longValue(),0);
-        assertEquals("Do not match",  0, number.intValue(),0);
+        assertEquals(0.10d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(0.10f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(0, number.longValue(),0,"Do not match");
+        assertEquals(0, number.intValue(),0,"Do not match");
     }
 
     @Test
-    public void shouldParseDecimalFractionNumbersWithSingleLeadingZero(){
+    void shouldParseDecimalFractionNumbersWithSingleLeadingZero(){
         Number number = NumberConversionUtil.stringToNumber("0.10d");
-        assertEquals("Do not match",  0.10d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  0.10f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  0, number.longValue(),0);
-        assertEquals("Do not match",  0, number.intValue(),0);
+        assertEquals(0.10d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(0.10f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(0, number.longValue(),0,"Do not match");
+        assertEquals(0, number.intValue(),0,"Do not match");
     }
 
 
     @Test
-    public void shouldParseDecimalFractionNumbersWithZerosAfterDecimalPoint(){
+    void shouldParseDecimalFractionNumbersWithZerosAfterDecimalPoint(){
         Number number = NumberConversionUtil.stringToNumber("0.010d");
-        assertEquals("Do not match",  0.010d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  0.010f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  0, number.longValue(),0);
-        assertEquals("Do not match",  0, number.intValue(),0);
+        assertEquals(0.010d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(0.010f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(0, number.longValue(),0,"Do not match");
+        assertEquals(0, number.intValue(),0,"Do not match");
     }
 
     @Test
-    public void shouldParseMixedDecimalFractionNumbersWithMultipleLeadingZeros(){
+    void shouldParseMixedDecimalFractionNumbersWithMultipleLeadingZeros(){
         Number number = NumberConversionUtil.stringToNumber("00200.10d");
-        assertEquals("Do not match",  200.10d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  200.10f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  200, number.longValue(),0);
-        assertEquals("Do not match",  200, number.intValue(),0);
+        assertEquals(200.10d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(200.10f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(200, number.longValue(),0,"Do not match");
+        assertEquals(200, number.intValue(),0,"Do not match");
     }
 
     @Test
-    public void shouldParseMixedDecimalFractionNumbersWithoutLeadingZero(){
+    void shouldParseMixedDecimalFractionNumbersWithoutLeadingZero(){
         Number number = NumberConversionUtil.stringToNumber("200.10d");
-        assertEquals("Do not match",  200.10d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  200.10f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  200, number.longValue(),0);
-        assertEquals("Do not match",  200, number.intValue(),0);
+        assertEquals(200.10d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(200.10f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(200, number.longValue(),0,"Do not match");
+        assertEquals(200, number.intValue(),0,"Do not match");
     }
 
 
     @Test
-    public void shouldParseMixedDecimalFractionNumbersWithZerosAfterDecimalPoint(){
+    void shouldParseMixedDecimalFractionNumbersWithZerosAfterDecimalPoint(){
         Number number = NumberConversionUtil.stringToNumber("200.010d");
-        assertEquals("Do not match",  200.010d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  200.010f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  200, number.longValue(),0);
-        assertEquals("Do not match",  200, number.intValue(),0);
+        assertEquals(200.010d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(200.010f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(200, number.longValue(),0,"Do not match");
+        assertEquals(200, number.intValue(),0,"Do not match");
     }
 
 
     @Test
-    public void shouldParseNegativeDecimalFractionNumbersWithMultipleLeadingZeros(){
+    void shouldParseNegativeDecimalFractionNumbersWithMultipleLeadingZeros(){
         Number number = NumberConversionUtil.stringToNumber("-00.10d");
-        assertEquals("Do not match",  -0.10d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  -0.10f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  -0, number.longValue(),0);
-        assertEquals("Do not match",  -0, number.intValue(),0);
+        assertEquals(-0.10d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(-0.10f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(-0, number.longValue(),0,"Do not match");
+        assertEquals(-0, number.intValue(),0,"Do not match");
     }
 
     @Test
-    public void shouldParseNegativeDecimalFractionNumbersWithSingleLeadingZero(){
+    void shouldParseNegativeDecimalFractionNumbersWithSingleLeadingZero(){
         Number number = NumberConversionUtil.stringToNumber("-0.10d");
-        assertEquals("Do not match",  -0.10d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  -0.10f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  -0, number.longValue(),0);
-        assertEquals("Do not match",  -0, number.intValue(),0);
+        assertEquals(-0.10d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(-0.10f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(-0, number.longValue(),0,"Do not match");
+        assertEquals(-0, number.intValue(),0,"Do not match");
     }
 
 
     @Test
-    public void shouldParseNegativeDecimalFractionNumbersWithZerosAfterDecimalPoint(){
+    void shouldParseNegativeDecimalFractionNumbersWithZerosAfterDecimalPoint(){
         Number number = NumberConversionUtil.stringToNumber("-0.010d");
-        assertEquals("Do not match",  -0.010d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  -0.010f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  -0, number.longValue(),0);
-        assertEquals("Do not match",  -0, number.intValue(),0);
+        assertEquals(-0.010d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(-0.010f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(-0, number.longValue(),0,"Do not match");
+        assertEquals(-0, number.intValue(),0,"Do not match");
     }
 
     @Test
-    public void shouldParseNegativeMixedDecimalFractionNumbersWithMultipleLeadingZeros(){
+    void shouldParseNegativeMixedDecimalFractionNumbersWithMultipleLeadingZeros(){
         Number number = NumberConversionUtil.stringToNumber("-00200.10d");
-        assertEquals("Do not match",  -200.10d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  -200.10f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  -200, number.longValue(),0);
-        assertEquals("Do not match",  -200, number.intValue(),0);
+        assertEquals(-200.10d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(-200.10f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(-200, number.longValue(),0,"Do not match");
+        assertEquals(-200, number.intValue(),0,"Do not match");
     }
 
     @Test
-    public void shouldParseNegativeMixedDecimalFractionNumbersWithoutLeadingZero(){
+    void shouldParseNegativeMixedDecimalFractionNumbersWithoutLeadingZero(){
         Number number = NumberConversionUtil.stringToNumber("-200.10d");
-        assertEquals("Do not match",  -200.10d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  -200.10f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  -200, number.longValue(),0);
-        assertEquals("Do not match",  -200, number.intValue(),0);
+        assertEquals(-200.10d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(-200.10f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(-200, number.longValue(),0,"Do not match");
+        assertEquals(-200, number.intValue(),0,"Do not match");
     }
 
 
     @Test
-    public void shouldParseNegativeMixedDecimalFractionNumbersWithZerosAfterDecimalPoint(){
+    void shouldParseNegativeMixedDecimalFractionNumbersWithZerosAfterDecimalPoint(){
         Number number = NumberConversionUtil.stringToNumber("-200.010d");
-        assertEquals("Do not match",  -200.010d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  -200.010f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  -200, number.longValue(),0);
-        assertEquals("Do not match",  -200, number.intValue(),0);
+        assertEquals(-200.010d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(-200.010f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(-200, number.longValue(),0,"Do not match");
+        assertEquals(-200, number.intValue(),0,"Do not match");
     }
 
     @Test
-    public void shouldParseNumbersWithExponents(){
+    void shouldParseNumbersWithExponents(){
         Number number = NumberConversionUtil.stringToNumber("23.45e7");
-        assertEquals("Do not match",  23.45e7d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  23.45e7f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  2.345E8, number.longValue(),0);
-        assertEquals("Do not match",  2.345E8, number.intValue(),0);
+        assertEquals(23.45e7d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(23.45e7f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(2.345E8, number.longValue(),0,"Do not match");
+        assertEquals(2.345E8, number.intValue(),0,"Do not match");
     }
 
 
     @Test
-    public void shouldParseNegativeNumbersWithExponents(){
+    void shouldParseNegativeNumbersWithExponents(){
         Number number = NumberConversionUtil.stringToNumber("-23.45e7");
-        assertEquals("Do not match",  -23.45e7d, number.doubleValue(),0.0d);
-        assertEquals("Do not match",  -23.45e7f, number.floatValue(),0.0f);
-        assertEquals("Do not match",  -2.345E8, number.longValue(),0);
-        assertEquals("Do not match",  -2.345E8, number.intValue(),0);
+        assertEquals(-23.45e7d, number.doubleValue(),0.0d,"Do not match");
+        assertEquals(-23.45e7f, number.floatValue(),0.0f,"Do not match");
+        assertEquals(-2.345E8, number.longValue(),0,"Do not match");
+        assertEquals(-2.345E8, number.intValue(),0,"Do not match");
     }
 
     @Test
-    public void shouldParseBigDecimal(){
+    void shouldParseBigDecimal(){
         Number number = NumberConversionUtil.stringToNumber("19007199254740993.35481234487103587486413587843213584");
         assertTrue(number instanceof BigDecimal);
     }
 
     @Test
-    public void shouldParseBigInteger(){
+    void shouldParseBigInteger(){
         Number number = NumberConversionUtil.stringToNumber("1900719925474099335481234487103587486413587843213584");
         assertTrue(number instanceof BigInteger);
     }
 
     @Test
-    public void shouldIdentifyPotentialNumber(){
-        assertTrue("Does not identify as number", NumberConversionUtil.potentialNumber("112.123"));
-        assertTrue("Does not identify as number", NumberConversionUtil.potentialNumber("112e123"));
-        assertTrue("Does not identify as number", NumberConversionUtil.potentialNumber("-112.123"));
-        assertTrue("Does not identify as number", NumberConversionUtil.potentialNumber("-112e23"));
-        assertFalse("Does not identify as not number", NumberConversionUtil.potentialNumber("--112.123"));
-        assertFalse("Does not identify as not number", NumberConversionUtil.potentialNumber("-a112.123"));
-        assertFalse("Does not identify as not number", NumberConversionUtil.potentialNumber("a112.123"));
-        assertFalse("Does not identify as not number", NumberConversionUtil.potentialNumber("e112.123"));
+    void shouldIdentifyPotentialNumber(){
+        assertTrue(NumberConversionUtil.potentialNumber("112.123"), "Does not identify as number");
+        assertTrue(NumberConversionUtil.potentialNumber("112e123"), "Does not identify as number");
+        assertTrue(NumberConversionUtil.potentialNumber("-112.123"), "Does not identify as number");
+        assertTrue(NumberConversionUtil.potentialNumber("-112e23"), "Does not identify as number");
+        assertFalse(NumberConversionUtil.potentialNumber("--112.123"), "Does not identify as not number");
+        assertFalse(NumberConversionUtil.potentialNumber("-a112.123"), "Does not identify as not number");
+        assertFalse(NumberConversionUtil.potentialNumber("a112.123"), "Does not identify as not number");
+        assertFalse(NumberConversionUtil.potentialNumber("e112.123"), "Does not identify as not number");
     }
 
-    @Test(expected = NumberFormatException.class)
-    public void shouldExpectExceptionWhenNumberIsNotFormatted(){
-        NumberConversionUtil.stringToNumber("112.aa123");
+    @Test
+    void shouldExpectExceptionWhenNumberIsNotFormatted(){
+        assertThrows(NumberFormatException.class, () -> {
+            NumberConversionUtil.stringToNumber("112.aa123");
+        });
     }
 
 

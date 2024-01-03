@@ -6,26 +6,27 @@ Public Domain.
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.json.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 /**
  * Tests for JSON-Java Property
  */
-public class PropertyTest {
+class PropertyTest {
 
     /**
      * JSONObject from null properties object should
      * result in an empty JSONObject.
      */
     @Test
-    public void shouldHandleNullProperties() {
+    void shouldHandleNullProperties() {
         Properties properties = null;
         JSONObject jsonObject = Property.toJSONObject(properties);
-        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
+        assertTrue(jsonObject.isEmpty(), "jsonObject should be empty");
     }
 
     /**
@@ -33,17 +34,17 @@ public class PropertyTest {
      * result in an empty JSONObject.
      */
     @Test
-    public void shouldHandleEmptyProperties() {
+    void shouldHandleEmptyProperties() {
         Properties properties = new Properties();
         JSONObject jsonObject = Property.toJSONObject(properties);
-        assertTrue("jsonObject should be empty", jsonObject.isEmpty());
+        assertTrue(jsonObject.isEmpty(), "jsonObject should be empty");
     }
 
     /**
      * JSONObject from simple properties object.
      */
     @Test
-    public void shouldHandleProperties() {
+    void shouldHandleProperties() {
         Properties properties = new Properties();
         
         properties.put("Illinois", "Springfield");
@@ -54,17 +55,12 @@ public class PropertyTest {
 
         JSONObject jsonObject = Property.toJSONObject(properties);
 
-        assertTrue("jsonObject should contain 5 items", jsonObject.length() == 5);
-        assertTrue("jsonObject should contain Illinois property", 
-                "Springfield".equals(jsonObject.get("Illinois")));
-        assertTrue("jsonObject should contain Missouri property", 
-                "Jefferson City".equals(jsonObject.get("Missouri")));
-        assertTrue("jsonObject should contain Washington property", 
-                "Olympia".equals(jsonObject.get("Washington")));
-        assertTrue("jsonObject should contain California property", 
-                "Sacramento".equals(jsonObject.get("California")));
-        assertTrue("jsonObject should contain Indiana property", 
-                "Indianapolis".equals(jsonObject.get("Indiana")));
+        assertEquals(5, jsonObject.length(), "jsonObject should contain 5 items");
+        assertEquals("Springfield", jsonObject.get("Illinois"), "jsonObject should contain Illinois property");
+        assertEquals("Jefferson City", jsonObject.get("Missouri"), "jsonObject should contain Missouri property");
+        assertEquals("Olympia", jsonObject.get("Washington"), "jsonObject should contain Washington property");
+        assertEquals("Sacramento", jsonObject.get("California"), "jsonObject should contain California property");
+        assertEquals("Indianapolis", jsonObject.get("Indiana"), "jsonObject should contain Indiana property");
     }
 
     /**
@@ -72,11 +68,10 @@ public class PropertyTest {
      * Properties object.
      */
     @Test
-    public void shouldHandleNullJSONProperty() {
+    void shouldHandleNullJSONProperty() {
         JSONObject jsonObject= null;
         Properties properties = Property.toProperties(jsonObject);
-        assertTrue("properties should be empty", 
-                properties.size() == 0);
+        assertEquals(0, properties.size(), "properties should be empty");
     }
 
     /**
@@ -84,7 +79,7 @@ public class PropertyTest {
      * Properties without changing.
      */
     @Test
-    public void shouldHandleJSONProperty() {
+    void shouldHandleJSONProperty() {
         Properties properties = new Properties();
         
         properties.put("Illinois", "Springfield");
@@ -96,7 +91,6 @@ public class PropertyTest {
         JSONObject jsonObject = Property.toJSONObject(properties);
         Properties jsonProperties = Property.toProperties(jsonObject);
 
-        assertTrue("property objects should match", 
-                properties.equals(jsonProperties));
+        assertEquals(properties, jsonProperties, "property objects should match");
     }
 }

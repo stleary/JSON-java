@@ -1,26 +1,19 @@
 package org.json.junit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(value = Parameterized.class)
 public class JSONObjectNumberTest {
-    private final String objectString;
+
     private Integer value = 50;
 
-    @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
             {"{value:0050}", 1},
@@ -46,105 +39,138 @@ public class JSONObjectNumberTest {
         });
     }
 
-    public JSONObjectNumberTest(String objectString, int resultIsNegative) {
-        this.objectString = objectString;
+    public void initJSONObjectNumberTest(String objectString, int resultIsNegative) {
         this.value *= resultIsNegative;
+        this.object = new JSONObject(objectString);
     }
 
     private JSONObject object;
 
-    @Before
-    public void setJsonObject() {
-        object = new JSONObject(objectString);
-    }
 
-    @Test
-    public void testGetNumber() {
+
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void getNumber(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.intValue(), object.getNumber("value").intValue());
     }
 
-    @Test
-    public void testGetBigDecimal() {
-        assertTrue(BigDecimal.valueOf(value).compareTo(object.getBigDecimal("value")) == 0);
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void getBigDecimal(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
+        assertEquals(0, BigDecimal.valueOf(value).compareTo(object.getBigDecimal("value")));
     }
 
-    @Test
-    public void testGetBigInteger() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void getBigInteger(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(BigInteger.valueOf(value), object.getBigInteger("value"));
     }
 
-    @Test
-    public void testGetFloat() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void getFloat(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.floatValue(), object.getFloat("value"), 0.0f);
     }
 
-    @Test
-    public void testGetDouble() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void getDouble(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.doubleValue(), object.getDouble("value"), 0.0d);
     }
 
-    @Test
-    public void testGetInt() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void getInt(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.intValue(), object.getInt("value"));
     }
 
-    @Test
-    public void testGetLong() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void getLong(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.longValue(), object.getLong("value"));
     }
 
-    @Test
-    public void testOptNumber() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optNumber(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.intValue(), object.optNumber("value").intValue());
     }
 
-    @Test
-    public void testOptBigDecimal() {
-        assertTrue(BigDecimal.valueOf(value).compareTo(object.optBigDecimal("value", null)) == 0);
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optBigDecimal(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
+        assertEquals(0, BigDecimal.valueOf(value).compareTo(object.optBigDecimal("value", null)));
     }
 
-    @Test
-    public void testOptBigInteger() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optBigInteger(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(BigInteger.valueOf(value), object.optBigInteger("value", null));
     }
 
-    @Test
-    public void testOptFloat() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optFloat(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.floatValue(), object.optFloat("value"), 0.0f);
     }
 
-    @Test
-    public void testOptFloatObject() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optFloatObject(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals((Float) value.floatValue(), object.optFloatObject("value"), 0.0f);
     }
 
-    @Test
-    public void testOptDouble() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optDouble(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.doubleValue(), object.optDouble("value"), 0.0d);
     }
 
-    @Test
-    public void testOptDoubleObject() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optDoubleObject(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals((Double) value.doubleValue(), object.optDoubleObject("value"), 0.0d);
     }
 
-    @Test
-    public void testOptInt() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optInt(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.intValue(), object.optInt("value"));
     }
 
-    @Test
-    public void testOptIntegerObject() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optIntegerObject(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals((Integer) value.intValue(), object.optIntegerObject("value"));
     }
 
-    @Test
-    public void testOptLong() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optLong(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals(value.longValue(), object.optLong("value"));
     }
 
-    @Test
-    public void testOptLongObject() {
+    @MethodSource("data")
+    @ParameterizedTest(name = "{index}: {0}")
+    void optLongObject(String objectString, int resultIsNegative) {
+        initJSONObjectNumberTest(objectString, resultIsNegative);
         assertEquals((Long) value.longValue(), object.optLongObject("value"));
     }
 }

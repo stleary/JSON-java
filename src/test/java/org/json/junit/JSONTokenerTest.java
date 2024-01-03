@@ -4,10 +4,7 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -20,21 +17,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test specific to the {@link org.json.JSONTokener} class.
  * @author John Aylward
  *
  */
-public class JSONTokenerTest {
+class JSONTokenerTest {
 
     /**
      * verify that back() fails as expected.
      * @throws IOException thrown if something unexpected happens.
      */
     @Test
-    public void verifyBackFailureZeroIndex() throws IOException {
+    void verifyBackFailureZeroIndex() throws IOException {
         Reader reader = new StringReader("some test string"); 
         try {
             final JSONTokener tokener = new JSONTokener(reader);
@@ -52,12 +49,13 @@ public class JSONTokenerTest {
             reader.close();
         }
     }
+
     /**
      * verify that back() fails as expected.
      * @throws IOException thrown if something unexpected happens.
      */
     @Test
-    public void verifyBackFailureDoubleBack() throws IOException {
+    void verifyBackFailureDoubleBack() throws IOException {
         Reader reader = new StringReader("some test string");
         try {
             final JSONTokener tokener = new JSONTokener(reader);
@@ -76,9 +74,9 @@ public class JSONTokenerTest {
            reader.close();
        }
     }
-    
+
     @Test
-    public void testValid() {
+    void valid() {
         checkValid("0",Number.class);
         checkValid(" 0  ",Number.class);
         checkValid("23",Number.class);
@@ -100,9 +98,9 @@ public class JSONTokenerTest {
         checkValid("\n\n[1,2]\n\n",JSONArray.class);
         checkValid("1 2", String.class);
     }
-    
+
     @Test
-    public void testErrors() {
+    void errors() {
         // Check that stream can detect that a value is found after
         // the first one
         checkError(" { \"a\":1 }  4 ");
@@ -171,7 +169,7 @@ public class JSONTokenerTest {
         }
 
     }
-    
+
     /**
      * Tests the failure of the skipTo method with a buffered reader. Preferably
      * we'd like this not to fail but at this time we don't have a good recovery.
@@ -179,7 +177,7 @@ public class JSONTokenerTest {
      * @throws IOException thrown if something unexpected happens.
      */
     @Test
-    public void testSkipToFailureWithBufferedReader() throws IOException {
+    void skipToFailureWithBufferedReader() throws IOException {
         final byte[] superLongBuffer = new byte[1000001];
         // fill our buffer
         for(int i=0;i<superLongBuffer.length;i++) {
@@ -211,7 +209,7 @@ public class JSONTokenerTest {
      * @throws IOException thrown if something unexpected happens.
      */
     @Test
-    public void testSkipToSuccessWithStringReader() throws IOException {
+    void skipToSuccessWithStringReader() throws IOException {
         final StringBuilder superLongBuffer = new StringBuilder(1000001);
         // fill our buffer
         for(int i=0;i<superLongBuffer.length();i++) {
@@ -236,7 +234,7 @@ public class JSONTokenerTest {
      * with different new line combinations.
      */
     @Test
-    public void testNextBackComboWithNewLines() {
+    void nextBackComboWithNewLines() {
         final String testString = "this is\nA test\r\nWith some different\rNew Lines";
         //                         ^       ^         ^                    ^
         // index positions         0       8        16                   36
@@ -245,7 +243,7 @@ public class JSONTokenerTest {
         assertEquals('t',tokener.next());
         assertEquals(" at 1 [character 2 line 1]", tokener.toString());
         tokener.skipTo('\n');
-        assertEquals("skipTo() improperly modifying indexes"," at 7 [character 8 line 1]", tokener.toString());
+        assertEquals(" at 7 [character 8 line 1]", tokener.toString(), "skipTo() improperly modifying indexes");
         assertEquals('\n',tokener.next());
         assertEquals(" at 8 [character 0 line 2]", tokener.toString());
         assertEquals('A',tokener.next());
@@ -253,7 +251,7 @@ public class JSONTokenerTest {
         tokener.back();
         assertEquals(" at 8 [character 0 line 2]", tokener.toString());
         tokener.skipTo('\r');
-        assertEquals("skipTo() improperly modifying indexes"," at 14 [character 6 line 2]", tokener.toString());
+        assertEquals(" at 14 [character 6 line 2]", tokener.toString(), "skipTo() improperly modifying indexes");
         // verify \r\n combo doesn't increment the line twice
         assertEquals('\r', tokener.next());
         assertEquals(" at 15 [character 0 line 3]", tokener.toString());
@@ -269,7 +267,7 @@ public class JSONTokenerTest {
         assertEquals('i', tokener.next());
         assertEquals(" at 18 [character 2 line 3]", tokener.toString());
         tokener.skipTo('\r');
-        assertEquals("skipTo() improperly modifying indexes"," at 35 [character 19 line 3]", tokener.toString());
+        assertEquals(" at 35 [character 19 line 3]", tokener.toString(), "skipTo() improperly modifying indexes");
         assertEquals('\r', tokener.next());
         assertEquals(" at 36 [character 0 line 4]", tokener.toString());
         tokener.back();
@@ -314,8 +312,8 @@ public class JSONTokenerTest {
         assertFalse(t2.more());
    }
 
-   @Test
-   public void testAutoClose(){
+    @Test
+    void autoClose(){
        Reader reader = new StringReader("some test string");
        try {
            JSONTokener tokener = new JSONTokener(reader);

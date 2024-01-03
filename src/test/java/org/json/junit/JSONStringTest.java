@@ -4,19 +4,19 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringWriter;
 import java.util.*;
 
 import org.json.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for JSONString implementations, and the difference between
  * {@link JSONObject#valueToString} and {@link JSONObject#writeValue}.
  */
-public class JSONStringTest {
+class JSONStringTest {
 
     /**
      * This tests the JSONObject.writeValue() method. We can't test directly
@@ -25,14 +25,14 @@ public class JSONStringTest {
      * writeValue().
      */
     @Test
-    public void writeValues() throws Exception {
+    void writeValues() throws Exception {
         JSONArray jsonArray = new JSONArray();
         jsonArray.put((Object)null);
 
         StringWriter writer = new StringWriter();
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[null]".equals(output));
+            assertEquals("[null]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             jsonArray.put(JSONObject.NULL);
@@ -43,7 +43,7 @@ public class JSONStringTest {
         writer = new StringWriter();
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[null]".equals(output));
+            assertEquals("[null]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             jsonArray.put(new JSONObject());
@@ -54,7 +54,7 @@ public class JSONStringTest {
         writer = new StringWriter();
         try  {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[{}]".equals(output));
+            assertEquals("[{}]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             jsonArray.put(new JSONArray());
@@ -65,7 +65,7 @@ public class JSONStringTest {
         writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[[]]".equals(output));
+            assertEquals("[[]]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             Map<?,?> singleMap = Collections.singletonMap("key1", "value1");
@@ -77,7 +77,7 @@ public class JSONStringTest {
         writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[{\"key1\":\"value1\"}]".equals(output));
+            assertEquals("[{\"key1\":\"value1\"}]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             List<?> singleList = Collections.singletonList("entry1");
@@ -89,7 +89,7 @@ public class JSONStringTest {
         writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[[\"entry1\"]]".equals(output));
+            assertEquals("[[\"entry1\"]]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             int[] intArray = new int[] { 1, 2, 3 };
@@ -101,7 +101,7 @@ public class JSONStringTest {
         writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[[1,2,3]]".equals(output));
+            assertEquals("[[1,2,3]]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             jsonArray.put(24);
@@ -112,7 +112,7 @@ public class JSONStringTest {
         writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[24]".equals(output));
+            assertEquals("[24]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             jsonArray.put("string value");
@@ -123,7 +123,7 @@ public class JSONStringTest {
         writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[\"string value\"]".equals(output));
+            assertEquals("[\"string value\"]", output, "String values should be equal");
     
             jsonArray = new JSONArray();
             jsonArray.put(true);
@@ -134,7 +134,7 @@ public class JSONStringTest {
         writer = new StringWriter();
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[true]".equals(output));
+            assertEquals("[true]", output, "String values should be equal");
         } finally {
             writer.close();
         }
@@ -147,40 +147,40 @@ public class JSONStringTest {
      */
     @SuppressWarnings("boxing")
     @Test
-    public void valuesToString() throws Exception {
+    void valuesToString() throws Exception {
 
         String output = JSONObject.valueToString(null);
-        assertTrue("String values should be equal", "null".equals(output));
+        assertEquals("null", output, "String values should be equal");
 
         output = JSONObject.valueToString(JSONObject.NULL);
-        assertTrue("String values should be equal", "null".equals(output));
+        assertEquals("null", output, "String values should be equal");
 
         output = JSONObject.valueToString(new JSONObject());
-        assertTrue("String values should be equal", "{}".equals(output));
+        assertEquals("{}", output, "String values should be equal");
 
         output = JSONObject.valueToString(new JSONArray());
-        assertTrue("String values should be equal", "[]".equals(output));
+        assertEquals("[]", output, "String values should be equal");
 
         Map<?,?> singleMap = Collections.singletonMap("key1", "value1");
         output = JSONObject.valueToString(singleMap);
-        assertTrue("String values should be equal", "{\"key1\":\"value1\"}".equals(output));
+        assertEquals("{\"key1\":\"value1\"}", output, "String values should be equal");
 
         List<?> singleList = Collections.singletonList("entry1");
         output = JSONObject.valueToString(singleList);
-        assertTrue("String values should be equal", "[\"entry1\"]".equals(output));
+        assertEquals("[\"entry1\"]", output, "String values should be equal");
 
         int[] intArray = new int[] { 1, 2, 3 };
         output = JSONObject.valueToString(intArray);
-        assertTrue("String values should be equal", "[1,2,3]".equals(output));
+        assertEquals("[1,2,3]", output, "String values should be equal");
 
         output = JSONObject.valueToString(24);
-        assertTrue("String values should be equal", "24".equals(output));
+        assertEquals("24", output, "String values should be equal");
 
         output = JSONObject.valueToString("string value");
-        assertTrue("String values should be equal", "\"string value\"".equals(output));
+        assertEquals("\"string value\"", output, "String values should be equal");
 
         output = JSONObject.valueToString(true);
-        assertTrue("String values should be equal", "true".equals(output));
+        assertEquals("true", output, "String values should be equal");
 
     }
 
@@ -189,7 +189,7 @@ public class JSONStringTest {
      * This is the usual case.
      */
     @Test
-    public void testJSONStringValue() throws Exception {
+    void jSONStringValue() throws Exception {
         JSONStringValue jsonString = new JSONStringValue();
         JSONArray jsonArray = new JSONArray();
 
@@ -198,10 +198,10 @@ public class JSONStringTest {
         StringWriter writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[\"the JSON string value\"]".equals(output));
+            assertEquals("[\"the JSON string value\"]", output, "String values should be equal");
     
             output = JSONObject.valueToString(jsonString);
-            assertTrue("String values should be equal", "\"the JSON string value\"".equals(output));
+            assertEquals("\"the JSON string value\"", output, "String values should be equal");
         } finally {
             writer.close();
         }
@@ -212,7 +212,7 @@ public class JSONStringTest {
      * use the object's toString() method. In the other, throw a JSONException.
      */
     @Test
-    public void testJSONNullStringValue() throws Exception {
+    void jSONNullStringValue() throws Exception {
         JSONNullStringValue jsonString = new JSONNullStringValue();
         JSONArray jsonArray = new JSONArray();
 
@@ -221,7 +221,7 @@ public class JSONStringTest {
         StringWriter writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[\"the toString value\"]".equals(output));
+            assertEquals("[\"the toString value\"]", output, "String values should be equal");
     
             // The only different between writeValue() and valueToString():
             // in this case, valueToString throws a JSONException
@@ -229,8 +229,8 @@ public class JSONStringTest {
                 output = JSONObject.valueToString(jsonString);
                 fail("Expected an exception, got a String value");
             } catch (Exception e) {
-                assertTrue("Expected JSONException", e instanceof JSONException);
-                assertTrue("Exception message does not match", "Bad value from toJSONString: null".equals(e.getMessage()));
+                assertTrue(e instanceof JSONException, "Expected JSONException");
+                assertEquals("Bad value from toJSONString: null", e.getMessage(), "Exception message does not match");
             }
         } finally {
             writer.close();
@@ -243,7 +243,7 @@ public class JSONStringTest {
      * the original exception.
      */
     @Test
-    public void testJSONStringExceptionValue() {
+    void jSONStringExceptionValue() {
         JSONStringExceptionValue jsonString = new JSONStringExceptionValue();
         JSONArray jsonArray = new JSONArray();
 
@@ -267,7 +267,7 @@ public class JSONStringTest {
             JSONObject.valueToString(jsonString);
             fail("Expected an exception, got a String value");
         } catch (JSONException e) {
-            assertTrue("Exception message does not match", "the exception value".equals(e.getMessage()));
+            assertEquals("the exception value", e.getMessage(), "Exception message does not match");
         } catch(Exception e) {
             fail("Expected JSONException");
         }
@@ -278,7 +278,7 @@ public class JSONStringTest {
      * This is the usual case.
      */
     @Test
-    public void testStringValue() throws Exception {
+    void stringValue() throws Exception {
         StringValue nonJsonString = new StringValue();
         JSONArray jsonArray = new JSONArray();
 
@@ -287,10 +287,10 @@ public class JSONStringTest {
         StringWriter writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[\"the toString value for StringValue\"]".equals(output));
+            assertEquals("[\"the toString value for StringValue\"]", output, "String values should be equal");
     
             output = JSONObject.valueToString(nonJsonString);
-            assertTrue("String values should be equal", "\"the toString value for StringValue\"".equals(output));
+            assertEquals("\"the toString value for StringValue\"", output, "String values should be equal");
         } finally {
             writer.close();
         }
@@ -301,7 +301,7 @@ public class JSONStringTest {
      * Defaults to empty string.
      */
     @Test
-    public void testNullStringValue() throws Exception {
+    void nullStringValue() throws Exception {
         NullStringValue nonJsonString = new NullStringValue();
         JSONArray jsonArray = new JSONArray();
 
@@ -310,10 +310,10 @@ public class JSONStringTest {
         StringWriter writer = new StringWriter(); 
         try {
             String output = jsonArray.write(writer).toString();
-            assertTrue("String values should be equal", "[\"\"]".equals(output));
+            assertEquals("[\"\"]", output, "String values should be equal");
     
             output = JSONObject.valueToString(nonJsonString);
-            assertTrue("String values should be equal", "\"\"".equals(output));
+            assertEquals("\"\"", output, "String values should be equal");
         } finally {
             writer.close();
         }

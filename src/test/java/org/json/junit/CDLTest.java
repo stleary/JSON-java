@@ -4,11 +4,11 @@ package org.json.junit;
 Public Domain.
 */
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
 import org.json.JSONArray;
 import org.json.CDL;
 
@@ -18,7 +18,7 @@ import org.json.CDL;
  * reference app. To test it, strings will be converted to JSON-Java classes
  * and then converted back.
  */
-public class CDLTest {
+class CDLTest {
 
     /**
      * String of lines where the column names are in the first row,
@@ -50,10 +50,12 @@ public class CDLTest {
      * Attempts to create a JSONArray from a null string.
      * Expect a NullPointerException.
      */
-    @Test(expected=NullPointerException.class)
-    public void exceptionOnNullString() {
-        String nullStr = null;
-        CDL.toJSONArray(nullStr);
+    @Test
+    void exceptionOnNullString() {
+        assertThrows(NullPointerException.class, () -> {
+            String nullStr = null;
+            CDL.toJSONArray(nullStr);
+        });
     }
 
     /**
@@ -61,32 +63,32 @@ public class CDLTest {
      * in column title line. Expects a JSONException.
      */
     @Test
-    public void unbalancedQuoteInName() {
+    void unbalancedQuoteInName() {
         String badLine = "Col1, \"Col2\nVal1, Val2";
         try {
             CDL.toJSONArray(badLine);
             fail("Expecting an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "Missing close quote '\"'. at 12 [character 0 line 2]",
-                    e.getMessage());
+            assertEquals("Missing close quote '\"'. at 12 [character 0 line 2]",
+                    e.getMessage(),
+                    "Expecting an exception message");
         }
     }
-    
+
     /**
      * Attempts to create a JSONArray from a string with unbalanced quotes
      * in value line. Expects a JSONException.
      */
     @Test
-    public void unbalancedQuoteInValue() {
+    void unbalancedQuoteInValue() {
         String badLine = "Col1, Col2\n\"Val1, Val2";
         try {
             CDL.toJSONArray(badLine);
             fail("Expecting an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "Missing close quote '\"'. at 22 [character 11 line 2]",
-                    e.getMessage());
+            assertEquals("Missing close quote '\"'. at 22 [character 11 line 2]",
+                    e.getMessage(),
+                    "Expecting an exception message");
             
         }
     }
@@ -96,33 +98,33 @@ public class CDLTest {
      * in column title line. Expects a JSONException.
      */
     @Test
-    public void nullInName() {
+    void nullInName() {
         String badLine = "C\0ol1, Col2\nVal1, Val2";
         try {
             CDL.toJSONArray(badLine);
             fail("Expecting an exception");
         } catch (JSONException e) {
-            assertEquals("Expecting an exception message",
-                    "Bad character 'o' (111). at 2 [character 3 line 1]",
-                    e.getMessage());
+            assertEquals("Bad character 'o' (111). at 2 [character 3 line 1]",
+                    e.getMessage(),
+                    "Expecting an exception message");
             
         }
     }
-    
+
     /**
      * Attempt to create a JSONArray with unbalanced quotes and a properly escaped doubled quote.
      * Expects a JSONException. 
      */
     @Test
-    public void unbalancedEscapedQuote(){
+    void unbalancedEscapedQuote(){
     	   String badLine = "Col1, Col2\n\"Val1, \"\"Val2\"\"";
            try {
                CDL.toJSONArray(badLine);
                fail("Expecting an exception");
            } catch (JSONException e) {
-               assertEquals("Expecting an exception message",
-                       "Missing close quote '\"'. at 26 [character 15 line 2]",
-                       e.getMessage());
+               assertEquals("Missing close quote '\"'. at 26 [character 15 line 2]",
+                       e.getMessage(),
+                       "Expecting an exception message");
                
            }
     }
@@ -131,7 +133,7 @@ public class CDLTest {
      * Assert that there is no error for a single escaped quote within a properly embedded quote.
      */
     @Test
-    public void singleEscapedQuote(){
+    void singleEscapedQuote(){
                String singleEscape = "Col1, Col2\nVal1, \"\"\"Val2\"";
                JSONArray jsonArray = CDL.toJSONArray(singleEscape);
                
@@ -141,13 +143,13 @@ public class CDLTest {
                assertTrue(cdlStr.contains("Val1"));
                assertTrue(cdlStr.contains("\"Val2"));
     }
-    
+
     /**
      * Assert that there is no error for a single escaped quote within a properly
      * embedded quote when not the last value.
      */
     @Test
-    public void singleEscapedQuoteMiddleString(){
+    void singleEscapedQuoteMiddleString(){
                String singleEscape = "Col1, Col2\nVal1, \"\"\"Val2\"\nVal 3,Val 4";
                JSONArray jsonArray = CDL.toJSONArray(singleEscape);
                
@@ -157,13 +159,13 @@ public class CDLTest {
                assertTrue(cdlStr.contains("Val1"));
                assertTrue(cdlStr.contains("\"Val2"));
     }
-    
+
     /**
      * Attempt to create a JSONArray with an escape quote and no enclosing quotes.
      * Expects a JSONException. 
      */
     @Test
-    public void badEscapedQuote(){
+    void badEscapedQuote(){
     	       String badLine = "Col1, Col2\nVal1, \"\"Val2";
     	       
     	       try {
@@ -171,74 +173,76 @@ public class CDLTest {
                    fail("Expecting an exception");
                } catch (JSONException e) {
             	   //System.out.println("Message" + e.getMessage());
-                   assertEquals("Expecting an exception message",
-                           "Bad character 'V' (86). at 20 [character 9 line 2]",
-                           e.getMessage());
+                   assertEquals("Bad character 'V' (86). at 20 [character 9 line 2]",
+                           e.getMessage(),
+                           "Expecting an exception message");
                    
                }
                
     }
-    
+
     /**
      * call toString with a null array
      */
-    @Test(expected=NullPointerException.class)
-    public void nullJSONArrayToString() {
-        CDL.toString((JSONArray)null);
+    @Test
+    void nullJSONArrayToString() {
+        assertThrows(NullPointerException.class, () -> {
+            CDL.toString((JSONArray)null);
+        });
     }
 
     /**
      * Create a JSONArray from an empty string
      */
     @Test
-    public void emptyString() {
+    void emptyString() {
         String emptyStr = "";
         JSONArray jsonArray = CDL.toJSONArray(emptyStr);
-        assertTrue("CDL should return null when the input string is empty",
-                jsonArray == null);
+        assertTrue(jsonArray == null,
+                "CDL should return null when the input string is empty");
     }
 
     /**
      * Create a JSONArray with only 1 row
      */
     @Test
-    public void onlyColumnNames() {
+    void onlyColumnNames() {
         String columnNameStr = "col1, col2, col3";
         JSONArray jsonArray = CDL.toJSONArray(columnNameStr);
-        assertNull("CDL should return null when only 1 row is given",
-                jsonArray);
+        assertNull(jsonArray,
+                "CDL should return null when only 1 row is given");
     }
 
     /**
      * Create a JSONArray from string containing only whitespace and commas
      */
     @Test
-    public void emptyLinesToJSONArray() {
+    void emptyLinesToJSONArray() {
         String str = " , , , \n , , , ";
         JSONArray jsonArray = CDL.toJSONArray(str);
-        assertNull("JSONArray should be null for no content",
-                jsonArray);
+        assertNull(jsonArray,
+                "JSONArray should be null for no content");
     }
 
     /**
      * call toString with a null array
      */
     @Test
-    public void emptyJSONArrayToString() {
+    void emptyJSONArrayToString() {
         JSONArray jsonArray = new JSONArray();
         String str = CDL.toString(jsonArray);
-        assertNull("CDL should return null for toString(null)",
-                str);
+        assertNull(str,
+                "CDL should return null for toString(null)");
     }
 
     /**
      * call toString with a null arrays for names and values
      */
     @Test
-    public void nullJSONArraysToString() {
+    void nullJSONArraysToString() {
         String str = CDL.toString(null, null);
-        assertNull("CDL should return null for toString(null)",
-                str);
+        assertNull(str,
+                "CDL should return null for toString(null)");
     }
 
     /**
@@ -246,7 +250,7 @@ public class CDLTest {
      * found that would otherwise be filtered out by CDL.
      */
     @Test
-    public void checkSpecialChars() {
+    void checkSpecialChars() {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
         jsonArray.put(jsonObject);
@@ -254,7 +258,7 @@ public class CDLTest {
         jsonObject.put("Col \r1", "V1");
         // \r will be filtered from value
         jsonObject.put("Col 2", "V2\r");
-        assertTrue("expected length should be 1",jsonArray.length() == 1);
+        assertEquals(1, jsonArray.length(), "expected length should be 1");
         String cdlStr = CDL.toString(jsonArray);
         jsonObject = jsonArray.getJSONObject(0);
         assertTrue(cdlStr.contains("\"Col 1\""));
@@ -267,7 +271,7 @@ public class CDLTest {
      * Create a JSONArray from a string of lines
      */
     @Test
-    public void textToJSONArray() {
+    void textToJSONArray() {
         JSONArray jsonArray = CDL.toJSONArray(this.lines);
         JSONArray expectedJsonArray = new JSONArray(this.expectedLines);
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
@@ -278,7 +282,7 @@ public class CDLTest {
      * string of value lines
      */
     @Test
-    public void jsonArrayToJSONArray() {
+    void jsonArrayToJSONArray() {
         String nameArrayStr = "[Col1, Col2]";
         String values = "V1, V2";
         JSONArray nameJSONArray = new JSONArray(nameArrayStr);
@@ -292,7 +296,7 @@ public class CDLTest {
      * then convert to string and then back to JSONArray
      */
     @Test
-    public void textToJSONArrayAndBackToString() {
+    void textToJSONArrayAndBackToString() {
         JSONArray jsonArray = CDL.toJSONArray(this.lines);
         String jsonStr = CDL.toString(jsonArray);
         JSONArray finalJsonArray = CDL.toJSONArray(jsonStr);
