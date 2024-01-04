@@ -192,6 +192,7 @@ public class XMLParserConfiguration extends ParserConfiguration {
      *
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public XMLParserConfiguration withKeepStrings(final boolean newVal) {
         return super.withKeepStrings(newVal);
@@ -309,6 +310,7 @@ public class XMLParserConfiguration extends ParserConfiguration {
      * @param maxNestingDepth the maximum nesting depth allowed to the XML parser
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public XMLParserConfiguration withMaxNestingDepth(int maxNestingDepth) {
         return super.withMaxNestingDepth(maxNestingDepth);
@@ -316,7 +318,7 @@ public class XMLParserConfiguration extends ParserConfiguration {
 
     /**
      * To enable explicit end tag with empty value.
-     * @param closeEmptyTag
+     * @param closeEmptyTag new value for the closeEmptyTag property
      * @return same instance of configuration with empty tag config updated
      */
     public XMLParserConfiguration withCloseEmptyTag(boolean closeEmptyTag){

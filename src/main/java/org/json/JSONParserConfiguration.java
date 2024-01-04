@@ -17,6 +17,7 @@ public class JSONParserConfiguration extends ParserConfiguration {
     return new JSONParserConfiguration();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public JSONParserConfiguration withMaxNestingDepth(final int maxNestingDepth) {
     return super.withMaxNestingDepth(maxNestingDepth);

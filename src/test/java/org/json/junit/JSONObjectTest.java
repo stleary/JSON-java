@@ -3760,6 +3760,48 @@ public class JSONObjectTest {
         String jsonString = object.toString();
     }
 
+    @Test(expected = JSONException.class)
+    public void testCircleReferenceFirstLevel() {
+        Map<Object, Object> jsonObject = new HashMap<>();
+
+        jsonObject.put("test", jsonObject);
+
+        new JSONObject(jsonObject, new JSONParserConfiguration());
+    }
+
+    @Test(expected = StackOverflowError.class)
+    public void testCircleReferenceMultiplyLevel_notConfigured_expectedStackOverflow() {
+        Map<Object, Object> inside = new HashMap<>();
+
+        Map<Object, Object> jsonObject = new HashMap<>();
+        inside.put("test", jsonObject);
+        jsonObject.put("test", inside);
+
+        new JSONObject(jsonObject, new JSONParserConfiguration().withMaxNestingDepth(99999));
+    }
+
+    @Test(expected = JSONException.class)
+    public void testCircleReferenceMultiplyLevel_configured_expectedJSONException() {
+        Map<Object, Object> inside = new HashMap<>();
+
+        Map<Object, Object> jsonObject = new HashMap<>();
+        inside.put("test", jsonObject);
+        jsonObject.put("test", inside);
+
+        new JSONObject(jsonObject, new JSONParserConfiguration());
+    }
+
+    @Test
+    public void testDifferentKeySameInstanceNotACircleReference() {
+        Map<Object, Object> map1 = new HashMap<>();
+        Map<Object, Object> map2 = new HashMap<>();
+
+        map1.put("test1", map2);
+        map1.put("test2", map2);
+
+        new JSONObject(map1);
+    }
+
     /**
      * Method to build nested map of max maxDepth
      *

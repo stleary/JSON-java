@@ -75,6 +75,7 @@ public class ParserConfiguration {
      * 
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
+    @SuppressWarnings("unchecked")
     public <T extends ParserConfiguration> T withKeepStrings(final boolean newVal) {
         T newConfig = (T)this.clone();
         newConfig.keepStrings = newVal;
@@ -101,6 +102,7 @@ public class ParserConfiguration {
      * 
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
+    @SuppressWarnings("unchecked")
     public <T extends ParserConfiguration> T withMaxNestingDepth(int maxNestingDepth) {
         T newConfig = (T)this.clone();
 
