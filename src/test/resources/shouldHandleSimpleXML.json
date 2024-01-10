@@ -1,0 +1,19 @@
+{
+  "addresses": {
+    "address": {
+      "street": "[CDATA[Baker street 5]",
+      "name": "Joe Tester",
+      "NothingHere": "",
+      "TrueValue": true,
+      "FalseValue": false,
+      "NullValue": null,
+      "PositiveValue": 42,
+      "NegativeValue": -23,
+      "DoubleValue": -23.45,
+      "Nan": "-23x.45",
+      "ArrayOfNum": "1, 2, 3, 4.1, 5.2"
+    },
+    "xsi:noNamespaceSchemaLocation": "test.xsd",
+    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"
+  }
+}

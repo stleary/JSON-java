@@ -4,14 +4,11 @@ package org.json.junit;
 Public Domain.
 */
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -249,40 +246,47 @@ public class XMLConfigurationTest {
      */
     @Test
     public void shouldHandleSimpleXML() {
-        String xmlStr = 
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-            "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
-            "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
-            "   <address>\n"+
-            "       <name>Joe Tester</name>\n"+
-            "       <street>[CDATA[Baker street 5]</street>\n"+
-            "       <NothingHere/>\n"+
-            "       <TrueValue>true</TrueValue>\n"+
-            "       <FalseValue>false</FalseValue>\n"+
-            "       <NullValue>null</NullValue>\n"+
-            "       <PositiveValue>42</PositiveValue>\n"+
-            "       <NegativeValue>-23</NegativeValue>\n"+
-            "       <DoubleValue>-23.45</DoubleValue>\n"+
-            "       <Nan>-23x.45</Nan>\n"+
-            "       <ArrayOfNum>1, 2, 3, 4.1, 5.2</ArrayOfNum>\n"+
-            "   </address>\n"+
-            "</addresses>";
+        String xmlStr =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+
+                        "   xsi:noNamespaceSchemaLocation='test.xsd'>\n"+
+                        "   <address>\n"+
+                        "       <name>Joe Tester</name>\n"+
+                        "       <street>[CDATA[Baker street 5]</street>\n"+
+                        "       <NothingHere/>\n"+
+                        "       <TrueValue>true</TrueValue>\n"+
+                        "       <FalseValue>false</FalseValue>\n"+
+                        "       <NullValue>null</NullValue>\n"+
+                        "       <PositiveValue>42</PositiveValue>\n"+
+                        "       <NegativeValue>-23</NegativeValue>\n"+
+                        "       <DoubleValue>-23.45</DoubleValue>\n"+
+                        "       <Nan>-23x.45</Nan>\n"+
+                        "       <ArrayOfNum>1, 2, 3, 4.1, 5.2</ArrayOfNum>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
 
-        String expectedStr = 
-            "{\"addresses\":{\"address\":{\"street\":\"[CDATA[Baker street 5]\","+
-            "\"name\":\"Joe Tester\",\"NothingHere\":\"\",TrueValue:true,\n"+
-            "\"FalseValue\":false,\"NullValue\":null,\"PositiveValue\":42,\n"+
-            "\"NegativeValue\":-23,\"DoubleValue\":-23.45,\"Nan\":-23x.45,\n"+
-            "\"ArrayOfNum\":\"1, 2, 3, 4.1, 5.2\"\n"+
-            "},\"xsi:noNamespaceSchemaLocation\":"+
-            "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
-            "XMLSchema-instance\"}}";
+        // Load expected JSON data from an InputStream
+        InputStream jsonInputStream = getClass().getResourceAsStream("/shouldHandleSimpleXML.json");
+        String expectedJsonStr = loadJsonFromInputStream(jsonInputStream);
 
-        XMLParserConfiguration config =
-                new XMLParserConfiguration().withcDataTagName("altContent");
-        compareStringToJSONObject(xmlStr, expectedStr, config);
-        compareReaderToJSONObject(xmlStr, expectedStr, config);
-        compareFileToJSONObject(xmlStr, expectedStr);
+        if (expectedJsonStr != null) {
+            XMLParserConfiguration config =
+                    new XMLParserConfiguration().withcDataTagName("altContent");
+            compareStringToJSONObject(xmlStr, expectedJsonStr, config);
+            compareReaderToJSONObject(xmlStr, expectedJsonStr, config);
+            compareFileToJSONObject(xmlStr, expectedJsonStr);
+        } else {
+            fail("Failed to load the expected JSON data from the InputStream.");
+        }
+    }
+
+    private String loadJsonFromInputStream(InputStream inputStream) {
+        try (InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+            return new BufferedReader(reader).lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -291,26 +295,32 @@ public class XMLConfigurationTest {
     @Test
     public void shouldHandleCommentsInXML() {
 
-        String xmlStr = 
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-                "<!-- this is a comment -->\n"+
-                "<addresses>\n"+
-                "   <address>\n"+
-                "       <![CDATA[ this is -- <another> comment ]]>\n"+
-                "       <name>Joe Tester</name>\n"+
-                "       <!-- this is a - multi line \n"+
-                "            comment -->\n"+
-                "       <street>Baker street 5</street>\n"+
-                "   </address>\n"+
-                "</addresses>";
-        XMLParserConfiguration config =
-                new XMLParserConfiguration().withcDataTagName("altContent");
-        JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
-        String expectedStr = "{\"addresses\":{\"address\":{\"street\":\"Baker "+
-                "street 5\",\"name\":\"Joe Tester\",\"altContent\":\" this is -- "+
-                "<another> comment \"}}}";
-        JSONObject expectedJsonObject = new JSONObject(expectedStr);
-        Util.compareActualVsExpectedJsonObjects(jsonObject,expectedJsonObject);
+
+        InputStream xmlInputStream = getClass().getResourceAsStream("/shouldHandleCommentsInXML.xml");
+        String xmlStr = loadXmlFromInputStream(xmlInputStream);
+
+        if (xmlStr != null) {
+            XMLParserConfiguration config = new XMLParserConfiguration().withcDataTagName("altContent");
+            JSONObject jsonObject = XML.toJSONObject(xmlStr, config);
+
+            String expectedStr = "{\"addresses\":{\"address\":{\"street\":\"Baker " +
+                    "street 5\",\"name\":\"Joe Tester\",\"altContent\":\" this is -- " +
+                    "<another> comment \"}}}";
+            JSONObject expectedJsonObject = new JSONObject(expectedStr);
+
+            Util.compareActualVsExpectedJsonObjects(jsonObject, expectedJsonObject);
+        } else {
+            fail("Failed to load the XML data from the InputStream.");
+        }
+    }
+
+    private String loadXmlFromInputStream(InputStream inputStream) {
+        try (InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+            return new BufferedReader(reader).lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**

@@ -1,0 +1,14 @@
+{
+  "key1": [1, 2, {"key3": true}],
+  "key2": {
+    "key1": "val1",
+    "key2": {
+      "key2": null
+    },
+    "key3": 42
+  },
+  "key3": [
+    ["value1", 2.1],
+    [null]
+  ]
+}

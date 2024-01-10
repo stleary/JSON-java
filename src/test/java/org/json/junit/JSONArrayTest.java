@@ -11,11 +11,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,29 +45,29 @@ import com.jayway.jsonpath.JsonPath;
  * Tests for JSON-Java JSONArray.java
  */
 public class JSONArrayTest {
-    private final String arrayStr = 
-            "["+
-                "true,"+
-                "false,"+
-                "\"true\","+
-                "\"false\","+
-                "\"hello\","+
-                "23.45e-4,"+
-                "\"23.45\","+
-                "42,"+
-                "\"43\","+
-                "["+
-                    "\"world\""+
-                "],"+
-                "{"+
-                    "\"key1\":\"value1\","+
-                    "\"key2\":\"value2\","+
-                    "\"key3\":\"value3\","+
-                    "\"key4\":\"value4\""+
-                "},"+
-                "0,"+
-                "\"-1\""+
-            "]";
+    private final String arrayStr =
+            "[" +
+                    "true," +
+                    "false," +
+                    "\"true\"," +
+                    "\"false\"," +
+                    "\"hello\"," +
+                    "23.45e-4," +
+                    "\"23.45\"," +
+                    "42," +
+                    "\"43\"," +
+                    "[" +
+                    "\"world\"" +
+                    "]," +
+                    "{" +
+                    "\"key1\":\"value1\"," +
+                    "\"key2\":\"value2\"," +
+                    "\"key3\":\"value3\"," +
+                    "\"key4\":\"value4\"" +
+                    "}," +
+                    "0," +
+                    "\"-1\"" +
+                    "]";
 
     /**
      * Tests that the similar method is working as expected.
@@ -80,7 +80,7 @@ public class JSONArrayTest {
                 .put("abc")
                 .put(string1)
                 .put(2);
-        
+
         JSONArray obj2 = new JSONArray()
                 .put("abc")
                 .put(string1)
@@ -94,23 +94,23 @@ public class JSONArrayTest {
         JSONArray obj4 = new JSONArray()
                 .put("abc")
                 .put(2.0)
-        		.put(new String(string1));
+                .put(new String(string1));
 
         JSONArray obj5 = new JSONArray()
                 .put("abc")
                 .put(2.0)
-        		.put(new String(string2));
-        
+                .put(new String(string2));
+
         assertFalse("obj1-obj2 Should eval to false", obj1.similar(obj2));
         assertTrue("obj1-obj3 Should eval to true", obj1.similar(obj3));
         assertFalse("obj4-obj5 Should eval to false", obj4.similar(obj5));
     }
-        
+
     /**
      * Attempt to create a JSONArray with a null string.
      * Expects a NullPointerException.
      */
-    @Test(expected=NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void nullException() {
         String str = null;
         assertNull("Should throw an exception", new JSONArray(str));
@@ -126,12 +126,12 @@ public class JSONArrayTest {
         try {
             assertNull("Should throw an exception", new JSONArray(str));
         } catch (JSONException e) {
-            assertEquals("Expected an exception message", 
+            assertEquals("Expected an exception message",
                     "A JSONArray text must start with '[' at 0 [character 1 line 1]",
                     e.getMessage());
         }
     }
-    
+
     /**
      * Attempt to create a JSONArray with an unclosed array.
      * Expects an exception
@@ -141,12 +141,12 @@ public class JSONArrayTest {
         try {
             assertNull("Should throw an exception", new JSONArray("["));
         } catch (JSONException e) {
-            assertEquals("Expected an exception message", 
+            assertEquals("Expected an exception message",
                     "Expected a ',' or ']' at 1 [character 2 line 1]",
                     e.getMessage());
         }
     }
-    
+
     /**
      * Attempt to create a JSONArray with an unclosed array.
      * Expects an exception
@@ -156,12 +156,12 @@ public class JSONArrayTest {
         try {
             assertNull("Should throw an exception", new JSONArray("[\"test\""));
         } catch (JSONException e) {
-            assertEquals("Expected an exception message", 
+            assertEquals("Expected an exception message",
                     "Expected a ',' or ']' at 7 [character 8 line 1]",
                     e.getMessage());
         }
     }
-    
+
     /**
      * Attempt to create a JSONArray with an unclosed array.
      * Expects an exception
@@ -171,7 +171,7 @@ public class JSONArrayTest {
         try {
             assertNull("Should throw an exception", new JSONArray("[\"test\","));
         } catch (JSONException e) {
-            assertEquals("Expected an exception message", 
+            assertEquals("Expected an exception message",
                     "Expected a ',' or ']' at 8 [character 9 line 1]",
                     e.getMessage());
         }
@@ -186,22 +186,22 @@ public class JSONArrayTest {
     public void badObject() {
         String str = "abc";
         try {
-            assertNull("Should throw an exception", new JSONArray((Object)str));
+            assertNull("Should throw an exception", new JSONArray((Object) str));
         } catch (JSONException e) {
-            assertTrue("Expected an exception message", 
+            assertTrue("Expected an exception message",
                     "JSONArray initial value should be a string or collection or array.".
-                    equals(e.getMessage()));
+                            equals(e.getMessage()));
         }
     }
-    
+
     /**
      * Verifies that the constructor has backwards compatibility with RAW types pre-java5.
      */
     @Test
     public void verifyConstructor() {
-        
+
         final JSONArray expected = new JSONArray("[10]");
-        
+
         @SuppressWarnings("rawtypes")
         Collection myRawC = Collections.singleton(Integer.valueOf(10));
         JSONArray jaRaw = new JSONArray(myRawC);
@@ -236,17 +236,17 @@ public class JSONArrayTest {
         final JSONArray jsonArray = new JSONArray();
 
         // array
-        int[] myInts = { 1, 2, 3, 4, 5 };
+        int[] myInts = {1, 2, 3, 4, 5};
         jsonArray.putAll(myInts);
 
         assertEquals("int arrays lengths should be equal",
-                     jsonArray.length(),
-                     myInts.length);
+                jsonArray.length(),
+                myInts.length);
 
         for (int i = 0; i < myInts.length; i++) {
             assertEquals("int arrays elements should be equal",
-                         myInts[i],
-                         jsonArray.getInt(i));
+                    myInts[i],
+                    jsonArray.getInt(i));
         }
 
         // collection
@@ -256,13 +256,13 @@ public class JSONArrayTest {
         int len = myInts.length + myList.size();
 
         assertEquals("arrays lengths should be equal",
-                     jsonArray.length(),
-                     len);
+                jsonArray.length(),
+                len);
 
         for (int i = 0; i < myList.size(); i++) {
             assertEquals("collection elements should be equal",
-                         myList.get(i),
-                         jsonArray.getString(myInts.length + i));
+                    myList.get(i),
+                    jsonArray.getString(myInts.length + i));
         }
         Util.checkJSONArrayMaps(jsonArray);
     }
@@ -272,7 +272,7 @@ public class JSONArrayTest {
      */
     @Test
     public void verifyPutCollection() {
-        
+
         final JSONArray expected = new JSONArray("[[10]]");
 
         @SuppressWarnings("rawtypes")
@@ -303,13 +303,13 @@ public class JSONArrayTest {
         )));
     }
 
-    
+
     /**
      * Verifies that the put Map has backwards compatibility with RAW types pre-java5.
      */
     @Test
     public void verifyPutMap() {
-        
+
         final JSONArray expected = new JSONArray("[{\"myKey\":10}]");
 
         @SuppressWarnings("rawtypes")
@@ -409,56 +409,56 @@ public class JSONArrayTest {
             assertTrue("expected getBoolean to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a boolean (class java.lang.String : hello).",e.getMessage());
+                    "JSONArray[4] is not a boolean (class java.lang.String : hello).", e.getMessage());
         }
         try {
             jsonArray.get(-1);
             assertTrue("expected get to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[-1] not found.",e.getMessage());
+                    "JSONArray[-1] not found.", e.getMessage());
         }
         try {
             jsonArray.getDouble(4);
             assertTrue("expected getDouble to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a double (class java.lang.String : hello).",e.getMessage());
+                    "JSONArray[4] is not a double (class java.lang.String : hello).", e.getMessage());
         }
         try {
             jsonArray.getInt(4);
             assertTrue("expected getInt to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a int (class java.lang.String : hello).",e.getMessage());
+                    "JSONArray[4] is not a int (class java.lang.String : hello).", e.getMessage());
         }
         try {
             jsonArray.getJSONArray(4);
             assertTrue("expected getJSONArray to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a JSONArray (class java.lang.String : hello).",e.getMessage());
+                    "JSONArray[4] is not a JSONArray (class java.lang.String : hello).", e.getMessage());
         }
         try {
             jsonArray.getJSONObject(4);
             assertTrue("expected getJSONObject to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a JSONObject (class java.lang.String : hello).",e.getMessage());
+                    "JSONArray[4] is not a JSONObject (class java.lang.String : hello).", e.getMessage());
         }
         try {
             jsonArray.getLong(4);
             assertTrue("expected getLong to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[4] is not a long (class java.lang.String : hello).",e.getMessage());
+                    "JSONArray[4] is not a long (class java.lang.String : hello).", e.getMessage());
         }
         try {
             jsonArray.getString(5);
             assertTrue("expected getString to fail", false);
         } catch (JSONException e) {
             assertEquals("Expected an exception message",
-                    "JSONArray[5] is not a String (class java.math.BigDecimal : 0.002345).",e.getMessage());
+                    "JSONArray[5] is not a String (class java.math.BigDecimal : 0.002345).", e.getMessage());
         }
         Util.checkJSONArrayMaps(jsonArray);
     }
@@ -467,7 +467,7 @@ public class JSONArrayTest {
      * The JSON parser is permissive of unambiguous unquoted keys and values.
      * Such JSON text should be allowed, even if it does not strictly conform
      * to the spec. However, after being parsed, toString() should emit strictly
-     * conforming JSON text.  
+     * conforming JSON text.
      */
     @Test
     public void unquotedText() {
@@ -478,7 +478,7 @@ public class JSONArrayTest {
     }
 
     /**
-     * Exercise JSONArray.join() by converting a JSONArray into a 
+     * Exercise JSONArray.join() by converting a JSONArray into a
      * comma-separated string. Since this is very nearly a JSON document,
      * array braces are added to the beginning and end prior to validation.
      */
@@ -491,8 +491,8 @@ public class JSONArrayTest {
         /**
          * Don't need to remake the JSONArray to perform the parsing
          */
-        Object doc = Configuration.defaultConfiguration().jsonProvider().parse("["+joinStr+"]");
-        assertTrue("expected 13 items in top level object", ((List<?>)(JsonPath.read(doc, "$"))).size() == 13);
+        Object doc = Configuration.defaultConfiguration().jsonProvider().parse("[" + joinStr + "]");
+        assertTrue("expected 13 items in top level object", ((List<?>) (JsonPath.read(doc, "$"))).size() == 13);
         assertTrue("expected true", Boolean.TRUE.equals(jsonArray.query("/0")));
         assertTrue("expected false", Boolean.FALSE.equals(jsonArray.query("/1")));
         assertTrue("expected \"true\"", "true".equals(jsonArray.query("/2")));
@@ -502,9 +502,9 @@ public class JSONArrayTest {
         assertTrue("expected \"23.45\"", "23.45".equals(jsonArray.query("/6")));
         assertTrue("expected 42", Integer.valueOf(42).equals(jsonArray.query("/7")));
         assertTrue("expected \"43\"", "43".equals(jsonArray.query("/8")));
-        assertTrue("expected 1 item in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 1);
+        assertTrue("expected 1 item in [9]", ((List<?>) (JsonPath.read(doc, "$[9]"))).size() == 1);
         assertTrue("expected world", "world".equals(jsonArray.query("/9/0")));
-        assertTrue("expected 4 items in [10]", ((Map<?,?>)(JsonPath.read(doc, "$[10]"))).size() == 4);
+        assertTrue("expected 4 items in [10]", ((Map<?, ?>) (JsonPath.read(doc, "$[10]"))).size() == 4);
         assertTrue("expected value1", "value1".equals(jsonArray.query("/10/key1")));
         assertTrue("expected value2", "value2".equals(jsonArray.query("/10/key2")));
         assertTrue("expected value3", "value3".equals(jsonArray.query("/10/key3")));
@@ -517,12 +517,12 @@ public class JSONArrayTest {
     /**
      * Confirm the JSONArray.length() method
      */
-    @Test 
+    @Test
     public void length() {
         assertTrue("expected empty JSONArray length 0",
                 new JSONArray().length() == 0);
         JSONArray jsonArray = new JSONArray(this.arrayStr);
-        assertTrue("expected JSONArray length 13. instead found "+jsonArray.length(), jsonArray.length() == 13);
+        assertTrue("expected JSONArray length 13. instead found " + jsonArray.length(), jsonArray.length() == 13);
         JSONArray nestedJsonArray = jsonArray.getJSONArray(9);
         assertTrue("expected JSONArray length 1", nestedJsonArray.length() == 1);
         Util.checkJSONArraysMaps(new ArrayList<JSONArray>(Arrays.asList(
@@ -536,7 +536,7 @@ public class JSONArrayTest {
      * and opt[type](index, default) API methods.
      */
     @SuppressWarnings("boxing")
-    @Test 
+    @Test
     public void opt() {
         JSONArray jsonArray = new JSONArray(this.arrayStr);
         assertTrue("Array opt value true",
@@ -547,14 +547,14 @@ public class JSONArrayTest {
         assertTrue("Array opt value out of range",
                 null == jsonArray.opt(jsonArray.length()));
 
-         assertTrue("Array opt boolean",
+        assertTrue("Array opt boolean",
                 Boolean.TRUE == jsonArray.optBoolean(0));
         assertTrue("Array opt boolean default",
                 Boolean.FALSE == jsonArray.optBoolean(-1, Boolean.FALSE));
         assertTrue("Array opt boolean implicit default",
                 Boolean.FALSE == jsonArray.optBoolean(-1));
 
-         assertTrue("Array opt boolean object",
+        assertTrue("Array opt boolean object",
                 Boolean.TRUE.equals(jsonArray.optBooleanObject(0)));
         assertTrue("Array opt boolean object default",
                 Boolean.FALSE.equals(jsonArray.optBooleanObject(-1, Boolean.FALSE)));
@@ -566,7 +566,7 @@ public class JSONArrayTest {
         assertTrue("Array opt double default",
                 Double.valueOf(1).equals(jsonArray.optDouble(0, 1)));
         assertTrue("Array opt double default implicit",
-           Double.valueOf(jsonArray.optDouble(99)).isNaN());
+                Double.valueOf(jsonArray.optDouble(99)).isNaN());
 
         assertTrue("Array opt double object",
                 Double.valueOf(23.45e-4).equals(jsonArray.optDoubleObject(5)));
@@ -580,7 +580,7 @@ public class JSONArrayTest {
         assertTrue("Array opt float default",
                 Float.valueOf(1).equals(jsonArray.optFloat(0, 1)));
         assertTrue("Array opt float default implicit",
-           Float.valueOf(jsonArray.optFloat(99)).isNaN());
+                Float.valueOf(jsonArray.optFloat(99)).isNaN());
 
         assertTrue("Array opt float object",
                 Float.valueOf(23.45e-4F).equals(jsonArray.optFloatObject(5)));
@@ -594,7 +594,7 @@ public class JSONArrayTest {
         assertTrue("Array opt Number default",
                 Double.valueOf(1).equals(jsonArray.optNumber(0, 1d)));
         assertTrue("Array opt Number default implicit",
-           Double.valueOf(jsonArray.optNumber(99,Double.NaN).doubleValue()).isNaN());
+                Double.valueOf(jsonArray.optNumber(99, Double.NaN).doubleValue()).isNaN());
 
         assertTrue("Array opt int",
                 Integer.valueOf(42).equals(jsonArray.optInt(7)));
@@ -647,25 +647,25 @@ public class JSONArrayTest {
         )));
         Util.checkJSONObjectMaps(nestedJsonObject);
     }
-    
+
     /**
      * Verifies that the opt methods properly convert string values.
      */
     @Test
-    public void optStringConversion(){
+    public void optStringConversion() {
         JSONArray ja = new JSONArray("[\"123\",\"true\",\"false\"]");
-        assertTrue("unexpected optBoolean value",ja.optBoolean(1,false)==true);
-        assertTrue("unexpected optBooleanObject value",Boolean.valueOf(true).equals(ja.optBooleanObject(1,false)));
-        assertTrue("unexpected optBoolean value",ja.optBoolean(2,true)==false);
-        assertTrue("unexpected optBooleanObject value",Boolean.valueOf(false).equals(ja.optBooleanObject(2,true)));
-        assertTrue("unexpected optInt value",ja.optInt(0,0)==123);
-        assertTrue("unexpected optIntegerObject value",Integer.valueOf(123).equals(ja.optIntegerObject(0,0)));
-        assertTrue("unexpected optLong value",ja.optLong(0,0)==123);
-        assertTrue("unexpected optLongObject value",Long.valueOf(123).equals(ja.optLongObject(0,0L)));
-        assertTrue("unexpected optDouble value",ja.optDouble(0,0.0)==123.0);
-        assertTrue("unexpected optDoubleObject value",Double.valueOf(123.0).equals(ja.optDoubleObject(0,0.0)));
-        assertTrue("unexpected optBigInteger value",ja.optBigInteger(0,BigInteger.ZERO).compareTo(new BigInteger("123"))==0);
-        assertTrue("unexpected optBigDecimal value",ja.optBigDecimal(0,BigDecimal.ZERO).compareTo(new BigDecimal("123"))==0);
+        assertTrue("unexpected optBoolean value", ja.optBoolean(1, false) == true);
+        assertTrue("unexpected optBooleanObject value", Boolean.valueOf(true).equals(ja.optBooleanObject(1, false)));
+        assertTrue("unexpected optBoolean value", ja.optBoolean(2, true) == false);
+        assertTrue("unexpected optBooleanObject value", Boolean.valueOf(false).equals(ja.optBooleanObject(2, true)));
+        assertTrue("unexpected optInt value", ja.optInt(0, 0) == 123);
+        assertTrue("unexpected optIntegerObject value", Integer.valueOf(123).equals(ja.optIntegerObject(0, 0)));
+        assertTrue("unexpected optLong value", ja.optLong(0, 0) == 123);
+        assertTrue("unexpected optLongObject value", Long.valueOf(123).equals(ja.optLongObject(0, 0L)));
+        assertTrue("unexpected optDouble value", ja.optDouble(0, 0.0) == 123.0);
+        assertTrue("unexpected optDoubleObject value", Double.valueOf(123.0).equals(ja.optDoubleObject(0, 0.0)));
+        assertTrue("unexpected optBigInteger value", ja.optBigInteger(0, BigInteger.ZERO).compareTo(new BigInteger("123")) == 0);
+        assertTrue("unexpected optBigDecimal value", ja.optBigDecimal(0, BigDecimal.ZERO).compareTo(new BigDecimal("123")) == 0);
         Util.checkJSONArrayMaps(ja);
     }
 
@@ -684,10 +684,10 @@ public class JSONArrayTest {
         jsonArray.put(false);
 
         String jsonArrayStr =
-            "["+
-                "hello,"+
-                "world"+
-            "]";
+                "[" +
+                        "hello," +
+                        "world" +
+                        "]";
         // 2
         jsonArray.put(new JSONArray(jsonArrayStr));
 
@@ -701,12 +701,12 @@ public class JSONArrayTest {
         // 6
         jsonArray.put("objectPut");
 
-        String jsonObjectStr = 
-            "{"+
-                "\"key10\":\"val10\","+
-                "\"key20\":\"val20\","+
-                "\"key30\":\"val30\""+
-            "}";
+        String jsonObjectStr =
+                "{" +
+                        "\"key10\":\"val10\"," +
+                        "\"key20\":\"val20\"," +
+                        "\"key30\":\"val30\"" +
+                        "}";
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
         // 7
         jsonArray.put(jsonObject);
@@ -724,23 +724,23 @@ public class JSONArrayTest {
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
-        assertTrue("expected 10 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 10);
+        assertTrue("expected 10 top level items", ((List<?>) (JsonPath.read(doc, "$"))).size() == 10);
         assertTrue("expected true", Boolean.TRUE.equals(jsonArray.query("/0")));
         assertTrue("expected false", Boolean.FALSE.equals(jsonArray.query("/1")));
-        assertTrue("expected 2 items in [2]", ((List<?>)(JsonPath.read(doc, "$[2]"))).size() == 2);
+        assertTrue("expected 2 items in [2]", ((List<?>) (JsonPath.read(doc, "$[2]"))).size() == 2);
         assertTrue("expected hello", "hello".equals(jsonArray.query("/2/0")));
         assertTrue("expected world", "world".equals(jsonArray.query("/2/1")));
         assertTrue("expected 2.5", Double.valueOf(2.5).equals(jsonArray.query("/3")));
         assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/4")));
         assertTrue("expected 45", Long.valueOf(45).equals(jsonArray.query("/5")));
         assertTrue("expected objectPut", "objectPut".equals(jsonArray.query("/6")));
-        assertTrue("expected 3 items in [7]", ((Map<?,?>)(JsonPath.read(doc, "$[7]"))).size() == 3);
+        assertTrue("expected 3 items in [7]", ((Map<?, ?>) (JsonPath.read(doc, "$[7]"))).size() == 3);
         assertTrue("expected val10", "val10".equals(jsonArray.query("/7/key10")));
         assertTrue("expected val20", "val20".equals(jsonArray.query("/7/key20")));
         assertTrue("expected val30", "val30".equals(jsonArray.query("/7/key30")));
-        assertTrue("expected 1 item in [8]", ((Map<?,?>)(JsonPath.read(doc, "$[8]"))).size() == 1);
+        assertTrue("expected 1 item in [8]", ((Map<?, ?>) (JsonPath.read(doc, "$[8]"))).size() == 1);
         assertTrue("expected v1", "v1".equals(jsonArray.query("/8/k1")));
-        assertTrue("expected 2 items in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 2);
+        assertTrue("expected 2 items in [9]", ((List<?>) (JsonPath.read(doc, "$[9]"))).size() == 2);
         assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/9/0")));
         assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/9/1")));
         Util.checkJSONArrayMaps(jsonArray);
@@ -762,10 +762,10 @@ public class JSONArrayTest {
         jsonArray.put(0, true);
 
         String jsonArrayStr =
-            "["+
-                "hello,"+
-                "world"+
-            "]";
+                "[" +
+                        "hello," +
+                        "world" +
+                        "]";
         // 2
         jsonArray.put(2, new JSONArray(jsonArrayStr));
 
@@ -781,18 +781,18 @@ public class JSONArrayTest {
 
         // 7 will be null
 
-        String jsonObjectStr = 
-            "{"+
-                "\"key10\":\"val10\","+
-                "\"key20\":\"val20\","+
-                "\"key30\":\"val30\""+
-            "}";
+        String jsonObjectStr =
+                "{" +
+                        "\"key10\":\"val10\"," +
+                        "\"key20\":\"val20\"," +
+                        "\"key30\":\"val30\"" +
+                        "}";
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
         jsonArray.put(8, jsonObject);
         Collection<Object> collection = new ArrayList<Object>();
         collection.add(1);
         collection.add(2);
-        jsonArray.put(9,collection);
+        jsonArray.put(9, collection);
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("k1", "v1");
@@ -800,14 +800,15 @@ public class JSONArrayTest {
         try {
             jsonArray.put(-1, "abc");
             assertTrue("put index < 0 should have thrown exception", false);
-        } catch(Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
-        assertTrue("expected 11 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 11);
+        assertTrue("expected 11 top level items", ((List<?>) (JsonPath.read(doc, "$"))).size() == 11);
         assertTrue("expected true", Boolean.TRUE.equals(jsonArray.query("/0")));
         assertTrue("expected false", Boolean.FALSE.equals(jsonArray.query("/1")));
-        assertTrue("expected 2 items in [2]", ((List<?>)(JsonPath.read(doc, "$[2]"))).size() == 2);
+        assertTrue("expected 2 items in [2]", ((List<?>) (JsonPath.read(doc, "$[2]"))).size() == 2);
         assertTrue("expected hello", "hello".equals(jsonArray.query("/2/0")));
         assertTrue("expected world", "world".equals(jsonArray.query("/2/1")));
         assertTrue("expected 2.5", Double.valueOf(2.5).equals(jsonArray.query("/3")));
@@ -815,29 +816,29 @@ public class JSONArrayTest {
         assertTrue("expected 45", Long.valueOf(45).equals(jsonArray.query("/5")));
         assertTrue("expected objectPut", "objectPut".equals(jsonArray.query("/6")));
         assertTrue("expected null", JSONObject.NULL.equals(jsonArray.query("/7")));
-        assertTrue("expected 3 items in [8]", ((Map<?,?>)(JsonPath.read(doc, "$[8]"))).size() == 3);
+        assertTrue("expected 3 items in [8]", ((Map<?, ?>) (JsonPath.read(doc, "$[8]"))).size() == 3);
         assertTrue("expected val10", "val10".equals(jsonArray.query("/8/key10")));
         assertTrue("expected val20", "val20".equals(jsonArray.query("/8/key20")));
         assertTrue("expected val30", "val30".equals(jsonArray.query("/8/key30")));
-        assertTrue("expected 2 items in [9]", ((List<?>)(JsonPath.read(doc, "$[9]"))).size() == 2);
+        assertTrue("expected 2 items in [9]", ((List<?>) (JsonPath.read(doc, "$[9]"))).size() == 2);
         assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/9/0")));
         assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/9/1")));
-        assertTrue("expected 1 item in [10]", ((Map<?,?>)(JsonPath.read(doc, "$[10]"))).size() == 1);
+        assertTrue("expected 1 item in [10]", ((Map<?, ?>) (JsonPath.read(doc, "$[10]"))).size() == 1);
         assertTrue("expected v1", "v1".equals(jsonArray.query("/10/k1")));
         Util.checkJSONObjectMaps(jsonObject);
         Util.checkJSONArrayMaps(jsonArray);
     }
 
     /**
-     * Exercise the JSONArray.remove(index) method 
+     * Exercise the JSONArray.remove(index) method
      * and confirm the resulting JSONArray.
      */
     @Test
     public void remove() {
-        String arrayStr1 = 
-            "["+
-                "1"+
-            "]";
+        String arrayStr1 =
+                "[" +
+                        "1" +
+                        "]";
         JSONArray jsonArray = new JSONArray(arrayStr1);
         jsonArray.remove(0);
         assertTrue("array should be empty", null == jsonArray.remove(5));
@@ -851,10 +852,10 @@ public class JSONArrayTest {
      */
     @Test
     public void notSimilar() {
-        String arrayStr1 = 
-            "["+
-                "1"+
-            "]";
+        String arrayStr1 =
+                "[" +
+                        "1" +
+                        "]";
         JSONArray jsonArray = new JSONArray(arrayStr1);
         JSONArray otherJsonArray = new JSONArray();
         assertTrue("arrays lengths differ", !jsonArray.similar(otherJsonArray));
@@ -894,83 +895,39 @@ public class JSONArrayTest {
      * Exercise JSONArray toString() method with various indent levels.
      */
     @Test
-    public void jsonArrayToStringIndent() {
-        String jsonArray0Str =
-                "[" +
-                    "[1,2," +
-                        "{\"key3\":true}" +
-                    "]," +
-                    "{\"key1\":\"val1\",\"key2\":" +
-                        "{\"key2\":\"val2\"}" +
-                    "}," +
-                    "[" +
-                        "[1,2.1]" +
-                    "," +
-                        "[null]" +
-                    "]" +
-                "]";
+    public void jsonArrayToStringIndent() throws IOException {
+        InputStream inputStream = getClass().getResourceAsStream("/jsonArrayToStringIndent.json");
+        String jsonString;
 
-        String jsonArray1Strs [] = 
-            {
-                "[",
-                " [",
-                "  1,",
-                "  2,",
-                "  {\"key3\": true}",
-                " ],",
-                " {",
-                "  \"key1\": \"val1\",",
-                "  \"key2\": {\"key2\": \"val2\"}",
-                " },",
-                " [",
-                "  [",
-                "   1,",
-                "   2.1",
-                "  ],",
-                "  [null]",
-                " ]",
-                "]"
-            };
-        String jsonArray4Strs [] =
-            {
-                "[",
-                "    [",
-                "        1,",
-                "        2,",
-                "        {\"key3\": true}",
-                "    ],",
-                "    {",
-                "        \"key1\": \"val1\",",
-                "        \"key2\": {\"key2\": \"val2\"}",
-                "    },",
-                "    [",
-                "        [",
-                "            1,",
-                "            2.1",
-                "        ],",
-                "        [null]",
-                "    ]",
-                "]"
-            };
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            jsonString = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        }
+
+        JSONObject expectedJson = new JSONObject(jsonString);
+        String jsonArray0Str = expectedJson.getString("jsonArray0");
+        List<Object> jsonArray1Strs = expectedJson.getJSONArray("jsonArray1").toList();
+        List<Object> jsonArray4Strs = expectedJson.getJSONArray("jsonArray4").toList();
+
         JSONArray jsonArray = new JSONArray(jsonArray0Str);
-        String [] actualStrArray = jsonArray.toString().split("\\r?\\n");
-        assertEquals("Expected 1 line", 1, actualStrArray.length);
-        actualStrArray = jsonArray.toString(0).split("\\r?\\n");
-        assertEquals("Expected 1 line", 1, actualStrArray.length);
 
-        actualStrArray = jsonArray.toString(1).split("\\r?\\n");
-        assertEquals("Expected lines", jsonArray1Strs.length, actualStrArray.length);
-        List<String> list = Arrays.asList(actualStrArray);
-        for (String s : jsonArray1Strs) {
-            list.contains(s);
+        // Check the length of the JSON string when indented by 1
+        String[] actualStrArray1 = jsonArray.toString(1).split("\\r?\\n");
+        assertEquals("Expected lines", jsonArray1Strs.size(), actualStrArray1.length);
+
+        // Check if all expected lines are present in the actual array
+        for (Object s : jsonArray1Strs) {
+            assertTrue(Arrays.asList(actualStrArray1).contains(String.valueOf(s)));
         }
-        
-        actualStrArray = jsonArray.toString(4).split("\\r?\\n");
-        assertEquals("Expected lines", jsonArray1Strs.length, actualStrArray.length);
-        list = Arrays.asList(actualStrArray);
-        for (String s : jsonArray4Strs) {
-            list.contains(s);
+
+        // Check the length of the JSON string when indented by 4
+        String[] actualStrArray4 = jsonArray.toString(4).split("\\r?\\n");
+        assertEquals("Expected lines", jsonArray4Strs.size(), actualStrArray4.length);
+
+        // Check if all expected lines are present in the actual array
+        for (Object s : jsonArray4Strs) {
+            assertTrue(Arrays.asList(actualStrArray4).contains(String.valueOf(s)));
         }
+
         Util.checkJSONArrayMaps(jsonArray);
     }
 
@@ -993,13 +950,13 @@ public class JSONArrayTest {
      */
     @Test
     public void objectArrayVsIsArray() {
-        int[] myInts = { 1, 2, 3, 4, 5, 6, 7 };
+        int[] myInts = {1, 2, 3, 4, 5, 6, 7};
         Object myObject = myInts;
         JSONArray jsonArray = new JSONArray(myObject);
 
         // validate JSON
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonArray.toString());
-        assertTrue("expected 7 top level items", ((List<?>)(JsonPath.read(doc, "$"))).size() == 7);
+        assertTrue("expected 7 top level items", ((List<?>) (JsonPath.read(doc, "$"))).size() == 7);
         assertTrue("expected 1", Integer.valueOf(1).equals(jsonArray.query("/0")));
         assertTrue("expected 2", Integer.valueOf(2).equals(jsonArray.query("/1")));
         assertTrue("expected 3", Integer.valueOf(3).equals(jsonArray.query("/2")));
@@ -1032,17 +989,17 @@ public class JSONArrayTest {
         assertTrue("Array double [23.45e-4]",
                 new BigDecimal("0.002345").equals(it.next()));
         assertTrue("Array string double",
-                Double.valueOf(23.45).equals(Double.parseDouble((String)it.next())));
+                Double.valueOf(23.45).equals(Double.parseDouble((String) it.next())));
 
         assertTrue("Array value int",
                 Integer.valueOf(42).equals(it.next()));
         assertTrue("Array value string int",
-                Integer.valueOf(43).equals(Integer.parseInt((String)it.next())));
+                Integer.valueOf(43).equals(Integer.parseInt((String) it.next())));
 
-        JSONArray nestedJsonArray = (JSONArray)it.next();
+        JSONArray nestedJsonArray = (JSONArray) it.next();
         assertTrue("Array value JSONArray", nestedJsonArray != null);
 
-        JSONObject nestedJsonObject = (JSONObject)it.next();
+        JSONObject nestedJsonObject = (JSONObject) it.next();
         assertTrue("Array value JSONObject", nestedJsonObject != null);
 
         assertTrue("Array value long",
@@ -1055,17 +1012,17 @@ public class JSONArrayTest {
         )));
         Util.checkJSONObjectMaps(nestedJsonObject);
     }
-    
+
     @Test(expected = JSONPointerException.class)
     public void queryWithNoResult() {
         new JSONArray().query("/a/b");
     }
-    
+
     @Test
     public void optQueryWithNoResult() {
         assertNull(new JSONArray().optQuery("/a/b"));
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void optQueryWithSyntaxError() {
         new JSONArray().optQuery("invalid");
@@ -1087,12 +1044,12 @@ public class JSONArrayTest {
             JSONArray finalArray = new JSONArray(actualStr);
             Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
             assertTrue("write() expected " + expectedStr +
-                    " but found " + actualStr,
+                            " but found " + actualStr,
                     actualStr.startsWith("[\"value1\",\"value2\",{")
-                    && actualStr.contains("\"key1\":1")
-                    && actualStr.contains("\"key2\":2")
-                    && actualStr.contains("\"key3\":3")
-                    );
+                            && actualStr.contains("\"key1\":1")
+                            && actualStr.contains("\"key2\":2")
+                            && actualStr.contains("\"key3\":3")
+            );
         } finally {
             stringWriter.close();
         }
@@ -1131,30 +1088,30 @@ public class JSONArrayTest {
             JSONArray finalArray = new JSONArray(actualStr);
             Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
             assertTrue("write() expected " + expectedStr +
-                " but found " + actualStr,
-                actualStr.startsWith("[\"value1\",\"value2\",{")
-                && actualStr.contains("\"key1\":1")
-                && actualStr.contains("\"key2\":false")
-                && actualStr.contains("\"key3\":3.14")
+                            " but found " + actualStr,
+                    actualStr.startsWith("[\"value1\",\"value2\",{")
+                            && actualStr.contains("\"key1\":1")
+                            && actualStr.contains("\"key2\":false")
+                            && actualStr.contains("\"key3\":3.14")
             );
         } finally {
             stringWriter.close();
         }
-        
+
         stringWriter = new StringWriter();
         try {
             String actualStr = jsonArray.write(stringWriter, 2, 1).toString();
             JSONArray finalArray = new JSONArray(actualStr);
             Util.compareActualVsExpectedJsonArrays(jsonArray, finalArray);
             assertTrue("write() expected " + expectedStr +
-                " but found " + actualStr,
-                actualStr.startsWith("[\n" + 
-                        "   \"value1\",\n" + 
-                        "   \"value2\",\n" + 
-                        "   {")
-                && actualStr.contains("\"key1\": 1")
-                && actualStr.contains("\"key2\": false")
-                && actualStr.contains("\"key3\": 3.14")
+                            " but found " + actualStr,
+                    actualStr.startsWith("[\n" +
+                            "   \"value1\",\n" +
+                            "   \"value2\",\n" +
+                            "   {")
+                            && actualStr.contains("\"key1\": 1")
+                            && actualStr.contains("\"key2\": false")
+                            && actualStr.contains("\"key3\": 3.14")
             );
             Util.checkJSONArrayMaps(finalArray);
         } finally {
@@ -1202,19 +1159,19 @@ public class JSONArrayTest {
     public void toList() {
         String jsonArrayStr =
                 "[" +
-                    "[1,2," +
+                        "[1,2," +
                         "{\"key3\":true}" +
-                    "]," +
-                    "{\"key1\":\"val1\",\"key2\":" +
+                        "]," +
+                        "{\"key1\":\"val1\",\"key2\":" +
                         "{\"key2\":null}," +
-                    "\"key3\":42,\"key4\":[]" +
-                    "}," +
-                    "[" +
+                        "\"key3\":42,\"key4\":[]" +
+                        "}," +
+                        "[" +
                         "[\"value1\",2.1]" +
-                    "," +
+                        "," +
                         "[null]" +
-                    "]" +
-                "]";
+                        "]" +
+                        "]";
 
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
         List<?> list = jsonArray.toList();
@@ -1274,9 +1231,18 @@ public class JSONArrayTest {
         Util.checkJSONArrayMaps(jsonArray);
     }
 
+    private String convertInputStreamToString(InputStream inputStream) throws IOException {
+        StringBuilder resultStringBuilder = new StringBuilder();
+        try (java.util.Scanner scanner = new java.util.Scanner(inputStream)) {
+            while (scanner.hasNextLine()) {
+                resultStringBuilder.append(scanner.nextLine());
+            }
+        }
+        return resultStringBuilder.toString();
+    }
     /**
      * Create a JSONArray with specified initial capacity.
-     * Expects an exception if the initial capacity is specified as a negative integer 
+     * Expects an exception if the initial capacity is specified as a negative integer
      */
     @Test
     public void testJSONArrayInt() {
@@ -1288,12 +1254,12 @@ public class JSONArrayTest {
         try {
             assertNotNull("Should throw an exception", new JSONArray(-1));
         } catch (JSONException e) {
-            assertEquals("Expected an exception message", 
+            assertEquals("Expected an exception message",
                     "JSONArray initial capacity cannot be negative.",
                     e.getMessage());
         }
     }
-    
+
     /**
      * Verifies that the object constructor can properly handle any supported collection object.
      */
@@ -1305,7 +1271,7 @@ public class JSONArrayTest {
         JSONArray a = new JSONArray(o);
         assertNotNull("Should not error", a);
         assertEquals("length", 3, a.length());
-        
+
         // should NOT copy the collection
         // this is required for backwards compatibility
         o = new ArrayList<Object>();
@@ -1328,7 +1294,7 @@ public class JSONArrayTest {
         }
         Util.checkJSONArrayMaps(a);
     }
-    
+
     /**
      * Verifies that the JSONArray constructor properly copies the original.
      */
@@ -1339,7 +1305,7 @@ public class JSONArrayTest {
         JSONArray a2 = new JSONArray(a1);
         assertNotNull("Should not error", a2);
         assertEquals("length", a1.length(), a2.length());
-        
+
         for(int i = 0; i < a1.length(); i++) {
             assertEquals("index " + i + " are equal", a1.get(i), a2.get(i));
         }
@@ -1347,7 +1313,7 @@ public class JSONArrayTest {
                 a1, a2
         )));
     }
-    
+
     /**
      * Verifies that the object constructor can properly handle any supported collection object.
      */
@@ -1359,7 +1325,7 @@ public class JSONArrayTest {
         a2.putAll(a1);
         assertNotNull("Should not error", a2);
         assertEquals("length", a1.length(), a2.length());
-        
+
         for(int i = 0; i < a1.length(); i++) {
             assertEquals("index " + i + " are equal", a1.get(i), a2.get(i));
         }

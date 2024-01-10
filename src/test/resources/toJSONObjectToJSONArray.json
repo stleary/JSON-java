@@ -1,0 +1,143 @@
+{
+  "expectedJSONObjectStr": {
+    "xsi:noNamespaceSchemaLocation": "test.xsd",
+    "childNodes": [
+      {
+        "childNodes": [
+          {
+            "childNodes": ["Joe Tester"],
+            "nameType": "my name",
+            "tagName": "name"
+          },
+          {
+            "childNodes": ["Baker street 5"],
+            "tagName": "street"
+          },
+          {
+            "tagName": "NothingHere",
+            "except": "an attribute"
+          },
+          {
+            "childNodes": [true],
+            "tagName": "TrueValue"
+          },
+          {
+            "childNodes": [false],
+            "tagName": "FalseValue"
+          },
+          {
+            "childNodes": [null],
+            "tagName": "NullValue"
+          },
+          {
+            "childNodes": [42],
+            "tagName": "PositiveValue"
+          },
+          {
+            "childNodes": [-23],
+            "tagName": "NegativeValue"
+          },
+          {
+            "childNodes": [-23.45],
+            "tagName": "DoubleValue"
+          },
+          {
+            "childNodes": ["-23x.45"],
+            "tagName": "Nan"
+          },
+          {
+            "childNodes": [
+              {
+                "childNodes": [1],
+                "tagName": "value"
+              },
+              {
+                "childNodes": [2],
+                "tagName": "value"
+              },
+              {
+                "childNodes": [
+                  {
+                    "childNodes": ["abc"],
+                    "svAttr": "svValue",
+                    "tagName": "subValue"
+                  }
+                ],
+                "tagName": "value"
+              },
+              {
+                "childNodes": [3],
+                "tagName": "value"
+              },
+              {
+                "childNodes": [4.1],
+                "tagName": "value"
+              },
+              {
+                "childNodes": [5.2],
+                "tagName": "value"
+              }
+            ],
+            "tagName": "ArrayOfNum"
+          }
+        ],
+        "addrType": "my address",
+        "tagName": "address"
+      }
+    ],
+    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+    "tagName": "addresses"
+  },
+  "expectedJSONArrayStr": [
+    "addresses",
+    {
+      "xsi:noNamespaceSchemaLocation": "test.xsd",
+      "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"
+    },
+    [
+      "address",
+      {
+        "addrType": "my address"
+      },
+      [
+        "name",
+        {
+          "nameType": "my name"
+        },
+        "Joe Tester"
+      ],
+      ["street", "Baker street 5"],
+      [
+        "NothingHere",
+        {
+          "except": "an attribute"
+        }
+      ],
+      ["TrueValue", true],
+      ["FalseValue", false],
+      ["NullValue", null],
+      ["PositiveValue", 42],
+      ["NegativeValue", -23],
+      ["DoubleValue", -23.45],
+      ["Nan", "-23x.45"],
+      [
+        "ArrayOfNum",
+        ["value", 1],
+        ["value", 2],
+        [
+          "value",
+          [
+            "subValue",
+            {
+              "svAttr": "svValue"
+            },
+            "abc"
+          ]
+        ],
+        ["value", 3],
+        ["value", 4.1],
+        ["value", 5.2]
+      ]
+    ]
+  ]
+}

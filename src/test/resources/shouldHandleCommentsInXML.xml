@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this is a comment -->
+<addresses>
+    <address>
+        <![CDATA[ this is -- <another> comment ]]>
+        <name>Joe Tester</name>
+        <!-- this is a - multi line
+             comment -->
+        <street>Baker street 5</street>
+    </address>
+</addresses>

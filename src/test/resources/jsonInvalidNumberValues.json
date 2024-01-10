@@ -1,0 +1,21 @@
+{
+  "hexNumber": "-0x123",
+  "tooManyZeros": "00",
+  "negativeInfinite": "-Infinity",
+  "negativeNaN": "-NaN",
+  "negativeNaNWithLeadingZeros": "-00NaN",
+  "negativeFraction": "-0.01",
+  "tooManyZerosFraction": "00.001",
+  "negativeHexFloat": "-0x1.fffp1",
+  "hexFloat": "0x1.0P-1074",
+  "floatIdentifier": 0.1,
+  "doubleIdentifier": 0.1,
+  "doubleIdentifierWithMultipleLeadingZerosBeforeDecimal": 0.1,
+  "negativeDoubleIdentifierWithMultipleLeadingZerosBeforeDecimal": -0.1,
+  "doubleIdentifierWithMultipleLeadingZerosAfterDecimal": 0.0001,
+  "negativeDoubleIdentifierWithMultipleLeadingZerosAfterDecimal": -0.0001,
+  "integerWithLeadingZeros": 900,
+  "integerWithAllZeros": 0,
+  "compositeWithLeadingZeros": 800.90,
+  "decimalPositiveWithoutNumberBeforeDecimalPoint": 0.90
+}

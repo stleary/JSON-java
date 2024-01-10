@@ -1,0 +1,17 @@
+{
+  "trueKey": true,
+  "falseKey": false,
+  "trueStrKey": "true",
+  "falseStrKey": "false",
+  "stringKey": "hello world!",
+  "intKey": 42,
+  "intStrKey": "43",
+  "longKey": 1234567890123456789,
+  "longStrKey": "987654321098765432",
+  "doubleKey": -23.45e7,
+  "doubleStrKey": "00001.000",
+  "arrayKey": [0, 1, 2],
+  "objectKey": {
+    "myKey": "myVal"
+  }
+}

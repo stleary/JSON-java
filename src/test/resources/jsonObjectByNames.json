@@ -1,0 +1,9 @@
+{
+  "trueKey": true,
+  "falseKey": false,
+  "nullKey": null,
+  "stringKey": "hello world!",
+  "escapeStringKey": "h\be\tllo w\u1234orld!",
+  "intKey": 42,
+  "doubleKey": -23.45e67
+}
