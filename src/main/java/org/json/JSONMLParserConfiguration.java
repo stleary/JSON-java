@@ -55,11 +55,13 @@ public class JSONMLParserConfiguration extends ParserConfiguration {
         );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public JSONMLParserConfiguration withKeepStrings(final boolean newVal) {
         return super.withKeepStrings(newVal);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public JSONMLParserConfiguration withMaxNestingDepth(int maxNestingDepth) {
         return super.withMaxNestingDepth(maxNestingDepth);

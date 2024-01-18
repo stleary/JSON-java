@@ -24,7 +24,7 @@ class NumberConversionUtil {
             val = "-0."+val.substring(2);
         }
         char initial = val.charAt(0);
-        if ((initial >= '0' && initial <= '9') || initial == '-' ) {
+        if ( isNumericChar(initial) || initial == '-' ) {
             // decimal representation
             if (isDecimalNotation(val)) {
                 // Use a BigDecimal all the time so we keep the original
@@ -53,13 +53,13 @@ class NumberConversionUtil {
             initial = val.charAt(0);
             if(initial == '0' && val.length() > 1) {
                 char at1 = val.charAt(1);
-                if(at1 >= '0' && at1 <= '9') {
+                if(isNumericChar(at1)) {
                     throw new NumberFormatException("val ["+input+"] is not a valid number.");
                 }
             } else if (initial == '-' && val.length() > 2) {
                 char at1 = val.charAt(1);
                 char at2 = val.charAt(2);
-                if(at1 == '0' && at2 >= '0' && at2 <= '9') {
+                if(at1 == '0' && isNumericChar(at2)) {
                     throw new NumberFormatException("val ["+input+"] is not a valid number.");
                 }
             }
@@ -81,6 +81,16 @@ class NumberConversionUtil {
             return bi;
         }
         throw new NumberFormatException("val ["+input+"] is not a valid number.");
+    }
+
+    /**
+     * Checks if the character is a numeric digit ('0' to '9').
+     *
+     * @param c The character to be checked.
+     * @return true if the character is a numeric digit, false otherwise.
+     */
+    private static boolean isNumericChar(char c) {
+        return (c <= '9' && c >= '0');
     }
 
     /**

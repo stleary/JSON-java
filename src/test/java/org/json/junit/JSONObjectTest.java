@@ -32,8 +32,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONPointerException;
+import org.json.JSONParserConfiguration;
 import org.json.JSONString;
 import org.json.JSONTokener;
+import org.json.ParserConfiguration;
 import org.json.XML;
 import org.json.junit.data.BrokenToString;
 import org.json.junit.data.ExceptionalBean;
@@ -3718,4 +3720,101 @@ public class JSONObjectTest {
             assertThrows(JSONException.class, () -> new JSONObject(bean));
         }
     }
+
+    @Test(expected = JSONException.class)
+    public void issue743SerializationMap() {
+      HashMap<String, Object> map = new HashMap<>();
+      map.put("t", map);
+      JSONObject object = new JSONObject(map);
+      String jsonString = object.toString();
+    }
+
+    @Test(expected = JSONException.class)
+    public void testCircularReferenceMultipleLevel() {
+      HashMap<String, Object> inside = new HashMap<>();
+      HashMap<String, Object> jsonObject = new HashMap<>();
+      inside.put("inside", jsonObject);
+      jsonObject.put("test", inside);
+      new JSONObject(jsonObject);
+    }
+
+    @Test
+    public void issue743SerializationMapWith512Objects() {
+        HashMap<String, Object> map  = buildNestedMap(ParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH);
+        JSONObject object = new JSONObject(map);
+        String jsonString = object.toString();
+    }
+
+    @Test
+    public void issue743SerializationMapWith1000Objects() {
+      HashMap<String, Object> map  = buildNestedMap(1000);
+      JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withMaxNestingDepth(1000);
+      JSONObject object = new JSONObject(map, parserConfiguration);
+      String jsonString = object.toString();
+    }
+
+    @Test(expected = JSONException.class)
+    public void issue743SerializationMapWith1001Objects() {
+        HashMap<String, Object> map  = buildNestedMap(1001);
+        JSONObject object = new JSONObject(map);
+        String jsonString = object.toString();
+    }
+
+    @Test(expected = JSONException.class)
+    public void testCircleReferenceFirstLevel() {
+        Map<Object, Object> jsonObject = new HashMap<>();
+
+        jsonObject.put("test", jsonObject);
+
+        new JSONObject(jsonObject, new JSONParserConfiguration());
+    }
+
+    @Test(expected = StackOverflowError.class)
+    public void testCircleReferenceMultiplyLevel_notConfigured_expectedStackOverflow() {
+        Map<Object, Object> inside = new HashMap<>();
+
+        Map<Object, Object> jsonObject = new HashMap<>();
+        inside.put("test", jsonObject);
+        jsonObject.put("test", inside);
+
+        new JSONObject(jsonObject, new JSONParserConfiguration().withMaxNestingDepth(99999));
+    }
+
+    @Test(expected = JSONException.class)
+    public void testCircleReferenceMultiplyLevel_configured_expectedJSONException() {
+        Map<Object, Object> inside = new HashMap<>();
+
+        Map<Object, Object> jsonObject = new HashMap<>();
+        inside.put("test", jsonObject);
+        jsonObject.put("test", inside);
+
+        new JSONObject(jsonObject, new JSONParserConfiguration());
+    }
+
+    @Test
+    public void testDifferentKeySameInstanceNotACircleReference() {
+        Map<Object, Object> map1 = new HashMap<>();
+        Map<Object, Object> map2 = new HashMap<>();
+
+        map1.put("test1", map2);
+        map1.put("test2", map2);
+
+        new JSONObject(map1);
+    }
+
+    /**
+     * Method to build nested map of max maxDepth
+     *
+     * @param maxDepth
+     * @return
+     */
+    public static HashMap<String, Object> buildNestedMap(int maxDepth) {
+        if (maxDepth <= 0) {
+            return new HashMap<>();
+        }
+        HashMap<String, Object> nestedMap = new HashMap<>();
+        nestedMap.put("t", buildNestedMap(maxDepth - 1));
+        return nestedMap;
+    }
+
 }
