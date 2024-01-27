@@ -1323,6 +1323,80 @@ public class XMLTest {
                 "parameter of the XMLParserConfiguration used");
         }
     }
+    @Test
+    public void testWithWhitespaceTrimmingDisabled() {
+        String originalXml = "<testXml> Test Whitespace String \t </testXml>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(false));
+        String expectedJsonString = "{\"testXml\":\" Test Whitespace String \t \"}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void testNestedWithWhitespaceTrimmingDisabled() {
+        String originalXml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "      <name> Sherlock Holmes </name>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(false));
+        String expectedJsonString = "{\"addresses\":{\"address\":{\"name\":\" Sherlock Holmes \"}}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void shouldTrimWhitespaceDoesNotSupportTagsEqualingCDataTagName() {
+    // When using withShouldTrimWhitespace = true, input containing tags with same name as cDataTagName is unsupported and should not be used in conjunction
+        String originalXml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "      <content> Sherlock Holmes </content>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(false).withcDataTagName("content"));
+        String expectedJsonString = "{\"addresses\":{\"address\":[[\"\\n      \",\" Sherlock Holmes \",\"\\n   \"]]}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void shouldTrimWhitespaceEnabledDropsTagsEqualingCDataTagNameButValueRemains() {
+        String originalXml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "      <content> Sherlock Holmes </content>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(true).withcDataTagName("content"));
+        String expectedJsonString = "{\"addresses\":{\"address\":\"Sherlock Holmes\"}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void testWithWhitespaceTrimmingEnabled() {
+        String originalXml = "<testXml> Test Whitespace String \t </testXml>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(true));
+        String expectedJsonString = "{\"testXml\":\"Test Whitespace String\"}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void testWithWhitespaceTrimmingEnabledByDefault() {
+        String originalXml = "<testXml> Test Whitespace String \t </testXml>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration());
+        String expectedJsonString = "{\"testXml\":\"Test Whitespace String\"}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
 }
 
 
