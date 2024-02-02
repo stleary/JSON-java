@@ -148,6 +148,11 @@ public class JSONObject {
      */
     private final Map<String, Object> map;
 
+    /**
+     * Retrieves the type of the underlying Map in this class.
+     *
+     * @return The class object representing the type of the underlying Map.
+     */
     public Class<? extends Map> getMapType() {
         return map.getClass();
     }
@@ -369,7 +374,6 @@ public class JSONObject {
      * &#64;JSONPropertyIgnore
      * public String getName() { return this.name; }
      * </pre>
-     * <p>
      *
      * @param bean
      *            An object that has getter methods that should be used to make
@@ -2232,6 +2236,14 @@ public class JSONObject {
         }
     }
 
+    /**
+     * Quotes a string and appends the result to a given Writer.
+     *
+     * @param string The input string to be quoted.
+     * @param w      The Writer to which the quoted string will be appended.
+     * @return The same Writer instance after appending the quoted string.
+     * @throws IOException If an I/O error occurs while writing to the Writer.
+     */
     public static Writer quote(String string, Writer w) throws IOException {
         if (string == null || string.isEmpty()) {
             w.write("\"\"");

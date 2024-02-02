@@ -352,9 +352,20 @@ public class XMLParserConfiguration extends ParserConfiguration {
         return clonedConfiguration;
     }
 
+    /**
+     * Checks if the parser should automatically close empty XML tags.
+     *
+     * @return {@code true} if empty XML tags should be automatically closed, {@code false} otherwise.
+     */
     public boolean isCloseEmptyTag() {
         return this.closeEmptyTag;
     }
+
+    /**
+     * Checks if the parser should trim white spaces from XML content.
+     *
+     * @return {@code true} if white spaces should be trimmed, {@code false} otherwise.
+     */
     public boolean shouldTrimWhiteSpace() {
         return this.shouldTrimWhiteSpace;
     }

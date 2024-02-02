@@ -56,6 +56,9 @@ public class XML {
      */
     public static final String NULL_ATTR = "xsi:nil";
 
+    /**
+     * Represents the XML attribute name for specifying type information.
+     */
     public static final String TYPE_ATTR = "xsi:type";
 
     /**
