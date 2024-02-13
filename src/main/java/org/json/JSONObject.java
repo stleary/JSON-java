@@ -256,7 +256,7 @@ public class JSONObject {
 
                         case MERGE_INTO_ARRAY:
                             if (mergedKeys == null) {
-                                mergedKeys = new ArrayList<>();
+                                mergedKeys = new ArrayList<String>();
                             }
 
                             Object current = this.get(key);

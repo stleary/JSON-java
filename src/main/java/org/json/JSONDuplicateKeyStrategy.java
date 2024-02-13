@@ -6,7 +6,7 @@ package org.json;
  */
 public enum JSONDuplicateKeyStrategy {
     /**
-     * The default value. And this is the way it used to be in the previous versions.<br/>
+     * The default value. And this is the way it used to be in the previous versions.<br>
      * The JSONParser will throw an {@link JSONException} when meet duplicate key.
      */
     THROW_EXCEPTION,
