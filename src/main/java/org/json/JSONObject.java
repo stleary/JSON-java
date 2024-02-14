@@ -212,10 +212,6 @@ public class JSONObject {
         this();
         char c;
         String key;
-        JSONDuplicateKeyStrategy duplicateKeyStrategy = jsonParserConfiguration.getDuplicateKeyStrategy();
-
-        // A list to store merged keys
-        List<String> mergedKeys = null;
 
         if (x.nextClean() != '{') {
             throw x.syntaxError("A JSONObject text must begin with '{'");
@@ -243,44 +239,14 @@ public class JSONObject {
             if (key != null) {
                 // Check if key exists
                 boolean keyExists = this.opt(key) != null;
-                // Read value early to make the tokener work well
-                Object value = null;
-                if (!keyExists || duplicateKeyStrategy != JSONDuplicateKeyStrategy.THROW_EXCEPTION) {
-                    value = x.nextValue();
+                if (keyExists && !jsonParserConfiguration.isOverwriteDuplicateKey()) {
+                    throw x.syntaxError("Duplicate key \"" + key + "\"");
                 }
 
-                if (keyExists) {
-                    switch (duplicateKeyStrategy) {
-                        case THROW_EXCEPTION:
-                            throw x.syntaxError("Duplicate key \"" + key + "\"");
-
-                        case MERGE_INTO_ARRAY:
-                            if (mergedKeys == null) {
-                                mergedKeys = new ArrayList<String>();
-                            }
-
-                            Object current = this.get(key);
-                            if (current instanceof JSONArray && mergedKeys.contains(key)) {
-                                ((JSONArray) current).put(value);
-                                break;
-                            }
-
-                            JSONArray merged = new JSONArray();
-                            merged.put(current);
-                            merged.put(value);
-                            this.put(key, merged);
-                            mergedKeys.add(key);
-                            break;
-                    }
-
-                    // == IGNORE, ignored :)
-                }
-
-                if (!keyExists || duplicateKeyStrategy == JSONDuplicateKeyStrategy.OVERWRITE) {
-                    // Only add value if non-null
-                    if (value != null) {
-                        this.put(key, value);
-                    }
+                Object value = x.nextValue();
+                // Only add value if non-null
+                if (value != null) {
+                    this.put(key, value);
                 }
             }
 

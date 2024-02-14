@@ -5,25 +5,27 @@ package org.json;
  */
 public class JSONParserConfiguration extends ParserConfiguration {
     /**
-     * The way should be used to handle duplicate keys.
+     * Used to indicate whether to overwrite duplicate key or not.
      */
-    private JSONDuplicateKeyStrategy duplicateKeyStrategy;
+    private boolean overwriteDuplicateKey;
 
     /**
      * Configuration with the default values.
      */
     public JSONParserConfiguration() {
-        this(JSONDuplicateKeyStrategy.THROW_EXCEPTION);
+        this(false);
     }
 
     /**
-     * Configure the parser with {@link JSONDuplicateKeyStrategy}.
+     * Configure the parser with argument overwriteDuplicateKey.
      *
-     * @param duplicateKeyStrategy Indicate which way should be used to handle duplicate keys.
+     * @param overwriteDuplicateKey Indicate whether to overwrite duplicate key or not.<br>
+     *                              If not, the JSONParser will throw a {@link JSONException}
+     *                              when meeting duplicate keys.
      */
-    public JSONParserConfiguration(JSONDuplicateKeyStrategy duplicateKeyStrategy) {
+    public JSONParserConfiguration(boolean overwriteDuplicateKey) {
         super();
-        this.duplicateKeyStrategy = duplicateKeyStrategy;
+        this.overwriteDuplicateKey = overwriteDuplicateKey;
     }
 
     @Override
@@ -37,14 +39,14 @@ public class JSONParserConfiguration extends ParserConfiguration {
         return super.withMaxNestingDepth(maxNestingDepth);
     }
 
-    public JSONParserConfiguration withDuplicateKeyStrategy(final JSONDuplicateKeyStrategy duplicateKeyStrategy) {
+    public JSONParserConfiguration withOverwriteDuplicateKey(final boolean overwriteDuplicateKey) {
         JSONParserConfiguration newConfig = this.clone();
-        newConfig.duplicateKeyStrategy = duplicateKeyStrategy;
+        newConfig.overwriteDuplicateKey = overwriteDuplicateKey;
 
         return newConfig;
     }
 
-    public JSONDuplicateKeyStrategy getDuplicateKeyStrategy() {
-        return this.duplicateKeyStrategy;
+    public boolean isOverwriteDuplicateKey() {
+        return this.overwriteDuplicateKey;
     }
 }
