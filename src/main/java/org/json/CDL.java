@@ -40,37 +40,37 @@ public class CDL {
         do {
             c = x.next();
         } while (c == ' ' || c == '\t');
-		if (c == 0) {
-			return null;
-		} else if (c == '"' || c == '\'') {
-			q = c;
-			sb = new StringBuilder();
-			for (;;) {
-				c = x.next();
-				if (c == q) {
-					//Handle escaped double-quote
-					char nextC = x.next();
-					if (nextC != '\"') {
-						// if our quote was the end of the file, don't step
-						if (nextC > 0) {
-							x.back();
-						}
-						break;
-					}
-				}
-				if (c == 0 || c == '\n' || c == '\r') {
-					throw x.syntaxError("Missing close quote '" + q + "'.");
-				}
-				sb.append(c);
-			}
-			return sb.toString();
-		} else if (c == delimiter) {
-			x.back();
-			return "";
-		}
-		x.back();
-		return x.nextTo(delimiter);
-	}
+        if (c == 0) {
+            return null;
+        } else if (c == '"' || c == '\'') {
+            q = c;
+            sb = new StringBuilder();
+            for (;;) {
+                c = x.next();
+                if (c == q) {
+                    //Handle escaped double-quote
+                    char nextC = x.next();
+                    if (nextC != '\"') {
+                        // if our quote was the end of the file, don't step
+                        if (nextC > 0) {
+                            x.back();
+                        }
+                        break;
+                    }
+                }
+                if (c == 0 || c == '\n' || c == '\r') {
+                    throw x.syntaxError("Missing close quote '" + q + "'.");
+                }
+                sb.append(c);
+            }
+            return sb.toString();
+        } else if (c == delimiter) {
+            x.back();
+            return "";
+        }
+        x.back();
+        return x.nextTo(delimiter);
+    }
 
     /**
      * Produce a JSONArray of strings from a row of comma delimited values.
@@ -83,8 +83,11 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #rowToJSONArray(JSONTokener)}, but with a custom delimiter.
-     * @see #rowToJSONArray(JSONTokener)
+     * Produce a JSONArray of strings from a row of comma delimited values.
+     * @param x A JSONTokener of the source text.
+     * @param delimiter custom delimiter char
+     * @return A JSONArray of strings.
+     * @throws JSONException if a called function fails
      */
     public static JSONArray rowToJSONArray(JSONTokener x, char delimiter) throws JSONException {
         JSONArray ja = new JSONArray();
@@ -127,9 +130,15 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #rowToJSONObject(JSONArray, JSONTokener)}, but with a custom {@code delimiter}.
-     * 
-     * @see #rowToJSONObject(JSONArray, JSONTokener) 
+     * Produce a JSONObject from a row of comma delimited text, using a
+     * parallel JSONArray of strings to provides the names of the elements.
+     * @param names A JSONArray of names. This is commonly obtained from the
+     *  first row of a comma delimited text file using the rowToJSONArray
+     *  method.
+     * @param x A JSONTokener of the source text.
+     * @param delimiter custom delimiter char
+     * @return A JSONObject combining the names and values.
+     * @throws JSONException if a called function fails
      */
     public static JSONObject rowToJSONObject(JSONArray names, JSONTokener x, char delimiter) throws JSONException {
         JSONArray ja = rowToJSONArray(x, delimiter);
@@ -148,8 +157,12 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #rowToString(JSONArray)}, but with a custom delimiter.
-     * @see  #rowToString(JSONArray)
+     * Produce a comma delimited text row from a JSONArray. Values containing
+     * the comma character will be quoted. Troublesome characters may be
+     * removed.
+     * @param ja A JSONArray of strings.
+     * @param delimiter custom delimiter char
+     * @return A string ending in NEWLINE.
      */
     public static String rowToString(JSONArray ja, char delimiter) {
         StringBuilder sb = new StringBuilder();
@@ -193,8 +206,12 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #toJSONArray(String)}, but with a custom delimiter.
-     * @see #toJSONArray(String)
+     * Produce a JSONArray of JSONObjects from a comma delimited text string,
+     * using the first row as a source of names.
+     * @param string The comma delimited text.
+     * @param delimiter custom delimiter char
+     * @return A JSONArray of JSONObjects.
+     * @throws JSONException if a called function fails
      */
     public static JSONArray toJSONArray(String string, char delimiter) throws JSONException {
         return toJSONArray(new JSONTokener(string), delimiter);
@@ -212,8 +229,12 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #toJSONArray(JSONTokener)}, but with a custom delimiter.
-     * @see #toJSONArray(JSONTokener)
+     * Produce a JSONArray of JSONObjects from a comma delimited text string,
+     * using the first row as a source of names.
+     * @param x The JSONTokener containing the comma delimited text.
+     * @param delimiter custom delimiter char
+     * @return A JSONArray of JSONObjects.
+     * @throws JSONException if a called function fails
      */
     public static JSONArray toJSONArray(JSONTokener x, char delimiter) throws JSONException {
         return toJSONArray(rowToJSONArray(x, delimiter), x, delimiter);
@@ -232,8 +253,13 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #toJSONArray(JSONArray, String)}, but with a custom delimiter.
-     * @see #toJSONArray(JSONArray, String)
+     * Produce a JSONArray of JSONObjects from a comma delimited text string
+     * using a supplied JSONArray as the source of element names.
+     * @param names A JSONArray of strings.
+     * @param string The comma delimited text.
+     * @param delimiter custom delimiter char
+     * @return A JSONArray of JSONObjects.
+     * @throws JSONException if a called function fails
      */
     public static JSONArray toJSONArray(JSONArray names, String string, char delimiter) throws JSONException {
         return toJSONArray(names, new JSONTokener(string), delimiter);
@@ -252,8 +278,13 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #toJSONArray(JSONArray, JSONTokener)}, but with a custom delimiter.
-     * @see #toJSONArray(JSONArray, JSONTokener)
+     * Produce a JSONArray of JSONObjects from a comma delimited text string
+     * using a supplied JSONArray as the source of element names.
+     * @param names A JSONArray of strings.
+     * @param x A JSONTokener of the source text.
+     * @param delimiter custom delimiter char
+     * @return A JSONArray of JSONObjects.
+     * @throws JSONException if a called function fails
      */
     public static JSONArray toJSONArray(JSONArray names, JSONTokener x, char delimiter) throws JSONException {
         if (names == null || names.length() == 0) {
@@ -287,8 +318,13 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #toString(JSONArray)}, but with a custom delimiter.
-     * @see #toString(JSONArray)
+     * Produce a comma delimited text from a JSONArray of JSONObjects. The
+     * first row will be a list of names obtained by inspecting the first
+     * JSONObject.
+     * @param ja A JSONArray of JSONObjects.
+     * @param delimiter custom delimiter char
+     * @return A comma delimited text.
+     * @throws JSONException if a called function fails
      */
     public static String toString(JSONArray ja, char delimiter) throws JSONException {
         JSONObject jo = ja.optJSONObject(0);
@@ -315,8 +351,14 @@ public class CDL {
     }
 
     /**
-     * Same as {@link #toString(JSONArray,JSONArray)}, but with a custom delimiter.
-     * @see #toString(JSONArray,JSONArray)
+     * Produce a comma delimited text from a JSONArray of JSONObjects using
+     * a provided list of names. The list of names is not included in the
+     * output.
+     * @param names A JSONArray of strings.
+     * @param ja A JSONArray of JSONObjects.
+     * @param delimiter custom delimiter char
+     * @return A comma delimited text.
+     * @throws JSONException if a called function fails
      */
     public static String toString(JSONArray names, JSONArray ja, char delimiter) throws JSONException {
         if (names == null || names.length() == 0) {
