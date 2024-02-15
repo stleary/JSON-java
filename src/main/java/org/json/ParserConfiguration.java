@@ -29,11 +29,20 @@ public class ParserConfiguration {
      */
     protected int maxNestingDepth;
 
+    /**
+     * Constructs a new ParserConfiguration with default settings.
+     */
     public ParserConfiguration() {
         this.keepStrings = false;
         this.maxNestingDepth = DEFAULT_MAXIMUM_NESTING_DEPTH;
     }
 
+    /**
+     * Constructs a new ParserConfiguration with the specified settings.
+     *
+     * @param keepStrings     A boolean indicating whether to preserve strings during parsing.
+     * @param maxNestingDepth An integer representing the maximum allowed nesting depth.
+     */
     protected ParserConfiguration(final boolean keepStrings, final int maxNestingDepth) {
         this.keepStrings = keepStrings;
         this.maxNestingDepth = maxNestingDepth;

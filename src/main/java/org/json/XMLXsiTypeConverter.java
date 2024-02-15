@@ -42,5 +42,12 @@ Public Domain.
  * @param <T> return type of convert method
  */
 public interface XMLXsiTypeConverter<T> {
+
+    /**
+     * Converts an XML xsi:type attribute value to the specified type {@code T}.
+     *
+     * @param value The string representation of the XML xsi:type attribute value to be converted.
+     * @return An object of type {@code T} representing the converted value.
+     */
     T convert(String value);
 }
