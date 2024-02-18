@@ -13,6 +13,12 @@ import java.util.Locale;
  */
 public class HTTP {
 
+    /**
+     * Constructs a new HTTP object.
+     */
+    public HTTP() {
+    }
+
     /** Carriage return/line feed. */
     public static final String CRLF = "\r\n";
 
