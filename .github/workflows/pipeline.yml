@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         # build against supported Java LTS versions:
         java: [ 8, 11, 17, 21 ]
