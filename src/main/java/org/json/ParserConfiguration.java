@@ -20,12 +20,12 @@ public class ParserConfiguration {
 
     /**
      * Specifies if values should be kept as strings (<code>true</code>), or if
-     * they should try to be guessed into JSON values (numeric, boolean, string)
+     * they should try to be guessed into JSON values (numeric, boolean, string).
      */
     protected boolean keepStrings;
 
     /**
-     * The maximum nesting depth when parsing a document.
+     * The maximum nesting depth when parsing an object.
      */
     protected int maxNestingDepth;
 
@@ -59,14 +59,14 @@ public class ParserConfiguration {
         // map should be cloned as well. If the values of the map are known to also
         // be immutable, then a shallow clone of the map is acceptable.
         return new ParserConfiguration(
-            this.keepStrings,
-            this.maxNestingDepth
+                this.keepStrings,
+                this.maxNestingDepth
         );
     }
 
     /**
      * When parsing the XML into JSONML, specifies if values should be kept as strings (<code>true</code>), or if
-     * they should try to be guessed into JSON values (numeric, boolean, string)
+     * they should try to be guessed into JSON values (numeric, boolean, string).
      *
      * @return The <code>keepStrings</code> configuration value.
      */
@@ -78,22 +78,21 @@ public class ParserConfiguration {
      * When parsing the XML into JSONML, specifies if values should be kept as strings (<code>true</code>), or if
      * they should try to be guessed into JSON values (numeric, boolean, string)
      *
-     * @param newVal
-     *      new value to use for the <code>keepStrings</code> configuration option.
-     * @param <T> the type of the configuration object
-     * 
+     * @param newVal new value to use for the <code>keepStrings</code> configuration option.
+     * @param <T>    the type of the configuration object
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
     @SuppressWarnings("unchecked")
     public <T extends ParserConfiguration> T withKeepStrings(final boolean newVal) {
-        T newConfig = (T)this.clone();
+        T newConfig = (T) this.clone();
         newConfig.keepStrings = newVal;
         return newConfig;
     }
 
     /**
      * The maximum nesting depth that the parser will descend before throwing an exception
-     * when parsing the XML into JSONML.
+     * when parsing an object (e.g. Map, Collection) into JSON-related objects.
+     *
      * @return the maximum nesting depth set for this configuration
      */
     public int getMaxNestingDepth() {
@@ -102,18 +101,19 @@ public class ParserConfiguration {
 
     /**
      * Defines the maximum nesting depth that the parser will descend before throwing an exception
-     * when parsing the XML into JSONML. The default max nesting depth is 512, which means the parser
-     * will throw a JsonException if the maximum depth is reached.
+     * when parsing an object (e.g. Map, Collection) into JSON-related objects.
+     * The default max nesting depth is 512, which means the parser will throw a JsonException if
+     * the maximum depth is reached.
      * Using any negative value as a parameter is equivalent to setting no limit to the nesting depth,
      * which means the parses will go as deep as the maximum call stack size allows.
+     *
      * @param maxNestingDepth the maximum nesting depth allowed to the XML parser
-     * @param <T> the type of the configuration object
-     * 
+     * @param <T>             the type of the configuration object
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
     @SuppressWarnings("unchecked")
     public <T extends ParserConfiguration> T withMaxNestingDepth(int maxNestingDepth) {
-        T newConfig = (T)this.clone();
+        T newConfig = (T) this.clone();
 
         if (maxNestingDepth > UNDEFINED_MAXIMUM_NESTING_DEPTH) {
             newConfig.maxNestingDepth = maxNestingDepth;
