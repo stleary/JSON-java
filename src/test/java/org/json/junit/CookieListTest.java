@@ -81,8 +81,8 @@ public class CookieListTest {
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("Expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
-        assertTrue("expected 31d4d96e407aad42", "31d4d96e407aad42".equals(jsonObject.query("/SID")));
+        assertEquals("Expected 1 top level item", 1, ((Map<?, ?>) (JsonPath.read(doc, "$"))).size());
+        assertEquals("expected 31d4d96e407aad42 for key SID", "31d4d96e407aad42", jsonObject.query("/SID"));
     }
 
     /**
@@ -94,8 +94,8 @@ public class CookieListTest {
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("Expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);
-        assertTrue("expected 31d4d96e407aad42", "31d4d96e407aad42".equals(jsonObject.query("/SID")));
+        assertEquals("Expected 1 top level item", 1, ((Map<?, ?>) (JsonPath.read(doc, "$"))).size());
+        assertEquals("expected 31d4d96e407aad42 for key SID", "31d4d96e407aad42", jsonObject.query("/SID"));
     }
 
     /**
@@ -114,13 +114,13 @@ public class CookieListTest {
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("Expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected myCookieValue1", "myCookieValue1".equals(jsonObject.query("/name1")));
-        assertTrue("expected myCookieValue2", "myCookieValue2".equals(jsonObject.query("/name2")));
-        assertTrue("expected myCookieValue3", "myCookieValue3".equals(jsonObject.query("/name3")));
-        assertTrue("expected myCookieValue4", "myCookieValue4".equals(jsonObject.query("/name4")));
-        assertTrue("expected myCookieValue5", "myCookieValue5".equals(jsonObject.query("/name5")));
-        assertTrue("expected myCookieValue6", "myCookieValue6".equals(jsonObject.query("/name6")));
+        assertEquals("Expected 6 top level items", 6, ((Map<?, ?>) (JsonPath.read(doc, "$"))).size());
+        assertEquals("expected myCookieValue1 for key name1", "myCookieValue1", jsonObject.query("/name1"));
+        assertEquals("expected myCookieValue2 for key name2", "myCookieValue2", jsonObject.query("/name2"));
+        assertEquals("expected myCookieValue3 for key name3", "myCookieValue3", jsonObject.query("/name3"));
+        assertEquals("expected myCookieValue4 for key name4", "myCookieValue4", jsonObject.query("/name4"));
+        assertEquals("expected myCookieValue5 for key name5", "myCookieValue5", jsonObject.query("/name5"));
+        assertEquals("expected myCookieValue6 for key name6", "myCookieValue6", jsonObject.query("/name6"));
     }
 
     /**
@@ -131,7 +131,7 @@ public class CookieListTest {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("key",  JSONObject.NULL);
         String cookieToStr = CookieList.toString(jsonObject);
-        assertTrue("toString() should be empty", "".equals(cookieToStr));
+        assertEquals("toString() should be empty", "", cookieToStr);
     }
 
     /**
@@ -154,13 +154,13 @@ public class CookieListTest {
 
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("Expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected myCookieValue1", "myCookieValue1".equals(jsonObject.query("/name1")));
-        assertTrue("expected myCookieValue2", "myCookieValue2".equals(jsonObject.query("/name2")));
-        assertTrue("expected myCookieValue3", "myCookieValue3".equals(jsonObject.query("/name3")));
-        assertTrue("expected myCookieValue4", "myCookieValue4".equals(jsonObject.query("/name4")));
-        assertTrue("expected myCookieValue5", "myCookieValue5".equals(jsonObject.query("/name5")));
-        assertTrue("expected myCookieValue6", "myCookieValue6".equals(jsonObject.query("/name6")));
+        assertEquals("Expected 6 top level items", 6, ((Map<?, ?>) (JsonPath.read(doc, "$"))).size());
+        assertEquals("expected myCookieValue1 for key name1", "myCookieValue1", jsonObject.query("/name1"));
+        assertEquals("expected myCookieValue2 for key name2", "myCookieValue2", jsonObject.query("/name2"));
+        assertEquals("expected myCookieValue3 for key name3", "myCookieValue3", jsonObject.query("/name3"));
+        assertEquals("expected myCookieValue4 for key name4", "myCookieValue4", jsonObject.query("/name4"));
+        assertEquals("expected myCookieValue5 for key name5", "myCookieValue5", jsonObject.query("/name5"));
+        assertEquals("expected myCookieValue6 for key name6", "myCookieValue6", jsonObject.query("/name6"));
     }
 
     /**
@@ -179,12 +179,12 @@ public class CookieListTest {
         JSONObject jsonObject = CookieList.toJSONObject(cookieStr);
         // validate JSON content
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("Expected 6 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 6);
-        assertTrue("expected myCookieValue1", "myCookieValue1".equals(jsonObject.query("/name1")));
-        assertTrue("expected my Cookie Value 2", "my Cookie Value 2".equals(jsonObject.query("/name2")));
-        assertTrue("expected my+Cookie&Value;3=", "my+Cookie&Value;3=".equals(jsonObject.query("/name3")));
-        assertTrue("expected my%CookieValue4", "my%CookieValue4".equals(jsonObject.query("/name4")));
-        assertTrue("expected my%CookieValue5", "myCookieValue5".equals(jsonObject.query("/name5")));
-        assertTrue("expected myCookieValue6", "myCookieValue6".equals(jsonObject.query("/name6")));
+        assertEquals("Expected 6 top level items", 6, ((Map<?, ?>) (JsonPath.read(doc, "$"))).size());
+        assertEquals("expected myCookieValue1 for key name1", "myCookieValue1", jsonObject.query("/name1"));
+        assertEquals("expected my Cookie Value 2 for key name2", "my Cookie Value 2", jsonObject.query("/name2"));
+        assertEquals("expected my+Cookie&Value;3= for key name3", "my+Cookie&Value;3=", jsonObject.query("/name3"));
+        assertEquals("expected my%CookieValue4 for key name4", "my%CookieValue4", jsonObject.query("/name4"));
+        assertEquals("expected my%CookieValue5 for key name5", "myCookieValue5", jsonObject.query("/name5"));
+        assertEquals("expected myCookieValue6 for key name6", "myCookieValue6", jsonObject.query("/name6"));
     }
 }
