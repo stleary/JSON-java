@@ -1659,11 +1659,33 @@ public class JSONArray implements Iterable<Object> {
      */
     @Override
     public String toString() {
+        StringBuilder sb = new StringBuilder();
         try {
-            return this.toString(0);
-        } catch (Exception e) {
+            write(sb);
+        } catch (JSONException e) {
             return null;
         }
+        return sb.toString();
+    }
+
+    StringBuilder write(StringBuilder sb) {
+        boolean needsComma = false;
+        int length = this.length();
+        sb.append('[');
+
+        for (int i = 0; i < length; i++) {
+            if (needsComma) {
+                sb.append(',');
+            }
+            try {
+                JSONObject.writeValue(sb, this.myArrayList.get(i));
+            } catch (Exception e) {
+                throw new JSONException("Unable to write JSONArray value at index: " + i, e);
+            }
+            needsComma = true;
+        }
+        sb.append(']');
+        return sb;
     }
 
     /**

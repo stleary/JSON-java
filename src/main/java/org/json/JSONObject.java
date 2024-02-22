@@ -2523,11 +2523,164 @@ public class JSONObject {
      */
     @Override
     public String toString() {
+        StringBuilder sb = new StringBuilder();
         try {
-            return this.toString(0);
-        } catch (Exception e) {
+            try {
+                boolean needsComma = false;
+                sb.append('{');
+
+                for (final Entry<String, ?> entry : this.entrySet()) {
+                    if (needsComma) {
+                        sb.append(',');
+                    }
+                    final String key = entry.getKey();
+                    sb.append(quote(key));
+                    sb.append(':');
+                    writeValue(sb, entry.getValue());
+                    needsComma = true;
+                }
+                sb.append('}');
+            } catch (IOException exception) {
+                throw new JSONException(exception);
+            }
+        } catch (JSONException e) {
             return null;
         }
+        return sb.toString();
+    }
+
+    static final StringBuilder writeValue(StringBuilder sb, Object value) throws JSONException, IOException {
+        if (value == null || value.equals(null)) {
+            sb.append("null");
+        } else if (value instanceof String) {
+            // assuming most values are Strings, so checking this first
+            quote(value.toString(), sb);
+            return sb;
+        } else if (value instanceof JSONString) {
+            Object o;
+            try {
+                o = ((JSONString) value).toJSONString();
+            } catch (Exception e) {
+                throw new JSONException(e);
+            }
+            sb.append(o != null ? o.toString() : quote(value.toString()));
+        } else if (value instanceof Number) {
+            final String numberAsString = numberToString((Number) value);
+            if (NUMBER_PATTERN.matcher(numberAsString).matches()) {
+                sb.append(numberAsString);
+            } else {
+                quote(numberAsString, sb);
+            }
+        } else if (value instanceof Boolean) {
+            sb.append(value.toString());
+        } else if (value instanceof Enum<?>) {
+            sb.append(quote(((Enum<?>) value).name()));
+        } else if (value instanceof JSONObject) {
+            try {
+                boolean needsComma = false;
+                sb.append('{');
+                for (final Entry<String, ?> entry : ((JSONObject) value).entrySet()) {
+                    if (needsComma) {
+                        sb.append(',');
+                    }
+                    final String key = entry.getKey();
+                    sb.append(quote(key));
+                    sb.append(':');
+                    writeValue(sb, entry.getValue());
+                    needsComma = true;
+                }
+                sb.append('}');
+            } catch (IOException exception) {
+                throw new JSONException(exception);
+            }
+        } else if (value instanceof JSONArray) {
+            ((JSONArray) value).write(sb);
+        } else if (value instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            JSONObject jsonObject = new JSONObject(map);
+            try {
+                boolean needsComma = false;
+                sb.append('{');
+                for (final Entry<String, ?> entry : jsonObject.entrySet()) {
+                    if (needsComma) {
+                        sb.append(',');
+                    }
+                    final String key = entry.getKey();
+                    sb.append(quote(key));
+                    sb.append(':');
+                    writeValue(sb, entry.getValue());
+                    needsComma = true;
+                }
+                sb.append('}');
+            } catch (IOException exception) {
+                throw new JSONException(exception);
+            }
+        } else if (value instanceof Collection) {
+            Collection<?> coll = (Collection<?>) value;
+            new JSONArray(coll).write(sb);
+        } else if (value.getClass().isArray()) {
+            new JSONArray(value).write(sb);
+        } else {
+            quote(value.toString(), sb);
+        }
+        return sb;
+    }
+
+    static final void quote(String string, StringBuilder sb) {
+        if (string == null || string.length() == 0) {
+            sb.append("\"\"");
+            return;
+        }
+        char         before;
+        char         c = 0;
+        String       hexValue;
+        int          i;
+        int          length = string.length();
+
+        sb.append('"');
+        for (i = 0; i < length; i += 1) {
+            before = c;
+            c = string.charAt(i);
+            switch (c) {
+                case '\\':
+                case '"':
+                    sb.append('\\');
+                    sb.append(c);
+                    break;
+                case '/':
+                    if (before == '<') {
+                        sb.append('\\');
+                    }
+                    sb.append(c);
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                default:
+                    if (c < ' ' || (c >= '\u0080' && c < '\u00a0') ||
+                            (c >= '\u2000' && c < '\u2100')) {
+                        sb.append("\\u");
+                        hexValue = Integer.toHexString(c);
+                        sb.append("0000", 0, 4 - hexValue.length());
+                        sb.append(hexValue);
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        sb.append('"');
     }
 
     /**
