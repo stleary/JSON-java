@@ -24,6 +24,12 @@ import static org.json.NumberConversionUtil.stringToNumber;
 @SuppressWarnings("boxing")
 public class XML {
 
+    /**
+     * Constructs a new XML object.
+     */
+    public XML() {
+    }
+
     /** The Character '&amp;'. */
     public static final Character AMP = '&';
 
