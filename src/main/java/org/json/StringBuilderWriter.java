@@ -10,16 +10,11 @@ import java.io.Writer;
 class StringBuilderWriter extends Writer {
     private final StringBuilder builder;
 
+    /**
+     * Create a new string builder writer using the default initial string-builder buffer size.
+     */
     StringBuilderWriter() {
         builder = new StringBuilder();
-        lock = builder;
-    }
-
-    StringBuilderWriter(int initialSize) {
-        if (initialSize < 0) {
-            throw new IllegalArgumentException("Negative buffer size");
-        }
-        builder = new StringBuilder(initialSize);
         lock = builder;
     }
 
@@ -29,7 +24,7 @@ class StringBuilderWriter extends Writer {
     }
 
     @Override
-    public void write(char cbuf[], int offset, int length) {
+    public void write(char[] cbuf, int offset, int length) {
         if ((offset < 0) || (offset > cbuf.length) || (length < 0) ||
                 ((offset + length) > cbuf.length) || ((offset + length) < 0)) {
             throw new IndexOutOfBoundsException();
@@ -57,7 +52,9 @@ class StringBuilderWriter extends Writer {
 
     @Override
     public StringBuilderWriter append(CharSequence csq, int start, int end) {
-        if (csq == null) csq = "null";
+        if (csq == null) {
+            csq = "null";
+        }
         return append(csq.subSequence(start, end));
     }
 
