@@ -5,7 +5,6 @@ Public Domain.
  */
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -1695,7 +1694,7 @@ public class JSONArray implements Iterable<Object> {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        StringWriter sw = new StringWriter();
+        Writer sw = new StringBuilderWriter();
         return this.write(sw, indentFactor, 0).toString();
     }
 

@@ -6,7 +6,6 @@ Public Domain.
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -2227,7 +2226,7 @@ public class JSONObject {
      */
     @SuppressWarnings("resource")
     public static String quote(String string) {
-        StringWriter sw = new StringWriter();
+        Writer sw = new StringBuilderWriter();
         try {
             return quote(string, sw).toString();
         } catch (IOException ignored) {
@@ -2558,7 +2557,7 @@ public class JSONObject {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        StringWriter w = new StringWriter();
+        Writer w = new StringBuilderWriter();
         return this.write(w, indentFactor, 0).toString();
     }
 
