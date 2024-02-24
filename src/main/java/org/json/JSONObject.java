@@ -28,9 +28,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.json.NumberConversionUtil.potentialNumber;
-import static org.json.NumberConversionUtil.stringToNumber;
-
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
  * form is a string wrapped in curly braces with colons between the names and
@@ -2460,7 +2457,8 @@ public class JSONObject {
          * produced, then the value will just be a string.
          */
 
-        if (potentialNumber(string)) {
+        char initial = string.charAt(0);
+        if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
                 return stringToNumber(string);
             } catch (Exception ignore) {
@@ -2469,8 +2467,75 @@ public class JSONObject {
         return string;
     }
 
+    /**
+     * Converts a string to a number using the narrowest possible type. Possible
+     * returns for this function are BigDecimal, Double, BigInteger, Long, and Integer.
+     * When a Double is returned, it should always be a valid Double and not NaN or +-infinity.
+     *
+     * @param val value to convert
+     * @return Number representation of the value.
+     * @throws NumberFormatException thrown if the value is not a valid number. A public
+     *      caller should catch this and wrap it in a {@link JSONException} if applicable.
+     */
+    protected static Number stringToNumber(final String val) throws NumberFormatException {
+        char initial = val.charAt(0);
+        if ((initial >= '0' && initial <= '9') || initial == '-') {
+            // decimal representation
+            if (isDecimalNotation(val)) {
+                // Use a BigDecimal all the time so we keep the original
+                // representation. BigDecimal doesn't support -0.0, ensure we
+                // keep that by forcing a decimal.
+                try {
+                    BigDecimal bd = new BigDecimal(val);
+                    if(initial == '-' && BigDecimal.ZERO.compareTo(bd)==0) {
+                        return Double.valueOf(-0.0);
+                    }
+                    return bd;
+                } catch (NumberFormatException retryAsDouble) {
+                    // this is to support "Hex Floats" like this: 0x1.0P-1074
+                    try {
+                        Double d = Double.valueOf(val);
+                        if(d.isNaN() || d.isInfinite()) {
+                            throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                        }
+                        return d;
+                    } catch (NumberFormatException ignore) {
+                        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                    }
+                }
+            }
+            // block items like 00 01 etc. Java number parsers treat these as Octal.
+            if(initial == '0' && val.length() > 1) {
+                char at1 = val.charAt(1);
+                if(at1 >= '0' && at1 <= '9') {
+                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                }
+            } else if (initial == '-' && val.length() > 2) {
+                char at1 = val.charAt(1);
+                char at2 = val.charAt(2);
+                if(at1 == '0' && at2 >= '0' && at2 <= '9') {
+                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                }
+            }
+            // integer representation.
+            // This will narrow any values to the smallest reasonable Object representation
+            // (Integer, Long, or BigInteger)
 
-
+            // BigInteger down conversion: We use a similar bitLength compare as
+            // BigInteger#intValueExact uses. Increases GC, but objects hold
+            // only what they need. i.e. Less runtime overhead if the value is
+            // long lived.
+            BigInteger bi = new BigInteger(val);
+            if(bi.bitLength() <= 31){
+                return Integer.valueOf(bi.intValue());
+            }
+            if(bi.bitLength() <= 63){
+                return Long.valueOf(bi.longValue());
+            }
+            return bi;
+        }
+        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+    }
 
     /**
      * Throw an exception if the object is a NaN or infinite number.
@@ -2896,5 +2961,23 @@ public class JSONObject {
         );
     }
 
-
+    /**
+     * For a prospective number, remove the leading zeros
+     * @param value prospective number
+     * @return number without leading zeros
+     */
+    private static String removeLeadingZerosOfNumber(String value){
+        if (value.equals("-")){return value;}
+        boolean negativeFirstChar = (value.charAt(0) == '-');
+        int counter = negativeFirstChar ? 1:0;
+        while (counter < value.length()){
+            if (value.charAt(counter) != '0'){
+                if (negativeFirstChar) {return "-".concat(value.substring(counter));}
+                return value.substring(counter);
+            }
+            ++counter;
+        }
+        if (negativeFirstChar) {return "-0";}
+        return "0";
+    }
 }
