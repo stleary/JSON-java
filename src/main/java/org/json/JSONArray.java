@@ -1694,7 +1694,10 @@ public class JSONArray implements Iterable<Object> {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        Writer sw = new StringBuilderWriter();
+        // each value requires a comma, so multiply the count my 2
+        // We don't want to oversize the initial capacity
+        int initialSize = myArrayList.size() * 2;
+        Writer sw = new StringBuilderWriter(Math.max(initialSize, 16));
         return this.write(sw, indentFactor, 0).toString();
     }
 

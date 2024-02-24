@@ -2226,7 +2226,10 @@ public class JSONObject {
      */
     @SuppressWarnings("resource")
     public static String quote(String string) {
-        Writer sw = new StringBuilderWriter();
+        if (string == null || string.isEmpty()) {
+            return "\"\"";
+        }
+        Writer sw = new StringBuilderWriter(string.length() + 2);
         try {
             return quote(string, sw).toString();
         } catch (IOException ignored) {
@@ -2557,7 +2560,10 @@ public class JSONObject {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        Writer w = new StringBuilderWriter();
+        // 6 characters are the minimum to serialise a key value pair e.g.: "k":1,
+        // and we don't want to oversize the initial capacity
+        int initialSize = map.size() * 6;
+        Writer w = new StringBuilderWriter(Math.max(initialSize, 16));
         return this.write(w, indentFactor, 0).toString();
     }
 
@@ -2699,6 +2705,10 @@ public class JSONObject {
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.write("null");
+        } else if (value instanceof String) {
+            // assuming most values are Strings, so testing it earlier
+            quote(value.toString(), writer);
+            return writer;
         } else if (value instanceof JSONString) {
             Object o;
             try {
@@ -2706,7 +2716,7 @@ public class JSONObject {
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
+            writer.write(o != null ? o.toString() : "\"\"");
         } else if (value instanceof Number) {
             // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
             final String numberAsString = numberToString((Number) value);

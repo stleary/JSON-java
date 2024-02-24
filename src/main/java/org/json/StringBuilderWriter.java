@@ -18,6 +18,19 @@ class StringBuilderWriter extends Writer {
         lock = builder;
     }
 
+    /**
+     * Create a new string builder writer using the specified initial string-builder buffer size.
+     *
+     * @param initialSize The number of {@code char} values that will fit into this buffer
+     *                    before it is automatically expanded
+     *
+     * @throws IllegalArgumentException If {@code initialSize} is negative
+     */
+    StringBuilderWriter(int initialSize) {
+        builder = new StringBuilder(initialSize);
+        lock = builder;
+    }
+
     @Override
     public void write(int c) {
         builder.append((char) c);
