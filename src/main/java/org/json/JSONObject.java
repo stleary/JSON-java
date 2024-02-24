@@ -2716,7 +2716,7 @@ public class JSONObject {
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            writer.write(o != null ? o.toString() : "\"\"");
+            writer.write(o != null ? o.toString() : quote(value.toString()));
         } else if (value instanceof Number) {
             // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
             final String numberAsString = numberToString((Number) value);
