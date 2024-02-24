@@ -2706,17 +2706,9 @@ public class JSONObject {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof String) {
-            // assuming most values are Strings, so testing it earlier
+            // assuming most values are Strings, so testing it early
             quote(value.toString(), writer);
             return writer;
-        } else if (value instanceof JSONString) {
-            Object o;
-            try {
-                o = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
         } else if (value instanceof Number) {
             // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
             final String numberAsString = numberToString((Number) value);
@@ -2729,8 +2721,6 @@ public class JSONObject {
             }
         } else if (value instanceof Boolean) {
             writer.write(value.toString());
-        } else if (value instanceof Enum<?>) {
-            writer.write(quote(((Enum<?>)value).name()));
         } else if (value instanceof JSONObject) {
             ((JSONObject) value).write(writer, indentFactor, indent);
         } else if (value instanceof JSONArray) {
@@ -2741,6 +2731,16 @@ public class JSONObject {
         } else if (value instanceof Collection) {
             Collection<?> coll = (Collection<?>) value;
             new JSONArray(coll).write(writer, indentFactor, indent);
+        } else if (value instanceof Enum<?>) {
+            writer.write(quote(((Enum<?>)value).name()));
+        } else if (value instanceof JSONString) {
+            Object o;
+            try {
+                o = ((JSONString) value).toJSONString();
+            } catch (Exception e) {
+                throw new JSONException(e);
+            }
+            writer.write(o != null ? o.toString() : quote(value.toString()));
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
         } else {
