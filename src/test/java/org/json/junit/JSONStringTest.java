@@ -319,6 +319,22 @@ public class JSONStringTest {
         }
     }
 
+    @Test
+    public void testEnumJSONString() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("key", MyEnum.MY_ENUM);
+        assertEquals("{\"key\":\"myJsonString\"}", jsonObject.toString());
+    }
+
+    private enum MyEnum implements JSONString {
+        MY_ENUM;
+
+        @Override
+        public String toJSONString() {
+            return "\"myJsonString\"";
+        }
+    }
+
     /**
      * A JSONString that returns a valid JSON string value.
      */
