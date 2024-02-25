@@ -2706,7 +2706,7 @@ public class JSONObject {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof JSONString) {
-            // JSONString must be checked first, so it can overwrite behaviour of other types
+            // JSONString must be checked first, so it can overwrite behaviour of other types below
             Object o;
             try {
                 o = ((JSONString) value).toJSONString();
