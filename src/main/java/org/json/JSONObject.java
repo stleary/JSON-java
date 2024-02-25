@@ -2705,6 +2705,15 @@ public class JSONObject {
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.write("null");
+        } else if (value instanceof JSONString) {
+            // JSONString must be checked first, so it can overwrite behaviour of other types
+            Object o;
+            try {
+                o = ((JSONString) value).toJSONString();
+            } catch (Exception e) {
+                throw new JSONException(e);
+            }
+            writer.write(o != null ? o.toString() : quote(value.toString()));
         } else if (value instanceof String) {
             // assuming most values are Strings, so testing it early
             quote(value.toString(), writer);
@@ -2733,14 +2742,6 @@ public class JSONObject {
             new JSONArray(coll).write(writer, indentFactor, indent);
         } else if (value instanceof Enum<?>) {
             writer.write(quote(((Enum<?>)value).name()));
-        } else if (value instanceof JSONString) {
-            Object o;
-            try {
-                o = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
         } else {
