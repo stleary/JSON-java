@@ -1400,16 +1400,30 @@ public class XMLTest {
     @Test
     public void clarifyCurrentBehavior() {
 
+        // Behavior documented in #826
+        // After reverting the code, amount is stored as numeric, and phone is stored as string
+        String str1 =
+                "    <datatypes>\n" +
+                "        <telephone>0123456789</telephone>\n" +
+                "        <amount>0.1230</amount>\n" +
+                "        <boolean>true</boolean>\n" +
+                "    </datatypes>";
+        JSONObject jsonObject1 = XML.toJSONObject(str1,
+                new XMLParserConfiguration().withKeepStrings(false));
+        assertEquals(jsonObject1.getJSONObject("datatypes").getFloat("amount"), 0.123, .1);
+        assertEquals(jsonObject1.getJSONObject("datatypes").getString("telephone"), "0123456789");
+
+
         // Behavior documented in #852
         // After reverting the code, value is still stored as a number. This is due to how XML.isDecimalNotation() works
         // and is probably a bug. JSONObject has a similar problem.
-        String str = "<color> <color_type>primary</color_type> <value>008E97</value> </color>";
-        JSONObject jsonObject = XML.toJSONObject(str);
-        assertEquals(jsonObject.getJSONObject("color").getLong("value"), 0e897, .1);
+        String str2 = "<color> <color_type>primary</color_type> <value>008E97</value> </color>";
+        JSONObject jsonObject2 = XML.toJSONObject(str2);
+        assertEquals(jsonObject2.getJSONObject("color").getLong("value"), 0e897, .1);
 
         // Workaround for now is to use keepStrings
-        JSONObject jsonObject1 = XML.toJSONObject(str, new XMLParserConfiguration().withKeepStrings(true));
-        assertEquals(jsonObject1.getJSONObject("color").getString("value"), "008E97");
+        JSONObject jsonObject3 = XML.toJSONObject(str2, new XMLParserConfiguration().withKeepStrings(true));
+        assertEquals(jsonObject3.getJSONObject("color").getString("value"), "008E97");
     }
 
 }
