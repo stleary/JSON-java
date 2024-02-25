@@ -1397,6 +1397,21 @@ public class XMLTest {
         Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
     }
 
+    @Test
+    public void clarifyCurrentBehavior() {
+
+        // Behavior documented in #852
+        // After reverting the code, value is still stored as a number. This is due to how XML.isDecimalNotation() works
+        // and is probably a bug. JSONObject has a similar problem.
+        String str = "<color> <color_type>primary</color_type> <value>008E97</value> </color>";
+        JSONObject jsonObject = XML.toJSONObject(str);
+        assertEquals(jsonObject.getJSONObject("color").getLong("value"), 0e897, .1);
+
+        // Workaround for now is to use keepStrings
+        JSONObject jsonObject1 = XML.toJSONObject(str, new XMLParserConfiguration().withKeepStrings(true));
+        assertEquals(jsonObject1.getJSONObject("color").getString("value"), "008E97");
+    }
+
 }
 
 

@@ -3738,6 +3738,43 @@ public class JSONObjectTest {
         new JSONObject(map1);
     }
 
+    @Test
+    public void clarifyCurrentBehavior() {
+        // Behavior documented in #653 optLong vs getLong inconsistencies
+        // This problem still exists.
+        // Internally, both number_1 and number_2 are stored as strings. This is reasonable since they are parsed as strings.
+        // However, getLong and optLong should return similar results
+        JSONObject json = new JSONObject("{\"number_1\":\"01234\", \"number_2\": \"332211\"}");
+        assertEquals(json.getLong("number_1"), 1234L);
+        assertEquals(json.optLong("number_1"), 0); //THIS VALUE IS NOT RETURNED AS A NUMBER
+        assertEquals(json.getLong("number_2"), 332211L);
+        assertEquals(json.optLong("number_2"), 332211L);
+
+        // Behavior documented in #826 JSONObject parsing 0-led numeric strings as ints
+        // After reverting the code, personId is stored as a string, and the behavior is as expected
+        String personId = "0123";
+        JSONObject j1 = new JSONObject("{personId: " + personId + "}");
+        assertEquals(j1.getString("personId"), "0123");
+
+        // Also #826. Here is input with missing quotes. Because of the leading zero, it should not be parsed as a number.
+        // This example was mentioned in the same ticket
+        // After reverting the code, personId is stored as a string, and the behavior is as expected
+        JSONObject j2 = new JSONObject("{\"personId\":0123}");
+        assertEquals(j2.getString("personId"), "0123");
+
+        // Behavior uncovered while working on the code
+        // All of the values are stored as strings except for hex4, which is stored as a number. This is probably incorrect
+        JSONObject j3 = new JSONObject("{ " +
+                "\"hex1\": \"010e4\", \"hex2\": \"00f0\", \"hex3\": \"0011\", " +
+                "\"hex4\": 00e0, \"hex5\": 00f0, \"hex6\": 0011 }");
+        assertEquals(j3.getString("hex1"), "010e4");
+        assertEquals(j3.getString("hex2"), "00f0");
+        assertEquals(j3.getString("hex3"), "0011");
+        assertEquals(j3.getLong("hex4"), 0, .1);
+        assertEquals(j3.getString("hex5"), "00f0");
+        assertEquals(j3.getString("hex6"), "0011");
+    }
+
     /**
      * Method to build nested map of max maxDepth
      *
