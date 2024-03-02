@@ -26,6 +26,12 @@ Public Domain.
 public class CDL {
 
     /**
+     * Constructs a new CDL object.
+     */
+    public CDL() {
+    }
+
+    /**
      * Get the next value. The value can be wrapped in quotes. The value can
      * be empty.
      * @param x A JSONTokener of the source text.

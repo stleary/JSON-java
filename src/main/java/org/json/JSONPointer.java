@@ -42,6 +42,12 @@ public class JSONPointer {
      */
     public static class Builder {
 
+        /**
+         * Constructs a new Builder object.
+         */
+        public Builder() {
+        }
+
         // Segments for the eventual JSONPointer string
         private final List<String> refTokens = new ArrayList<String>();
 
