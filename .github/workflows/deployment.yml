@@ -3,15 +3,15 @@
 #  * https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 #  * https://github.com/actions/setup-java/blob/v3.13.0/docs/advanced-usage.md#Publishing-using-Apache-Maven
 #
-
+# 
 # COMMENTING OUT UNTIL SECRETS CAN BE ADDED
-#name: Deployment workflow
+# name: Deployment workflow
 #
-#on:
+# on:
 #    release:
 #      types: [published]
 #
-#jobs:
+# jobs:
 #  # old-school build and jar method. No tests run or compiled.
 #  publish-1_6:
 #    name: Publish Java 1.6 to GitHub Release
