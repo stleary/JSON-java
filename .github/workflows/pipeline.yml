@@ -34,14 +34,159 @@ jobs:
         with:
           name: Create java 1.6 JAR
           path: target/*.jar
-  build:
+
+  build-8:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         # build against supported Java LTS versions:
-        java: [ 8, 11, 17, 21 ]
+        java: [ 8 ]
+    name: Java ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+          cache: 'maven'
+      - name: Compile Java ${{ matrix.java }}
+        run: mvn clean compile -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true -D maven.javadoc.skip=true
+      - name: Run Tests ${{ matrix.java }}
+        run: |
+          mvn test -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+      - name: Build Test Report ${{ matrix.java }}
+        if: ${{ always() }}
+        run: |
+          mvn surefire-report:report-only -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+          mvn site -D generateReports=false -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+      - name: Upload Test Results ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Results ${{ matrix.java }}
+          path: target/surefire-reports/
+      - name: Upload Test Report ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Report ${{ matrix.java }}
+          path: target/site/
+      - name: Package Jar ${{ matrix.java }}
+        run: mvn clean package -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true
+      - name: Upload Package Results ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Package Jar ${{ matrix.java }}
+          path: target/*.jar
+
+  build-11:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        # build against supported Java LTS versions:
+        java: [ 11 ]
+    name: Java ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+          cache: 'maven'
+      - name: Compile Java ${{ matrix.java }}
+        run: mvn clean compile -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true -D maven.javadoc.skip=true
+      - name: Run Tests ${{ matrix.java }}
+        run: |
+          mvn test -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+      - name: Build Test Report ${{ matrix.java }}
+        if: ${{ always() }}
+        run: |
+          mvn surefire-report:report-only -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+          mvn site -D generateReports=false -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+      - name: Upload Test Results ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Results ${{ matrix.java }}
+          path: target/surefire-reports/
+      - name: Upload Test Report ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Report ${{ matrix.java }}
+          path: target/site/
+      - name: Package Jar ${{ matrix.java }}
+        run: mvn clean package -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true
+      - name: Upload Package Results ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Package Jar ${{ matrix.java }}
+          path: target/*.jar
+
+  build-17:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        # build against supported Java LTS versions:
+        java: [ 17 ]
+    name: Java ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+          cache: 'maven'
+      - name: Compile Java ${{ matrix.java }}
+        run: mvn clean compile -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true -D maven.javadoc.skip=true
+      - name: Run Tests ${{ matrix.java }}
+        run: |
+          mvn test -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+      - name: Build Test Report ${{ matrix.java }}
+        if: ${{ always() }}
+        run: |
+          mvn surefire-report:report-only -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+          mvn site -D generateReports=false -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+      - name: Upload Test Results ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Results ${{ matrix.java }}
+          path: target/surefire-reports/
+      - name: Upload Test Report ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Report ${{ matrix.java }}
+          path: target/site/
+      - name: Package Jar ${{ matrix.java }}
+        run: mvn clean package -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true
+      - name: Upload Package Results ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Package Jar ${{ matrix.java }}
+          path: target/*.jar
+
+  build-21:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        # build against supported Java LTS versions:
+        java: [ 21 ]
     name: Java ${{ matrix.java }}
     steps:
       - uses: actions/checkout@v3
