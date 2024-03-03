@@ -3,27 +3,7 @@ package org.json;
 import java.util.Locale;
 
 /*
-Copyright (c) 2002 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Public Domain.
 */
 
 /**
@@ -34,6 +14,12 @@ SOFTWARE.
  * @version 2015-12-09
  */
 public class Cookie {
+
+    /**
+     * Constructs a new Cookie object.
+     */
+    public Cookie() {
+    }
 
     /**
      * Produce a copy of a string in which the characters '+', '%', '=', ';'
@@ -109,7 +95,7 @@ public class Cookie {
         // parse the remaining cookie attributes
         while (x.more()) {
             name = unescape(x.nextTo("=;")).trim().toLowerCase(Locale.ROOT);
-            // don't allow a cookies attributes to overwrite it's name or value.
+            // don't allow a cookies attributes to overwrite its name or value.
             if("name".equalsIgnoreCase(name)) {
                 throw new JSONException("Illegal attribute name: 'name'");
             }

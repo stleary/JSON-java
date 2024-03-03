@@ -1,27 +1,7 @@
 package org.json;
 
 /*
-Copyright (c) 2002 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Public Domain.
  */
 
 /**
@@ -31,6 +11,12 @@ SOFTWARE.
  */
 public class CookieList {
 
+    /**
+     * Constructs a new CookieList object.
+     */
+    public CookieList() {
+    }
+ 
     /**
      * Convert a cookie list into a JSONObject. A cookie list is a sequence
      * of name/value pairs. The names are separated from the values by '='.
@@ -66,19 +52,19 @@ public class CookieList {
      * @throws JSONException if a called function fails
      */
     public static String toString(JSONObject jo) throws JSONException {
-        boolean             b = false;
+        boolean             isEndOfPair = false;
         final StringBuilder sb = new StringBuilder();
         // Don't use the new entrySet API to maintain Android support
         for (final String key : jo.keySet()) {
             final Object value = jo.opt(key);
             if (!JSONObject.NULL.equals(value)) {
-                if (b) {
+                if (isEndOfPair) {
                     sb.append(';');
                 }
                 sb.append(Cookie.escape(key));
                 sb.append("=");
                 sb.append(Cookie.escape(value.toString()));
-                b = true;
+                isEndOfPair = true;
             }
         }
         return sb.toString();

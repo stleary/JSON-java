@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class WeirdList {
     /** */
-    private final List<Integer> list = new ArrayList();
+    private final List<Integer> list = new ArrayList<>();
 
     /**
      * @param vals
@@ -25,14 +25,14 @@ public class WeirdList {
      * @return a copy of the list
      */
     public List<Integer> get() {
-        return new ArrayList(this.list);
+        return new ArrayList<>(this.list);
     }
 
     /**
      * @return a copy of the list
      */
     public List<Integer> getALL() {
-        return new ArrayList(this.list);
+        return new ArrayList<>(this.list);
     }
 
     /**

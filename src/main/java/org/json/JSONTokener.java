@@ -1,34 +1,10 @@
 package org.json;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.nio.charset.Charset;
 
 /*
-Copyright (c) 2002 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Public Domain.
  */
 
 /**
@@ -81,7 +57,7 @@ public class JSONTokener {
      * @param inputStream The source.
      */
     public JSONTokener(InputStream inputStream) {
-        this(new InputStreamReader(inputStream));
+        this(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
     }
 
 
@@ -145,7 +121,7 @@ public class JSONTokener {
 
     /**
      * Checks if the end of the input has been reached.
-     *  
+     *
      * @return true if at the end of the file and we didn't step back
      */
     public boolean end() {
@@ -209,6 +185,12 @@ public class JSONTokener {
         this.previous = (char) c;
         return this.previous;
     }
+
+    /**
+     * Get the last character read from the input or '\0' if nothing has been read yet.
+     * @return the last character read from the input.
+     */
+    protected char getPrevious() { return this.previous;}
 
     /**
      * Increments the internal indexes according to the previous character
@@ -420,18 +402,32 @@ public class JSONTokener {
      */
     public Object nextValue() throws JSONException {
         char c = this.nextClean();
+        switch (c) {
+        case '{':
+            this.back();
+            try {
+                return new JSONObject(this);
+            } catch (StackOverflowError e) {
+                throw new JSONException("JSON Array or Object depth too large to process.", e);
+            }
+        case '[':
+            this.back();
+            try {
+                return new JSONArray(this);
+            } catch (StackOverflowError e) {
+                throw new JSONException("JSON Array or Object depth too large to process.", e);
+            }
+        }
+        return nextSimpleValue(c);
+    }
+
+    Object nextSimpleValue(char c) {
         String string;
 
         switch (c) {
         case '"':
         case '\'':
             return this.nextString(c);
-        case '{':
-            this.back();
-            return new JSONObject(this);
-        case '[':
-            this.back();
-            return new JSONArray(this);
         }
 
         /*
@@ -527,5 +523,16 @@ public class JSONTokener {
     public String toString() {
         return " at " + this.index + " [character " + this.character + " line " +
                 this.line + "]";
+    }
+
+    /**
+     * Closes the underlying reader, releasing any resources associated with it.
+     *
+     * @throws IOException If an I/O error occurs while closing the reader.
+     */
+    public void close() throws IOException {
+        if(reader!=null){
+            reader.close();
+        }
     }
 }

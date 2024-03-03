@@ -1,5 +1,5 @@
 # This workflow will build a Java project with Maven
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# For more information see: https://docs.github.com/en/actions/learn-github-actions or https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 
 name: Java CI with Maven
 
@@ -12,63 +12,72 @@ on:
 jobs:
   # old-school build and jar method. No tests run or compiled.
   build-1_6: 
-    runs-on: ubuntu-16.04
-    strategy:
-      matrix:
-        # build for java 1.6, however don't run any tests
-        java: [ 1.6 ]
-    name: Java ${{ matrix.java }}
+    name: Java 1.6
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup java
         uses: actions/setup-java@v1
         with:
-          java-version: ${{ matrix.java }}
-      - name: Compile Java ${{ matrix.java }}
+          java-version: 1.6
+      - name: Compile Java 1.6
         run: |
           mkdir -p target/classes
-          javac -d target/classes/ src/main/java/org/json/*.java
-      - name: Create java ${{ matrix.java }} JAR
+          javac -version
+          javac -source 1.6 -target 1.6 -d target/classes/ src/main/java/org/json/*.java
+      - name: Create java 1.6 JAR
         run: |
           jar cvf target/org.json.jar -C target/classes .
-      - name: Upload Java ${{ matrix.java }} JAR
-        uses: actions/upload-artifact@v1
+      - name: Upload JAR 1.6
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
         with:
-          name: Java ${{ matrix.java }} JAR
-          path: target/org.json.jar
-      
+          name: Create java 1.6 JAR
+          path: target/*.jar
   build:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
+      max-parallel: 2
       matrix:
         # build against supported Java LTS versions:
-        java: [ 1.7, 8, 11 ]
+        java: [ 8, 11, 17, 21 ]
     name: Java ${{ matrix.java }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup java
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@v3
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'
           java-version: ${{ matrix.java }}
+          cache: 'maven'
       - name: Compile Java ${{ matrix.java }}
-        run: mvn clean compile -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }} -Dmaven.test.skip=true -Dmaven.site.skip=true -Dmaven.javadoc.skip=true
+        run: mvn clean compile -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true -D maven.javadoc.skip=true
       - name: Run Tests ${{ matrix.java }}
         run: |
-          mvn test -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
+          mvn test -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
       - name: Build Test Report ${{ matrix.java }}
         if: ${{ always() }}
         run: |
-          mvn surefire-report:report-only -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
-          mvn site -DgenerateReports=false -Dmaven.compiler.source=${{ matrix.java }} -Dmaven.compiler.target=${{ matrix.java }}
+          mvn surefire-report:report-only -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
+          mvn site -D generateReports=false -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }}
       - name: Upload Test Results ${{ matrix.java }}
         if: ${{ always() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Test Results ${{ matrix.java }}
           path: target/surefire-reports/
       - name: Upload Test Report ${{ matrix.java }}
         if: ${{ always() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Test Report ${{ matrix.java }}
           path: target/site/
+      - name: Package Jar ${{ matrix.java }}
+        run: mvn clean package -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true
+      - name: Upload Package Results ${{ matrix.java }}
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: Package Jar ${{ matrix.java }}
+          path: target/*.jar

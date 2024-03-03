@@ -1,31 +1,10 @@
 package org.json.junit;
 
 /*
-Copyright (c) 2020 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Public Domain.
 */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -41,7 +20,12 @@ import org.junit.Test;
 public class JSONPointerTest {
 
     private static final JSONObject document;
+    private static final String EXPECTED_COMPLETE_DOCUMENT = "{\"\":0,\" \":7,\"g|h\":4,\"c%d\":2,\"k\\\"l\":6,\"a/b\":1,\"i\\\\j\":5," +
+    		"\"obj\":{\"\":{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some other value\"}," +
+            "\"other~key\":{\"another/key\":[\"val\"]},\"key\":\"value\"},\"foo\":[\"bar\",\"baz\"],\"e^f\":3," +
+            "\"m~n\":8}";
 
+    
     static {
         @SuppressWarnings("resource")
         InputStream resourceAsStream = JSONPointerTest.class.getClassLoader().getResourceAsStream("jsonpointer-testdoc.json");
@@ -57,7 +41,7 @@ public class JSONPointerTest {
 
     @Test
     public void emptyPointer() {
-        assertSame(document, query(""));
+        assertTrue(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).similar(query("")));
     }
 
     @SuppressWarnings("unused")
@@ -68,12 +52,12 @@ public class JSONPointerTest {
 
     @Test
     public void objectPropertyQuery() {
-        assertSame(document.get("foo"), query("/foo"));
+        assertEquals("[\"bar\",\"baz\"]", query("/foo").toString());
     }
 
     @Test
     public void arrayIndexQuery() {
-        assertSame(document.getJSONArray("foo").get(0), query("/foo/0"));
+        assertEquals("bar", query("/foo/0"));
     }
 
     @Test(expected = JSONPointerException.class)
@@ -83,71 +67,78 @@ public class JSONPointerTest {
 
     @Test
     public void queryByEmptyKey() {
-        assertSame(document.get(""), query("/"));
+        assertEquals(0, query("/"));
     }
 
     @Test
     public void queryByEmptyKeySubObject() {
-        assertSame(document.getJSONObject("obj").getJSONObject(""), query("/obj/"));
+        JSONObject json = new JSONObject("{\"\":\"empty key of an object with an empty key\",\"subKey\":\"Some" +
+                " other value\"}");
+        JSONObject obj = (JSONObject) query("/obj/");
+        assertTrue(json.similar(obj));
     }
 
     @Test
     public void queryByEmptyKeySubObjectSubOject() {
-        assertSame(
-            document.getJSONObject("obj").getJSONObject("").get(""),
-            query("/obj//")
-        );
+        assertEquals("empty key of an object with an empty key", query("/obj//"));
     }
     
     @Test
     public void queryByEmptyKeySubObjectValue() {
-        assertSame(
-            document.getJSONObject("obj").getJSONObject("").get("subKey"),
-            query("/obj//subKey")
-        );
+        assertEquals("Some other value", query("/obj//subKey"));
     }
 
     @Test
     public void slashEscaping() {
-        assertSame(document.get("a/b"), query("/a~1b"));
+        assertEquals(1, query("/a~1b"));
     }
 
     @Test
     public void tildeEscaping() {
-        assertSame(document.get("m~n"), query("/m~0n"));
+        assertEquals(8, query("/m~0n"));
     }
 
+    /**
+     * We pass backslashes as-is
+     * 
+     * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
+     */
     @Test
-    public void backslashEscaping() {
-        assertSame(document.get("i\\j"), query("/i\\\\j"));
+    public void backslashHandling() {
+        assertEquals(5, query("/i\\j"));
     }
-
+    
+    /**
+     * We pass quotations as-is
+     * 
+     * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
+     */
     @Test
-    public void quotationEscaping() {
-        assertSame(document.get("k\"l"), query("/k\\\\\\\"l"));
+    public void quotationHandling() {
+        assertEquals(6, query("/k\"l"));
     }
-
+   
     @Test
     public void whitespaceKey() {
-        assertSame(document.get(" "), query("/ "));
+        assertEquals(7, query("/ "));
     }
 
     @Test
     public void uriFragmentNotation() {
-        assertSame(document.get("foo"), query("#/foo"));
+        assertEquals("[\"bar\",\"baz\"]", query("#/foo").toString());
     }
 
     @Test
     public void uriFragmentNotationRoot() {
-        assertSame(document, query("#"));
+        assertTrue(new JSONObject(EXPECTED_COMPLETE_DOCUMENT).similar(query("#")));
     }
 
     @Test
     public void uriFragmentPercentHandling() {
-        assertSame(document.get("c%d"), query("#/c%25d"));
-        assertSame(document.get("e^f"), query("#/e%5Ef"));
-        assertSame(document.get("g|h"), query("#/g%7Ch"));
-        assertSame(document.get("m~n"), query("#/m~0n"));
+        assertEquals(2, query("#/c%25d"));
+        assertEquals(3, query("#/e%5Ef"));
+        assertEquals(4, query("#/g%7Ch"));
+        assertEquals(8, query("#/m~0n"));
     }
 
     @SuppressWarnings("unused")
@@ -189,7 +180,7 @@ public class JSONPointerTest {
                 .append("\"")
                 .append(0)
                 .build();
-        assertEquals("/obj/other~0key/another~1key/\\\"/0", pointer.toString());
+        assertEquals("/obj/other~0key/another~1key/\"/0", pointer.toString());
     }
     
     @Test
@@ -380,5 +371,29 @@ public class JSONPointerTest {
         assertTrue("Expected bVal", "bVal".equals(obj));
         obj = jsonArray.optQuery(new JSONPointer("/a/b/c"));
         assertTrue("Expected null", obj == null);
+    }
+    
+    /**
+     * When creating a jsonObject we need to parse escaped characters "\\\\"
+     *  --> it's the string representation of  "\\", so when query'ing via the JSONPointer 
+     *  we DON'T escape them
+     *  
+     */
+    @Test
+    public void queryFromJSONObjectUsingPointer0() {
+    	String str = "{"+
+                "\"string\\\\\\\\Key\":\"hello world!\","+
+
+                "\"\\\\\":\"slash test\"," + 
+                "}"+
+                "}";
+            JSONObject jsonObject = new JSONObject(str);
+            //Summary of issue: When a KEY in the jsonObject is "\\\\" --> it's held
+            // as "\\" which means when querying, we need to use "\\"
+            Object twoBackslahObj = jsonObject.optQuery(new JSONPointer("/\\"));
+            assertEquals("slash test", twoBackslahObj);
+
+            Object fourBackslashObj = jsonObject.optQuery(new JSONPointer("/string\\\\Key"));
+            assertEquals("hello world!", fourBackslashObj);
     }
 }

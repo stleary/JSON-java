@@ -1,27 +1,7 @@
 package org.json.junit;
 
 /*
-Copyright (c) 2020 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Public Domain.
 */
 
 import static org.junit.Assert.assertEquals;
@@ -38,16 +18,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.XML;
-import org.json.XMLParserConfiguration;
-import org.json.XMLXsiTypeConverter;
+import org.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -65,6 +40,7 @@ public class XMLTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    
     /**
      * JSONObject from a null XML string.
      * Expects a NullPointerException
@@ -940,7 +916,7 @@ public class XMLTest {
             InputStream xmlStream = null;
             try {
                 xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue537.xml");
-                Reader xmlReader = new InputStreamReader(xmlStream);
+                Reader xmlReader = new InputStreamReader(xmlStream, Charset.forName("UTF-8"));
                 JSONObject actual = XML.toJSONObject(xmlReader, true);
                 InputStream jsonStream = null;
                 try {
@@ -1068,4 +1044,389 @@ public class XMLTest {
             fail("Expected to be unable to modify the config");
         } catch (Exception ignored) { }
     }
+
+    @Test
+    public void testIndentComplicatedJsonObject(){
+        String str = "{\n" +
+                "  \"success\": true,\n" +
+                "  \"error\": null,\n" +
+                "  \"response\": [\n" +
+                "    {\n" +
+                "      \"timestamp\": 1664917200,\n" +
+                "      \"dateTimeISO\": \"2022-10-05T00:00:00+03:00\",\n" +
+                "      \"loc\": {\n" +
+                "        \"lat\": 39.91987,\n" +
+                "        \"long\": 32.85427\n" +
+                "      },\n" +
+                "      \"place\": {\n" +
+                "        \"name\": \"ankara\",\n" +
+                "        \"state\": \"an\",\n" +
+                "        \"country\": \"tr\"\n" +
+                "      },\n" +
+                "      \"profile\": {\n" +
+                "        \"tz\": \"Europe/Istanbul\"\n" +
+                "      },\n" +
+                "      \"sun\": {\n" +
+                "        \"rise\": 1664941721,\n" +
+                "        \"riseISO\": \"2022-10-05T06:48:41+03:00\",\n" +
+                "        \"set\": 1664983521,\n" +
+                "        \"setISO\": \"2022-10-05T18:25:21+03:00\",\n" +
+                "        \"transit\": 1664962621,\n" +
+                "        \"transitISO\": \"2022-10-05T12:37:01+03:00\",\n" +
+                "        \"midnightSun\": false,\n" +
+                "        \"polarNight\": false,\n" +
+                "        \"twilight\": {\n" +
+                "          \"civilBegin\": 1664940106,\n" +
+                "          \"civilBeginISO\": \"2022-10-05T06:21:46+03:00\",\n" +
+                "          \"civilEnd\": 1664985136,\n" +
+                "          \"civilEndISO\": \"2022-10-05T18:52:16+03:00\",\n" +
+                "          \"nauticalBegin\": 1664938227,\n" +
+                "          \"nauticalBeginISO\": \"2022-10-05T05:50:27+03:00\",\n" +
+                "          \"nauticalEnd\": 1664987015,\n" +
+                "          \"nauticalEndISO\": \"2022-10-05T19:23:35+03:00\",\n" +
+                "          \"astronomicalBegin\": 1664936337,\n" +
+                "          \"astronomicalBeginISO\": \"2022-10-05T05:18:57+03:00\",\n" +
+                "          \"astronomicalEnd\": 1664988905,\n" +
+                "          \"astronomicalEndISO\": \"2022-10-05T19:55:05+03:00\"\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"moon\": {\n" +
+                "        \"rise\": 1664976480,\n" +
+                "        \"riseISO\": \"2022-10-05T16:28:00+03:00\",\n" +
+                "        \"set\": 1664921520,\n" +
+                "        \"setISO\": \"2022-10-05T01:12:00+03:00\",\n" +
+                "        \"transit\": 1664994240,\n" +
+                "        \"transitISO\": \"2022-10-05T21:24:00+03:00\",\n" +
+                "        \"underfoot\": 1664949360,\n" +
+                "        \"underfootISO\": \"2022-10-05T08:56:00+03:00\",\n" +
+                "        \"phase\": {\n" +
+                "          \"phase\": 0.3186,\n" +
+                "          \"name\": \"waxing gibbous\",\n" +
+                "          \"illum\": 71,\n" +
+                "          \"age\": 9.41,\n" +
+                "          \"angle\": 0.55\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}" ;
+        JSONObject jsonObject = new JSONObject(str);
+        String actualIndentedXmlString = XML.toString(jsonObject, 1);
+        JSONObject actualJsonObject = XML.toJSONObject(actualIndentedXmlString);
+        String expected = "<success>true</success>\n" +
+                "<response>\n" +
+                " <dateTimeISO>2022-10-05T00:00:00+03:00</dateTimeISO>\n" +
+                " <loc>\n" +
+                "  <lat>39.91987</lat>\n" +
+                "  <long>32.85427</long>\n" +
+                " </loc>\n" +
+                " <moon>\n" +
+                "  <phase>\n" +
+                "   <phase>0.3186</phase>\n" +
+                "   <name>waxing gibbous</name>\n" +
+                "   <angle>0.55</angle>\n" +
+                "   <illum>71</illum>\n" +
+                "   <age>9.41</age>\n" +
+                "  </phase>\n" +
+                "  <setISO>2022-10-05T01:12:00+03:00</setISO>\n" +
+                "  <underfoot>1664949360</underfoot>\n" +
+                "  <set>1664921520</set>\n" +
+                "  <transit>1664994240</transit>\n" +
+                "  <transitISO>2022-10-05T21:24:00+03:00</transitISO>\n" +
+                "  <riseISO>2022-10-05T16:28:00+03:00</riseISO>\n" +
+                "  <rise>1664976480</rise>\n" +
+                "  <underfootISO>2022-10-05T08:56:00+03:00</underfootISO>\n" +
+                " </moon>\n" +
+                " <profile>\n" +
+                "  <tz>Europe/Istanbul</tz>\n" +
+                " </profile>\n" +
+                " <place>\n" +
+                "  <country>tr</country>\n" +
+                "  <name>ankara</name>\n" +
+                "  <state>an</state>\n" +
+                " </place>\n" +
+                " <sun>\n" +
+                "  <setISO>2022-10-05T18:25:21+03:00</setISO>\n" +
+                "  <midnightSun>false</midnightSun>\n" +
+                "  <set>1664983521</set>\n" +
+                "  <transit>1664962621</transit>\n" +
+                "  <polarNight>false</polarNight>\n" +
+                "  <transitISO>2022-10-05T12:37:01+03:00</transitISO>\n" +
+                "  <riseISO>2022-10-05T06:48:41+03:00</riseISO>\n" +
+                "  <rise>1664941721</rise>\n" +
+                "  <twilight>\n" +
+                "   <civilEnd>1664985136</civilEnd>\n" +
+                "   <astronomicalBegin>1664936337</astronomicalBegin>\n" +
+                "   <astronomicalEnd>1664988905</astronomicalEnd>\n" +
+                "   <astronomicalBeginISO>2022-10-05T05:18:57+03:00</astronomicalBeginISO>\n" +
+                "   <civilBegin>1664940106</civilBegin>\n" +
+                "   <nauticalEndISO>2022-10-05T19:23:35+03:00</nauticalEndISO>\n" +
+                "   <astronomicalEndISO>2022-10-05T19:55:05+03:00</astronomicalEndISO>\n" +
+                "   <nauticalBegin>1664938227</nauticalBegin>\n" +
+                "   <nauticalEnd>1664987015</nauticalEnd>\n" +
+                "   <nauticalBeginISO>2022-10-05T05:50:27+03:00</nauticalBeginISO>\n" +
+                "   <civilBeginISO>2022-10-05T06:21:46+03:00</civilBeginISO>\n" +
+                "   <civilEndISO>2022-10-05T18:52:16+03:00</civilEndISO>\n" +
+                "  </twilight>\n" +
+                " </sun>\n" +
+                " <timestamp>1664917200</timestamp>\n" +
+                "</response>\n" +
+                "<error>null</error>\n";
+        JSONObject expectedJsonObject = XML.toJSONObject(expected);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
+
+
+    }
+
+    @Test
+    public void shouldCreateExplicitEndTagWithEmptyValueWhenConfigured(){
+        String jsonString = "{outer:{innerOne:\"\", innerTwo:\"two\"}}";
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String expectedXmlString = "<encloser><outer><innerOne></innerOne><innerTwo>two</innerTwo></outer></encloser>";
+        String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(true));
+        JSONObject actualJsonObject = XML.toJSONObject(xmlForm);
+        JSONObject expectedJsonObject = XML.toJSONObject(expectedXmlString);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
+    }
+
+    @Test
+    public void shouldNotCreateExplicitEndTagWithEmptyValueWhenNotConfigured(){
+        String jsonString = "{outer:{innerOne:\"\", innerTwo:\"two\"}}";
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String expectedXmlString = "<encloser><outer><innerOne/><innerTwo>two</innerTwo></outer></encloser>";
+        String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(false));
+        JSONObject actualJsonObject = XML.toJSONObject(xmlForm);
+        JSONObject expectedJsonObject = XML.toJSONObject(expectedXmlString);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
+    }
+
+
+    @Test
+    public void testIndentSimpleJsonObject(){
+        String str = "{    \"employee\": {  \n" +
+                "        \"name\":       \"sonoo\",   \n" +
+                "        \"salary\":      56000,   \n" +
+                "        \"married\":    true  \n" +
+                "    }}";
+        JSONObject jsonObject = new JSONObject(str);
+        String actual = XML.toString(jsonObject, "Test", 2);
+        JSONObject actualJsonObject = XML.toJSONObject(actual);
+        String expected = "<Test>\n" +
+                "  <employee>\n" +
+                "    <name>sonoo</name>\n" +
+                "    <salary>56000</salary>\n" +
+                "    <married>true</married>\n" +
+                "  </employee>\n" +
+                "</Test>\n";
+        JSONObject expectedJsonObject = XML.toJSONObject(expected);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
+    }
+
+    @Test
+    public void testIndentSimpleJsonArray(){
+        String str = "[  \n" +
+                "    {\"name\":\"Ram\", \"email\":\"Ram@gmail.com\"},  \n" +
+                "    {\"name\":\"Bob\", \"email\":\"bob32@gmail.com\"}  \n" +
+                "]  ";
+        JSONArray jsonObject = new JSONArray(str);
+        String actual = XML.toString(jsonObject, 2);
+        JSONObject actualJsonObject = XML.toJSONObject(actual);
+        String expected = "<array>\n" +
+                "  <name>Ram</name>\n" +
+                "  <email>Ram@gmail.com</email>\n" +
+                "</array>\n" +
+                "<array>\n" +
+                "  <name>Bob</name>\n" +
+                "  <email>bob32@gmail.com</email>\n" +
+                "</array>\n";
+        JSONObject expectedJsonObject = XML.toJSONObject(expected);
+        assertTrue(expectedJsonObject.similar(actualJsonObject));
+
+
+    }
+
+    @Test
+    public void testIndentComplicatedJsonObjectWithArrayAndWithConfig(){
+        try (InputStream jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.json")) {
+            final JSONObject object = new JSONObject(new JSONTokener(jsonStream));
+            String actualString = XML.toString(object, null, XMLParserConfiguration.KEEP_STRINGS, 2);
+            try (InputStream xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.xml")) {
+                int bufferSize = 1024;
+                char[] buffer = new char[bufferSize];
+                StringBuilder expected = new StringBuilder();
+                Reader in = new InputStreamReader(xmlStream, "UTF-8");
+                for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+                    expected.append(buffer, 0, numRead);
+                }
+                assertTrue(XML.toJSONObject(expected.toString()).similar(XML.toJSONObject(actualString)));
+            }
+        } catch (IOException e) {
+            fail("file writer error: " +e.getMessage());
+        }
+    }
+
+    @Test
+    public void testMaxNestingDepthOf42IsRespected() {
+        final String wayTooLongMalformedXML = new String(new char[6000]).replace("\0", "<a>");
+
+        final int maxNestingDepth = 42;
+
+        try {
+            XML.toJSONObject(wayTooLongMalformedXML, XMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+
+            fail("Expecting a JSONException");
+        } catch (JSONException e) {
+            assertTrue("Wrong throwable thrown: not expecting message <" + e.getMessage() + ">",
+                e.getMessage().startsWith("Maximum nesting depth of " + maxNestingDepth));
+        }
+    }
+
+    @Test
+    public void testMaxNestingDepthIsRespectedWithValidXML() {
+        final String perfectlyFineXML = "<Test>\n" +
+            "  <employee>\n" +
+            "    <name>sonoo</name>\n" +
+            "    <salary>56000</salary>\n" +
+            "    <married>true</married>\n" +
+            "  </employee>\n" +
+            "</Test>\n";
+
+        final int maxNestingDepth = 1;
+
+        try {
+            XML.toJSONObject(perfectlyFineXML, XMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+
+            fail("Expecting a JSONException");
+        } catch (JSONException e) {
+            assertTrue("Wrong throwable thrown: not expecting message <" + e.getMessage() + ">",
+                e.getMessage().startsWith("Maximum nesting depth of " + maxNestingDepth));
+        }
+    }
+
+    @Test
+    public void testMaxNestingDepthWithValidFittingXML() {
+        final String perfectlyFineXML = "<Test>\n" +
+            "  <employee>\n" +
+            "    <name>sonoo</name>\n" +
+            "    <salary>56000</salary>\n" +
+            "    <married>true</married>\n" +
+            "  </employee>\n" +
+            "</Test>\n";
+
+        final int maxNestingDepth = 3;
+
+        try {
+            XML.toJSONObject(perfectlyFineXML, XMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            fail("XML document should be parsed as its maximum depth fits the maxNestingDepth " +
+                "parameter of the XMLParserConfiguration used");
+        }
+    }
+    @Test
+    public void testWithWhitespaceTrimmingDisabled() {
+        String originalXml = "<testXml> Test Whitespace String \t </testXml>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(false));
+        String expectedJsonString = "{\"testXml\":\" Test Whitespace String \t \"}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void testNestedWithWhitespaceTrimmingDisabled() {
+        String originalXml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "      <name> Sherlock Holmes </name>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(false));
+        String expectedJsonString = "{\"addresses\":{\"address\":{\"name\":\" Sherlock Holmes \"}}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void shouldTrimWhitespaceDoesNotSupportTagsEqualingCDataTagName() {
+    // When using withShouldTrimWhitespace = true, input containing tags with same name as cDataTagName is unsupported and should not be used in conjunction
+        String originalXml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "      <content> Sherlock Holmes </content>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(false).withcDataTagName("content"));
+        String expectedJsonString = "{\"addresses\":{\"address\":[[\"\\n      \",\" Sherlock Holmes \",\"\\n   \"]]}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void shouldTrimWhitespaceEnabledDropsTagsEqualingCDataTagNameButValueRemains() {
+        String originalXml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                        "<addresses>\n"+
+                        "   <address>\n"+
+                        "      <content> Sherlock Holmes </content>\n"+
+                        "   </address>\n"+
+                        "</addresses>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(true).withcDataTagName("content"));
+        String expectedJsonString = "{\"addresses\":{\"address\":\"Sherlock Holmes\"}}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void testWithWhitespaceTrimmingEnabled() {
+        String originalXml = "<testXml> Test Whitespace String \t </testXml>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration().withShouldTrimWhitespace(true));
+        String expectedJsonString = "{\"testXml\":\"Test Whitespace String\"}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+    @Test
+    public void testWithWhitespaceTrimmingEnabledByDefault() {
+        String originalXml = "<testXml> Test Whitespace String \t </testXml>";
+
+        JSONObject actualJson = XML.toJSONObject(originalXml, new XMLParserConfiguration());
+        String expectedJsonString = "{\"testXml\":\"Test Whitespace String\"}";
+        JSONObject expectedJson = new JSONObject(expectedJsonString);
+        Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void clarifyCurrentBehavior() {
+
+        // Behavior documented in #826
+        // After reverting the code, amount is stored as numeric, and phone is stored as string
+        String str1 =
+                "    <datatypes>\n" +
+                "        <telephone>0123456789</telephone>\n" +
+                "        <amount>0.1230</amount>\n" +
+                "        <boolean>true</boolean>\n" +
+                "    </datatypes>";
+        JSONObject jsonObject1 = XML.toJSONObject(str1,
+                new XMLParserConfiguration().withKeepStrings(false));
+        assertEquals(jsonObject1.getJSONObject("datatypes").getFloat("amount"), 0.123, .1);
+        assertEquals(jsonObject1.getJSONObject("datatypes").getString("telephone"), "0123456789");
+
+
+        // Behavior documented in #852
+        // After reverting the code, value is still stored as a number. This is due to how XML.isDecimalNotation() works
+        // and is probably a bug. JSONObject has a similar problem.
+        String str2 = "<color> <color_type>primary</color_type> <value>008E97</value> </color>";
+        JSONObject jsonObject2 = XML.toJSONObject(str2);
+        assertEquals(jsonObject2.getJSONObject("color").getLong("value"), 0e897, .1);
+
+        // Workaround for now is to use keepStrings
+        JSONObject jsonObject3 = XML.toJSONObject(str2, new XMLParserConfiguration().withKeepStrings(true));
+        assertEquals(jsonObject3.getJSONObject("color").getString("value"), "008E97");
+    }
+
 }
+
+
+

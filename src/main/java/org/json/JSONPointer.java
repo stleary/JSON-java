@@ -10,27 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 /*
-Copyright (c) 2002 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Public Domain.
 */
 
 /**
@@ -61,6 +41,12 @@ public class JSONPointer {
      * exactly one segment in each step.
      */
     public static class Builder {
+
+        /**
+         * Constructs a new Builder object.
+         */
+        public Builder() {
+        }
 
         // Segments for the eventual JSONPointer string
         private final List<String> refTokens = new ArrayList<String>();
@@ -183,14 +169,21 @@ public class JSONPointer {
         //}
     }
 
+    /**
+     * Constructs a new JSONPointer instance with the provided list of reference tokens.
+     *
+     * @param refTokens A list of strings representing the reference tokens for the JSON Pointer.
+     *                  Each token identifies a step in the path to the targeted value.
+     */
     public JSONPointer(List<String> refTokens) {
         this.refTokens = new ArrayList<String>(refTokens);
     }
 
+    /**
+     * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
+     */
     private static String unescape(String token) {
-        return token.replace("~1", "/").replace("~0", "~")
-                .replace("\\\"", "\"")
-                .replace("\\\\", "\\");
+        return token.replace("~1", "/").replace("~0", "~");
     }
 
     /**
@@ -263,16 +256,15 @@ public class JSONPointer {
     /**
      * Escapes path segment values to an unambiguous form.
      * The escape char to be inserted is '~'. The chars to be escaped 
-     * are ~, which maps to ~0, and /, which maps to ~1. Backslashes
-     * and double quote chars are also escaped.
+     * are ~, which maps to ~0, and /, which maps to ~1.
      * @param token the JSONPointer segment value to be escaped
      * @return the escaped value for the token
+     * 
+     * @see <a href="https://tools.ietf.org/html/rfc6901#section-3">rfc6901 section 3</a>
      */
     private static String escape(String token) {
         return token.replace("~", "~0")
-                .replace("/", "~1")
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"");
+                .replace("/", "~1");
     }
 
     /**

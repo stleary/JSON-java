@@ -1,27 +1,7 @@
 package org.json;
 
 /*
-Copyright (c) 2002 JSON.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-The Software shall be used for Good, not Evil.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Public Domain.
 */
 
 import java.io.Reader;
@@ -39,6 +19,8 @@ public class XMLTokener extends JSONTokener {
     * amp, apos, gt, lt, quot.
     */
    public static final java.util.HashMap<String, Character> entity;
+
+   private XMLParserConfiguration configuration = XMLParserConfiguration.ORIGINAL;
 
    static {
        entity = new java.util.HashMap<String, Character>(8);
@@ -63,6 +45,16 @@ public class XMLTokener extends JSONTokener {
      */
     public XMLTokener(String s) {
         super(s);
+    }
+
+    /**
+     * Construct an XMLTokener from a Reader and an XMLParserConfiguration.
+     * @param r A source reader.
+     * @param configuration the configuration that can be used to set certain flags
+     */
+    public XMLTokener(Reader r, XMLParserConfiguration configuration) {
+        super(r);
+        this.configuration = configuration;
     }
 
     /**
@@ -103,7 +95,7 @@ public class XMLTokener extends JSONTokener {
         StringBuilder sb;
         do {
             c = next();
-        } while (Character.isWhitespace(c));
+        } while (Character.isWhitespace(c) && configuration.shouldTrimWhiteSpace());
         if (c == 0) {
             return null;
         }
@@ -117,7 +109,9 @@ public class XMLTokener extends JSONTokener {
             }
             if (c == '<') {
                 back();
-                return sb.toString().trim();
+                if (configuration.shouldTrimWhiteSpace()) {
+                    return sb.toString().trim();
+                } else return sb.toString();
             }
             if (c == '&') {
                 sb.append(nextEntity(c));
