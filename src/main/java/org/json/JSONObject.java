@@ -214,8 +214,8 @@ public class JSONObject {
         if (x.nextClean() != '{') {
             throw x.syntaxError("A JSONObject text must begin with '{'");
         }
+        c = x.nextClean();
         for (;;) {
-            c = x.nextClean();
             switch (c) {
             case 0:
                 throw x.syntaxError("A JSONObject text must end with '}'");
@@ -252,13 +252,13 @@ public class JSONObject {
             switch (x.nextClean()) {
             case ';':
             case ',':
-                if (x.nextClean() == '}') {
+                c = x.nextClean();
+                if (c == '}') {
                     return;
                 }
                 if (x.end()) {
                     throw x.syntaxError("A JSONObject text must end with '}'");
                 }
-                x.back();
                 break;
             case '}':
                 return;
