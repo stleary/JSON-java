@@ -295,12 +295,9 @@ public class JSONTokener {
         StringBuilder sb = new StringBuilder();
         for (;;) {
             c = this.next();
-            switch (c) {
-            case 0:
-            case '\n':
-            case '\r':
-                throw this.syntaxError("Unterminated string");
-            case '\\':
+            if (c == quote) {
+                return sb.toString();
+            } else if (c == '\\') {
                 c = this.next();
                 switch (c) {
                 case 'b':
@@ -334,11 +331,9 @@ public class JSONTokener {
                 default:
                     throw this.syntaxError("Illegal escape.");
                 }
-                break;
-            default:
-                if (c == quote) {
-                    return sb.toString();
-                }
+            } else if (c == 0 || c == '\n' || c == '\r') {
+                throw this.syntaxError("Unterminated string");
+            } else {
                 sb.append(c);
             }
         }
