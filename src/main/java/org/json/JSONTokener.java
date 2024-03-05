@@ -397,15 +397,14 @@ public class JSONTokener {
      */
     public Object nextValue() throws JSONException {
         char c = this.nextClean();
-        switch (c) {
-        case '{':
+        if (c == '{') {
             this.back();
             try {
                 return new JSONObject(this);
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
-        case '[':
+        } else if (c == '[') {
             this.back();
             try {
                 return new JSONArray(this);
@@ -419,9 +418,7 @@ public class JSONTokener {
     Object nextSimpleValue(char c) {
         String string;
 
-        switch (c) {
-        case '"':
-        case '\'':
+        if (c == '"' || c == '\'') {
             return this.nextString(c);
         }
 

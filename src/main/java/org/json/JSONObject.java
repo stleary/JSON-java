@@ -216,12 +216,11 @@ public class JSONObject {
         }
         c = x.nextClean();
         for (;;) {
-            switch (c) {
-            case 0:
+            if (c == 0) {
                 throw x.syntaxError("A JSONObject text must end with '}'");
-            case '}':
+            } else if (c == '}') {
                 return;
-            default:
+            } else {
                 key = x.nextSimpleValue(c).toString();
             }
 
