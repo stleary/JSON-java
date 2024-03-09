@@ -13,24 +13,14 @@ public class JSONParserConfiguration extends ParserConfiguration {
      * Configuration with the default values.
      */
     public JSONParserConfiguration() {
-        this(false);
-    }
-
-    /**
-     * Configure the parser with argument overwriteDuplicateKey.
-     *
-     * @param overwriteDuplicateKey Indicate whether to overwrite duplicate key or not.<br>
-     *                              If not, the JSONParser will throw a {@link JSONException}
-     *                              when meeting duplicate keys.
-     */
-    public JSONParserConfiguration(boolean overwriteDuplicateKey) {
         super();
-        this.overwriteDuplicateKey = overwriteDuplicateKey;
+        this.overwriteDuplicateKey = false;
     }
 
     @Override
     protected JSONParserConfiguration clone() {
-        JSONParserConfiguration clone = new JSONParserConfiguration(overwriteDuplicateKey);
+        JSONParserConfiguration clone = new JSONParserConfiguration();
+        clone.overwriteDuplicateKey = overwriteDuplicateKey;
         clone.maxNestingDepth = maxNestingDepth;
         return clone;
     }
