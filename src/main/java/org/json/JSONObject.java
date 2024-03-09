@@ -15,17 +15,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -205,6 +196,21 @@ public class JSONObject {
      *             duplicated key.
      */
     public JSONObject(JSONTokener x) throws JSONException {
+        this(x, new JSONParserConfiguration());
+    }
+
+    /**
+     * Construct a JSONObject from a JSONTokener with custom json parse configurations.
+     *
+     * @param x
+     *            A JSONTokener object containing the source string.
+     * @param jsonParserConfiguration
+     *            Variable to pass parser custom configuration for json parsing.
+     * @throws JSONException
+     *             If there is a syntax error in the source string or a
+     *             duplicated key.
+     */
+    public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
         char c;
         String key;
@@ -234,13 +240,14 @@ public class JSONObject {
 
             if (key != null) {
                 // Check if key exists
-                if (this.opt(key) != null) {
-                    // key already exists
+                boolean keyExists = this.opt(key) != null;
+                if (keyExists && !jsonParserConfiguration.isOverwriteDuplicateKey()) {
                     throw x.syntaxError("Duplicate key \"" + key + "\"");
                 }
-                // Only add value if non-null
+
                 Object value = x.nextValue();
-                if (value!=null) {
+                // Only add value if non-null
+                if (value != null) {
                     this.put(key, value);
                 }
             }
@@ -296,7 +303,6 @@ public class JSONObject {
 
     /**
      * Construct a JSONObject from a map with recursion depth.
-     *
      */
     private JSONObject(Map<?, ?> m, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
         if (recursionDepth > jsonParserConfiguration.getMaxNestingDepth()) {
@@ -427,7 +433,25 @@ public class JSONObject {
      *                duplicated key.
      */
     public JSONObject(String source) throws JSONException {
-        this(new JSONTokener(source));
+        this(source, new JSONParserConfiguration());
+    }
+
+    /**
+     * Construct a JSONObject from a source JSON text string with custom json parse configurations.
+     * This is the most commonly used JSONObject constructor.
+     *
+     * @param source
+     *            A string beginning with <code>{</code>&nbsp;<small>(left
+     *            brace)</small> and ending with <code>}</code>
+     *            &nbsp;<small>(right brace)</small>.
+     * @param jsonParserConfiguration
+     *            Variable to pass parser custom configuration for json parsing.
+     * @exception JSONException
+     *                If there is a syntax error in the source string or a
+     *                duplicated key.
+     */
+    public JSONObject(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
+        this(new JSONTokener(source), jsonParserConfiguration);
     }
 
     /**
