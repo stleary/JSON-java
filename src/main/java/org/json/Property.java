@@ -13,6 +13,13 @@ import java.util.Properties;
  * @version 2015-05-05
  */
 public class Property {
+
+    /**
+     * Constructs a new Property object.
+     */
+    public Property() {
+    }
+
     /**
      * Converts a property file object into a JSONObject. The property file object is a table of name value pairs.
      * @param properties java.util.Properties

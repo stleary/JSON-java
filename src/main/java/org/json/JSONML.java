@@ -13,6 +13,13 @@ Public Domain.
  * @version 2016-01-30
  */
 public class JSONML {
+
+    /**
+     * Constructs a new JSONML object.
+     */
+    public JSONML() {
+    }
+
     /**
      * Parse XML values and store them in a JSONArray.
      * @param x       The XMLTokener containing the source string.
