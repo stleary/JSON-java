@@ -1,7 +1,8 @@
-package org.json;
+package org.json.junit;
 
 import static org.junit.Assert.assertEquals;
 
+import org.json.StringBuilderWriter;
 import org.junit.Before;
 import org.junit.Test;
 

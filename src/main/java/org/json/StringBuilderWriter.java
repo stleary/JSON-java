@@ -7,13 +7,13 @@ import java.io.Writer;
  * Performance optimised alternative for {@link java.io.StringWriter}
  * using internally a {@link StringBuilder} instead of a {@link StringBuffer}.
  */
-class StringBuilderWriter extends Writer {
+public class StringBuilderWriter extends Writer {
     private final StringBuilder builder;
 
     /**
      * Create a new string builder writer using the default initial string-builder buffer size.
      */
-    StringBuilderWriter() {
+    public StringBuilderWriter() {
         builder = new StringBuilder();
         lock = builder;
     }
@@ -26,7 +26,7 @@ class StringBuilderWriter extends Writer {
      *
      * @throws IllegalArgumentException If {@code initialSize} is negative
      */
-    StringBuilderWriter(int initialSize) {
+    public StringBuilderWriter(int initialSize) {
         builder = new StringBuilder(initialSize);
         lock = builder;
     }
