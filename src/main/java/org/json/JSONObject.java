@@ -2819,6 +2819,8 @@ public class JSONObject {
             }
         } else if (value instanceof Boolean) {
             writer.write(value.toString());
+        } else if (value instanceof Enum<?>) {
+            writer.write(quote(((Enum<?>)value).name()));
         } else if (value instanceof JSONObject) {
             ((JSONObject) value).write(writer, indentFactor, indent);
         } else if (value instanceof JSONArray) {
@@ -2829,8 +2831,6 @@ public class JSONObject {
         } else if (value instanceof Collection) {
             Collection<?> coll = (Collection<?>) value;
             new JSONArray(coll).write(writer, indentFactor, indent);
-        } else if (value instanceof Enum<?>) {
-            writer.write(quote(((Enum<?>)value).name()));
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
         } else {
