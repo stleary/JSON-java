@@ -5,6 +5,8 @@ and artifactId "json". For example:
 [https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
 
 ~~~
+20240303    Revert optLong/getLong changes, and recent commits.
+
 20240205    Recent commits.
 
 20231013    First release with minimum Java version 1.8. Recent commits, including fixes for CVE-2023-5072.

@@ -791,7 +791,7 @@ public class XMLTest {
     @Test
     public void testToJSONArray_jsonOutput() {
         final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final JSONObject expectedJson = new JSONObject("{\"root\":{\"item\":{\"id\":1},\"id\":[1,1,0,0],\"title\":true}}");
+        final JSONObject expectedJson = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}");
         final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, false);
 
         Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expectedJson);
@@ -1395,6 +1395,35 @@ public class XMLTest {
         String expectedJsonString = "{\"testXml\":\"Test Whitespace String\"}";
         JSONObject expectedJson = new JSONObject(expectedJsonString);
         Util.compareActualVsExpectedJsonObjects(actualJson,expectedJson);
+    }
+
+    @Test
+    public void clarifyCurrentBehavior() {
+
+        // Behavior documented in #826
+        // After reverting the code, amount is stored as numeric, and phone is stored as string
+        String str1 =
+                "    <datatypes>\n" +
+                "        <telephone>0123456789</telephone>\n" +
+                "        <amount>0.1230</amount>\n" +
+                "        <boolean>true</boolean>\n" +
+                "    </datatypes>";
+        JSONObject jsonObject1 = XML.toJSONObject(str1,
+                new XMLParserConfiguration().withKeepStrings(false));
+        assertEquals(jsonObject1.getJSONObject("datatypes").getFloat("amount"), 0.123, .1);
+        assertEquals(jsonObject1.getJSONObject("datatypes").getString("telephone"), "0123456789");
+
+
+        // Behavior documented in #852
+        // After reverting the code, value is still stored as a number. This is due to how XML.isDecimalNotation() works
+        // and is probably a bug. JSONObject has a similar problem.
+        String str2 = "<color> <color_type>primary</color_type> <value>008E97</value> </color>";
+        JSONObject jsonObject2 = XML.toJSONObject(str2);
+        assertEquals(jsonObject2.getJSONObject("color").getLong("value"), 0e897, .1);
+
+        // Workaround for now is to use keepStrings
+        JSONObject jsonObject3 = XML.toJSONObject(str2, new XMLParserConfiguration().withKeepStrings(true));
+        assertEquals(jsonObject3.getJSONObject("color").getString("value"), "008E97");
     }
 
 }
