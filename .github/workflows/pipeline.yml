@@ -52,8 +52,6 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: 'maven'
       - name: Compile Java ${{ matrix.java }}
-        env:
-          MAVEN_OPTS: -Xss4m
         run: mvn clean compile -D maven.compiler.source=${{ matrix.java }} -D maven.compiler.target=${{ matrix.java }} -D maven.test.skip=true -D maven.site.skip=true -D maven.javadoc.skip=true
       - name: Run Tests ${{ matrix.java }}
         run: |
