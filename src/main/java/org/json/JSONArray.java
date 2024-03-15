@@ -85,10 +85,12 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Construct a JSONArray from a JSONTokener.
+     * Constructs a JSONArray from a JSONTokener and a JSONParserConfiguration.
+     * JSONParserConfiguration contains strictMode turned off (false) by default.
      *
-     * @param x A JSONTokener
-     * @throws JSONException If there is a syntax error.
+     * @param x                       A JSONTokener instance from which the JSONArray is constructed.
+     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
+     * @throws JSONException If a syntax error occurs during the construction of the JSONArray.
      */
     public JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
@@ -103,7 +105,7 @@ public class JSONArray implements Iterable<Object> {
         }
         if (nextChar != ']') {
             x.back();
-            for (;;) {
+            for (; ; ) {
                 if (x.nextClean() == ',') {
                     x.back();
                     this.myArrayList.add(JSONObject.NULL);
