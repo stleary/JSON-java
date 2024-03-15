@@ -31,7 +31,7 @@ public class JSONParserConfigurationTest {
 
     @Test
     public void givenInvalidInputArrays_testStrictModeTrue_shouldThrowJsonException() {
-        List<String> strictModeInputTestCases = Arrays.asList("[1,2];[3,4]", "", "[1, 2,3]:[4,5]"/*, "[{test: implied}]"*/);
+        List<String> strictModeInputTestCases = Arrays.asList("[1,2];[3,4]", "", "[1, 2,3]:[4,5]", "[{test: implied}]");
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
 
@@ -41,6 +41,15 @@ public class JSONParserConfigurationTest {
                 () -> new JSONArray(testCase, jsonParserConfiguration));
             System.out.println("Passed");
         });
+    }
+
+    @Test
+    public void givenInvalidInputArrays_testStrictModeFalse_shouldNotThrowAnyException() {
+        List<String> strictModeInputTestCases = Arrays.asList("[1,2];[3,4]", "[1, 2,3]:[4,5]", "[{test: implied}]");
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(false);
+
+        strictModeInputTestCases.stream().peek(System.out::println).forEach(testCase -> new JSONArray(testCase, jsonParserConfiguration));
     }
 
     @Test
