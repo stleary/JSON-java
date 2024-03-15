@@ -36,10 +36,9 @@ public class JSONParserConfigurationTest {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
 
-        strictModeInputTestCases.forEach(testCase -> {
-            assertThrows("expected non-compliant array but got instead: " + testCase, JSONException.class,
-                () -> new JSONArray(testCase, jsonParserConfiguration));
-        });
+        strictModeInputTestCases.forEach(
+            testCase -> assertThrows("expected non-compliant array but got instead: " + testCase, JSONException.class,
+                () -> new JSONArray(testCase, jsonParserConfiguration)));
     }
 
     @Test
