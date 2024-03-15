@@ -2,6 +2,7 @@ package org.json.junit;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,25 +32,23 @@ public class JSONParserConfigurationTest {
 
     @Test
     public void givenInvalidInputArrays_testStrictModeTrue_shouldThrowJsonException() {
-        List<String> strictModeInputTestCases = Arrays.asList("[1,2];[3,4]", "", "[1, 2,3]:[4,5]", "[{test: implied}]");
+        List<String> strictModeInputTestCases = getNonCompliantJSONList();
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
 
         strictModeInputTestCases.forEach(testCase -> {
-            System.out.println("Test case: " + testCase);
             assertThrows("expected non-compliant array but got instead: " + testCase, JSONException.class,
                 () -> new JSONArray(testCase, jsonParserConfiguration));
-            System.out.println("Passed");
         });
     }
 
     @Test
     public void givenInvalidInputArrays_testStrictModeFalse_shouldNotThrowAnyException() {
-        List<String> strictModeInputTestCases = Arrays.asList("[1,2];[3,4]", "[1, 2,3]:[4,5]", "[{test: implied}]");
+        List<String> strictModeInputTestCases = getNonCompliantJSONList();
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(false);
 
-        strictModeInputTestCases.stream().peek(System.out::println).forEach(testCase -> new JSONArray(testCase, jsonParserConfiguration));
+        strictModeInputTestCases.forEach(testCase -> new JSONArray(testCase, jsonParserConfiguration));
     }
 
     @Test
@@ -70,5 +69,15 @@ public class JSONParserConfigurationTest {
 
         assertTrue(jsonParserConfiguration.isOverwriteDuplicateKey());
         assertEquals(42, jsonParserConfiguration.getMaxNestingDepth());
+    }
+
+    private List<String> getNonCompliantJSONList() {
+        return Arrays.asList(
+            "[1,2];[3,4]",
+            "[1, 2,3]:[4,5]",
+            "[{test: implied}]",
+            "[{\"test\": implied}]",
+            "[{\"number\":\"7990154836330\",\"color\":'c'},{\"number\":8784148854580,\"color\":RosyBrown},{\"number\":\"5875770107113\",\"color\":\"DarkSeaGreen\"}]",
+            "[{test: \"implied\"}]");
     }
 }

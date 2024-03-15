@@ -109,7 +109,11 @@ public class JSONArray implements Iterable<Object> {
                     this.myArrayList.add(JSONObject.NULL);
                 } else {
                     x.back();
-                    this.myArrayList.add(x.nextValue());
+                    if (jsonParserConfiguration.isStrictMode()) {
+                        this.myArrayList.add(x.nextValue(true));
+                    } else {
+                        this.myArrayList.add(x.nextValue());
+                    }
                 }
                 switch (x.nextClean()) {
                     case 0:
@@ -1693,7 +1697,8 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException        If not an array or if an array value is non-finite number.
      * @throws NullPointerException Thrown if the array parameter is null.
      */
-    private void addAll(Object array, boolean wrap, int recursionDepth, JSONParserConfiguration jsonParserConfiguration)
+    private void addAll(Object array, boolean wrap, int recursionDepth, JSONParserConfiguration
+        jsonParserConfiguration)
         throws JSONException {
         if (array.getClass().isArray()) {
             int length = Array.getLength(array);
