@@ -311,7 +311,7 @@ public class JSONTokener {
     public String nextString(char quote) throws JSONException {
         char c;
         StringBuilder sb = new StringBuilder();
-        for (; ; ) {
+        for (;;) {
             c = this.next();
             switch (c) {
                 case 0:
@@ -542,6 +542,8 @@ public class JSONTokener {
     }
 
     Object nextSimpleValue(char c, boolean strictMode) {
+        String string;
+
         if (c == '"' || c == '\'') {
             String str = this.nextString(c);
             if (strictMode) {
@@ -550,19 +552,6 @@ public class JSONTokener {
             return str;
         }
 
-        return parsedUnquotedText(c);
-    }
-
-    /**
-     * Parses unquoted text from the JSON input. This could be the values true, false, or null, or it can be a number.
-     * Non-standard forms are also accepted. Characters are accumulated until the end of the text or a formatting
-     * character is reached.
-     *
-     * @param c The starting character.
-     * @return The parsed object.
-     * @throws JSONException If the parsed string is empty.
-     */
-    private Object parsedUnquotedText(char c) {
         StringBuilder sb = new StringBuilder();
         while (c >= ' ' && ",:]}/\\\"[{;=#".indexOf(c) < 0) {
             sb.append(c);
@@ -572,8 +561,8 @@ public class JSONTokener {
             this.back();
         }
 
-        String string = sb.toString().trim();
-        if (string.isEmpty()) {
+        string = sb.toString().trim();
+        if ("".equals(string)) {
             throw this.syntaxError("Missing value");
         }
         return JSONObject.stringToValue(string);
