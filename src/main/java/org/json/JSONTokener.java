@@ -396,7 +396,7 @@ public class JSONTokener {
     public String nextTo(String delimiters) throws JSONException {
         char c;
         StringBuilder sb = new StringBuilder();
-        for (;;) {
+        for (; ; ) {
             c = this.next();
             if (delimiters.indexOf(c) >= 0 || c == 0 ||
                 c == '\n' || c == '\r') {
@@ -457,9 +457,9 @@ public class JSONTokener {
         if (strictMode) {
             Object valueToValidate = nextSimpleValue(c, true);
 
-            boolean isNumeric = valueToValidate.toString().chars().allMatch( Character::isDigit );
+            boolean isNumeric = checkIfValueIsNumeric(valueToValidate);
 
-            if(isNumeric){
+            if (isNumeric) {
                 return valueToValidate;
             }
 
@@ -473,6 +473,15 @@ public class JSONTokener {
         }
 
         return nextSimpleValue(c);
+    }
+
+    private boolean checkIfValueIsNumeric(Object valueToValidate) {
+        for (char c : valueToValidate.toString().toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
