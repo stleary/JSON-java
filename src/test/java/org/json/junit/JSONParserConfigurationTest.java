@@ -2,7 +2,6 @@ package org.json.junit;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +13,6 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class JSONParserConfigurationTest {
-
     private static final String TEST_SOURCE = "{\"key\": \"value1\", \"key\": \"value2\"}";
 
     @Test(expected = JSONException.class)
@@ -25,7 +23,7 @@ public class JSONParserConfigurationTest {
     @Test
     public void testOverwrite() {
         JSONObject jsonObject = new JSONObject(TEST_SOURCE,
-            new JSONParserConfiguration().withOverwriteDuplicateKey(true));
+                new JSONParserConfiguration().withOverwriteDuplicateKey(true));
 
         assertEquals("duplicate key should be overwritten", "value2", jsonObject.getString("key"));
     }
@@ -53,8 +51,8 @@ public class JSONParserConfigurationTest {
     @Test
     public void verifyDuplicateKeyThenMaxDepth() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
-            .withOverwriteDuplicateKey(true)
-            .withMaxNestingDepth(42);
+                .withOverwriteDuplicateKey(true)
+                .withMaxNestingDepth(42);
 
         assertEquals(42, jsonParserConfiguration.getMaxNestingDepth());
         assertTrue(jsonParserConfiguration.isOverwriteDuplicateKey());
@@ -63,8 +61,8 @@ public class JSONParserConfigurationTest {
     @Test
     public void verifyMaxDepthThenDuplicateKey() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
-            .withMaxNestingDepth(42)
-            .withOverwriteDuplicateKey(true);
+                .withMaxNestingDepth(42)
+                .withOverwriteDuplicateKey(true);
 
         assertTrue(jsonParserConfiguration.isOverwriteDuplicateKey());
         assertEquals(42, jsonParserConfiguration.getMaxNestingDepth());
