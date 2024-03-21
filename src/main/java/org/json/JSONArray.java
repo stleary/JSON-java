@@ -5,7 +5,6 @@ Public Domain.
  */
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -1730,7 +1729,10 @@ public class JSONArray implements Iterable<Object> {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        StringWriter sw = new StringWriter();
+        // each value requires a comma, so multiply the count by 2
+        // We don't want to oversize the initial capacity
+        int initialSize = myArrayList.size() * 2;
+        Writer sw = new StringBuilderWriter(Math.max(initialSize, 16));
         return this.write(sw, indentFactor, 0).toString();
     }
 

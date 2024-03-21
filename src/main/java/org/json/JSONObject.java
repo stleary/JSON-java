@@ -6,7 +6,6 @@ Public Domain.
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -2266,7 +2265,10 @@ public class JSONObject {
      */
     @SuppressWarnings("resource")
     public static String quote(String string) {
-        StringWriter sw = new StringWriter();
+        if (string == null || string.isEmpty()) {
+            return "\"\"";
+        }
+        Writer sw = new StringBuilderWriter(string.length() + 2);
         try {
             return quote(string, sw).toString();
         } catch (IOException ignored) {
@@ -2665,7 +2667,10 @@ public class JSONObject {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        StringWriter w = new StringWriter();
+        // 6 characters are the minimum to serialise a key value pair e.g.: "k":1,
+        // and we don't want to oversize the initial capacity
+        int initialSize = map.size() * 6;
+        Writer w = new StringBuilderWriter(Math.max(initialSize, 16));
         return this.write(w, indentFactor, 0).toString();
     }
 
@@ -2808,6 +2813,7 @@ public class JSONObject {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof JSONString) {
+            // JSONString must be checked first, so it can overwrite behaviour of other types below
             Object o;
             try {
                 o = ((JSONString) value).toJSONString();
@@ -2815,6 +2821,10 @@ public class JSONObject {
                 throw new JSONException(e);
             }
             writer.write(o != null ? o.toString() : quote(value.toString()));
+        } else if (value instanceof String) {
+            // assuming most values are Strings, so testing it early
+            quote(value.toString(), writer);
+            return writer;
         } else if (value instanceof Number) {
             // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
             final String numberAsString = numberToString((Number) value);
