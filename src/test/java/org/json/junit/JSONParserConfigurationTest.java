@@ -23,7 +23,7 @@ public class JSONParserConfigurationTest {
     @Test
     public void testOverwrite() {
         JSONObject jsonObject = new JSONObject(TEST_SOURCE,
-                new JSONParserConfiguration().withOverwriteDuplicateKey(true));
+            new JSONParserConfiguration().withOverwriteDuplicateKey(true));
 
         assertEquals("duplicate key should be overwritten", "value2", jsonObject.getString("key"));
     }
@@ -46,6 +46,42 @@ public class JSONParserConfigurationTest {
             .withStrictMode(false);
 
         strictModeInputTestCases.forEach(testCase -> new JSONArray(testCase, jsonParserConfiguration));
+    }
+
+    @Test
+    public void givenInvalidInputArray_testStrictModeTrue_shouldThrowInvalidCharacterErrorMessage() {
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(true);
+
+        String testCase = "[1,2];[3,4]";
+        JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
+            JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
+
+        assertEquals("invalid character found after end of array: ; at 6 [character 7 line 1]", je.getMessage());
+    }
+
+    @Test
+    public void givenInvalidInputArray_testStrictModeTrue_shouldThrowValueNotSurroundedByQuotesErrorMessage() {
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(true);
+
+        String testCase = "[{\"test\": implied}]";
+        JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
+            JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
+
+        assertEquals("Value is not surrounded by quotes: implied", je.getMessage());
+    }
+
+    @Test
+    public void givenInvalidInputArray_testStrictModeTrue_shouldThrowKeyNotSurroundedByQuotesErrorMessage() {
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(true);
+
+        String testCase = "[{test: implied}]";
+        JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
+            JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
+
+        assertEquals("Key is not surrounded by quotes: test", je.getMessage());
     }
 
     @Test
