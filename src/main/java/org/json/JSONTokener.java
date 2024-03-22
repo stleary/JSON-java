@@ -394,51 +394,158 @@ public class JSONTokener {
 
 
     /**
-     * Get the next value. The value can be a Boolean, Double, Integer,
-     * JSONArray, JSONObject, Long, or String, or the JSONObject.NULL object.
-     * @throws JSONException If syntax error.
+     * Get the next value. The value can be a Boolean, Double, Integer, JSONArray, JSONObject, Long, or String, or the
+     * JSONObject.NULL object.
      *
      * @return An object.
+     * @throws JSONException If syntax error.
      */
     public Object nextValue() throws JSONException {
+        return nextValue(false);
+    }
+
+    /**
+     * Get the next value. The value can be a Boolean, Double, Integer, JSONArray, JSONObject, Long, or String, or the
+     * JSONObject.NULL object. The strictMode parameter controls the behavior of the method when parsing the value.
+     *
+     * @param strictMode If true, the method will strictly adhere to the JSON syntax, throwing a JSONException for any
+     *                   deviations.
+     * @return An object.
+     * @throws JSONException If syntax error.
+     */
+    public Object nextValue(boolean strictMode) throws JSONException {
         char c = this.nextClean();
         switch (c) {
-        case '{':
-            this.back();
-            try {
-                return new JSONObject(this);
-            } catch (StackOverflowError e) {
-                throw new JSONException("JSON Array or Object depth too large to process.", e);
-            }
-        case '[':
-            this.back();
-            try {
-                return new JSONArray(this);
-            } catch (StackOverflowError e) {
-                throw new JSONException("JSON Array or Object depth too large to process.", e);
-            }
+            case '{':
+                this.back();
+                return getJsonObject(strictMode);
+            case '[':
+                this.back();
+                return getJsonArray();
+            default:
+                return getValue(c, strictMode);
         }
+    }
+
+    /**
+     * This method is used to get the next value.
+     *
+     * @param c          The next character in the JSONTokener.
+     * @param strictMode If true, the method will strictly adhere to the JSON syntax, throwing a JSONException if the
+     *                   value is not surrounded by quotes.
+     * @return An object which is the next value in the JSONTokener.
+     * @throws JSONException If the value is not surrounded by quotes when strictMode is true.
+     */
+    private Object getValue(char c, boolean strictMode) {
+        if (strictMode) {
+            Object valueToValidate = nextSimpleValue(c, true);
+
+            boolean isNumeric = checkIfValueIsNumeric(valueToValidate);
+
+            if (isNumeric) {
+                return valueToValidate;
+            }
+
+            boolean hasQuotes = valueIsWrappedByQuotes(valueToValidate);
+
+            if (!hasQuotes) {
+                throw new JSONException("Value is not surrounded by quotes: " + valueToValidate);
+            }
+
+            return valueToValidate;
+        }
+
         return nextSimpleValue(c);
     }
 
-    Object nextSimpleValue(char c) {
-        String string;
+    private boolean checkIfValueIsNumeric(Object valueToValidate) {
+        for (char c : valueToValidate.toString().toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-        switch (c) {
-        case '"':
-        case '\'':
-            return this.nextString(c);
+    /**
+     * This method is used to get a JSONObject from the JSONTokener. The strictMode parameter controls the behavior of
+     * the method when parsing the JSONObject.
+     *
+     * @param strictMode If true, the method will strictly adhere to the JSON syntax, throwing a JSONException for any
+     *                   deviations.
+     * @return A JSONObject which is the next value in the JSONTokener.
+     * @throws JSONException If the JSONObject or JSONArray depth is too large to process.
+     */
+    private JSONObject getJsonObject(boolean strictMode) {
+        try {
+            if (strictMode) {
+                return new JSONObject(this, new JSONParserConfiguration().withStrictMode(true));
+            }
+
+            return new JSONObject(this);
+        } catch (StackOverflowError e) {
+            throw new JSONException("JSON Array or Object depth too large to process.", e);
+        }
+    }
+
+    /**
+     * This method is used to get a JSONArray from the JSONTokener.
+     *
+     * @return A JSONArray which is the next value in the JSONTokener.
+     * @throws JSONException If the JSONArray depth is too large to process.
+     */
+    private JSONArray getJsonArray() {
+        try {
+            return new JSONArray(this);
+        } catch (StackOverflowError e) {
+            throw new JSONException("JSON Array or Object depth too large to process.", e);
+        }
+    }
+
+    /**
+     * This method checks if the provided value is wrapped by quotes.
+     *
+     * @param valueToValidate The value to be checked. It is converted to a string before checking.
+     * @return A boolean indicating whether the value is wrapped by quotes. It returns true if the value is wrapped by
+     * either single or double quotes.
+     */
+    private boolean valueIsWrappedByQuotes(Object valueToValidate) {
+        String stringToValidate = valueToValidate.toString();
+        boolean isWrappedByDoubleQuotes = isWrappedByQuotes(stringToValidate, "\"");
+        boolean isWrappedBySingleQuotes = isWrappedByQuotes(stringToValidate, "'");
+        return isWrappedByDoubleQuotes || isWrappedBySingleQuotes;
+    }
+
+    private boolean isWrappedByQuotes(String valueToValidate, String quoteType) {
+        return valueToValidate.startsWith(quoteType) && valueToValidate.endsWith(quoteType);
+    }
+
+    Object nextSimpleValue(char c) {
+        return nextSimpleValue(c, false);
+    }
+
+    Object nextSimpleValue(char c, boolean strictMode) {
+        if (c == '"' || c == '\'') {
+            String str = this.nextString(c);
+            if (strictMode) {
+                return String.format("\"%s\"", str);
+            }
+            return str;
         }
 
-        /*
-         * Handle unquoted text. This could be the values true, false, or
-         * null, or it can be a number. An implementation (such as this one)
-         * is allowed to also accept non-standard forms.
-         *
-         * Accumulate characters until we reach the end of the text or a
-         * formatting character.
-         */
+        return parsedUnquotedText(c);
+    }
 
+    /**
+     * Parses unquoted text from the JSON input. This could be the values true, false, or null, or it can be a number.
+     * Non-standard forms are also accepted. Characters are accumulated until the end of the text or a formatting
+     * character is reached.
+     *
+     * @param c The starting character.
+     * @return The parsed object.
+     * @throws JSONException If the parsed string is empty.
+     */
+    private Object parsedUnquotedText(char c) {
         StringBuilder sb = new StringBuilder();
         while (c >= ' ' && ",:]}/\\\"[{;=#".indexOf(c) < 0) {
             sb.append(c);
@@ -448,8 +555,8 @@ public class JSONTokener {
             this.back();
         }
 
-        string = sb.toString().trim();
-        if ("".equals(string)) {
+        String string = sb.toString().trim();
+        if (string.isEmpty()) {
             throw this.syntaxError("Missing value");
         }
         return JSONObject.stringToValue(string);

@@ -220,12 +220,19 @@ public class JSONObject {
         for (;;) {
             c = x.nextClean();
             switch (c) {
-            case 0:
-                throw x.syntaxError("A JSONObject text must end with '}'");
-            case '}':
-                return;
-            default:
-                key = x.nextSimpleValue(c).toString();
+                case 0:
+                    throw x.syntaxError("A JSONObject text must end with '}'");
+                case '}':
+                    return;
+                default:
+                    String keyToValidate = getKeyToValidate(x, c, jsonParserConfiguration.isStrictMode());
+                    boolean keyHasQuotes = keyToValidate.startsWith("\"") && keyToValidate.endsWith("\"");
+
+                    if (jsonParserConfiguration.isStrictMode() && !keyHasQuotes) {
+                        throw new JSONException("Key is not surrounded by quotes: " + keyToValidate);
+                    }
+
+                    key = keyToValidate;
             }
 
             // The key is followed by ':'.
@@ -244,7 +251,7 @@ public class JSONObject {
                     throw x.syntaxError("Duplicate key \"" + key + "\"");
                 }
 
-                Object value = x.nextValue();
+                Object value = getValue(x, jsonParserConfiguration.isStrictMode());
                 // Only add value if non-null
                 if (value != null) {
                     this.put(key, value);
@@ -270,6 +277,17 @@ public class JSONObject {
                 throw x.syntaxError("Expected a ',' or '}'");
             }
         }
+    }
+
+    private Object getValue(JSONTokener x, boolean strictMode) {
+        if (strictMode) {
+            return x.nextValue(true);
+        }
+        return x.nextValue();
+    }
+
+    private String getKeyToValidate(JSONTokener x, char c, boolean strictMode) {
+        return x.nextSimpleValue(c, strictMode).toString();
     }
 
     /**
@@ -1247,7 +1265,7 @@ public class JSONObject {
     static BigDecimal objectToBigDecimal(Object val, BigDecimal defaultValue) {
         return objectToBigDecimal(val, defaultValue, true);
     }
-    
+
     /**
      * @param val value to convert
      * @param defaultValue default value to return is the conversion doesn't work or is null.
