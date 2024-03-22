@@ -299,7 +299,8 @@ public class JSONTokener {
             case 0:
             case '\n':
             case '\r':
-                throw this.syntaxError("Unterminated string");
+                throw this.syntaxError("Unterminated string. " +
+                        "Character with int code " + (int) c + " is not allowed within a quoted string.");
             case '\\':
                 c = this.next();
                 switch (c) {
@@ -322,7 +323,7 @@ public class JSONTokener {
                     try {
                         sb.append((char)Integer.parseInt(this.next(4), 16));
                     } catch (NumberFormatException e) {
-                        throw this.syntaxError("Illegal escape.", e);
+                        throw this.syntaxError("Illegal escape. \\u must be followed by a 4 digit number.", e);
                     }
                     break;
                 case '"':
@@ -332,7 +333,7 @@ public class JSONTokener {
                     sb.append(c);
                     break;
                 default:
-                    throw this.syntaxError("Illegal escape.");
+                    throw this.syntaxError("Illegal escape. Escape sequence  \\" + c + " is not valid.");
                 }
                 break;
             default:
@@ -521,7 +522,7 @@ public class JSONTokener {
      */
     @Override
     public String toString() {
-        return " at " + this.index + " [character " + this.character + " line " +
+        return " at index: " + this.index + " [character number " + this.character + " in line " +
                 this.line + "]";
     }
 
