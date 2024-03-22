@@ -23,7 +23,7 @@ public class JSONParserConfigurationTest {
     @Test
     public void testOverwrite() {
         JSONObject jsonObject = new JSONObject(TEST_SOURCE,
-            new JSONParserConfiguration().withOverwriteDuplicateKey(true));
+                new JSONParserConfiguration().withOverwriteDuplicateKey(true));
 
         assertEquals("duplicate key should be overwritten", "value2", jsonObject.getString("key"));
     }
