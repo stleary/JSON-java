@@ -522,7 +522,7 @@ public class JSONTokener {
      */
     @Override
     public String toString() {
-        return " at index: " + this.index + " [character number " + this.character + " in line " +
+        return " at " + this.index + " [character " + this.character + " line " +
                 this.line + "]";
     }
 
