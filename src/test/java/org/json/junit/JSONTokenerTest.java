@@ -254,7 +254,7 @@ public class JSONTokenerTest {
         assertEquals(" at index 8 [character number 0 in line 2]", tokener.toString());
         tokener.skipTo('\r');
         assertEquals("skipTo() improperly modifying indexes"," at index 14 [character number 6 in line 2]", tokener.toString());
-        // verify \r\n combo doesn't increment the in line twice
+        // verify \r\n combo doesn't increment the line twice
         assertEquals('\r', tokener.next());
         assertEquals(" at index 15 [character number 0 in line 3]", tokener.toString());
         assertEquals('\n', tokener.next());
