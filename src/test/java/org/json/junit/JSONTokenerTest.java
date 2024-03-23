@@ -233,7 +233,7 @@ public class JSONTokenerTest {
 
     /**
      * Verify that next and back are working properly and tracking the correct positions
-     * with different new in line combinations.
+     * with different new line combinations.
      */
     @Test
     public void testNextBackComboWithNewLines() {
