@@ -350,7 +350,7 @@ public class XMLTest {
                 "   <address>\n"+
                 "       <![CDATA[ this is -- <another> comment ]]>\n"+
                 "       <name>Joe Tester</name>\n"+
-                "       <!-- this is a - multi in line \n"+
+                "       <!-- this is a - multi line \n"+
                 "            comment -->\n"+
                 "       <street>Baker street 5</street>\n"+
                 "   </address>\n"+
