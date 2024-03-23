@@ -259,7 +259,7 @@ public class JSONTokenerTest {
         assertEquals(" at index 15 [character number 0 in line 3]", tokener.toString());
         assertEquals('\n', tokener.next());
         assertEquals(" at index 16 [character number 0 in line 3]", tokener.toString());
-        // verify stepping back after reading the \n of an \r\n combo doesn't  increment the in line incorrectly
+        // verify stepping back after reading the \n of an \r\n combo doesn't  increment the line incorrectly
         tokener.back();
         assertEquals(" at index 15 [character number 6 in line 2]", tokener.toString());
         assertEquals('\n', tokener.next());
