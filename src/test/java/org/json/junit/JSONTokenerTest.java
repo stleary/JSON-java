@@ -233,7 +233,7 @@ public class JSONTokenerTest {
 
     /**
      * Verify that next and back are working properly and tracking the correct positions
-     * with different new line combinations.
+     * with different new in line combinations.
      */
     @Test
     public void testNextBackComboWithNewLines() {
@@ -241,74 +241,74 @@ public class JSONTokenerTest {
         //                         ^       ^         ^                    ^
         // index positions         0       8        16                   36
         final JSONTokener tokener = new JSONTokener(testString);
-        assertEquals(" at 0 [character 1 line 1]", tokener.toString());
+        assertEquals(" at index 0 [character number 1 in line 1]", tokener.toString());
         assertEquals('t',tokener.next());
-        assertEquals(" at 1 [character 2 line 1]", tokener.toString());
+        assertEquals(" at index 1 [character number 2 in line 1]", tokener.toString());
         tokener.skipTo('\n');
-        assertEquals("skipTo() improperly modifying indexes"," at 7 [character 8 line 1]", tokener.toString());
+        assertEquals("skipTo() improperly modifying indexes"," at index 7 [character number 8 in line 1]", tokener.toString());
         assertEquals('\n',tokener.next());
-        assertEquals(" at 8 [character 0 line 2]", tokener.toString());
+        assertEquals(" at index 8 [character number 0 in line 2]", tokener.toString());
         assertEquals('A',tokener.next());
-        assertEquals(" at 9 [character 1 line 2]", tokener.toString());
+        assertEquals(" at index 9 [character number 1 in line 2]", tokener.toString());
         tokener.back();
-        assertEquals(" at 8 [character 0 line 2]", tokener.toString());
+        assertEquals(" at index 8 [character number 0 in line 2]", tokener.toString());
         tokener.skipTo('\r');
-        assertEquals("skipTo() improperly modifying indexes"," at 14 [character 6 line 2]", tokener.toString());
-        // verify \r\n combo doesn't increment the line twice
+        assertEquals("skipTo() improperly modifying indexes"," at index 14 [character number 6 in line 2]", tokener.toString());
+        // verify \r\n combo doesn't increment the in line twice
         assertEquals('\r', tokener.next());
-        assertEquals(" at 15 [character 0 line 3]", tokener.toString());
+        assertEquals(" at index 15 [character number 0 in line 3]", tokener.toString());
         assertEquals('\n', tokener.next());
-        assertEquals(" at 16 [character 0 line 3]", tokener.toString());
-        // verify stepping back after reading the \n of an \r\n combo doesn't  increment the line incorrectly
+        assertEquals(" at index 16 [character number 0 in line 3]", tokener.toString());
+        // verify stepping back after reading the \n of an \r\n combo doesn't  increment the in line incorrectly
         tokener.back();
-        assertEquals(" at 15 [character 6 line 2]", tokener.toString());
+        assertEquals(" at index 15 [character number 6 in line 2]", tokener.toString());
         assertEquals('\n', tokener.next());
-        assertEquals(" at 16 [character 0 line 3]", tokener.toString());
+        assertEquals(" at index 16 [character number 0 in line 3]", tokener.toString());
         assertEquals('W', tokener.next());
-        assertEquals(" at 17 [character 1 line 3]", tokener.toString());
+        assertEquals(" at index 17 [character number 1 in line 3]", tokener.toString());
         assertEquals('i', tokener.next());
-        assertEquals(" at 18 [character 2 line 3]", tokener.toString());
+        assertEquals(" at index 18 [character number 2 in line 3]", tokener.toString());
         tokener.skipTo('\r');
-        assertEquals("skipTo() improperly modifying indexes"," at 35 [character 19 line 3]", tokener.toString());
+        assertEquals("skipTo() improperly modifying indexes"," at index 35 [character number 19 in line 3]", tokener.toString());
         assertEquals('\r', tokener.next());
-        assertEquals(" at 36 [character 0 line 4]", tokener.toString());
+        assertEquals(" at index 36 [character number 0 in line 4]", tokener.toString());
         tokener.back();
-        assertEquals(" at 35 [character 19 line 3]", tokener.toString());
+        assertEquals(" at index 35 [character number 19 in line 3]", tokener.toString());
         assertEquals('\r', tokener.next());
-        assertEquals(" at 36 [character 0 line 4]", tokener.toString());
+        assertEquals(" at index 36 [character number 0 in line 4]", tokener.toString());
         assertEquals('N', tokener.next());
-        assertEquals(" at 37 [character 1 line 4]", tokener.toString());
+        assertEquals(" at index 37 [character number 1 in line 4]", tokener.toString());
         
         // verify we get the same data just walking though, no calls to back
         final JSONTokener t2 = new JSONTokener(testString);
         for(int i=0; i<7; i++) {
-            assertTrue(t2.toString().startsWith(" at " + i + " "));
+            assertTrue(t2.toString().startsWith(" at index " + i + " "));
             assertEquals(testString.charAt(i), t2.next());
         }
-        assertEquals(" at 7 [character 8 line 1]", t2.toString());
+        assertEquals(" at index 7 [character number 8 in line 1]", t2.toString());
         assertEquals(testString.charAt(7), t2.next());
-        assertEquals(" at 8 [character 0 line 2]", t2.toString());
+        assertEquals(" at index 8 [character number 0 in line 2]", t2.toString());
         for(int i=8; i<14; i++) {
-            assertTrue(t2.toString().startsWith(" at " + i + " "));
+            assertTrue(t2.toString().startsWith(" at index " + i + " "));
             assertEquals(testString.charAt(i), t2.next());
         }
-        assertEquals(" at 14 [character 6 line 2]", t2.toString());
+        assertEquals(" at index 14 [character number 6 in line 2]", t2.toString());
         assertEquals('\r', t2.next());
-        assertEquals(" at 15 [character 0 line 3]", t2.toString());
+        assertEquals(" at index 15 [character number 0 in line 3]", t2.toString());
         assertEquals('\n', t2.next());
-        assertEquals(" at 16 [character 0 line 3]", t2.toString());
+        assertEquals(" at index 16 [character number 0 in line 3]", t2.toString());
         assertEquals('W', t2.next());
-        assertEquals(" at 17 [character 1 line 3]", t2.toString());
+        assertEquals(" at index 17 [character number 1 in line 3]", t2.toString());
         for(int i=17; i<37; i++) {
-            assertTrue(t2.toString().startsWith(" at " + i + " "));
+            assertTrue(t2.toString().startsWith(" at index " + i + " "));
             assertEquals(testString.charAt(i), t2.next());
         }
-        assertEquals(" at 37 [character 1 line 4]", t2.toString());
+        assertEquals(" at index 37 [character number 1 in line 4]", t2.toString());
         for(int i=37; i<testString.length(); i++) {
-            assertTrue(t2.toString().startsWith(" at " + i + " "));
+            assertTrue(t2.toString().startsWith(" at index " + i + " "));
             assertEquals(testString.charAt(i), t2.next());
         }
-        assertEquals(" at "+ testString.length() +" [character 9 line 4]", t2.toString());
+        assertEquals(" at index "+ testString.length() +" [character number 9 in line 4]", t2.toString());
         // end of the input
         assertEquals(0, t2.next());
         assertFalse(t2.more());

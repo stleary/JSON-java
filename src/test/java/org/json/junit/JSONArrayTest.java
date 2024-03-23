@@ -127,7 +127,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray(str));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "A JSONArray text must start with '[' at 0 [character 1 line 1]",
+                    "A JSONArray text must start with '[' at index 0 [character number 1 in line 1]",
                     e.getMessage());
         }
     }
@@ -142,7 +142,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("["));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' at 1 [character 2 line 1]",
+                    "Expected a ',' or ']' at index 1 [character number 2 in line 1]",
                     e.getMessage());
         }
     }
@@ -157,7 +157,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("[\"test\""));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' at 7 [character 8 line 1]",
+                    "Expected a ',' or ']' at index 7 [character number 8 in line 1]",
                     e.getMessage());
         }
     }
@@ -172,7 +172,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("[\"test\","));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' at 8 [character 9 line 1]",
+                    "Expected a ',' or ']' at index 8 [character number 9 in line 1]",
                     e.getMessage());
         }
     }

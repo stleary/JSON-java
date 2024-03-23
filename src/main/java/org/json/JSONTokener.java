@@ -520,11 +520,11 @@ public class JSONTokener {
     /**
      * Make a printable string of this JSONTokener.
      *
-     * @return " at {index} [character {character} line {line}]"
+     * @return " at index {index} [character number {character} in line {line}]"
      */
     @Override
     public String toString() {
-        return " at " + this.index + " [character " + this.character + " line " +
+        return " at index " + this.index + " [character number " + this.character + " in line " +
                 this.line + "]";
     }
 

@@ -2202,7 +2202,7 @@ public class JSONObjectTest {
             fail("JSONException should be thrown");
         } catch (JSONException ex) {
             assertEquals("Unterminated string. " + "Character with int code 0" +
-                    " is not allowed within a quoted string. at 8 [character 9 line 1]", ex.getMessage());
+                    " is not allowed within a quoted string. at index 8 [character number 9 in line 1]", ex.getMessage());
         }
     }
 
@@ -2216,7 +2216,7 @@ public class JSONObjectTest {
                 fail("JSONException should be thrown");
             } catch (JSONException ex) {
                 assertEquals("Unterminated string. " + "Character with int code " + (int) c +
-                        " is not allowed within a quoted string. at 9 [character 0 line 2]", ex.getMessage());
+                        " is not allowed within a quoted string. at index 9 [character number 0 in line 2]", ex.getMessage());
             }
         }
     }
@@ -2230,7 +2230,7 @@ public class JSONObjectTest {
             fail("JSONException should be thrown");
         } catch (JSONException ex) {
             assertEquals("Illegal escape. \\u must be followed by a 4 digit hexadecimal number. " +
-                    "\\123x is not valid. at 14 [character 15 line 1]", ex.getMessage());
+                    "\\123x is not valid. at index 14 [character number 15 in line 1]", ex.getMessage());
         }
     }
 
@@ -2243,7 +2243,7 @@ public class JSONObjectTest {
             fail("JSONException should be thrown");
         } catch (JSONException ex) {
             assertEquals("Illegal escape. Escape sequence  " + c + " is not valid." +
-                    " at 10 [character 11 line 1]", ex.getMessage());
+                    " at index 10 [character number 11 in line 1]", ex.getMessage());
         }
     }
 
@@ -2259,7 +2259,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "A JSONObject text must begin with '{' at 1 [character 2 line 1]",
+                    "A JSONObject text must begin with '{' at index 1 [character number 2 in line 1]",
                     e.getMessage());
         }
         try {
@@ -2268,7 +2268,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "A JSONObject text must end with '}' at 1 [character 2 line 1]",
+                    "A JSONObject text must end with '}' at index 1 [character number 2 in line 1]",
                     e.getMessage());
         }
         try {
@@ -2277,7 +2277,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "Expected a ':' after a key at 10 [character 11 line 1]",
+                    "Expected a ':' after a key at index 10 [character number 11 in line 1]",
                     e.getMessage());
         }
         try {
@@ -2286,7 +2286,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) { 
             assertEquals("Expecting an exception message", 
-                    "Expected a ',' or '}' at 15 [character 16 line 1]",
+                    "Expected a ',' or '}' at index 15 [character number 16 in line 1]",
                     e.getMessage());
         }
         try {
@@ -2295,7 +2295,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Missing value at 1 [character 2 line 1]",
+                "Missing value at index 1 [character number 2 in line 1]",
                 e.getMessage());
         }
         try {
@@ -2304,7 +2304,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Missing value at 9 [character 10 line 1]",
+                "Missing value at index 9 [character number 10 in line 1]",
                 e.getMessage());
         }
         try {
@@ -2313,7 +2313,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Expected a ':' after a key at 5 [character 6 line 1]",
+                "Expected a ':' after a key at index 5 [character number 6 in line 1]",
                 e.getMessage());
         }
         try {
@@ -2322,7 +2322,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Expected a ':' after a key at 5 [character 6 line 1]",
+                "Expected a ':' after a key at index 5 [character number 6 in line 1]",
                 e.getMessage());
         }
         try {
@@ -2331,7 +2331,7 @@ public class JSONObjectTest {
             assertNull("Expected an exception",new JSONObject(str));
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "A JSONObject text must end with '}' at 15 [character 16 line 1]",
+                    "A JSONObject text must end with '}' at index 15 [character number 16 in line 1]",
                     e.getMessage());
         }
         try {
@@ -2412,7 +2412,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    "Duplicate key \"attr03\" at index 90 [character number 13 in line 5]",
                     e.getMessage());
         }
         try {
@@ -2431,7 +2431,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    "Duplicate key \"attr03\" at index 90 [character number 13 in line 5]",
                     e.getMessage());
         }
         try {
@@ -2452,7 +2452,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    "Duplicate key \"attr03\" at index 90 [character number 13 in line 5]",
                     e.getMessage());
         }
         try {
@@ -2472,7 +2472,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    "Duplicate key \"attr04-03\" at index 215 [character number 20 in line 9]",
                     e.getMessage());
         }
         try {
@@ -2496,7 +2496,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    "Duplicate key \"attr04-03\" at index 215 [character number 20 in line 9]",
                     e.getMessage());
         }
         try {
@@ -2522,7 +2522,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    "Duplicate key \"attr04-03\" at index 215 [character number 20 in line 9]",
                     e.getMessage());
         }
         try {
@@ -2541,7 +2541,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr01\" at 124 [character 17 line 8]",
+                    "Duplicate key \"attr01\" at index 124 [character number 17 in line 8]",
                     e.getMessage());
         }
         try {
@@ -2566,7 +2566,7 @@ public class JSONObjectTest {
             fail("Expected an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an expection message",
-                    "Duplicate key \"attr02-01\" at 269 [character 24 line 13]",
+                    "Duplicate key \"attr02-01\" at index 269 [character number 24 in line 13]",
                     e.getMessage());
         }
     }

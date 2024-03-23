@@ -49,7 +49,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Bad XML at 0 [character 1 line 1]",
+                "Bad XML at index 0 [character number 1 in line 1]",
                 e.getMessage());
         }
     }
@@ -102,7 +102,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Bad XML at 23 [character 24 line 1]",
+                "Bad XML at index 23 [character number 24 in line 1]",
                 e.getMessage());
         }
     }
@@ -205,7 +205,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Misshaped tag at 176 [character 14 line 4]",
+                "Misshaped tag at index 176 [character number 14 in line 4]",
                 e.getMessage());
         }
     }
@@ -230,7 +230,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Misshaped meta tag at 215 [character 12 line 7]",
+                "Misshaped meta tag at index 215 [character number 12 in line 7]",
                 e.getMessage());
         }
     }
@@ -260,7 +260,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Misshaped meta tag at 214 [character 12 line 7]",
+                "Misshaped meta tag at index 214 [character number 12 in line 7]",
                 e.getMessage());
         }
     }
@@ -290,7 +290,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Misplaced '<' at 194 [character 5 line 6]",
+                "Misplaced '<' at index 194 [character number 5 in line 6]",
                 e.getMessage());
         }
     }
@@ -350,7 +350,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Misplaced '<' at 206 [character 1 line 7]",
+                "Misplaced '<' at index 206 [character number 1 in line 7]",
                 e.getMessage());
         }
     }
@@ -380,7 +380,7 @@ public class JSONMLTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                "Expected 'CDATA[' at 204 [character 11 line 5]",
+                "Expected 'CDATA[' at index 204 [character number 11 in line 5]",
                 e.getMessage());
         }
     }
@@ -682,7 +682,7 @@ public class JSONMLTest {
                 "<address>\n"+
                     "<!-- <!--[CDATA[ this is -- <another> comment ]] -->\n"+
                     "<name>Joe Tester</name>\n"+
-                    "<!-- this is a - multi line \n"+
+                    "<!-- this is a - multi in line \n"+
                     "comment -->\n"+
                     "<street>Baker street 5</street>\n"+
                 "</address>\n"+
@@ -815,7 +815,7 @@ public class JSONMLTest {
             fail("Exception expected for invalid JSON.");
         } catch (JSONException ex) {
             assertEquals("Exception string did not match: ",
-                    "Unterminated string at 271 [character 272 line 1]",
+                    "Unterminated string at index 271 [character number 272 in line 1]",
                     ex.getMessage());
         }
     }
@@ -829,7 +829,7 @@ public class JSONMLTest {
             fail("Exception expected for invalid JSON.");
         } catch (JSONException ex) {
             assertEquals("Exception string did not match: ",
-                    "Unterminated string at 242 [character 238 line 2]",
+                    "Unterminated string at index 242 [character number 238 in line 2]",
                     ex.getMessage());
         }
     }

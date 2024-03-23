@@ -91,7 +91,7 @@ public class XMLConfigurationTest {
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Misshaped tag at 176 [character 14 line 4]",
+                    "Misshaped tag at index 176 [character number 14 in line 4]",
                     e.getMessage());
         }
     }
@@ -116,7 +116,7 @@ public class XMLConfigurationTest {
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Misshaped meta tag at 214 [character 12 line 7]",
+                    "Misshaped meta tag at index 214 [character number 12 in line 7]",
                     e.getMessage());
         }
     }
@@ -141,7 +141,7 @@ public class XMLConfigurationTest {
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Misshaped meta tag at 213 [character 12 line 7]",
+                    "Misshaped meta tag at index 213 [character number 12 in line 7]",
                     e.getMessage());
         }
     }
@@ -166,7 +166,7 @@ public class XMLConfigurationTest {
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Misplaced '<' at 193 [character 4 line 6]",
+                    "Misplaced '<' at index 193 [character number 4 in line 6]",
                     e.getMessage());
         }
     }
@@ -193,7 +193,7 @@ public class XMLConfigurationTest {
             fail("Expecting a JSONException");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Expected 'CDATA[' at 204 [character 11 line 5]",
+                    "Expected 'CDATA[' at index 204 [character number 11 in line 5]",
                     e.getMessage());
         }
     }
@@ -298,7 +298,7 @@ public class XMLConfigurationTest {
                 "   <address>\n"+
                 "       <![CDATA[ this is -- <another> comment ]]>\n"+
                 "       <name>Joe Tester</name>\n"+
-                "       <!-- this is a - multi line \n"+
+                "       <!-- this is a - multi in line \n"+
                 "            comment -->\n"+
                 "       <street>Baker street 5</street>\n"+
                 "   </address>\n"+
