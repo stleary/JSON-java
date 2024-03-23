@@ -320,10 +320,12 @@ public class JSONTokener {
                     sb.append('\r');
                     break;
                 case 'u':
+                    String next = this.next(4);
                     try {
-                        sb.append((char)Integer.parseInt(this.next(4), 16));
+                        sb.append((char)Integer.parseInt(next, 16));
                     } catch (NumberFormatException e) {
-                        throw this.syntaxError("Illegal escape. \\u must be followed by a 4 digit number.", e);
+                        throw this.syntaxError("Illegal escape. " +
+                                "\\u must be followed by a 4 digit hexadecimal number. \\" + next + " is not valid.", e);
                     }
                     break;
                 case '"':
