@@ -48,7 +48,7 @@ public class CookieTest {
             fail("Expecting an exception");
         } catch (JSONException e) {
             assertEquals("Expecting an exception message",
-                    "Expected '=' and instead saw '' at index 25 [character number 26 in line 1]",
+                    "Expected '=' and instead saw '' at 25 [character 26 line 1]",
                     e.getMessage());
         }
     }

@@ -57,7 +57,7 @@ public class CookieListTest {
              * Not sure of the missing char, but full string compare fails 
              */
             assertEquals("Expecting an exception message",
-                    "Expected '=' and instead saw '' at index 25 [character number 26 in line 1]",
+                    "Expected '=' and instead saw '' at 25 [character 26 line 1]",
                     e.getMessage());
         }
     }
