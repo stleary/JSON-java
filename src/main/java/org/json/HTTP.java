@@ -113,24 +113,38 @@ public class HTTP {
     public static String toString(JSONObject jo) throws JSONException {
         StringBuilder       sb = new StringBuilder();
         if (jo.has("Status-Code") && jo.has("Reason-Phrase")) {
-            sb.append(jo.getString("HTTP-Version"));
-            sb.append(' ');
-            sb.append(jo.getString("Status-Code"));
-            sb.append(' ');
-            sb.append(jo.getString("Reason-Phrase"));
+            appendResponseHeaderLine(sb, jo);
         } else if (jo.has("Method") && jo.has("Request-URI")) {
-            sb.append(jo.getString("Method"));
-            sb.append(' ');
-            sb.append('"');
-            sb.append(jo.getString("Request-URI"));
-            sb.append('"');
-            sb.append(' ');
-            sb.append(jo.getString("HTTP-Version"));
+            appendRequestHeaderLine(sb, jo);
         } else {
             throw new JSONException("Not enough material for an HTTP header.");
         }
         sb.append(CRLF);
         // Don't use the new entrySet API to maintain Android support
+        appendMainHeaders(sb, jo);
+        sb.append(CRLF);
+        return sb.toString();
+    }
+
+    private static void appendResponseHeaderLine(StringBuilder sb, JSONObject jo) throws JSONException {
+        sb.append(jo.getString("HTTP-Version"));
+        sb.append(' ');
+        sb.append(jo.getString("Status-Code"));
+        sb.append(' ');
+        sb.append(jo.getString("Reason-Phrase"));
+    }
+
+    private static void appendRequestHeaderLine(StringBuilder sb, JSONObject jo) throws JSONException {
+        sb.append(jo.getString("Method"));
+        sb.append(' ');
+        sb.append('"');
+        sb.append(jo.getString("Request-URI"));
+        sb.append('"');
+        sb.append(' ');
+        sb.append(jo.getString("HTTP-Version"));
+    }
+
+    private static void appendMainHeaders(StringBuilder sb, JSONObject jo) throws JSONException {
         for (final String key : jo.keySet()) {
             String value = jo.optString(key);
             if (!"HTTP-Version".equals(key)      && !"Status-Code".equals(key) &&
@@ -142,7 +156,8 @@ public class HTTP {
                 sb.append(CRLF);
             }
         }
-        sb.append(CRLF);
-        return sb.toString();
     }
+
+
+
 }
