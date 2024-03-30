@@ -412,29 +412,29 @@ public class JSONTokener {
      * @throws JSONException If syntax error.
      */
     public Object nextValue() throws JSONException {
-        return nextValue(false);
+        return nextValue(new JSONParserConfiguration());
     }
 
     /**
      * Get the next value. The value can be a Boolean, Double, Integer, JSONArray, JSONObject, Long, or String, or the
      * JSONObject.NULL object. The strictMode parameter controls the behavior of the method when parsing the value.
      *
-     * @param strictMode If true, the method will strictly adhere to the JSON syntax, throwing a JSONException for any
-     *                   deviations.
+     * @param jsonParserConfiguration which carries options such as strictMode and allowSingleQuotes, these methods will
+     *                                strictly adhere to the JSON syntax, throwing a JSONException for any deviations.
      * @return An object.
      * @throws JSONException If syntax error.
      */
-    public Object nextValue(boolean strictMode) throws JSONException {
+    public Object nextValue(JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         char c = this.nextClean();
         switch (c) {
             case '{':
                 this.back();
-                return getJsonObject(strictMode);
+                return getJsonObject(jsonParserConfiguration);
             case '[':
                 this.back();
                 return getJsonArray();
             default:
-                return nextSimpleValue(c, strictMode);
+                return nextSimpleValue(c, jsonParserConfiguration);
         }
     }
 
@@ -442,18 +442,15 @@ public class JSONTokener {
      * This method is used to get a JSONObject from the JSONTokener. The strictMode parameter controls the behavior of
      * the method when parsing the JSONObject.
      *
-     * @param strictMode If true, the method will strictly adhere to the JSON syntax, throwing a JSONException for any
-     *                   deviations.
+     * @param jsonParserConfiguration which carries options such as strictMode and allowSingleQuotes, these methods will
+     *                                strictly adhere to the JSON syntax, throwing a JSONException for any deviations.
+     *                                deviations.
      * @return A JSONObject which is the next value in the JSONTokener.
      * @throws JSONException If the JSONObject or JSONArray depth is too large to process.
      */
-    private JSONObject getJsonObject(boolean strictMode) {
+    private JSONObject getJsonObject(JSONParserConfiguration jsonParserConfiguration) {
         try {
-            if (strictMode) {
-                return new JSONObject(this, new JSONParserConfiguration().withStrictMode(true));
-            }
-
-            return new JSONObject(this);
+            return new JSONObject(this, jsonParserConfiguration);
         } catch (StackOverflowError e) {
             throw new JSONException("JSON Array or Object depth too large to process.", e);
         }
@@ -473,7 +470,14 @@ public class JSONTokener {
         }
     }
 
-    Object nextSimpleValue(char c, boolean strictMode) {
+    Object nextSimpleValue(char c, JSONParserConfiguration jsonParserConfiguration) {
+        boolean strictMode = jsonParserConfiguration.isStrictMode();
+        boolean allowSingleQuotes = jsonParserConfiguration.isAllowSingleQuotes();
+
+        if(strictMode && !allowSingleQuotes && c == '\''){
+            throw this.syntaxError("Single quote wrap not allowed in strict mode");
+        }
+
         if (c == '"' || c == '\'') {
             return this.nextString(c, strictMode);
         }

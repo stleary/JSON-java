@@ -225,7 +225,7 @@ public class JSONObject {
                 case '}':
                     return;
                 default:
-                    key = x.nextSimpleValue(c, jsonParserConfiguration.isStrictMode()).toString();
+                    key = x.nextSimpleValue(c, jsonParserConfiguration).toString();
             }
 
             // The key is followed by ':'.
@@ -244,7 +244,7 @@ public class JSONObject {
                     throw x.syntaxError("Duplicate key \"" + key + "\"");
                 }
 
-                Object value = getValue(x, jsonParserConfiguration.isStrictMode());
+                Object value = x.nextValue(jsonParserConfiguration);
                 // Only add value if non-null
                 if (value != null) {
                     this.put(key, value);
@@ -272,12 +272,6 @@ public class JSONObject {
         }
     }
 
-    private Object getValue(JSONTokener x, boolean strictMode) {
-        if (strictMode) {
-            return x.nextValue(true);
-        }
-        return x.nextValue();
-    }
     /**
      * Construct a JSONObject from a Map.
      *

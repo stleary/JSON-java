@@ -26,6 +26,11 @@ public class JSONParserConfiguration extends ParserConfiguration {
     private boolean strictMode;
 
     /**
+     * Allows Single Quotes when strictMode is true. Has no effect if strictMode is false.
+     */
+    private boolean allowSingleQuotes;
+
+    /**
      * Configuration with the default values.
      */
     public JSONParserConfiguration() {
@@ -93,6 +98,24 @@ public class JSONParserConfiguration extends ParserConfiguration {
     }
 
     /**
+     * Allows single quotes mode configuration for JSON parser when strictMode is on.
+     * <p>
+     * If this option is set to true when strict Mode is enabled, the parser will allow single quoted fields.
+     * <p>
+     * This option is false by default.
+     *
+     * @param mode a boolean value indicating whether single quotes should be allowed or not
+     * @return a new JSONParserConfiguration instance with the updated strict mode setting
+     */
+    public JSONParserConfiguration allowSingleQuotes(final boolean mode) {
+        JSONParserConfiguration clone = this.clone();
+        clone.strictMode = this.strictMode;
+        clone.allowSingleQuotes = mode;
+
+        return clone;
+    }
+
+    /**
      * The parser's behavior when meeting duplicate keys, controls whether the parser should
      * overwrite duplicate keys or not.
      *
@@ -115,4 +138,14 @@ public class JSONParserConfiguration extends ParserConfiguration {
     public boolean isStrictMode() {
         return this.strictMode;
     }
+
+    /**
+     * Retrieves the allow single quotes option.
+     * <p>
+     * Allow Single Quotes, when enabled during strict mode, instructs the parser to allow single quoted JSON fields.
+     * The parser will not throw a JSONException if compliant single quoted fields are found in the JSON structure.
+     *
+     * @return the current allow single quotes setting.
+     */
+    public boolean isAllowSingleQuotes() {return this.allowSingleQuotes;}
 }

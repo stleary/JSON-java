@@ -118,9 +118,9 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenUnbalancedQuotes_testStrictModeTrue_shouldThrowJsonExceptionWtihConcreteErrorDescription() {
+    public void givenUnbalancedQuotes_testStrictModeTrueAndAllowSingleQuotes_shouldThrowJsonExceptionWtihConcreteErrorDescription() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
-            .withStrictMode(true);
+            .withStrictMode(true).allowSingleQuotes(true);
 
         String testCaseOne = "[\"abc', \"test\"]";
         String testCaseTwo = "['abc\", \"test\"]";
@@ -198,6 +198,7 @@ public class JSONParserConfigurationTest {
         return Arrays.asList(
             "[1,2];[3,4]",
             "[test]",
+            "[{'testSingleQuote': 'testSingleQuote'}]",
             "[1, 2,3]:[4,5]",
             "[{test: implied}]",
             "[{\"test\": implied}]",

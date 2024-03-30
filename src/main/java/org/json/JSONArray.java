@@ -113,11 +113,7 @@ public class JSONArray implements Iterable<Object> {
                     this.myArrayList.add(JSONObject.NULL);
                 } else {
                     x.back();
-                    if (jsonParserConfiguration.isStrictMode()) {
-                        this.myArrayList.add(x.nextValue(true));
-                    } else {
-                        this.myArrayList.add(x.nextValue());
-                    }
+                    this.myArrayList.add(x.nextValue(jsonParserConfiguration));
                 }
                 switch (x.nextClean()) {
                     case 0:
