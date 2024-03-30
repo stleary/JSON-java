@@ -284,62 +284,73 @@ public class JSONTokener {
      * Backslash processing is done. The formal JSON format does not
      * allow strings in single quotes, but an implementation is allowed to
      * accept them.
+     * If strictMode is true, this implementation will not accept unbalanced quotes (e.g will not accept <code>"test'</code>)
      * @param quote The quoting character, either
      *      <code>"</code>&nbsp;<small>(double quote)</small> or
      *      <code>'</code>&nbsp;<small>(single quote)</small>.
-     * @return      A String.
-     * @throws JSONException Unterminated string.
+     * @return A String.
+     * @throws JSONException Unterminated string or unbalanced quotes if strictMode == true.
      */
-    public String nextString(char quote) throws JSONException {
+    public String nextString(char quote, boolean strictMode) throws JSONException {
         char c;
         StringBuilder sb = new StringBuilder();
         for (;;) {
             c = this.next();
             switch (c) {
-            case 0:
-            case '\n':
-            case '\r':
-                throw this.syntaxError("Unterminated string");
-            case '\\':
-                c = this.next();
-                switch (c) {
-                case 'b':
-                    sb.append('\b');
-                    break;
-                case 't':
-                    sb.append('\t');
-                    break;
-                case 'n':
-                    sb.append('\n');
-                    break;
-                case 'f':
-                    sb.append('\f');
-                    break;
-                case 'r':
-                    sb.append('\r');
-                    break;
-                case 'u':
-                    try {
-                        sb.append((char)Integer.parseInt(this.next(4), 16));
-                    } catch (NumberFormatException e) {
-                        throw this.syntaxError("Illegal escape.", e);
+                case 0:
+                case '\n':
+                case '\r':
+                    throw this.syntaxError("Unterminated string");
+                case '\\':
+                    c = this.next();
+                    switch (c) {
+                        case 'b':
+                            sb.append('\b');
+                            break;
+                        case 't':
+                            sb.append('\t');
+                            break;
+                        case 'n':
+                            sb.append('\n');
+                            break;
+                        case 'f':
+                            sb.append('\f');
+                            break;
+                        case 'r':
+                            sb.append('\r');
+                            break;
+                        case 'u':
+                            try {
+                                sb.append((char) Integer.parseInt(this.next(4), 16));
+                            } catch (NumberFormatException e) {
+                                throw this.syntaxError("Illegal escape.", e);
+                            }
+                            break;
+                        case '"':
+                        case '\'':
+                        case '\\':
+                        case '/':
+                            sb.append(c);
+                            break;
+                        default:
+                            throw this.syntaxError("Illegal escape.");
                     }
                     break;
-                case '"':
-                case '\'':
-                case '\\':
-                case '/':
-                    sb.append(c);
-                    break;
                 default:
-                    throw this.syntaxError("Illegal escape.");
-                }
-                break;
-            default:
-                if (c == quote) {
-                    return sb.toString();
-                }
-                sb.append(c);
+                    if (strictMode && c == '\"' && quote != c) {
+                        throw this.syntaxError(String.format(
+                            "Field contains unbalanced quotes. Starts with %s but ends with double quote.", quote));
+                    }
+
+                    if (strictMode && c == '\'' && quote != c) {
+                        throw this.syntaxError(String.format(
+                            "Field contains unbalanced quotes. Starts with %s but ends with single quote.", quote));
+                    }
+
+                    if (c == quote) {
+                        return sb.toString();
+                    }
+                    sb.append(c);
             }
         }
     }
@@ -423,48 +434,8 @@ public class JSONTokener {
                 this.back();
                 return getJsonArray();
             default:
-                return getValue(c, strictMode);
+                return nextSimpleValue(c, strictMode);
         }
-    }
-
-    /**
-     * This method is used to get the next value.
-     *
-     * @param c          The next character in the JSONTokener.
-     * @param strictMode If true, the method will strictly adhere to the JSON syntax, throwing a JSONException if the
-     *                   value is not surrounded by quotes.
-     * @return An object which is the next value in the JSONTokener.
-     * @throws JSONException If the value is not surrounded by quotes when strictMode is true.
-     */
-    private Object getValue(char c, boolean strictMode) {
-        if (strictMode) {
-            Object valueToValidate = nextSimpleValue(c, true);
-
-            boolean isNumeric = checkIfValueIsNumeric(valueToValidate);
-
-            if (isNumeric) {
-                return valueToValidate;
-            }
-
-            boolean hasQuotes = valueIsWrappedByQuotes(valueToValidate);
-
-            if (!hasQuotes) {
-                throw new JSONException("Value is not surrounded by quotes: " + valueToValidate);
-            }
-
-            return valueToValidate;
-        }
-
-        return nextSimpleValue(c);
-    }
-
-    private boolean checkIfValueIsNumeric(Object valueToValidate) {
-        for (char c : valueToValidate.toString().toCharArray()) {
-            if (!Character.isDigit(c)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -502,38 +473,12 @@ public class JSONTokener {
         }
     }
 
-    /**
-     * This method checks if the provided value is wrapped by quotes.
-     *
-     * @param valueToValidate The value to be checked. It is converted to a string before checking.
-     * @return A boolean indicating whether the value is wrapped by quotes. It returns true if the value is wrapped by
-     * either single or double quotes.
-     */
-    private boolean valueIsWrappedByQuotes(Object valueToValidate) {
-        String stringToValidate = valueToValidate.toString();
-        boolean isWrappedByDoubleQuotes = isWrappedByQuotes(stringToValidate, "\"");
-        boolean isWrappedBySingleQuotes = isWrappedByQuotes(stringToValidate, "'");
-        return isWrappedByDoubleQuotes || isWrappedBySingleQuotes;
-    }
-
-    private boolean isWrappedByQuotes(String valueToValidate, String quoteType) {
-        return valueToValidate.startsWith(quoteType) && valueToValidate.endsWith(quoteType);
-    }
-
-    Object nextSimpleValue(char c) {
-        return nextSimpleValue(c, false);
-    }
-
     Object nextSimpleValue(char c, boolean strictMode) {
         if (c == '"' || c == '\'') {
-            String str = this.nextString(c);
-            if (strictMode) {
-                return String.format("\"%s\"", str);
-            }
-            return str;
+            return this.nextString(c, strictMode);
         }
 
-        return parsedUnquotedText(c);
+        return parsedUnquotedText(c, strictMode);
     }
 
     /**
@@ -545,7 +490,7 @@ public class JSONTokener {
      * @return The parsed object.
      * @throws JSONException If the parsed string is empty.
      */
-    private Object parsedUnquotedText(char c) {
+    private Object parsedUnquotedText(char c, boolean strictMode) {
         StringBuilder sb = new StringBuilder();
         while (c >= ' ' && ",:]}/\\\"[{;=#".indexOf(c) < 0) {
             sb.append(c);
@@ -556,12 +501,36 @@ public class JSONTokener {
         }
 
         String string = sb.toString().trim();
+
+        if (strictMode) {
+            boolean isBooleanOrNumeric = checkIfValueIsBooleanOrNumeric(string);
+
+            if (isBooleanOrNumeric) {
+                return string;
+            }
+
+            throw new JSONException(String.format("Value is not surrounded by quotes: %s", string));
+        }
+
         if (string.isEmpty()) {
             throw this.syntaxError("Missing value");
         }
         return JSONObject.stringToValue(string);
     }
 
+    private boolean checkIfValueIsBooleanOrNumeric(Object valueToValidate) {
+        String stringToValidate = valueToValidate.toString();
+        if (stringToValidate.equals("true") || stringToValidate.equals("false")) {
+            return true;
+        }
+
+        try {
+            Double.parseDouble(stringToValidate);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
     /**
      * Skip characters until the next character is the requested character.

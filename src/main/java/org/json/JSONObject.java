@@ -225,14 +225,7 @@ public class JSONObject {
                 case '}':
                     return;
                 default:
-                    String keyToValidate = getKeyToValidate(x, c, jsonParserConfiguration.isStrictMode());
-                    boolean keyHasQuotes = keyToValidate.startsWith("\"") && keyToValidate.endsWith("\"");
-
-                    if (jsonParserConfiguration.isStrictMode() && !keyHasQuotes) {
-                        throw new JSONException("Key is not surrounded by quotes: " + keyToValidate);
-                    }
-
-                    key = keyToValidate;
+                    key = x.nextSimpleValue(c, jsonParserConfiguration.isStrictMode()).toString();
             }
 
             // The key is followed by ':'.
@@ -285,11 +278,6 @@ public class JSONObject {
         }
         return x.nextValue();
     }
-
-    private String getKeyToValidate(JSONTokener x, char c, boolean strictMode) {
-        return x.nextSimpleValue(c, strictMode).toString();
-    }
-
     /**
      * Construct a JSONObject from a Map.
      *
