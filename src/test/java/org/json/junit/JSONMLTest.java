@@ -841,7 +841,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 42;
 
         try {
-            JSONML.toJSONArray(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONML.toJSONArray(wayTooLongMalformedXML, JSONML.JSON_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -864,7 +864,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 1;
 
         try {
-            JSONML.toJSONArray(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONML.toJSONArray(perfectlyFineXML, JSONML.JSON_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -886,7 +886,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 3;
 
         try {
-            JSONML.toJSONArray(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONML.toJSONArray(perfectlyFineXML, JSONML.JSON_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("XML document should be parsed as its maximum depth fits the maxNestingDepth " +
@@ -900,7 +900,7 @@ public class JSONMLTest {
         final String wayTooLongMalformedXML = new String(new char[6000]).replace("\0", "<a>");
 
         try {
-            JSONML.toJSONObject(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL);
+            JSONML.toJSONObject(wayTooLongMalformedXML, JSONML.JSON_PARSER_CONFIG);
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -917,7 +917,7 @@ public class JSONMLTest {
             new String(new char[actualDepth]).replace("\0", "</a>");
 
         try {
-            JSONML.toJSONObject(deeperThanDefaultMax, JSONMLParserConfiguration.ORIGINAL
+            JSONML.toJSONObject(deeperThanDefaultMax, JSONML.JSON_PARSER_CONFIG
                 .withMaxNestingDepth(JSONMLParserConfiguration.UNDEFINED_MAXIMUM_NESTING_DEPTH));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -934,7 +934,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 42;
 
         try {
-            JSONML.toJSONObject(wayTooLongMalformedXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONML.toJSONObject(wayTooLongMalformedXML, JSONML.JSON_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -956,7 +956,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 1;
 
         try {
-            JSONML.toJSONObject(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONML.toJSONObject(perfectlyFineXML, JSONML.JSON_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
 
             fail("Expecting a JSONException");
         } catch (JSONException e) {
@@ -978,7 +978,7 @@ public class JSONMLTest {
         final int maxNestingDepth = 3;
 
         try {
-            JSONML.toJSONObject(perfectlyFineXML, JSONMLParserConfiguration.ORIGINAL.withMaxNestingDepth(maxNestingDepth));
+            JSONML.toJSONObject(perfectlyFineXML, JSONML.JSON_PARSER_CONFIG.withMaxNestingDepth(maxNestingDepth));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("XML document should be parsed as its maximum depth fits the maxNestingDepth " +
