@@ -118,24 +118,36 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenUnbalancedQuotes_testStrictModeTrueAndAllowSingleQuotes_shouldThrowJsonExceptionWtihConcreteErrorDescription() {
+    public void givenNonCompliantQuotes_testStrictModeTrue_shouldThrowJsonExceptionWithConcreteErrorDescription() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
-            .withStrictMode(true).allowSingleQuotes(true);
+            .withStrictMode(true);
 
         String testCaseOne = "[\"abc', \"test\"]";
         String testCaseTwo = "['abc\", \"test\"]";
+        String testCaseThree = "['abc']";
+        String testCaseFour = "[{'testField': \"testValue\"}]";
 
         JSONException jeOne = assertThrows(JSONException.class,
             () -> new JSONArray(testCaseOne, jsonParserConfiguration));
         JSONException jeTwo = assertThrows(JSONException.class,
             () -> new JSONArray(testCaseTwo, jsonParserConfiguration));
+        JSONException jeThree = assertThrows(JSONException.class,
+            () -> new JSONArray(testCaseThree, jsonParserConfiguration));
+        JSONException jeFour = assertThrows(JSONException.class,
+            () -> new JSONArray(testCaseFour, jsonParserConfiguration));
 
         assertEquals(
             "Field contains unbalanced quotes. Starts with \" but ends with single quote. at 6 [character 7 line 1]",
             jeOne.getMessage());
         assertEquals(
-            "Field contains unbalanced quotes. Starts with ' but ends with double quote. at 6 [character 7 line 1]",
+            "Single quote wrap not allowed in strict mode at 2 [character 3 line 1]",
             jeTwo.getMessage());
+        assertEquals(
+            "Single quote wrap not allowed in strict mode at 2 [character 3 line 1]",
+            jeThree.getMessage());
+        assertEquals(
+            "Single quote wrap not allowed in strict mode at 3 [character 4 line 1]",
+            jeFour.getMessage());
     }
 
     @Test

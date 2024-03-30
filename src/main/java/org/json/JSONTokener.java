@@ -472,9 +472,8 @@ public class JSONTokener {
 
     Object nextSimpleValue(char c, JSONParserConfiguration jsonParserConfiguration) {
         boolean strictMode = jsonParserConfiguration.isStrictMode();
-        boolean allowSingleQuotes = jsonParserConfiguration.isAllowSingleQuotes();
 
-        if(strictMode && !allowSingleQuotes && c == '\''){
+        if(strictMode && c == '\''){
             throw this.syntaxError("Single quote wrap not allowed in strict mode");
         }
 
