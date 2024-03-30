@@ -4,6 +4,15 @@ package org.json;
  * Configuration object for the JSON parser. The configuration is immutable.
  */
 public class JSONParserConfiguration extends ParserConfiguration {
+
+    /** Original Configuration of the JSON Parser. */
+    public static final JSONParserConfiguration ORIGINAL
+        = new JSONParserConfiguration();
+
+    /** Original configuration of the JSON Parser except that values are kept as strings. */
+    public static final JSONParserConfiguration KEEP_STRINGS
+        = new JSONParserConfiguration().withKeepStrings(true);
+
     /**
      * Used to indicate whether to overwrite duplicate key or not.
      */
