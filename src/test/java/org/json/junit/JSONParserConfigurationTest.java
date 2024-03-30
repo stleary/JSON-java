@@ -164,7 +164,7 @@ public class JSONParserConfigurationTest {
             () -> new JSONArray(testCaseTwo, jsonParserConfiguration));
 
         assertEquals("Expected a ',' or ']' at 10 [character 11 line 1]", jeOne.getMessage());
-        assertEquals("Unterminated string at 15 [character 16 line 1]", jeTwo.getMessage());
+        assertEquals("Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]", jeTwo.getMessage());
     }
 
 
