@@ -2193,6 +2193,60 @@ public class JSONObjectTest {
         }
     }
 
+    @Test
+    public void jsonObjectParseControlCharacterEOFAssertExceptionMessage(){
+        char c = '\0';
+        final String source = "{\"key\":\"" + c + "\"}";
+        try {
+            JSONObject jo = new JSONObject(source);
+            fail("JSONException should be thrown");
+        } catch (JSONException ex) {
+            assertEquals("Unterminated string. " + "Character with int code 0" +
+                    " is not allowed within a quoted string. at 8 [character 9 line 1]", ex.getMessage());
+        }
+    }
+
+    @Test
+    public void jsonObjectParseControlCharacterNewLineAssertExceptionMessage(){
+        char[] chars = {'\n', '\r'};
+        for( char c : chars) {
+            final String source = "{\"key\":\"" + c + "\"}";
+            try {
+                JSONObject jo = new JSONObject(source);
+                fail("JSONException should be thrown");
+            } catch (JSONException ex) {
+                assertEquals("Unterminated string. " + "Character with int code " + (int) c +
+                        " is not allowed within a quoted string. at 9 [character 0 line 2]", ex.getMessage());
+            }
+        }
+    }
+
+    @Test
+    public void jsonObjectParseUTF8EncodingAssertExceptionMessage(){
+        String c = "\\u123x";
+        final String source = "{\"key\":\"" + c + "\"}";
+        try {
+            JSONObject jo = new JSONObject(source);
+            fail("JSONException should be thrown");
+        } catch (JSONException ex) {
+            assertEquals("Illegal escape. \\u must be followed by a 4 digit hexadecimal number. " +
+                    "\\123x is not valid. at 14 [character 15 line 1]", ex.getMessage());
+        }
+    }
+
+    @Test
+    public void jsonObjectParseIllegalEscapeAssertExceptionMessage(){
+        String c = "\\x";
+        final String source = "{\"key\":\"" + c + "\"}";
+        try {
+            JSONObject jo = new JSONObject(source);
+            fail("JSONException should be thrown");
+        } catch (JSONException ex) {
+            assertEquals("Illegal escape. Escape sequence  " + c + " is not valid." +
+                    " at 10 [character 11 line 1]", ex.getMessage());
+        }
+    }
+
     /**
      * Explore how JSONObject handles parsing errors.
      */
