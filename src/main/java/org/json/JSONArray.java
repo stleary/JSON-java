@@ -286,17 +286,7 @@ public class JSONArray implements Iterable<Object> {
      *             convertible to boolean.
      */
     public boolean getBoolean(int index) throws JSONException {
-        Object object = this.get(index);
-        if (object.equals(Boolean.FALSE)
-                || (object instanceof String && ((String) object)
-                        .equalsIgnoreCase("false"))) {
-            return false;
-        } else if (object.equals(Boolean.TRUE)
-                || (object instanceof String && ((String) object)
-                        .equalsIgnoreCase("true"))) {
-            return true;
-        }
-        throw wrongValueFormatException(index, "boolean", object, null);
+        return NumberHandler.getBoolean(this, index);
     }
 
     /**
@@ -310,15 +300,7 @@ public class JSONArray implements Iterable<Object> {
      *             to a number.
      */
     public double getDouble(int index) throws JSONException {
-        final Object object = this.get(index);
-        if(object instanceof Number) {
-            return ((Number)object).doubleValue();
-        }
-        try {
-            return Double.parseDouble(object.toString());
-        } catch (Exception e) {
-            throw wrongValueFormatException(index, "double", object, e);
-        }
+        return NumberHandler.getDouble(this, index);
     }
 
     /**
@@ -405,12 +387,7 @@ public class JSONArray implements Iterable<Object> {
      *             to a BigDecimal.
      */
     public BigDecimal getBigDecimal (int index) throws JSONException {
-        Object object = this.get(index);
-        BigDecimal val = JSONObject.objectToBigDecimal(object, null);
-        if(val == null) {
-            throw wrongValueFormatException(index, "BigDecimal", object, null);
-        }
-        return val;
+        return NumberHandler.getBigDecimal(this, index);
     }
 
     /**
@@ -442,15 +419,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the key is not found or if the value is not a number.
      */
     public int getInt(int index) throws JSONException {
-        final Object object = this.get(index);
-        if(object instanceof Number) {
-            return ((Number)object).intValue();
-        }
-        try {
-            return Integer.parseInt(object.toString());
-        } catch (Exception e) {
-            throw wrongValueFormatException(index, "int", object, e);
-        }
+        return NumberHandler.getInt(this, index);
     }
 
     /**
@@ -500,15 +469,7 @@ public class JSONArray implements Iterable<Object> {
      *             to a number.
      */
     public long getLong(int index) throws JSONException {
-        final Object object = this.get(index);
-        if(object instanceof Number) {
-            return ((Number)object).longValue();
-        }
-        try {
-            return Long.parseLong(object.toString());
-        } catch (Exception e) {
-            throw wrongValueFormatException(index, "long", object, e);
-        }
+       return NumberHandler.getLong(this, index);
     }
 
     /**
