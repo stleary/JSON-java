@@ -422,7 +422,7 @@ public class JSONTokener {
      * Get the next value. The value can be a Boolean, Double, Integer, JSONArray, JSONObject, Long, or String, or the
      * JSONObject.NULL object. The strictMode parameter controls the behavior of the method when parsing the value.
      *
-     * @param jsonParserConfiguration which carries options such as strictMode and allowSingleQuotes, these methods will
+     * @param jsonParserConfiguration which carries options such as strictMode, these methods will
      *                                strictly adhere to the JSON syntax, throwing a JSONException for any deviations.
      * @return An object.
      * @throws JSONException If syntax error.
@@ -432,10 +432,18 @@ public class JSONTokener {
         switch (c) {
             case '{':
                 this.back();
-                return getJsonObject(jsonParserConfiguration);
+                try {
+                    return new JSONObject(this, jsonParserConfiguration);
+                } catch (StackOverflowError e) {
+                    throw new JSONException("JSON Array or Object depth too large to process.", e);
+                }
             case '[':
                 this.back();
-                return getJsonArray();
+                try {
+                    return new JSONArray(this);
+                } catch (StackOverflowError e) {
+                    throw new JSONException("JSON Array or Object depth too large to process.", e);
+                }
             default:
                 return nextSimpleValue(c, jsonParserConfiguration);
         }
@@ -445,7 +453,7 @@ public class JSONTokener {
      * This method is used to get a JSONObject from the JSONTokener. The strictMode parameter controls the behavior of
      * the method when parsing the JSONObject.
      *
-     * @param jsonParserConfiguration which carries options such as strictMode and allowSingleQuotes, these methods will
+     * @param jsonParserConfiguration which carries options such as strictMode, these methods will
      *                                strictly adhere to the JSON syntax, throwing a JSONException for any deviations.
      *                                deviations.
      * @return A JSONObject which is the next value in the JSONTokener.

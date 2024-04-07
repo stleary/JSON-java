@@ -24,11 +24,6 @@ public class JSONParserConfiguration extends ParserConfiguration {
     private boolean strictMode;
 
     /**
-     * Allows Single Quotes when strictMode is true. Has no effect if strictMode is false.
-     */
-    private boolean allowSingleQuotes;
-
-    /**
      * Configuration with the default values.
      */
     public JSONParserConfiguration() {
