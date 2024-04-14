@@ -47,6 +47,16 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
+    public void givenValidDoubleArray_testStrictModeTrue_shouldNotThrowJsonException() {
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(true);
+
+        String testCase = "[[\"c\"],[\"a\"]]";
+
+        new JSONArray(testCase, jsonParserConfiguration);
+    }
+
+    @Test
     public void givenCompliantJSONArrayFile_testStrictModeTrue_shouldNotThrowAnyException() throws IOException {
         try (Stream<String> lines = Files.lines(Paths.get("src/test/resources/compliantJsonArray.json"))) {
             String compliantJsonArrayAsString = lines.collect(Collectors.joining());
@@ -208,6 +218,15 @@ public class JSONParserConfigurationTest {
      */
     private List<String> getNonCompliantJSONList() {
         return Arrays.asList(
+            "[]asdf",
+            "[]]",
+            "[]}",
+            "[][",
+            "[]{",
+            "[],",
+            "[]:",
+            "[],[",
+            "[],{",
             "[1,2];[3,4]",
             "[test]",
             "[{'testSingleQuote': 'testSingleQuote'}]",

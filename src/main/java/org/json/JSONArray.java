@@ -144,6 +144,42 @@ public class JSONArray implements Iterable<Object> {
                 }
             }
         }
+
+        if (jsonParserConfiguration.isStrictMode()) {
+            validateInput(x);
+        }
+    }
+
+    /**
+     * Checks if Array adheres to strict mode guidelines, if not, throws JSONException providing back the input in the
+     * error message.
+     *
+     * @param x tokener used to examine input.
+     * @throws JSONException if input is not compliant with strict mode guidelines;
+     */
+    private void validateInput(JSONTokener x) {
+        char nextChar = x.getPrevious();
+
+        boolean isEndOfArray = nextChar == ']';
+        boolean nextCharacterIsNotEoF = x.nextClean() != 0;
+
+        if (isEndOfArray && nextCharacterIsNotEoF) {
+            String completeInput = collectCompleteInput(x);
+            throw new JSONException("Provided Array is not compliant with strict mode guidelines: " + completeInput);
+        }
+    }
+
+    private String collectCompleteInput(JSONTokener x) {
+        String nonCompliantStringAfterArray = collectNonCompliantStringAfterArray(x);
+        return myArrayList + nonCompliantStringAfterArray;
+    }
+
+    private String collectNonCompliantStringAfterArray(JSONTokener x) {
+        StringBuilder sb = new StringBuilder().append(x.getPrevious());
+        while(x.nextClean() != 0){
+            sb.append(x.getPrevious());
+        }
+        return sb.toString();
     }
 
     /**
