@@ -107,7 +107,7 @@ public class JSONArray implements Iterable<Object> {
         }
         if (nextChar != ']') {
             x.back();
-            for (;;) {
+            for (; ; ) {
                 if (x.nextClean() == ',') {
                     x.back();
                     this.myArrayList.add(JSONObject.NULL);
@@ -158,9 +158,9 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException if input is not compliant with strict mode guidelines;
      */
     private void validateInput(JSONTokener x) {
-        char nextChar = x.getPrevious();
+        char cursor = x.getPrevious();
 
-        boolean isEndOfArray = nextChar == ']';
+        boolean isEndOfArray = cursor == ']';
         boolean nextCharacterIsNotEoF = x.nextClean() != 0;
 
         if (isEndOfArray && nextCharacterIsNotEoF) {
