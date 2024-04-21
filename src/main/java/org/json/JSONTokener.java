@@ -284,10 +284,11 @@ public class JSONTokener {
      * Backslash processing is done. The formal JSON format does not
      * allow strings in single quotes, but an implementation is allowed to
      * accept them.
-     * If strictMode is true, this implementation will not accept unbalanced quotes (e.g will not accept <code>"test'</code>)
+     * If strictMode is true, this implementation will not accept unbalanced quotes (e.g will not accept <code>"test'</code>).
      * @param quote The quoting character, either
      *      <code>"</code>&nbsp;<small>(double quote)</small> or
      *      <code>'</code>&nbsp;<small>(single quote)</small>.
+     * @param strictMode If true, this implementation will not accept unbalanced quotes (e.g will not accept <code>"test'</code>).
      * @return A String.
      * @throws JSONException Unterminated string or unbalanced quotes if strictMode == true.
      */
