@@ -218,6 +218,7 @@ public class JSONParserConfigurationTest {
      */
     private List<String> getNonCompliantJSONList() {
         return Arrays.asList(
+            "[[a]]",
             "[]asdf",
             "[]]",
             "[]}",

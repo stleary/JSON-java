@@ -440,7 +440,7 @@ public class JSONTokener {
             case '[':
                 this.back();
                 try {
-                    return new JSONArray(this);
+                    return new JSONArray(this, jsonParserConfiguration);
                 } catch (StackOverflowError e) {
                     throw new JSONException("JSON Array or Object depth too large to process.", e);
                 }
@@ -516,6 +516,10 @@ public class JSONTokener {
 
         String string = sb.toString().trim();
 
+        if (string.isEmpty()) {
+            throw this.syntaxError("Missing value");
+        }
+
         if (strictMode) {
             boolean isBooleanOrNumeric = checkIfValueIsBooleanOrNumeric(string);
 
@@ -526,9 +530,6 @@ public class JSONTokener {
             throw new JSONException(String.format("Value is not surrounded by quotes: %s", string));
         }
 
-        if (string.isEmpty()) {
-            throw this.syntaxError("Missing value");
-        }
         return JSONObject.stringToValue(string);
     }
 

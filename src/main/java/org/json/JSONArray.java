@@ -133,6 +133,17 @@ public class JSONArray implements Iterable<Object> {
                     case ']':
                         if (jsonParserConfiguration.isStrictMode()) {
                             nextChar = x.nextClean();
+
+                            if (nextChar == ','){
+                                x.back();
+                                return;
+                            }
+
+                            if (nextChar == ']'){
+                                x.back();
+                                return;
+                            }
+
                             if (nextChar != 0) {
                                 throw x.syntaxError("invalid character found after end of array: " + nextChar);
                             }
@@ -161,25 +172,12 @@ public class JSONArray implements Iterable<Object> {
         char cursor = x.getPrevious();
 
         boolean isEndOfArray = cursor == ']';
-        boolean nextCharacterIsNotEoF = x.nextClean() != 0;
+        char nextChar = x.nextClean();
+        boolean nextCharacterIsNotEoF = nextChar != 0;
 
         if (isEndOfArray && nextCharacterIsNotEoF) {
-            String completeInput = collectCompleteInput(x);
-            throw new JSONException("Provided Array is not compliant with strict mode guidelines: " + completeInput);
+            throw x.syntaxError(String.format("Provided Array is not compliant with strict mode guidelines: '%s'", nextChar));
         }
-    }
-
-    private String collectCompleteInput(JSONTokener x) {
-        String nonCompliantStringAfterArray = collectNonCompliantStringAfterArray(x);
-        return myArrayList + nonCompliantStringAfterArray;
-    }
-
-    private String collectNonCompliantStringAfterArray(JSONTokener x) {
-        StringBuilder sb = new StringBuilder().append(x.getPrevious());
-        while(x.nextClean() != 0){
-            sb.append(x.getPrevious());
-        }
-        return sb.toString();
     }
 
     /**
