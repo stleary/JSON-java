@@ -76,6 +76,13 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
+    public void allowNullInStrictMode() {
+        String expected = "[null]";
+        JSONArray jsonArray = new JSONArray(expected, new JSONParserConfiguration().withStrictMode(true));
+        assertEquals(expected, jsonArray.toString());
+    }
+
+    @Test
     public void shouldHandleNumericArray() {
         String expected = "[10]";
         JSONArray jsonArray = new JSONArray(expected, new JSONParserConfiguration().withStrictMode(true));

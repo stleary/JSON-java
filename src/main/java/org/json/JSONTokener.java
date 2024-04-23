@@ -527,7 +527,7 @@ public class JSONTokener {
     }
 
     private Object getValidNumberOrBooleanFromObject(Object value) {
-        if (value instanceof Number || value instanceof Boolean) {
+        if (value instanceof Number || value instanceof Boolean || value.equals(JSONObject.NULL)) {
             return value;
         }
 
