@@ -523,10 +523,10 @@ public class JSONTokener {
 
         Object stringToValue = JSONObject.stringToValue(string);
 
-        return strictMode ? getValidNumberOrBooleanFromObject(stringToValue) : stringToValue;
+        return strictMode ? getValidNumberBooleanOrNullFromObject(stringToValue) : stringToValue;
     }
 
-    private Object getValidNumberOrBooleanFromObject(Object value) {
+    private Object getValidNumberBooleanOrNullFromObject(Object value) {
         if (value instanceof Number || value instanceof Boolean || value.equals(JSONObject.NULL)) {
             return value;
         }
