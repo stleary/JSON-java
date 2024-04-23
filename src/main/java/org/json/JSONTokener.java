@@ -521,17 +521,17 @@ public class JSONTokener {
             throw this.syntaxError("Missing value");
         }
 
-        if (strictMode) {
-            Object stringToVal = JSONObject.stringToValue(string);
+        Object stringToValue = JSONObject.stringToValue(string);
 
-            if (stringToVal instanceof Number || stringToVal instanceof Boolean) {
-                return stringToVal;
-            }
+        return strictMode ? getValidNumberOrBooleanFromObject(stringToValue) : stringToValue;
+    }
 
-            throw new JSONException(String.format("Value is not surrounded by quotes: %s", string));
+    private Object getValidNumberOrBooleanFromObject(Object value) {
+        if (value instanceof Number || value instanceof Boolean) {
+            return value;
         }
 
-        return JSONObject.stringToValue(string);
+        throw new JSONException(String.format("Value is not surrounded by quotes: %s", value));
     }
 
     /**
