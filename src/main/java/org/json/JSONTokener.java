@@ -522,30 +522,16 @@ public class JSONTokener {
         }
 
         if (strictMode) {
-            boolean isBooleanOrNumeric = checkIfValueIsBooleanOrNumeric(string);
+            Object stringToVal = JSONObject.stringToValue(string);
 
-            if (isBooleanOrNumeric) {
-                return string;
+            if (stringToVal instanceof Number || stringToVal instanceof Boolean) {
+                return stringToVal;
             }
 
             throw new JSONException(String.format("Value is not surrounded by quotes: %s", string));
         }
 
         return JSONObject.stringToValue(string);
-    }
-
-    private boolean checkIfValueIsBooleanOrNumeric(Object valueToValidate) {
-        String stringToValidate = valueToValidate.toString();
-        if (stringToValidate.equals("true") || stringToValidate.equals("false")) {
-            return true;
-        }
-
-        try {
-            Double.parseDouble(stringToValidate);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 
     /**

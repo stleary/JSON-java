@@ -51,9 +51,35 @@ public class JSONParserConfigurationTest {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
 
-        String testCase = "[[\"c\"],[\"a\"]]";
+        String testCase = "[[\"c\"], [10.2], [true, false, true]]";
 
-        new JSONArray(testCase, jsonParserConfiguration);
+        JSONArray jsonArray = new JSONArray(testCase, jsonParserConfiguration);
+        JSONArray arrayShouldContainStringAt0 = jsonArray.getJSONArray(0);
+        JSONArray arrayShouldContainNumberAt0 = jsonArray.getJSONArray(1);
+        JSONArray arrayShouldContainBooleanAt0 = jsonArray.getJSONArray(2);
+
+        assertTrue(arrayShouldContainStringAt0.get(0) instanceof String);
+        assertTrue(arrayShouldContainNumberAt0.get(0) instanceof Number);
+        assertTrue(arrayShouldContainBooleanAt0.get(0) instanceof Boolean);
+    }
+
+    @Test
+    public void givenInvalidString_testStrictModeTrue_shouldThrowJsonException() {
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(true);
+
+        String testCase = "[badString]";
+
+        JSONException je = assertThrows(JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
+
+        assertEquals("Value is not surrounded by quotes: badString", je.getMessage());
+    }
+
+    @Test
+    public void shouldHandleNumericArray() {
+        String expected = "[10]";
+        JSONArray jsonArray = new JSONArray(expected, new JSONParserConfiguration().withStrictMode(true));
+        assertEquals(expected, jsonArray.toString());
     }
 
     @Test
