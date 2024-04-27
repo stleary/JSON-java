@@ -2,6 +2,8 @@ package org.json;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 Public Domain.
@@ -31,6 +33,8 @@ public class JSONTokener {
     private boolean usePrevious;
     /** the number of characters read in the previous line. */
     private long characterPreviousLine;
+    private final List<Character> smallCharMemory;
+    private int arrayLevel = 0;
 
 
     /**
@@ -49,6 +53,7 @@ public class JSONTokener {
         this.character = 1;
         this.characterPreviousLine = 0;
         this.line = 1;
+        this.smallCharMemory = new ArrayList<>(2);
     }
 
 
@@ -186,6 +191,46 @@ public class JSONTokener {
         return this.previous;
     }
 
+    private void insertCharacterInCharMemory(Character c) {
+        boolean foundSameCharRef = checkForEqualCharRefInMicroCharMemory(c);
+        if(foundSameCharRef){
+            return;
+        }
+
+        if(smallCharMemory.size() < 2){
+            smallCharMemory.add(c);
+            return;
+        }
+
+        smallCharMemory.set(0, smallCharMemory.get(1));
+        smallCharMemory.remove(1);
+        smallCharMemory.add(c);
+    }
+
+    private boolean checkForEqualCharRefInMicroCharMemory(Character c) {
+        boolean isNotEmpty = !smallCharMemory.isEmpty();
+        if (isNotEmpty) {
+            Character lastChar = smallCharMemory.get(smallCharMemory.size() - 1);
+            return c.compareTo(lastChar) == 0;
+        }
+
+        // list is empty so there's no equal characters
+        return false;
+    }
+
+    /**
+     * Retrieves the previous char from memory.
+     *
+     * @return previous char stored in memory.
+     */
+    public char getPreviousChar() {
+        return smallCharMemory.get(0);
+    }
+
+    public int getArrayLevel(){
+        return this.arrayLevel;
+    }
+
     /**
      * Get the last character read from the input or '\0' if nothing has been read yet.
      * @return the last character read from the input.
@@ -263,7 +308,6 @@ public class JSONTokener {
         return new String(chars);
     }
 
-
     /**
      * Get the next char in the string, skipping whitespace.
      * @throws JSONException Thrown if there is an error reading the source string.
@@ -273,6 +317,7 @@ public class JSONTokener {
         for (;;) {
             char c = this.next();
             if (c == 0 || c > ' ') {
+                insertCharacterInCharMemory(c);
                 return c;
             }
         }
@@ -441,6 +486,7 @@ public class JSONTokener {
             case '[':
                 this.back();
                 try {
+                    this.arrayLevel++;
                     return new JSONArray(this, jsonParserConfiguration);
                 } catch (StackOverflowError e) {
                     throw new JSONException("JSON Array or Object depth too large to process.", e);
@@ -531,7 +577,7 @@ public class JSONTokener {
             return value;
         }
 
-        throw new JSONException(String.format("Value is not surrounded by quotes: %s", value));
+        throw this.syntaxError(String.format("Value '%s' is not surrounded by quotes", value));
     }
 
     /**

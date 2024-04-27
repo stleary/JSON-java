@@ -142,7 +142,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("["));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' at 1 [character 2 line 1]",
+                    "Expected a ',' or ']' but instead found '[' at 1 [character 2 line 1]",
                     e.getMessage());
         }
     }
@@ -157,7 +157,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("[\"test\""));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' at 7 [character 8 line 1]",
+                    "Expected a ',' or ']' but instead found '\"' at 7 [character 8 line 1]",
                     e.getMessage());
         }
     }
@@ -172,7 +172,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("[\"test\","));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' at 8 [character 9 line 1]",
+                    "Expected a ',' or ']' but instead found ',' at 8 [character 9 line 1]",
                     e.getMessage());
         }
     }

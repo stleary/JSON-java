@@ -47,6 +47,17 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
+    public void givenEmptyArray_testStrictModeTrue_shouldNotThrowJsonException(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(true);
+
+        String testCase = "[]";
+
+        JSONArray jsonArray = new JSONArray(testCase, jsonParserConfiguration);
+        System.out.println(jsonArray);
+    }
+
+    @Test
     public void givenValidDoubleArray_testStrictModeTrue_shouldNotThrowJsonException() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
@@ -64,6 +75,30 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
+    public void givenValidEmptyArrayInsideArray_testStrictModeTrue_shouldNotThrowJsonException(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(true);
+
+        String testCase = "[[]]";
+
+        JSONArray jsonArray = new JSONArray(testCase, jsonParserConfiguration);
+
+        assertEquals(testCase, jsonArray.toString());
+    }
+
+    @Test
+    public void givenValidEmptyArrayInsideArray_testStrictModeFalse_shouldNotThrowJsonException(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(false);
+
+        String testCase = "[[]]";
+
+        JSONArray jsonArray = new JSONArray(testCase, jsonParserConfiguration);
+
+        assertEquals(testCase, jsonArray.toString());
+    }
+
+    @Test
     public void givenInvalidString_testStrictModeTrue_shouldThrowJsonException() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
@@ -72,7 +107,7 @@ public class JSONParserConfigurationTest {
 
         JSONException je = assertThrows(JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
 
-        assertEquals("Value is not surrounded by quotes: badString", je.getMessage());
+        assertEquals("Value 'badString' is not surrounded by quotes at 10 [character 11 line 1]", je.getMessage());
     }
 
     @Test
@@ -121,7 +156,7 @@ public class JSONParserConfigurationTest {
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
             JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
 
-        assertEquals("invalid character found after end of array: ; at 6 [character 7 line 1]", je.getMessage());
+        assertEquals("invalid character ';' found after end of array at 6 [character 7 line 1]", je.getMessage());
     }
 
     @Test
@@ -134,7 +169,7 @@ public class JSONParserConfigurationTest {
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
             JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
 
-        assertEquals("invalid character found after end of array: ; at 10 [character 11 line 1]", je.getMessage());
+        assertEquals("invalid character ';' found after end of array at 10 [character 11 line 1]", je.getMessage());
     }
 
     @Test
@@ -147,7 +182,7 @@ public class JSONParserConfigurationTest {
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
             JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
 
-        assertEquals("Value is not surrounded by quotes: implied", je.getMessage());
+        assertEquals("Value 'implied' is not surrounded by quotes at 17 [character 18 line 1]", je.getMessage());
     }
 
     @Test
@@ -206,7 +241,7 @@ public class JSONParserConfigurationTest {
         JSONException jeTwo = assertThrows(JSONException.class,
             () -> new JSONArray(testCaseTwo, jsonParserConfiguration));
 
-        assertEquals("Expected a ',' or ']' at 10 [character 11 line 1]", jeOne.getMessage());
+        assertEquals("Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]", jeOne.getMessage());
         assertEquals("Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]", jeTwo.getMessage());
     }
 
@@ -220,7 +255,7 @@ public class JSONParserConfigurationTest {
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
             JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
 
-        assertEquals(String.format("Value is not surrounded by quotes: %s", "test"), je.getMessage());
+        assertEquals("Value 'test' is not surrounded by quotes at 6 [character 7 line 1]", je.getMessage());
     }
 
     @Test
@@ -251,6 +286,9 @@ public class JSONParserConfigurationTest {
      */
     private List<String> getNonCompliantJSONList() {
         return Arrays.asList(
+            "[1],",
+            "[[1]\"sa\",[2]]a",
+            "[1],\"dsa\": \"test\"",
             "[[a]]",
             "[]asdf",
             "[]]",
