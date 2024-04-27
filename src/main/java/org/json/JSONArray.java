@@ -121,6 +121,10 @@ public class JSONArray implements Iterable<Object> {
 
                 throwErrorIfEoF(x);
 
+                if(strictMode && cursor == ']'){
+                    throw x.syntaxError(getInvalidCharErrorMsg(cursor));
+                }
+
                 if (cursor == ']') {
                     break;
                 }
@@ -135,7 +139,7 @@ public class JSONArray implements Iterable<Object> {
                     boolean isNotEoF = !x.end();
 
                     if (isNotEoF && x.getArrayLevel() == 0) {
-                        throw x.syntaxError(String.format("invalid character '%s' found after end of array", cursor));
+                        throw x.syntaxError(getInvalidCharErrorMsg(cursor));
                     }
 
                     x.back();
@@ -147,7 +151,7 @@ public class JSONArray implements Iterable<Object> {
                 boolean quoteIsNotNextToValidChar = x.getPreviousChar() != ',' && x.getPreviousChar() != '[';
 
                 if (strictMode && currentCharIsQuote && quoteIsNotNextToValidChar) {
-                    throw x.syntaxError(String.format("invalid character '%s' found after end of array", cursor));
+                    throw x.syntaxError(getInvalidCharErrorMsg(cursor));
                 }
 
                 this.myArrayList.add(x.nextValue(jsonParserConfiguration));
@@ -1954,6 +1958,7 @@ public class JSONArray implements Iterable<Object> {
     private void addAll(Object array, boolean wrap, int recursionDepth) {
         addAll(array, wrap, recursionDepth, new JSONParserConfiguration());
     }
+
     /**
      * Add an array's elements to the JSONArray.
      *`
@@ -2000,7 +2005,6 @@ public class JSONArray implements Iterable<Object> {
                     "JSONArray initial value should be a string or collection or array.");
         }
     }
-
     /**
      * Create a new JSONException in a common format for incorrect conversions.
      * @param idx index of the item
@@ -2029,4 +2033,7 @@ public class JSONArray implements Iterable<Object> {
                 , cause);
     }
 
+    private static String getInvalidCharErrorMsg(char cursor) {
+        return String.format("invalid character '%s' found after end of array", cursor);
+    }
 }

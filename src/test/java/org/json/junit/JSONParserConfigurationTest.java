@@ -287,6 +287,7 @@ public class JSONParserConfigurationTest {
     private List<String> getNonCompliantJSONList() {
         return Arrays.asList(
             "[1],",
+            "[1,]",
             "[[1]\"sa\",[2]]a",
             "[1],\"dsa\": \"test\"",
             "[[a]]",
