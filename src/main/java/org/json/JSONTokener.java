@@ -53,7 +53,7 @@ public class JSONTokener {
         this.character = 1;
         this.characterPreviousLine = 0;
         this.line = 1;
-        this.smallCharMemory = new ArrayList<>(2);
+        this.smallCharMemory = new ArrayList<Character>(2);
     }
 
 
