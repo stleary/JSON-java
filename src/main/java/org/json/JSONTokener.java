@@ -325,77 +325,66 @@ public class JSONTokener {
 
 
     /**
-     * Return the characters up to the next close quote character.
-     * Backslash processing is done. The formal JSON format does not
-     * allow strings in single quotes, but an implementation is allowed to
-     * accept them.
-     * If strictMode is true, this implementation will not accept unbalanced quotes (e.g will not accept <code>"test'</code>).
+     * Return the characters up to the next close quote character. Backslash processing is done. The formal JSON format
+     * does not allow strings in single quotes, but an implementation is allowed to accept them.
+     *
      * @param quote The quoting character, either
      *      <code>"</code>&nbsp;<small>(double quote)</small> or
      *      <code>'</code>&nbsp;<small>(single quote)</small>.
-     * @param strictMode If true, this implementation will not accept unbalanced quotes (e.g will not accept <code>"test'</code>).
      * @return A String.
      * @throws JSONException Unterminated string or unbalanced quotes if strictMode == true.
      */
-    public String nextString(char quote, boolean strictMode) throws JSONException {
+    public String nextString(char quote) throws JSONException {
         char c;
         StringBuilder sb = new StringBuilder();
         for (;;) {
             c = this.next();
             switch (c) {
-            case 0:
-            case '\n':
-            case '\r':
-                throw this.syntaxError("Unterminated string. " +
+                case 0:
+                case '\n':
+                case '\r':
+                    throw this.syntaxError("Unterminated string. " +
                         "Character with int code " + (int) c + " is not allowed within a quoted string.");
-            case '\\':
-                c = this.next();
-                switch (c) {
-                case 'b':
-                    sb.append('\b');
-                    break;
-                case 't':
-                    sb.append('\t');
-                    break;
-                case 'n':
-                    sb.append('\n');
-                    break;
-                case 'f':
-                    sb.append('\f');
-                    break;
-                case 'r':
-                    sb.append('\r');
-                    break;
-                case 'u':
-                    String next = this.next(4);
-                    try {
-                        sb.append((char)Integer.parseInt(next, 16));
-                    } catch (NumberFormatException e) {
-                        throw this.syntaxError("Illegal escape. " +
-                                "\\u must be followed by a 4 digit hexadecimal number. \\" + next + " is not valid.", e);
-                    }
-                    break;
-                case '"':
-                case '\'':
                 case '\\':
-                case '/':
-                    sb.append(c);
+                    c = this.next();
+                    switch (c) {
+                        case 'b':
+                            sb.append('\b');
+                            break;
+                        case 't':
+                            sb.append('\t');
+                            break;
+                        case 'n':
+                            sb.append('\n');
+                            break;
+                        case 'f':
+                            sb.append('\f');
+                            break;
+                        case 'r':
+                            sb.append('\r');
+                            break;
+                        case 'u':
+                            String next = this.next(4);
+                            try {
+                                sb.append((char) Integer.parseInt(next, 16));
+                            } catch (NumberFormatException e) {
+                                throw this.syntaxError("Illegal escape. " +
+                                        "\\u must be followed by a 4 digit hexadecimal number. \\" + next
+                                        + " is not valid.",
+                                    e);
+                            }
+                            break;
+                        case '"':
+                        case '\'':
+                        case '\\':
+                        case '/':
+                            sb.append(c);
+                            break;
+                        default:
+                            throw this.syntaxError("Illegal escape. Escape sequence  \\" + c + " is not valid.");
+                    }
                     break;
                 default:
-                    throw this.syntaxError("Illegal escape. Escape sequence  \\" + c + " is not valid.");
-                }
-                break;
-                default:
-                    if (strictMode && c == '\"' && quote != c) {
-                        throw this.syntaxError(String.format(
-                            "Field contains unbalanced quotes. Starts with %s but ends with double quote.", quote));
-                    }
-
-                    if (strictMode && c == '\'' && quote != c) {
-                        throw this.syntaxError(String.format(
-                            "Field contains unbalanced quotes. Starts with %s but ends with single quote.", quote));
-                    }
-
                     if (c == quote) {
                         return sb.toString();
                     }
@@ -403,7 +392,6 @@ public class JSONTokener {
             }
         }
     }
-
 
     /**
      * Get the text up but not including the specified character or the
@@ -528,15 +516,24 @@ public class JSONTokener {
         }
     }
 
+    /**
+     * Get the next simple value from the JSON input. Simple values include strings (wrapped in single or double
+     * quotes), numbers, booleans, and null. This method is called when the next character is not '{' or '['.
+     *
+     * @param c                       The starting character.
+     * @param jsonParserConfiguration The configuration object containing parsing options.
+     * @return The parsed simple value.
+     * @throws JSONException If there is a syntax error or the value does not adhere to the configuration rules.
+     */
     Object nextSimpleValue(char c, JSONParserConfiguration jsonParserConfiguration) {
         boolean strictMode = jsonParserConfiguration.isStrictMode();
 
-        if(strictMode && c == '\''){
+        if (strictMode && c == '\'') {
             throw this.syntaxError("Single quote wrap not allowed in strict mode");
         }
 
         if (c == '"' || c == '\'') {
-            return this.nextString(c, strictMode);
+            return this.nextString(c);
         }
 
         return parsedUnquotedText(c, strictMode);

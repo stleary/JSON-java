@@ -136,9 +136,13 @@ public class JSONArray implements Iterable<Object> {
             case ']':
                 if (strictMode) {
                     cursor = x.nextClean();
-                    boolean isNotEoF = !x.end();
+                    boolean isEoF = x.end();
 
-                    if (isNotEoF && x.getArrayLevel() == 0) {
+                    if (isEoF) {
+                        break;
+                    }
+
+                    if (x.getArrayLevel() == 0) {
                         throw x.syntaxError(getInvalidCharErrorMsg(cursor));
                     }
 

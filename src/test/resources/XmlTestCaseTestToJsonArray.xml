@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<addresses xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation='test.xsd'>
+  <address addrType="my address">
+    <name nameType="my name">Joe Tester</name>
+    <street><![CDATA[Baker street 5]]></street>
+    <NothingHere except="an attribute"/>
+    <TrueValue>true</TrueValue>
+    <FalseValue>false</FalseValue>
+    <NullValue>null</NullValue>
+    <PositiveValue>42</PositiveValue>
+    <NegativeValue>-23</NegativeValue>
+    <DoubleValue>-23.45</DoubleValue>
+    <Nan>-23x.45</Nan>
+    <ArrayOfNum>
+      <value>1</value>
+      <value>2</value>
+      <value>
+        <subValue svAttr="svValue">abc</subValue>
+      </value>
+      <value>3</value>
+      <value>4.1</value>
+      <value>5.2</value>
+    </ArrayOfNum>
+  </address>
+</addresses>

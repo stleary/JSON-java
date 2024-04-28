@@ -47,14 +47,15 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenEmptyArray_testStrictModeTrue_shouldNotThrowJsonException(){
+    public void givenEmptyArray_testStrictModeTrue_shouldNotThrowJsonException() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
 
         String testCase = "[]";
 
         JSONArray jsonArray = new JSONArray(testCase, jsonParserConfiguration);
-        System.out.println(jsonArray);
+
+        assertEquals(testCase, jsonArray.toString());
     }
 
     @Test
@@ -215,7 +216,7 @@ public class JSONParserConfigurationTest {
             () -> new JSONArray(testCaseFour, jsonParserConfiguration));
 
         assertEquals(
-            "Field contains unbalanced quotes. Starts with \" but ends with single quote. at 6 [character 7 line 1]",
+            "Value 'test' is not surrounded by quotes at 13 [character 14 line 1]",
             jeOne.getMessage());
         assertEquals(
             "Single quote wrap not allowed in strict mode at 2 [character 3 line 1]",
