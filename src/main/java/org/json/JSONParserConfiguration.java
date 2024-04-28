@@ -28,6 +28,10 @@ public class JSONParserConfiguration extends ParserConfiguration {
      */
     public JSONParserConfiguration() {
         super();
+        // TODO: Force strict mode to true, unless otherwise set by .withStrictMode()
+        //  This will be replaced with a later change that executes test runs with and without strict mode.
+        //  This change will cause many of the unit tests to fail.
+        this.strictMode = true;
         this.overwriteDuplicateKey = false;
     }
 
