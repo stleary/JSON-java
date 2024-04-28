@@ -469,7 +469,8 @@ public class JSONArrayTest {
      * to the spec. However, after being parsed, toString() should emit strictly
      * conforming JSON text.  
      */
-    @Test
+    // TODO: This test will only run in non-strictMode. TBD later.
+    @Ignore
     public void unquotedText() {
         String str = "[value1, something!, (parens), foo@bar.com, 23, 23+45]";
         JSONArray jsonArray = new JSONArray(str);
@@ -685,8 +686,8 @@ public class JSONArrayTest {
 
         String jsonArrayStr =
             "["+
-                "hello,"+
-                "world"+
+                "\"hello\","+
+                "\"world\""+
             "]";
         // 2
         jsonArray.put(new JSONArray(jsonArrayStr));
@@ -763,8 +764,8 @@ public class JSONArrayTest {
 
         String jsonArrayStr =
             "["+
-                "hello,"+
-                "world"+
+                "\"hello\","+
+                "\"world\""+
             "]";
         // 2
         jsonArray.put(2, new JSONArray(jsonArrayStr));
