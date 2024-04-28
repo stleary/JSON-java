@@ -294,10 +294,7 @@ public class XMLTest {
             "<euro>A &#8364;33</euro>"+
             "<euroX>A &#x20ac;22&#x20AC;</euroX>"+
             "<unknown>some text &copy;</unknown>"+
-            // TODO: Looks like a strictMode regression where embedded single quotes are not handled correctly
-            //  Should be fixed.
-            // "<known>&#x0022; &quot; &amp; &apos; &lt; &gt;</known>"+
-            "<known>&#x0022; &quot; &amp;  &lt; &gt;</known>"+
+            "<known>&#x0022; &quot; &amp; &apos; &lt; &gt;</known>"+
             "<high>&#x1D122; &#x10165;</high>" +
             "</root>";
         String expectedStr = 
@@ -306,10 +303,7 @@ public class XMLTest {
             "\"euro\":\"A €33\"," +
             "\"euroX\":\"A €22€\"," +
             "\"unknown\":\"some text &copy;\"," +
-            // TODO: Looks like a strictMode regression where embedded single quotes are not handled correctly
-            //  Should be fixed.
-            // "\"known\":\"\\\" \\\" & ' < >\"," +
-            "\"known\":\"\\\" \\\" &  < >\"," +
+            "\"known\":\"\\\" \\\" & ' < >\"," +
             "\"high\":\"𝄢 𐅥\""+
             "}}";
         
@@ -323,12 +317,9 @@ public class XMLTest {
      */
     @Test
     public void testJsonToXmlEscape(){
-        // TODO: Looks like a strictMode regression where embedded single quotes are not handled correctly
-        //  Should be fixed.
         final String jsonSrc = "{\"amount\":\"10,00 €\","
                 + "\"description\":\"Ação Válida\u0085\","
-                // + "\"xmlEntities\":\"\\\" ' & < >\""
-                + "\"xmlEntities\":\"\\\"  & < >\""
+                + "\"xmlEntities\":\"\\\" ' & < >\""
                 + "}";
         JSONObject json = new JSONObject(jsonSrc);
         String xml = XML.toString(json);
@@ -342,8 +333,7 @@ public class XMLTest {
         assertTrue("Escaping á failed. Not found in XML output.", xml.contains("á"));
         // test XML Entities converted
         assertTrue("Escaping \" failed. Not found in XML output.", xml.contains("&quot;"));
-        // TODO: restore when the regression is fixed
-        // assertTrue("Escaping ' failed. Not found in XML output.", xml.contains("&apos;"));
+        assertTrue("Escaping ' failed. Not found in XML output.", xml.contains("&apos;"));
         assertTrue("Escaping & failed. Not found in XML output.", xml.contains("&amp;"));
         assertTrue("Escaping < failed. Not found in XML output.", xml.contains("&lt;"));
         assertTrue("Escaping > failed. Not found in XML output.", xml.contains("&gt;"));
