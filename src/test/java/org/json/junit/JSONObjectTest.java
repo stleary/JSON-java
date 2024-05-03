@@ -56,6 +56,7 @@ import org.json.junit.data.RecursiveBeanEquals;
 import org.json.junit.data.Singleton;
 import org.json.junit.data.SingletonEnum;
 import org.json.junit.data.WeirdList;
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -75,6 +76,14 @@ public class JSONObjectTest {
      */
     static final Pattern NUMBER_PATTERN = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
 
+    @After
+    public void tearDown() {
+        SingletonEnum.getInstance().setSomeInt(0);
+        SingletonEnum.getInstance().setSomeString(null);
+        Singleton.getInstance().setSomeInt(0);
+        Singleton.getInstance().setSomeString(null);
+    }
+    
     /**
      * Tests that the similar method is working as expected.
      */
