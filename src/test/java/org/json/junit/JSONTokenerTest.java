@@ -98,8 +98,7 @@ public class JSONTokenerTest {
         checkValid(" []  ",JSONArray.class);
         checkValid("[1,2]",JSONArray.class);
         checkValid("\n\n[1,2]\n\n",JSONArray.class);
-        // TODO: strictMode regression, needs to be fixed
-        // checkValid("1 2", String.class);
+        checkValid("1 2", String.class);
     }
     
     @Test
