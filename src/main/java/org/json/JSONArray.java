@@ -96,53 +96,83 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
-        if (x.nextClean() != '[') {
+        char nextChar = x.nextClean();
+
+        // check first character, if not '[' throw JSONException
+        if (nextChar != '[') {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
 
-        char nextChar = x.nextClean();
-        if (nextChar == 0) {
-            // array is unclosed. No ']' found, instead EOF
-            throw x.syntaxError("Expected a ',' or ']'");
-        }
-        if (nextChar != ']') {
-            x.back();
-            for (;;) {
-                if (x.nextClean() == ',') {
-                    x.back();
-                    this.myArrayList.add(JSONObject.NULL);
-                } else {
-                    x.back();
-                    this.myArrayList.add(x.nextValue(jsonParserConfiguration));
-                }
-                switch (x.nextClean()) {
-                    case 0:
-                        // array is unclosed. No ']' found, instead EOF
-                        throw x.syntaxError("Expected a ',' or ']'");
-                    case ',':
-                        nextChar = x.nextClean();
-                        if (nextChar == 0) {
-                            // array is unclosed. No ']' found, instead EOF
-                            throw x.syntaxError("Expected a ',' or ']'");
-                        }
-                        if (nextChar == ']') {
-                            return;
-                        }
-                        x.back();
-                        break;
-                    case ']':
-                        if (jsonParserConfiguration.isStrictMode()) {
-                            nextChar = x.nextClean();
-                            if (nextChar != 0) {
-                                throw x.syntaxError("invalid character found after end of array: " + nextChar);
-                            }
-                        }
+        parseTokener(x, jsonParserConfiguration); // runs recursively
 
-                        return;
-                    default:
-                        throw x.syntaxError("Expected a ',' or ']'");
+    }
+
+    private void parseTokener(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) {
+        boolean strictMode = jsonParserConfiguration.isStrictMode();
+
+        char cursor = x.nextClean();
+
+        switch (cursor) {
+            case 0:
+                throwErrorIfEoF(x);
+                break;
+            case ',':
+                cursor = x.nextClean();
+
+                throwErrorIfEoF(x);
+
+                if(strictMode && cursor == ']'){
+                    throw x.syntaxError(getInvalidCharErrorMsg(cursor));
                 }
-            }
+
+                if (cursor == ']') {
+                    break;
+                }
+
+                x.back();
+
+                parseTokener(x, jsonParserConfiguration);
+                break;
+            case ']':
+                if (strictMode) {
+                    cursor = x.nextClean();
+                    boolean isEoF = x.end();
+
+                    if (isEoF) {
+                        break;
+                    }
+
+                    if (x.getArrayLevel() == 0) {
+                        throw x.syntaxError(getInvalidCharErrorMsg(cursor));
+                    }
+
+                    x.back();
+                }
+                break;
+            default:
+                x.back();
+                boolean currentCharIsQuote = x.getPrevious() == '"';
+                boolean quoteIsNotNextToValidChar = x.getPreviousChar() != ',' && x.getPreviousChar() != '[';
+
+                if (strictMode && currentCharIsQuote && quoteIsNotNextToValidChar) {
+                    throw x.syntaxError(getInvalidCharErrorMsg(cursor));
+                }
+
+                this.myArrayList.add(x.nextValue(jsonParserConfiguration));
+                parseTokener(x, jsonParserConfiguration);
+        }
+    }
+
+    /**
+     * Throws JSONException if JSONTokener has reached end of file, usually when array is unclosed. No ']' found,
+     * instead EoF.
+     *
+     * @param x the JSONTokener being evaluated.
+     * @throws JSONException if JSONTokener has reached end of file.
+     */
+    private void throwErrorIfEoF(JSONTokener x) {
+        if (x.end()) {
+            throw x.syntaxError(String.format("Expected a ',' or ']' but instead found '%s'", x.getPrevious()));
         }
     }
 
@@ -1932,6 +1962,7 @@ public class JSONArray implements Iterable<Object> {
     private void addAll(Object array, boolean wrap, int recursionDepth) {
         addAll(array, wrap, recursionDepth, new JSONParserConfiguration());
     }
+
     /**
      * Add an array's elements to the JSONArray.
      *`
@@ -1978,7 +2009,6 @@ public class JSONArray implements Iterable<Object> {
                     "JSONArray initial value should be a string or collection or array.");
         }
     }
-
     /**
      * Create a new JSONException in a common format for incorrect conversions.
      * @param idx index of the item
@@ -2007,4 +2037,7 @@ public class JSONArray implements Iterable<Object> {
                 , cause);
     }
 
+    private static String getInvalidCharErrorMsg(char cursor) {
+        return String.format("invalid character '%s' found after end of array", cursor);
+    }
 }

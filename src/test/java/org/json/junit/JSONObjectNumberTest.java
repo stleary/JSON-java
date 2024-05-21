@@ -23,22 +23,22 @@ public class JSONObjectNumberTest {
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {"{value:50}", 1},
-            {"{value:50.0}", 1},
-            {"{value:5e1}", 1},
-            {"{value:5E1}", 1},
-            {"{value:5e1}", 1},
-            {"{value:'50'}", 1},
-            {"{value:-50}", -1},
-            {"{value:-50.0}", -1},
-            {"{value:-5e1}", -1},
-            {"{value:-5E1}", -1},
-            {"{value:-5e1}", -1},
-            {"{value:'-50'}", -1}
+            {"{\"value\":50}", 1},
+            {"{\"value\":50.0}", 1},
+            {"{\"value\":5e1}", 1},
+            {"{\"value\":5E1}", 1},
+            {"{\"value\":5e1}", 1},
+            {"{\"value\":\"50\"}", 1},
+            {"{\"value\":-50}", -1},
+            {"{\"value\":-50.0}", -1},
+            {"{\"value\":-5e1}", -1},
+            {"{\"value\":-5E1}", -1},
+            {"{\"value\":-5e1}", -1},
+            {"{\"value\":\"-50\"}", -1}
             // JSON does not support octal or hex numbers;
             // see https://stackoverflow.com/a/52671839/6323312
-            // "{value:062}", // octal 50
-            // "{value:0x32}" // hex 50
+            // "{\"value\":062}", // octal 50
+            // "{\"value\":0x32}" // hex 50
         });
     }
 

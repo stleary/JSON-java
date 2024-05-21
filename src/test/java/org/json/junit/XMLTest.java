@@ -265,11 +265,13 @@ public class XMLTest {
             "   </address>\n"+
             "</addresses>";
 
+        // TODO: fails in strict mode because -23x.45 was not surrounded by quotes.
+        //  Should be split into a strictMode test, and a similar non-strictMode test
         String expectedStr = 
             "{\"addresses\":{\"address\":{\"street\":\"[CDATA[Baker street 5]\","+
-            "\"name\":\"Joe Tester\",\"NothingHere\":\"\",TrueValue:true,\n"+
+            "\"name\":\"Joe Tester\",\"NothingHere\":\"\",\"TrueValue\":true,\n"+
             "\"FalseValue\":false,\"NullValue\":null,\"PositiveValue\":42,\n"+
-            "\"NegativeValue\":-23,\"DoubleValue\":-23.45,\"Nan\":-23x.45,\n"+
+            "\"NegativeValue\":-23,\"DoubleValue\":-23.45,\"Nan\":\"-23x.45\",\n"+
             "\"ArrayOfNum\":\"1, 2, 3, 4.1, 5.2\"\n"+
             "},\"xsi:noNamespaceSchemaLocation\":"+
             "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
@@ -1180,7 +1182,7 @@ public class XMLTest {
 
     @Test
     public void shouldCreateExplicitEndTagWithEmptyValueWhenConfigured(){
-        String jsonString = "{outer:{innerOne:\"\", innerTwo:\"two\"}}";
+        String jsonString = "{\"outer\":{\"innerOne\":\"\", \"innerTwo\":\"two\"}}";
         JSONObject jsonObject = new JSONObject(jsonString);
         String expectedXmlString = "<encloser><outer><innerOne></innerOne><innerTwo>two</innerTwo></outer></encloser>";
         String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(true));
@@ -1191,7 +1193,7 @@ public class XMLTest {
 
     @Test
     public void shouldNotCreateExplicitEndTagWithEmptyValueWhenNotConfigured(){
-        String jsonString = "{outer:{innerOne:\"\", innerTwo:\"two\"}}";
+        String jsonString = "{\"outer\":{\"innerOne\":\"\", \"innerTwo\":\"two\"}}";
         JSONObject jsonObject = new JSONObject(jsonString);
         String expectedXmlString = "<encloser><outer><innerOne/><innerTwo>two</innerTwo></outer></encloser>";
         String xmlForm = XML.toString(jsonObject,"encloser", new XMLParserConfiguration().withCloseEmptyTag(false));
