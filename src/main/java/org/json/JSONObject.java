@@ -1762,12 +1762,7 @@ public class JSONObject {
         Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
         for (final Method method : methods) {
             final int modifiers = method.getModifiers();
-            if (Modifier.isPublic(modifiers)
-                    && !Modifier.isStatic(modifiers)
-                    && method.getParameterTypes().length == 0
-                    && !method.isBridge()
-                    && method.getReturnType() != Void.TYPE
-                    && isValidMethodName(method.getName())) {
+            if (isValidMethod(modifiers, method)) {
                 final String key = getKeyNameFromMethod(method);
                 if (key != null && !key.isEmpty()) {
                     try {
@@ -1804,6 +1799,15 @@ public class JSONObject {
                 }
             }
         }
+    }
+
+    private boolean isValidMethod(int modifiers,Method method) {
+        return Modifier.isPublic(modifiers)
+        && !Modifier.isStatic(modifiers)
+        && method.getParameterTypes().length == 0
+        && !method.isBridge()
+        && method.getReturnType() != Void.TYPE
+        && isValidMethodName(method.getName());
     }
 
     private static boolean isValidMethodName(String name) {
