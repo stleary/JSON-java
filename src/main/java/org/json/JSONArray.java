@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 
@@ -60,7 +61,7 @@ import java.util.Map;
  * @author JSON.org
  * @version 2016-08/15
  */
-public class JSONArray implements Iterable<Object> {
+public class JSONArray implements List<Object> {
 
     /**
      * The arrayList where the JSONArray's properties are kept.
@@ -318,6 +319,54 @@ public class JSONArray implements Iterable<Object> {
         return this.myArrayList.iterator();
     }
 
+    @Override
+    public Object[] toArray() {
+        return myArrayList.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] array) {
+        return myArrayList.toArray(array);
+    }
+
+    @Override
+    public boolean add(Object object) {
+        JSONObject.testValidity(object);
+        return myArrayList.add(object);
+    }
+
+    @Override
+    public boolean remove(Object object) {
+        return myArrayList.remove(object);
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> collection) {
+        return myArrayList.containsAll(collection);
+    }
+
+    @Override
+    public boolean addAll(Collection<?> collection) {
+        JSONObject.testValidity(collection);
+        return myArrayList.addAll(collection);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<?> collection) {
+        JSONObject.testValidity(collection);
+        return myArrayList.addAll(index, collection);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> collection) {
+        return myArrayList.removeAll(collection);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> collection) {
+        return myArrayList.retainAll(collection);
+    }
+
     /**
      * Get the object value associated with an index.
      *
@@ -333,6 +382,18 @@ public class JSONArray implements Iterable<Object> {
             throw new JSONException("JSONArray[" + index + "] not found.");
         }
         return object;
+    }
+
+    @Override
+    public Object set(int index, Object object) {
+        JSONObject.testValidity(object);
+        return myArrayList.set(index, object);
+    }
+
+    @Override
+    public void add(int index, Object object) {
+        JSONObject.testValidity(object);
+        myArrayList.add(index, object);
     }
 
     /**
@@ -1635,6 +1696,31 @@ public class JSONArray implements Iterable<Object> {
             : null;
     }
 
+    @Override
+    public int indexOf(Object object) {
+        return myArrayList.indexOf(object);
+    }
+
+    @Override
+    public int lastIndexOf(Object object) {
+        return myArrayList.lastIndexOf(object);
+    }
+
+    @Override
+    public ListIterator<Object> listIterator() {
+        return myArrayList.listIterator();
+    }
+
+    @Override
+    public ListIterator<Object> listIterator(int index) {
+        return myArrayList.listIterator(index);
+    }
+
+    @Override
+    public List<Object> subList(int from, int to) {
+        return myArrayList.subList(from, to);
+    }
+
     /**
      * Determine if two JSONArrays are similar.
      * They must contain similar sequences.
@@ -1875,6 +1961,11 @@ public class JSONArray implements Iterable<Object> {
         return results;
     }
 
+    @Override
+    public int size() {
+        return myArrayList.size();
+    }
+
     /**
      * Check if JSONArray is empty.
      *
@@ -1882,6 +1973,11 @@ public class JSONArray implements Iterable<Object> {
      */
     public boolean isEmpty() {
         return this.myArrayList.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object object) {
+        return myArrayList.contains(object);
     }
 
     /**
