@@ -9,7 +9,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 import java.util.stream.Collectors;
@@ -17,8 +16,9 @@ import java.util.stream.Stream;
 import org.json.*;
 
 /**
- * These are helpful utility methods that perform basic comparisons between various objects. In most cases, the
- * comparisons are not order-dependent, or else the order is known.
+ * These are helpful utility methods that perform basic comparisons
+ * between various objects. In most cases, the comparisons are not
+ * order-dependent, or else the order is known.
  */
 public class Util {
 
@@ -31,15 +31,15 @@ public class Util {
     }
 
     /**
-     * Compares two JSONArrays for equality. The arrays need not be in the same order.
-     *
-     * @param jsonArray         created by the code to be tested
+     * Compares two JSONArrays for equality.
+     * The arrays need not be in the same order.
+     * @param jsonArray created by the code to be tested
      * @param expectedJsonArray created specifically for comparing
      */
     public static void compareActualVsExpectedJsonArrays(JSONArray jsonArray,
-        JSONArray expectedJsonArray) {
+            JSONArray expectedJsonArray) {
         assertTrue("jsonArray lengths should be equal",
-            jsonArray.length() == expectedJsonArray.length());
+                jsonArray.length() == expectedJsonArray.length());
         for (int i = 0; i < jsonArray.length(); ++i) {
             Object value = jsonArray.get(i);
             Object expectedValue = expectedJsonArray.get(i);
@@ -48,15 +48,15 @@ public class Util {
     }
 
     /**
-     * Compares two JSONObjects for equality. The objects need not be in the same order
-     *
-     * @param jsonObject         created by the code to be tested
+     * Compares two JSONObjects for equality. The objects need not be
+     * in the same order
+     * @param jsonObject created by the code to be tested
      * @param expectedJsonObject created specifically for comparing
      */
     public static void compareActualVsExpectedJsonObjects(
-        JSONObject jsonObject, JSONObject expectedJsonObject) {
+            JSONObject jsonObject, JSONObject expectedJsonObject) {
         assertTrue("jsonObjects should have the same length",
-            jsonObject.length() == expectedJsonObject.length());
+                jsonObject.length() == expectedJsonObject.length());
         Iterator<String> keys = jsonObject.keys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -67,25 +67,25 @@ public class Util {
     }
 
     /**
-     * Compare two objects for equality. Might be JSONArray, JSONObject, or something else.
-     *
-     * @param value         created by the code to be tested
+     * Compare two objects for equality. Might be JSONArray, JSONObject,
+     * or something else.
+     * @param value created by the code to be tested
      * @param expectedValue created specifically for comparing
      */
     private static void compareActualVsExpectedObjects(Object value,
-        Object expectedValue) {
+            Object expectedValue) {
         if (value instanceof JSONObject && expectedValue instanceof JSONObject) {
             // Compare JSONObjects
-            JSONObject jsonObject = (JSONObject) value;
-            JSONObject expectedJsonObject = (JSONObject) expectedValue;
+            JSONObject jsonObject = (JSONObject)value;
+            JSONObject expectedJsonObject = (JSONObject)expectedValue;
             compareActualVsExpectedJsonObjects(
-                jsonObject, expectedJsonObject);
+                    jsonObject, expectedJsonObject);
         } else if (value instanceof JSONArray && expectedValue instanceof JSONArray) {
             // Compare JSONArrays
-            JSONArray jsonArray = (JSONArray) value;
-            JSONArray expectedJsonArray = (JSONArray) expectedValue;
+            JSONArray jsonArray = (JSONArray)value;
+            JSONArray expectedJsonArray = (JSONArray)expectedValue;
             compareActualVsExpectedJsonArrays(
-                jsonArray, expectedJsonArray);
+                    jsonArray, expectedJsonArray);
         } else {
             /**
              * Compare all other types using toString(). First, the types must
@@ -112,7 +112,6 @@ public class Util {
 
     /**
      * Asserts that all JSONObject maps are the same as the default ctor
-     *
      * @param jsonObjects list of objects to be tested
      */
     public static void checkJSONObjectsMaps(List<JSONObject> jsonObjects) {
@@ -130,7 +129,6 @@ public class Util {
 
     /**
      * Asserts that all JSONObject maps are the same as the default ctor
-     *
      * @param jsonObject the object to be tested
      */
     public static void checkJSONObjectMaps(JSONObject jsonObject) {
@@ -141,9 +139,8 @@ public class Util {
 
     /**
      * Asserts that all JSONObject maps are the same as mapType
-     *
      * @param jsonObject object to be tested
-     * @param mapType    mapType to test against
+     * @param mapType mapType to test against
      */
     public static void checkJSONObjectMaps(JSONObject jsonObject, Class<? extends Map> mapType) {
         if (mapType == null) {
@@ -182,9 +179,8 @@ public class Util {
 
     /**
      * Asserts that all JSONObject maps in the JSONArray object match mapType
-     *
      * @param jsonArray object to be tested
-     * @param mapType   map type to be tested against
+     * @param mapType map type to be tested against
      */
     public static void checkJSONArrayMaps(JSONArray jsonArray, Class<? extends Map> mapType) {
         if (jsonArray == null) {
@@ -197,18 +193,18 @@ public class Util {
         while (it.hasNext()) {
             Object val = it.next();
             if (val instanceof JSONObject) {
-                JSONObject jsonObjectVal = (JSONObject) val;
+                JSONObject jsonObjectVal = (JSONObject)val;
                 checkJSONObjectMaps(jsonObjectVal, mapType);
             } else if (val instanceof JSONArray) {
-                JSONArray jsonArrayVal = (JSONArray) val;
+                JSONArray jsonArrayVal = (JSONArray)val;
                 checkJSONArrayMaps(jsonArrayVal, mapType);
             }
         }
     }
 
     /**
-     * Asserts that all JSONObject maps nested in the JSONArray match the default mapType
-     *
+     * Asserts that all JSONObject maps nested in the JSONArray match
+     * the default mapType
      * @param jsonArray the object to be tested
      */
     public static void checkJSONArrayMaps(JSONArray jsonArray) {
