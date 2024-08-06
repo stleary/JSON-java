@@ -59,6 +59,19 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
+    public void givenValidArraysWithInvalidJsonObjects_testStrictMode_shouldThrowJsonException(){
+        final List<String> jsonArrays = Arrays.asList(
+            "[1, {}}]",
+            "[1, 2, 3, \"value\", true]abc",
+            "[{}, {\"key\":\"value\"}abc]"
+        );
+
+        jsonArrays.forEach(jsonArray ->
+            assertThrows(JSONException.class,
+                () -> new JSONArray(jsonArray, new JSONParserConfiguration().withStrictMode(true))));
+    }
+
+    @Test
     public void givenValidJsonObjects_testStrictModeTrue() {
         final List<String> jsonPaths = Arrays.asList(
             "src/test/resources/Issue884-validJsonObj.json"
