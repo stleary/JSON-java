@@ -50,7 +50,8 @@ public class JSONParserConfigurationTest {
     public void givenInvalidJsonObjects_testStrictModeTrue_shouldThrowJsonException() {
         final List<String> jsonObjects = Arrays.asList(
             "{}}",
-            "{}abc"
+            "{}abc",
+            "{{}"
         );
 
         jsonObjects.forEach(jsonObject ->
@@ -59,7 +60,7 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenValidArraysWithInvalidJsonObjects_testStrictMode_shouldThrowJsonException(){
+    public void givenValidArraysWithInvalidJsonObjects_testStrictMode_shouldThrowJsonException() {
         final List<String> jsonArrays = Arrays.asList(
             "[1, {}}]",
             "[1, 2, 3, \"value\", true]abc",
@@ -78,12 +79,12 @@ public class JSONParserConfigurationTest {
         );
 
         jsonPaths.forEach(path -> {
-                final String resultJsonAsString = Util.getJsonStringFromFilePath(Paths.get(path));
+            final String resultJsonAsString = Util.getJsonStringFromFilePath(Paths.get(path));
 
-                final JSONObject resultJsonObject = new JSONObject(resultJsonAsString,
-                    new JSONParserConfiguration().withStrictMode(true));
+            final JSONObject resultJsonObject = new JSONObject(resultJsonAsString,
+                new JSONParserConfiguration().withStrictMode(true));
 
-                assertEquals(resultJsonAsString.replaceAll("\\s", "").length(), resultJsonObject.toString().length());
+            assertEquals(resultJsonAsString.replaceAll("\\s", "").length(), resultJsonObject.toString().length());
         });
     }
 
@@ -167,15 +168,13 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenCompliantJSONArrayFile_testStrictModeTrue_shouldNotThrowAnyException() throws IOException {
-        try (Stream<String> lines = Files.lines(Paths.get("src/test/resources/compliantJsonArray.json"))) {
-            String compliantJsonArrayAsString = lines.collect(Collectors.joining());
-            JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
-                .withStrictMode(true);
+    public void givenCompliantJSONArrayFile_testStrictModeTrue_shouldNotThrowAnyException() {
+        final String compliantJsonArrayAsString = Util.getJsonStringFromFilePath(
+            Paths.get("src/test/resources/compliantJsonArray.json"));
+        final JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+            .withStrictMode(true);
 
-            new JSONArray(compliantJsonArrayAsString, jsonParserConfiguration);
-        }
-
+        new JSONArray(compliantJsonArrayAsString, jsonParserConfiguration);
     }
 
     @Test
