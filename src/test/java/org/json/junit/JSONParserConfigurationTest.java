@@ -47,6 +47,44 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
+    public void givenInvalidJsonObjects_testStrictModeTrue_shouldThrowJsonException() throws IOException {
+        /*assertThrows(JSONException.class,
+            () -> new JSONObject("{}abc", new JSONParserConfiguration().withStrictMode(true)));*/
+
+        try (final Stream<String> lines = Files.lines(Paths.get("src/test/resources/Issue884-validJsonObj.json"))) {
+            final String resultJsonAsString = lines.collect(Collectors.joining());
+
+            final JSONObject jsonObject = new JSONObject(resultJsonAsString, new JSONParserConfiguration().withStrictMode(true));
+
+            System.out.println(jsonObject.toString(2));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //JSONObject jsonObject = new JSONObject("{\"test\": {\"key\": \"val\", \"key2\"}}", new JSONParserConfiguration().withStrictMode(true));
+        //JSONObject jsonObject2 = new JSONObject("{}}", new JSONParserConfiguration().withStrictMode(true));
+    }
+
+    @Test
+    public void givenValidJsonObject_testStrictModeTrue_shouldThrowJsonException() throws IOException {
+        /*assertThrows(JSONException.class,
+            () -> new JSONObject("{}abc", new JSONParserConfiguration().withStrictMode(true)));*/
+
+        try (final Stream<String> lines = Files.lines(Paths.get("src/test/resources/Issue884-validJsonObj.json"))) {
+            final String resultJsonAsString = lines.collect(Collectors.joining());
+
+            final JSONObject jsonObject = new JSONObject(resultJsonAsString, new JSONParserConfiguration().withStrictMode(true));
+
+            System.out.println(jsonObject.toString(2));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //JSONObject jsonObject = new JSONObject("{\"test\": {\"key\": \"val\", \"key2\"}}", new JSONParserConfiguration().withStrictMode(true));
+        //JSONObject jsonObject2 = new JSONObject("{}}", new JSONParserConfiguration().withStrictMode(true));
+    }
+
+    @Test
     public void givenEmptyArray_testStrictModeTrue_shouldNotThrowJsonException() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
@@ -76,7 +114,7 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenValidEmptyArrayInsideArray_testStrictModeTrue_shouldNotThrowJsonException(){
+    public void givenValidEmptyArrayInsideArray_testStrictModeTrue_shouldNotThrowJsonException() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
 
@@ -88,7 +126,7 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenValidEmptyArrayInsideArray_testStrictModeFalse_shouldNotThrowJsonException(){
+    public void givenValidEmptyArrayInsideArray_testStrictModeFalse_shouldNotThrowJsonException() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(false);
 
@@ -242,8 +280,12 @@ public class JSONParserConfigurationTest {
         JSONException jeTwo = assertThrows(JSONException.class,
             () -> new JSONArray(testCaseTwo, jsonParserConfiguration));
 
-        assertEquals("Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]", jeOne.getMessage());
-        assertEquals("Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]", jeTwo.getMessage());
+        assertEquals(
+            "Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]",
+            jeOne.getMessage());
+        assertEquals(
+            "Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]",
+            jeTwo.getMessage());
     }
 
 

@@ -1,0 +1,14 @@
+{
+    "test": {
+        "key": "value",
+        "key2": "value",
+        "key3": {
+            "anotherNested": "obj",
+            "anArray": [
+                "val1",
+                1,
+                3
+            ]
+        }
+    }
+}
