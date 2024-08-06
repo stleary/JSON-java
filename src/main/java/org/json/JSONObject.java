@@ -209,9 +209,7 @@ public class JSONObject {
                 case '}':
                     if (jsonParserConfiguration.isStrictMode()) {
                         c = x.nextClean();
-                        System.out.println(c);
                         if (c != 0) {
-                            System.out.println("yes");
                             throw x.syntaxError(String.format("Invalid char '%s' after '}'", c));
                         }
                         x.back();

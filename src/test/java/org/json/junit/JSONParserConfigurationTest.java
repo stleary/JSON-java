@@ -47,41 +47,31 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenInvalidJsonObjects_testStrictModeTrue_shouldThrowJsonException() throws IOException {
-        /*assertThrows(JSONException.class,
-            () -> new JSONObject("{}abc", new JSONParserConfiguration().withStrictMode(true)));*/
+    public void givenInvalidJsonObjects_testStrictModeTrue_shouldThrowJsonException() {
+        final List<String> jsonObjects = Arrays.asList(
+            "{}}",
+            "{}abc"
+        );
 
-        try (final Stream<String> lines = Files.lines(Paths.get("src/test/resources/Issue884-validJsonObj.json"))) {
-            final String resultJsonAsString = lines.collect(Collectors.joining());
-
-            final JSONObject jsonObject = new JSONObject(resultJsonAsString, new JSONParserConfiguration().withStrictMode(true));
-
-            System.out.println(jsonObject.toString(2));
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        //JSONObject jsonObject = new JSONObject("{\"test\": {\"key\": \"val\", \"key2\"}}", new JSONParserConfiguration().withStrictMode(true));
-        //JSONObject jsonObject2 = new JSONObject("{}}", new JSONParserConfiguration().withStrictMode(true));
+        jsonObjects.forEach(jsonObject ->
+            assertThrows(JSONException.class,
+                () -> new JSONObject(jsonObject, new JSONParserConfiguration().withStrictMode(true))));
     }
 
     @Test
-    public void givenValidJsonObject_testStrictModeTrue_shouldThrowJsonException() throws IOException {
-        /*assertThrows(JSONException.class,
-            () -> new JSONObject("{}abc", new JSONParserConfiguration().withStrictMode(true)));*/
+    public void givenValidJsonObjects_testStrictModeTrue() {
+        final List<String> jsonPaths = Arrays.asList(
+            "src/test/resources/Issue884-validJsonObj.json"
+        );
 
-        try (final Stream<String> lines = Files.lines(Paths.get("src/test/resources/Issue884-validJsonObj.json"))) {
-            final String resultJsonAsString = lines.collect(Collectors.joining());
+        jsonPaths.forEach(path -> {
+                final String resultJsonAsString = Util.getJsonStringFromFilePath(Paths.get(path));
 
-            final JSONObject jsonObject = new JSONObject(resultJsonAsString, new JSONParserConfiguration().withStrictMode(true));
+                final JSONObject resultJsonObject = new JSONObject(resultJsonAsString,
+                    new JSONParserConfiguration().withStrictMode(true));
 
-            System.out.println(jsonObject.toString(2));
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        //JSONObject jsonObject = new JSONObject("{\"test\": {\"key\": \"val\", \"key2\"}}", new JSONParserConfiguration().withStrictMode(true));
-        //JSONObject jsonObject2 = new JSONObject("{}}", new JSONParserConfiguration().withStrictMode(true));
+                assertEquals(resultJsonAsString.replaceAll("\\s", "").length(), resultJsonObject.toString().length());
+        });
     }
 
     @Test
