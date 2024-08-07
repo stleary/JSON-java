@@ -1,12 +1,8 @@
 package org.json.junit;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -118,7 +114,7 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenValidEmptyArrayInsideArray_testStrictModeTrue_shouldNotThrowJsonException() {
+    public void givenValidEmptyArrayInsideArray_testStrictModeTrue_shouldNotThrowJsonException(){
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(true);
 
@@ -130,7 +126,7 @@ public class JSONParserConfigurationTest {
     }
 
     @Test
-    public void givenValidEmptyArrayInsideArray_testStrictModeFalse_shouldNotThrowJsonException() {
+    public void givenValidEmptyArrayInsideArray_testStrictModeFalse_shouldNotThrowJsonException(){
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
             .withStrictMode(false);
 
@@ -282,12 +278,8 @@ public class JSONParserConfigurationTest {
         JSONException jeTwo = assertThrows(JSONException.class,
             () -> new JSONArray(testCaseTwo, jsonParserConfiguration));
 
-        assertEquals(
-            "Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]",
-            jeOne.getMessage());
-        assertEquals(
-            "Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]",
-            jeTwo.getMessage());
+        assertEquals("Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]", jeOne.getMessage());
+        assertEquals("Unterminated string. Character with int code 0 is not allowed within a quoted string. at 15 [character 16 line 1]", jeTwo.getMessage());
     }
 
 
