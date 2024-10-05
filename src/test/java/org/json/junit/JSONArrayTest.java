@@ -259,6 +259,11 @@ public class JSONArrayTest {
                      jsonArray.length(),
                      len);
 
+	// collection as object
+        @SuppressWarnings("RedundantCast")
+        Object myListAsObject = (Object) myList;
+        jsonArray.putAll(myListAsObject);
+	    
         for (int i = 0; i < myList.size(); i++) {
             assertEquals("collection elements should be equal",
                          myList.get(i),
