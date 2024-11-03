@@ -75,31 +75,19 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Constructs a JSONArray from a JSONTokener.
-     * <p>
-     * This constructor reads the JSONTokener to parse a JSON array. It uses the default JSONParserConfiguration.
+     * Construct a JSONArray from a JSONTokener.
      *
-     * @param x A JSONTokener
-     * @throws JSONException If there is a syntax error.
+     * @param x
+     *            A JSONTokener
+     * @throws JSONException
+     *             If there is a syntax error.
      */
     public JSONArray(JSONTokener x) throws JSONException {
-        this(x, new JSONParserConfiguration());
-    }
-
-    /**
-     * Constructs a JSONArray from a JSONTokener and a JSONParserConfiguration.
-     * JSONParserConfiguration contains strictMode turned off (false) by default.
-     *
-     * @param x                       A JSONTokener instance from which the JSONArray is constructed.
-     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
-     * @throws JSONException If a syntax error occurs during the construction of the JSONArray.
-     */
-    public JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
         if (x.nextClean() != '[') {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
-
+        
         char nextChar = x.nextClean();
         if (nextChar == 0) {
             // array is unclosed. No ']' found, instead EOF
@@ -113,34 +101,27 @@ public class JSONArray implements Iterable<Object> {
                     this.myArrayList.add(JSONObject.NULL);
                 } else {
                     x.back();
-                    this.myArrayList.add(x.nextValue(jsonParserConfiguration));
+                    this.myArrayList.add(x.nextValue());
                 }
                 switch (x.nextClean()) {
-                    case 0:
+                case 0:
+                    // array is unclosed. No ']' found, instead EOF
+                    throw x.syntaxError("Expected a ',' or ']'");
+                case ',':
+                    nextChar = x.nextClean();
+                    if (nextChar == 0) {
                         // array is unclosed. No ']' found, instead EOF
                         throw x.syntaxError("Expected a ',' or ']'");
-                    case ',':
-                        nextChar = x.nextClean();
-                        if (nextChar == 0) {
-                            // array is unclosed. No ']' found, instead EOF
-                            throw x.syntaxError("Expected a ',' or ']'");
-                        }
-                        if (nextChar == ']') {
-                            return;
-                        }
-                        x.back();
-                        break;
-                    case ']':
-                        if (jsonParserConfiguration.isStrictMode()) {
-                            nextChar = x.nextClean();
-                            if (nextChar != 0) {
-                                throw x.syntaxError("invalid character found after end of array: " + nextChar);
-                            }
-                        }
-
+                    }
+                    if (nextChar == ']') {
                         return;
-                    default:
-                        throw x.syntaxError("Expected a ',' or ']'");
+                    }
+                    x.back();
+                    break;
+                case ']':
+                    return;
+                default:
+                    throw x.syntaxError("Expected a ',' or ']'");
                 }
             }
         }
@@ -157,19 +138,7 @@ public class JSONArray implements Iterable<Object> {
      *             If there is a syntax error.
      */
     public JSONArray(String source) throws JSONException {
-        this(new JSONTokener(source), new JSONParserConfiguration());
-    }
-
-    /**
-     * Constructs a JSONArray from a source JSON text and a JSONParserConfiguration.
-     *
-     * @param source                  A string that begins with <code>[</code>&nbsp;<small>(left bracket)</small> and
-     *                                ends with <code>]</code> &nbsp;<small>(right bracket)</small>.
-     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
-     * @throws JSONException If there is a syntax error.
-     */
-    public JSONArray(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
-        this(new JSONTokener(source), jsonParserConfiguration);
+        this(new JSONTokener(source));
     }
 
     /**
@@ -398,7 +367,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Get the enum value associated with an index.
-     *
+     * 
      * @param <E>
      *            Enum Type
      * @param clazz
@@ -586,7 +555,7 @@ public class JSONArray implements Iterable<Object> {
         if (len == 0) {
             return "";
         }
-
+        
         StringBuilder sb = new StringBuilder(
                    JSONObject.valueToString(this.myArrayList.get(0)));
 
@@ -900,7 +869,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Get the enum value associated with a key.
-     *
+     * 
      * @param <E>
      *            Enum Type
      * @param clazz
@@ -915,7 +884,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Get the enum value associated with a key.
-     *
+     * 
      * @param <E>
      *            Enum Type
      * @param clazz
@@ -948,8 +917,8 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the optional BigInteger value associated with an index. The
-     * defaultValue is returned if there is no value for the index, or if the
+     * Get the optional BigInteger value associated with an index. The 
+     * defaultValue is returned if there is no value for the index, or if the 
      * value is not a number and cannot be converted to a number.
      *
      * @param index
@@ -964,8 +933,8 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the optional BigDecimal value associated with an index. The
-     * defaultValue is returned if there is no value for the index, or if the
+     * Get the optional BigDecimal value associated with an index. The 
+     * defaultValue is returned if there is no value for the index, or if the 
      * value is not a number and cannot be converted to a number. If the value
      * is float or double, the {@link BigDecimal#BigDecimal(double)}
      * constructor will be used. See notes on the constructor for conversion
@@ -1134,7 +1103,7 @@ public class JSONArray implements Iterable<Object> {
         if (val instanceof Number){
             return (Number) val;
         }
-
+        
         if (val instanceof String) {
             try {
                 return JSONObject.stringToNumber((String) val);
@@ -1211,7 +1180,7 @@ public class JSONArray implements Iterable<Object> {
     public JSONArray put(double value) throws JSONException {
         return this.put(Double.valueOf(value));
     }
-
+    
     /**
      * Append a float value. This increases the array's length by one.
      *
@@ -1466,19 +1435,19 @@ public class JSONArray implements Iterable<Object> {
      *
      * @param collection
      *            A Collection.
-     * @return this.
+     * @return this. 
      */
     public JSONArray putAll(Collection<?> collection) {
         this.addAll(collection, false);
         return this;
     }
-
+    
     /**
      * Put an Iterable's elements in to the JSONArray.
      *
      * @param iter
      *            An Iterable.
-     * @return this.
+     * @return this. 
      */
     public JSONArray putAll(Iterable<?> iter) {
         this.addAll(iter, false);
@@ -1490,7 +1459,7 @@ public class JSONArray implements Iterable<Object> {
      *
      * @param array
      *            A JSONArray.
-     * @return this.
+     * @return this. 
      */
     public JSONArray putAll(JSONArray array) {
         // directly copy the elements from the source array to this one
@@ -1505,7 +1474,7 @@ public class JSONArray implements Iterable<Object> {
      * @param array
      *            Array. If the parameter passed is null, or not an array or Iterable, an
      *            exception will be thrown.
-     * @return this.
+     * @return this. 
      *
      * @throws JSONException
      *            If not an array, JSONArray, Iterable or if an value is non-finite number.
@@ -1516,9 +1485,9 @@ public class JSONArray implements Iterable<Object> {
         this.addAll(array, false);
         return this;
     }
-
+    
     /**
-     * Creates a JSONPointer using an initialization string and tries to
+     * Creates a JSONPointer using an initialization string and tries to 
      * match it to an item within this JSONArray. For example, given a
      * JSONArray initialized with this document:
      * <pre>
@@ -1526,7 +1495,7 @@ public class JSONArray implements Iterable<Object> {
      *     {"b":"c"}
      * ]
      * </pre>
-     * and this JSONPointer string:
+     * and this JSONPointer string: 
      * <pre>
      * "/0/b"
      * </pre>
@@ -1539,9 +1508,9 @@ public class JSONArray implements Iterable<Object> {
     public Object query(String jsonPointer) {
         return query(new JSONPointer(jsonPointer));
     }
-
+    
     /**
-     * Uses a user initialized JSONPointer  and tries to
+     * Uses a user initialized JSONPointer  and tries to 
      * match it to an item within this JSONArray. For example, given a
      * JSONArray initialized with this document:
      * <pre>
@@ -1549,7 +1518,7 @@ public class JSONArray implements Iterable<Object> {
      *     {"b":"c"}
      * ]
      * </pre>
-     * and this JSONPointer:
+     * and this JSONPointer: 
      * <pre>
      * "/0/b"
      * </pre>
@@ -1562,11 +1531,11 @@ public class JSONArray implements Iterable<Object> {
     public Object query(JSONPointer jsonPointer) {
         return jsonPointer.queryFrom(this);
     }
-
+    
     /**
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
-     *
+     * 
      * @param jsonPointer the string representation of the JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
@@ -1574,11 +1543,11 @@ public class JSONArray implements Iterable<Object> {
     public Object optQuery(String jsonPointer) {
     	return optQuery(new JSONPointer(jsonPointer));
     }
-
+    
     /**
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
-     *
+     * 
      * @param jsonPointer The JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
@@ -1698,11 +1667,11 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Make a pretty-printed JSON text of this JSONArray.
-     *
+     * 
      * <p>If <pre> {@code indentFactor > 0}</pre> and the {@link JSONArray} has only
      * one element, then the array will be output on a single line:
      * <pre>{@code [1]}</pre>
-     *
+     * 
      * <p>If an array has 2 or more elements, then it will be output across
      * multiple lines: <pre>{@code
      * [
@@ -1714,7 +1683,7 @@ public class JSONArray implements Iterable<Object> {
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      * </b>
-     *
+     * 
      * @param indentFactor
      *            The number of spaces to add to each level of indentation.
      * @return a printable, displayable, transmittable representation of the
@@ -1748,11 +1717,11 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Write the contents of the JSONArray as JSON text to a writer.
-     *
+     * 
      * <p>If <pre>{@code indentFactor > 0}</pre> and the {@link JSONArray} has only
      * one element, then the array will be output on a single line:
      * <pre>{@code [1]}</pre>
-     *
+     * 
      * <p>If an array has 2 or more elements, then it will be output across
      * multiple lines: <pre>{@code
      * [
@@ -1978,7 +1947,7 @@ public class JSONArray implements Iterable<Object> {
                     "JSONArray initial value should be a string or collection or array.");
         }
     }
-
+    
     /**
      * Create a new JSONException in a common format for incorrect conversions.
      * @param idx index of the item
