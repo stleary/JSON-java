@@ -2,8 +2,6 @@ package org.json;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 Public Domain.
@@ -33,8 +31,6 @@ public class JSONTokener {
     private boolean usePrevious;
     /** the number of characters read in the previous line. */
     private long characterPreviousLine;
-    private final List<Character> smallCharMemory;
-    private int arrayLevel = 0;
 
 
     /**
@@ -53,7 +49,6 @@ public class JSONTokener {
         this.character = 1;
         this.characterPreviousLine = 0;
         this.line = 1;
-        this.smallCharMemory = new ArrayList<Character>(2);
     }
 
 
@@ -191,46 +186,6 @@ public class JSONTokener {
         return this.previous;
     }
 
-    private void insertCharacterInCharMemory(Character c) {
-        boolean foundSameCharRef = checkForEqualCharRefInMicroCharMemory(c);
-        if(foundSameCharRef){
-            return;
-        }
-
-        if(smallCharMemory.size() < 2){
-            smallCharMemory.add(c);
-            return;
-        }
-
-        smallCharMemory.set(0, smallCharMemory.get(1));
-        smallCharMemory.remove(1);
-        smallCharMemory.add(c);
-    }
-
-    private boolean checkForEqualCharRefInMicroCharMemory(Character c) {
-        boolean isNotEmpty = !smallCharMemory.isEmpty();
-        if (isNotEmpty) {
-            Character lastChar = smallCharMemory.get(smallCharMemory.size() - 1);
-            return c.compareTo(lastChar) == 0;
-        }
-
-        // list is empty so there's no equal characters
-        return false;
-    }
-
-    /**
-     * Retrieves the previous char from memory.
-     *
-     * @return previous char stored in memory.
-     */
-    public char getPreviousChar() {
-        return smallCharMemory.get(0);
-    }
-
-    public int getArrayLevel(){
-        return this.arrayLevel;
-    }
-
     /**
      * Get the last character read from the input or '\0' if nothing has been read yet.
      * @return the last character read from the input.
@@ -308,6 +263,7 @@ public class JSONTokener {
         return new String(chars);
     }
 
+
     /**
      * Get the next char in the string, skipping whitespace.
      * @throws JSONException Thrown if there is an error reading the source string.
@@ -317,7 +273,6 @@ public class JSONTokener {
         for (;;) {
             char c = this.next();
             if (c == 0 || c > ' ') {
-                insertCharacterInCharMemory(c);
                 return c;
             }
         }
@@ -325,66 +280,77 @@ public class JSONTokener {
 
 
     /**
-     * Return the characters up to the next close quote character. Backslash processing is done. The formal JSON format
-     * does not allow strings in single quotes, but an implementation is allowed to accept them.
-     *
+     * Return the characters up to the next close quote character.
+     * Backslash processing is done. The formal JSON format does not
+     * allow strings in single quotes, but an implementation is allowed to
+     * accept them.
+     * If strictMode is true, this implementation will not accept unbalanced quotes (e.g will not accept <code>"test'</code>).
      * @param quote The quoting character, either
      *      <code>"</code>&nbsp;<small>(double quote)</small> or
      *      <code>'</code>&nbsp;<small>(single quote)</small>.
+     * @param strictMode If true, this implementation will not accept unbalanced quotes (e.g will not accept <code>"test'</code>).
      * @return A String.
      * @throws JSONException Unterminated string or unbalanced quotes if strictMode == true.
      */
-    public String nextString(char quote) throws JSONException {
+    public String nextString(char quote, boolean strictMode) throws JSONException {
         char c;
         StringBuilder sb = new StringBuilder();
         for (;;) {
             c = this.next();
             switch (c) {
-                case 0:
-                case '\n':
-                case '\r':
-                    throw this.syntaxError("Unterminated string. " +
+            case 0:
+            case '\n':
+            case '\r':
+                throw this.syntaxError("Unterminated string. " +
                         "Character with int code " + (int) c + " is not allowed within a quoted string.");
-                case '\\':
-                    c = this.next();
-                    switch (c) {
-                        case 'b':
-                            sb.append('\b');
-                            break;
-                        case 't':
-                            sb.append('\t');
-                            break;
-                        case 'n':
-                            sb.append('\n');
-                            break;
-                        case 'f':
-                            sb.append('\f');
-                            break;
-                        case 'r':
-                            sb.append('\r');
-                            break;
-                        case 'u':
-                            String next = this.next(4);
-                            try {
-                                sb.append((char) Integer.parseInt(next, 16));
-                            } catch (NumberFormatException e) {
-                                throw this.syntaxError("Illegal escape. " +
-                                        "\\u must be followed by a 4 digit hexadecimal number. \\" + next
-                                        + " is not valid.",
-                                    e);
-                            }
-                            break;
-                        case '"':
-                        case '\'':
-                        case '\\':
-                        case '/':
-                            sb.append(c);
-                            break;
-                        default:
-                            throw this.syntaxError("Illegal escape. Escape sequence  \\" + c + " is not valid.");
+            case '\\':
+                c = this.next();
+                switch (c) {
+                case 'b':
+                    sb.append('\b');
+                    break;
+                case 't':
+                    sb.append('\t');
+                    break;
+                case 'n':
+                    sb.append('\n');
+                    break;
+                case 'f':
+                    sb.append('\f');
+                    break;
+                case 'r':
+                    sb.append('\r');
+                    break;
+                case 'u':
+                    String next = this.next(4);
+                    try {
+                        sb.append((char)Integer.parseInt(next, 16));
+                    } catch (NumberFormatException e) {
+                        throw this.syntaxError("Illegal escape. " +
+                                "\\u must be followed by a 4 digit hexadecimal number. \\" + next + " is not valid.", e);
                     }
                     break;
+                case '"':
+                case '\'':
+                case '\\':
+                case '/':
+                    sb.append(c);
+                    break;
                 default:
+                    throw this.syntaxError("Illegal escape. Escape sequence  \\" + c + " is not valid.");
+                }
+                break;
+                default:
+                    if (strictMode && c == '\"' && quote != c) {
+                        throw this.syntaxError(String.format(
+                            "Field contains unbalanced quotes. Starts with %s but ends with double quote.", quote));
+                    }
+
+                    if (strictMode && c == '\'' && quote != c) {
+                        throw this.syntaxError(String.format(
+                            "Field contains unbalanced quotes. Starts with %s but ends with single quote.", quote));
+                    }
+
                     if (c == quote) {
                         return sb.toString();
                     }
@@ -392,6 +358,7 @@ public class JSONTokener {
             }
         }
     }
+
 
     /**
      * Get the text up but not including the specified character or the
@@ -474,8 +441,7 @@ public class JSONTokener {
             case '[':
                 this.back();
                 try {
-                    this.arrayLevel++;
-                    return new JSONArray(this, jsonParserConfiguration);
+                    return new JSONArray(this);
                 } catch (StackOverflowError e) {
                     throw new JSONException("JSON Array or Object depth too large to process.", e);
                 }
@@ -516,24 +482,15 @@ public class JSONTokener {
         }
     }
 
-    /**
-     * Get the next simple value from the JSON input. Simple values include strings (wrapped in single or double
-     * quotes), numbers, booleans, and null. This method is called when the next character is not '{' or '['.
-     *
-     * @param c                       The starting character.
-     * @param jsonParserConfiguration The configuration object containing parsing options.
-     * @return The parsed simple value.
-     * @throws JSONException If there is a syntax error or the value does not adhere to the configuration rules.
-     */
     Object nextSimpleValue(char c, JSONParserConfiguration jsonParserConfiguration) {
         boolean strictMode = jsonParserConfiguration.isStrictMode();
 
-        if (strictMode && c == '\'') {
+        if(strictMode && c == '\''){
             throw this.syntaxError("Single quote wrap not allowed in strict mode");
         }
 
         if (c == '"' || c == '\'') {
-            return this.nextString(c);
+            return this.nextString(c, strictMode);
         }
 
         return parsedUnquotedText(c, strictMode);
@@ -560,21 +517,34 @@ public class JSONTokener {
 
         String string = sb.toString().trim();
 
+        if (strictMode) {
+            boolean isBooleanOrNumeric = checkIfValueIsBooleanOrNumeric(string);
+
+            if (isBooleanOrNumeric) {
+                return string;
+            }
+
+            throw new JSONException(String.format("Value is not surrounded by quotes: %s", string));
+        }
+
         if (string.isEmpty()) {
             throw this.syntaxError("Missing value");
         }
-
-        Object stringToValue = JSONObject.stringToValue(string);
-
-        return strictMode ? getValidNumberBooleanOrNullFromObject(stringToValue) : stringToValue;
+        return JSONObject.stringToValue(string);
     }
 
-    private Object getValidNumberBooleanOrNullFromObject(Object value) {
-        if (value instanceof Number || value instanceof Boolean || value.equals(JSONObject.NULL)) {
-            return value;
+    private boolean checkIfValueIsBooleanOrNumeric(Object valueToValidate) {
+        String stringToValidate = valueToValidate.toString();
+        if (stringToValidate.equals("true") || stringToValidate.equals("false")) {
+            return true;
         }
 
-        throw this.syntaxError(String.format("Value '%s' is not surrounded by quotes", value));
+        try {
+            Double.parseDouble(stringToValidate);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /**

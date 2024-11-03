@@ -6,11 +6,6 @@ Public Domain.
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.json.*;
 import org.junit.Test;
 
@@ -653,41 +648,20 @@ public class JSONMLTest {
         // create a JSON array from the original string and make sure it
         // looks as expected
         JSONArray jsonArray = JSONML.toJSONArray(xmlStr);
+        JSONArray expectedJsonArray = new JSONArray(expectedJSONArrayStr);
+        Util.compareActualVsExpectedJsonArrays(jsonArray,expectedJsonArray);
 
         // restore the XML, then make another JSONArray and make sure it
         // looks as expected
         String jsonArrayXmlToStr = JSONML.toString(jsonArray);
+        JSONArray finalJsonArray = JSONML.toJSONArray(jsonArrayXmlToStr);
+        Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
 
         // lastly, confirm the restored JSONObject XML and JSONArray XML look
         // reasonably similar
         JSONObject jsonObjectFromObject = JSONML.toJSONObject(jsonObjectXmlToStr);
         JSONObject jsonObjectFromArray = JSONML.toJSONObject(jsonArrayXmlToStr);
         Util.compareActualVsExpectedJsonObjects(jsonObjectFromObject, jsonObjectFromArray);
-    }
-
-    @Test
-    public void givenXmlStr_testToJSONArray_shouldEqualExpectedArray() throws IOException {
-        try (Stream<String> jsonLines = Files.lines(
-            Paths.get("src/test/resources/JSONArrayExpectedTestCaseForToJsonArrayTest.json"));
-            Stream<String> xmlLines = Files.lines(Paths.get("src/test/resources/XmlTestCaseTestToJsonArray.xml"))) {
-
-            String xmlStr = xmlLines.collect(Collectors.joining());
-            String expectedJSONArrayStr = jsonLines.collect(Collectors.joining());
-
-            JSONArray jsonArray = JSONML.toJSONArray(xmlStr);
-            JSONArray expectedJsonArray = new JSONArray(expectedJSONArrayStr);
-
-            assertEquals(expectedJsonArray.toString(), jsonArray.toString());
-            //TODO Util.compareActualVsExpectedJsonArrays can be replaced with above assertEquals(expectedJsonArray.toString(), jsonArray.toString())
-            Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
-
-            String jsonArrayXmlToStr = JSONML.toString(jsonArray);
-
-            JSONArray finalJsonArray = JSONML.toJSONArray(jsonArrayXmlToStr);
-
-            //TODO Util.compareActualVsExpectedJsonArrays can be replaced with assertEquals(expectedJsonArray.toString(), finalJsonArray.toString())
-            Util.compareActualVsExpectedJsonArrays(finalJsonArray, expectedJsonArray);
-        }
     }
 
     /**
