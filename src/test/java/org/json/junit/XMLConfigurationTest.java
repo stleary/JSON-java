@@ -268,14 +268,11 @@ public class XMLConfigurationTest {
             "   </address>\n"+
             "</addresses>";
 
-        // TODO: This test failed in strictMode due to -23x.45 not being surrounded by quotes
-        //  It should probably be split into two tests, one of which does not run in strictMode.
-        //  TBD.
         String expectedStr = 
             "{\"addresses\":{\"address\":{\"street\":\"[CDATA[Baker street 5]\","+
-            "\"name\":\"Joe Tester\",\"NothingHere\":\"\",\"TrueValue\":true,\n"+
+            "\"name\":\"Joe Tester\",\"NothingHere\":\"\",TrueValue:true,\n"+
             "\"FalseValue\":false,\"NullValue\":null,\"PositiveValue\":42,\n"+
-            "\"NegativeValue\":-23,\"DoubleValue\":-23.45,\"Nan\":\"-23x.45\",\n"+
+            "\"NegativeValue\":-23,\"DoubleValue\":-23.45,\"Nan\":-23x.45,\n"+
             "\"ArrayOfNum\":\"1, 2, 3, 4.1, 5.2\"\n"+
             "},\"xsi:noNamespaceSchemaLocation\":"+
             "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+

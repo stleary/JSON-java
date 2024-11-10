@@ -142,7 +142,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("["));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' but instead found '[' at 1 [character 2 line 1]",
+                    "Expected a ',' or ']' at 1 [character 2 line 1]",
                     e.getMessage());
         }
     }
@@ -157,7 +157,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("[\"test\""));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' but instead found '\"' at 7 [character 8 line 1]",
+                    "Expected a ',' or ']' at 7 [character 8 line 1]",
                     e.getMessage());
         }
     }
@@ -172,7 +172,7 @@ public class JSONArrayTest {
             assertNull("Should throw an exception", new JSONArray("[\"test\","));
         } catch (JSONException e) {
             assertEquals("Expected an exception message", 
-                    "Expected a ',' or ']' but instead found ',' at 8 [character 9 line 1]",
+                    "Expected a ',' or ']' at 8 [character 9 line 1]",
                     e.getMessage());
         }
     }
@@ -469,8 +469,7 @@ public class JSONArrayTest {
      * to the spec. However, after being parsed, toString() should emit strictly
      * conforming JSON text.  
      */
-    // TODO: This test will only run in non-strictMode. TBD later.
-    @Ignore
+    @Test
     public void unquotedText() {
         String str = "[value1, something!, (parens), foo@bar.com, 23, 23+45]";
         JSONArray jsonArray = new JSONArray(str);
@@ -686,8 +685,8 @@ public class JSONArrayTest {
 
         String jsonArrayStr =
             "["+
-                "\"hello\","+
-                "\"world\""+
+                "hello,"+
+                "world"+
             "]";
         // 2
         jsonArray.put(new JSONArray(jsonArrayStr));
@@ -764,8 +763,8 @@ public class JSONArrayTest {
 
         String jsonArrayStr =
             "["+
-                "\"hello\","+
-                "\"world\""+
+                "hello,"+
+                "world"+
             "]";
         // 2
         jsonArray.put(2, new JSONArray(jsonArrayStr));
