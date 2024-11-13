@@ -1939,7 +1939,7 @@ public class JSONArray implements Iterable<Object> {
             // JSONArray
             this.myArrayList.addAll(((JSONArray)array).myArrayList);
         } else if (array instanceof Collection) {
-            this.addAll((Collection<?>)array, wrap, recursionDepth);
+            this.addAll((Collection<?>)array, wrap, recursionDepth, jsonParserConfiguration);
         } else if (array instanceof Iterable) {
             this.addAll((Iterable<?>)array, wrap);
         } else {
