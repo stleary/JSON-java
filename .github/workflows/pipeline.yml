@@ -10,30 +10,6 @@ on:
     branches: [ master ]
 
 jobs:
-  # old-school build and jar method. No tests run or compiled.
-  build-1_6: 
-    name: Java 1.6
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.6
-      - name: Compile Java 1.6
-        run: |
-          mkdir -p target/classes
-          javac -version
-          javac -source 1.6 -target 1.6 -d target/classes/ src/main/java/org/json/*.java
-      - name: Create java 1.6 JAR
-        run: |
-          jar cvf target/org.json.jar -C target/classes .
-      - name: Upload JAR 1.6
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: Create java 1.6 JAR
-          path: target/*.jar
 
   build-8:
     runs-on: ubuntu-latest
