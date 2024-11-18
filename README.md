@@ -26,7 +26,9 @@ Project goals include:
 * No external dependencies
 * Fast execution and low memory footprint
 * Maintain backward compatibility
-* Designed and tested to use on Java versions 1.6 - 21
+* Designed and tested to use on Java versions 8 - 21
+  * The last release to support Java 6 is [20230618](https://mvnrepository.com/artifact/org.json/json/20230618)
+
 
 
 The files in this package implement JSON encoders and decoders. The package can also convert between JSON and XML, HTTP headers, Cookies, and CDL.
