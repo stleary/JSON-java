@@ -1,7 +1,7 @@
 package org.json;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /*
 Public Domain.
@@ -57,7 +57,7 @@ public class JSONTokener {
      * @param inputStream The source.
      */
     public JSONTokener(InputStream inputStream) {
-        this(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
+        this(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
     }
 
 
