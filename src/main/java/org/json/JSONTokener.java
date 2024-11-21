@@ -67,7 +67,7 @@ public class JSONTokener {
      * @param s     A source string.
      */
     public JSONTokener(String s) {
-        this(new StringReader(s));
+        this(new CharSequenceReader(s));
     }
 
 
