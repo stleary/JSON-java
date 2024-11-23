@@ -328,8 +328,7 @@ public class JSONWriter {
             // Instead we will quote it as a string
             return JSONObject.quote(numberAsString);
         }
-        if (value instanceof Boolean || value instanceof JSONObject
-                || value instanceof JSONArray) {
+        if (isDirectlyConvertibleToJSON(value)) {
             return value.toString();
         }
         if (value instanceof Map) {
@@ -347,6 +346,10 @@ public class JSONWriter {
             return JSONObject.quote(((Enum<?>)value).name());
         }
         return JSONObject.quote(value.toString());
+    }
+
+    private static boolean isDirectlyConvertibleToJSON(Object value) {
+        return value instanceof Boolean || value instanceof JSONObject || value instanceof JSONArray;
     }
 
     /**
