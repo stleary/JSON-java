@@ -113,36 +113,66 @@ public class HTTP {
     public static String toString(JSONObject jo) throws JSONException {
         StringBuilder       sb = new StringBuilder();
         if (jo.has("Status-Code") && jo.has("Reason-Phrase")) {
-            sb.append(jo.getString("HTTP-Version"));
-            sb.append(' ');
-            sb.append(jo.getString("Status-Code"));
-            sb.append(' ');
-            sb.append(jo.getString("Reason-Phrase"));
+            appendResponseHeader(sb, jo);
         } else if (jo.has("Method") && jo.has("Request-URI")) {
-            sb.append(jo.getString("Method"));
-            sb.append(' ');
-            sb.append('"');
-            sb.append(jo.getString("Request-URI"));
-            sb.append('"');
-            sb.append(' ');
-            sb.append(jo.getString("HTTP-Version"));
+            appendRequestHeader(sb, jo);
         } else {
             throw new JSONException("Not enough material for an HTTP header.");
         }
         sb.append(CRLF);
-        // Don't use the new entrySet API to maintain Android support
+
+        // Append other HTTP fields
+        appendAdditionalHeaders(sb, jo);
+
+        sb.append(CRLF);
+        return sb.toString();
+    }
+
+    /**
+     * Appends the HTTP response header to the StringBuilder.
+     * @param sb The StringBuilder to append to.
+     * @param jo The JSONObject representing the HTTP response.
+     * @throws JSONException if required fields are missing.
+     */
+    private static void appendResponseHeader(StringBuilder sb, JSONObject jo) throws JSONException {
+        sb.append(jo.getString("HTTP-Version"));
+        sb.append(' ');
+        sb.append(jo.getString("Status-Code"));
+        sb.append(' ');
+        sb.append(jo.getString("Reason-Phrase"));
+    }
+
+    /**
+     * Appends the HTTP request header to the StringBuilder.
+     * @param sb The StringBuilder to append to.
+     * @param jo The JSONObject representing the HTTP request.
+     * @throws JSONException if required fields are missing.
+     */
+    private static void appendRequestHeader(StringBuilder sb, JSONObject jo) throws JSONException {
+        sb.append(jo.getString("Method"));
+        sb.append(' ');
+        sb.append('"');
+        sb.append(jo.getString("Request-URI"));
+        sb.append('"');
+        sb.append(' ');
+        sb.append(jo.getString("HTTP-Version"));
+    }
+    /**
+     * Appends additional HTTP headers to the StringBuilder.
+     * @param sb The StringBuilder to append to.
+     * @param jo The JSONObject containing the additional headers.
+     */
+    private static void appendAdditionalHeaders(StringBuilder sb, JSONObject jo) {
         for (final String key : jo.keySet()) {
             String value = jo.optString(key);
-            if (!"HTTP-Version".equals(key)      && !"Status-Code".equals(key) &&
+            if (!"HTTP-Version".equals(key) && !"Status-Code".equals(key) &&
                     !"Reason-Phrase".equals(key) && !"Method".equals(key) &&
-                    !"Request-URI".equals(key)   && !JSONObject.NULL.equals(value)) {
+                    !"Request-URI".equals(key) && !JSONObject.NULL.equals(value)) {
                 sb.append(key);
                 sb.append(": ");
-                sb.append(jo.optString(key));
+                sb.append(value);
                 sb.append(CRLF);
             }
         }
-        sb.append(CRLF);
-        return sb.toString();
     }
 }
