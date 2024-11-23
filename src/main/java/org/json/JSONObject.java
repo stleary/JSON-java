@@ -201,7 +201,7 @@ public class JSONObject {
     /**
      * Construct a JSONObject from a JSONTokener with custom json parse configurations.
      *
-     * @param x
+     * @param jsonTokener
      *            A JSONTokener object containing the source string.
      * @param jsonParserConfiguration
      *            Variable to pass parser custom configuration for json parsing.
@@ -209,30 +209,30 @@ public class JSONObject {
      *             If there is a syntax error in the source string or a
      *             duplicated key.
      */
-    public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
+    public JSONObject(JSONTokener jsonTokener, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
-        char c;
+        char currentChar;
         String key;
 
-        if (x.nextClean() != '{') {
-            throw x.syntaxError("A JSONObject text must begin with '{'");
+        if (jsonTokener.nextClean() != '{') {
+            throw jsonTokener.syntaxError("A JSONObject text must begin with '{'");
         }
         for (;;) {
-            c = x.nextClean();
-            switch (c) {
+            currentChar = jsonTokener.nextClean();
+            switch (currentChar) {
             case 0:
-                throw x.syntaxError("A JSONObject text must end with '}'");
+                throw jsonTokener.syntaxError("A JSONObject text must end with '}'");
             case '}':
                 return;
             default:
-                key = x.nextSimpleValue(c).toString();
+                key = jsonTokener.nextSimpleValue(currentChar).toString();
             }
 
             // The key is followed by ':'.
 
-            c = x.nextClean();
-            if (c != ':') {
-                throw x.syntaxError("Expected a ':' after a key");
+            currentChar = jsonTokener.nextClean();
+            if (currentChar != ':') {
+                throw jsonTokener.syntaxError("Expected a ':' after a key");
             }
 
             // Use syntaxError(..) to include error location
@@ -241,10 +241,10 @@ public class JSONObject {
                 // Check if key exists
                 boolean keyExists = this.opt(key) != null;
                 if (keyExists && !jsonParserConfiguration.isOverwriteDuplicateKey()) {
-                    throw x.syntaxError("Duplicate key \"" + key + "\"");
+                    throw jsonTokener.syntaxError("Duplicate key \"" + key + "\"");
                 }
 
-                Object value = x.nextValue();
+                Object value = jsonTokener.nextValue();
                 // Only add value if non-null
                 if (value != null) {
                     this.put(key, value);
@@ -253,21 +253,21 @@ public class JSONObject {
 
             // Pairs are separated by ','.
 
-            switch (x.nextClean()) {
+            switch (jsonTokener.nextClean()) {
             case ';':
             case ',':
-                if (x.nextClean() == '}') {
+                if (jsonTokener.nextClean() == '}') {
                     return;
                 }
-                if (x.end()) {
-                    throw x.syntaxError("A JSONObject text must end with '}'");
+                if (jsonTokener.end()) {
+                    throw jsonTokener.syntaxError("A JSONObject text must end with '}'");
                 }
-                x.back();
+                jsonTokener.back();
                 break;
             case '}':
                 return;
             default:
-                throw x.syntaxError("Expected a ',' or '}'");
+                throw jsonTokener.syntaxError("Expected a ',' or '}'");
             }
         }
     }
