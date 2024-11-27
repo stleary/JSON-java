@@ -19,7 +19,7 @@ public class JSONML {
      */
     public JSONML() {
     }
-
+    public static final JSONMLParserConfiguration JSONML_PARSER_CONFIGURATION = new JSONMLParserConfiguration();
     /**
      * Parse XML values and store them in a JSONArray.
      * @param x       The XMLTokener containing the source string.
@@ -38,7 +38,7 @@ public class JSONML {
         int currentNestingDepth
     ) throws JSONException {
         return parse(x,arrayForm, ja,
-            keepStrings ? JSONMLParserConfiguration.KEEP_STRINGS : JSONMLParserConfiguration.ORIGINAL,
+            keepStrings ? JSONMLParserConfiguration.KEEP_STRINGS : JSONML_PARSER_CONFIGURATION,
             currentNestingDepth);
     }
 
@@ -261,7 +261,7 @@ public class JSONML {
      * @throws JSONException Thrown on error converting to a JSONArray
      */
     public static JSONArray toJSONArray(String string) throws JSONException {
-        return (JSONArray)parse(new XMLTokener(string), true, null, JSONMLParserConfiguration.ORIGINAL, 0);
+        return (JSONArray)parse(new XMLTokener(string), true, null, JSONML_PARSER_CONFIGURATION, 0);
     }
 
 

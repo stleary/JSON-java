@@ -14,9 +14,7 @@ public class JSONMLParserConfiguration extends ParserConfiguration {
      */
     public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = ParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH;
 
-    /** Original Configuration of the XML to JSONML Parser. */
-    public static final JSONMLParserConfiguration ORIGINAL
-        = new JSONMLParserConfiguration();
+
     /** Original configuration of the XML to JSONML Parser except that values are kept as strings. */
     public static final JSONMLParserConfiguration KEEP_STRINGS
         = new JSONMLParserConfiguration().withKeepStrings(true);
