@@ -26,42 +26,6 @@ public class XML {
     public XML() {
     }
 
-    /** The Character '&amp;'. */
-    public static final Character AMP = '&';
-
-    /** The Character '''. */
-    public static final Character APOS = '\'';
-
-    /** The Character '!'. */
-    public static final Character BANG = '!';
-
-    /** The Character '='. */
-    public static final Character EQ = '=';
-
-    /** The Character <pre>{@code '>'. }</pre>*/
-    public static final Character GT = '>';
-
-    /** The Character '&lt;'. */
-    public static final Character LT = '<';
-
-    /** The Character '?'. */
-    public static final Character QUEST = '?';
-
-    /** The Character '"'. */
-    public static final Character QUOT = '"';
-
-    /** The Character '/'. */
-    public static final Character SLASH = '/';
-
-    /**
-     * Null attribute name
-     */
-    public static final String NULL_ATTR = "xsi:nil";
-
-    /**
-     * Represents the XML attribute name for specifying type information.
-     */
-    public static final String TYPE_ATTR = "xsi:type";
 
     /**
      * Creates an iterator for navigating Code Points in a string instead of
@@ -268,7 +232,7 @@ public class XML {
 
         // <!
 
-        if (token == BANG) {
+        if (token == XMLSpecialCharacters.getBang()) {
             c = x.next();
             if (c == '-') {
                 if (x.next() == '-') {
@@ -294,19 +258,19 @@ public class XML {
                 token = x.nextMeta();
                 if (token == null) {
                     throw x.syntaxError("Missing '>' after '<!'.");
-                } else if (token == LT) {
+                } else if (token == XMLSpecialCharacters.getLt()) {
                     i += 1;
-                } else if (token == GT) {
+                } else if (token == XMLSpecialCharacters.getGt()) {
                     i -= 1;
                 }
             } while (i > 0);
             return false;
-        } else if (token == QUEST) {
+        } else if (token == XMLStructuralCharacters.getQuest()) {
 
             // <?
             x.skipPast("?>");
             return false;
-        } else if (token == SLASH) {
+        } else if (token == XMLStructuralCharacters.getSlash()) {
 
             // Close tag </
 
@@ -317,7 +281,7 @@ public class XML {
             if (!token.equals(name)) {
                 throw x.syntaxError("Mismatched " + name + " and " + token);
             }
-            if (x.nextToken() != GT) {
+            if (x.nextToken() != XMLSpecialCharacters.getGt()) {
                 throw x.syntaxError("Misshaped close tag");
             }
             return true;
@@ -341,18 +305,18 @@ public class XML {
                 if (token instanceof String) {
                     string = (String) token;
                     token = x.nextToken();
-                    if (token == EQ) {
+                    if (token == XMLSpecialCharacters.getEq()) {
                         token = x.nextToken();
                         if (!(token instanceof String)) {
                             throw x.syntaxError("Missing value");
                         }
 
                         if (config.isConvertNilAttributeToNull()
-                                && NULL_ATTR.equals(string)
+                                && XMLAttributeConstants.getNullAttr().equals(string)
                                 && Boolean.parseBoolean((String) token)) {
                             nilAttributeFound = true;
                         } else if(config.getXsiTypeMap() != null && !config.getXsiTypeMap().isEmpty()
-                                && TYPE_ATTR.equals(string)) {
+                                && XMLAttributeConstants.getTypeAttr().equals(string)) {
                             xmlXsiTypeConverter = config.getXsiTypeMap().get(token);
                         } else if (!nilAttributeFound) {
                             jsonObject.accumulate(string,
@@ -366,9 +330,9 @@ public class XML {
                     }
 
 
-                } else if (token == SLASH) {
+                } else if (token == XMLStructuralCharacters.getSlash()) {
                     // Empty tag <.../>
-                    if (x.nextToken() != GT) {
+                    if (x.nextToken() != XMLSpecialCharacters.getGt()) {
                         throw x.syntaxError("Misshaped tag");
                     }
                     if (config.getForceList().contains(tagName)) {
@@ -391,7 +355,7 @@ public class XML {
                     }
                     return false;
 
-                } else if (token == GT) {
+                } else if (token == XMLSpecialCharacters.getGt()) {
                     // Content, between <...> and </...>
                     for (;;) {
                         token = x.nextContent();
@@ -412,7 +376,7 @@ public class XML {
                                 }
                             }
 
-                        } else if (token == LT) {
+                        } else if (token == XMLSpecialCharacters.getLt()) {
                             // Nested element
                             if (currentNestingDepth == config.getMaxNestingDepth()) {
                                 throw x.syntaxError("Maximum nesting depth of " + config.getMaxNestingDepth() + " reached");

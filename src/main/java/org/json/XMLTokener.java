@@ -24,11 +24,11 @@ public class XMLTokener extends JSONTokener {
 
    static {
        entity = new java.util.HashMap<String, Character>(8);
-       entity.put("amp",  XML.AMP);
-       entity.put("apos", XML.APOS);
-       entity.put("gt",   XML.GT);
-       entity.put("lt",   XML.LT);
-       entity.put("quot", XML.QUOT);
+       entity.put("amp",  XMLSpecialCharacters.getAmp());
+       entity.put("apos", XMLStructuralCharacters.getApos());
+       entity.put("gt",   XMLSpecialCharacters.getGt());
+       entity.put("lt",   XMLSpecialCharacters.getLt());
+       entity.put("quot", XMLStructuralCharacters.getQuot());
    }
 
     /**
@@ -100,7 +100,7 @@ public class XMLTokener extends JSONTokener {
             return null;
         }
         if (c == '<') {
-            return XML.LT;
+            return XMLSpecialCharacters.getLt();
         }
         sb = new StringBuilder();
         for (;;) {
@@ -201,17 +201,17 @@ public class XMLTokener extends JSONTokener {
         case 0:
             throw syntaxError("Misshaped meta tag");
         case '<':
-            return XML.LT;
+            return XMLSpecialCharacters.getLt();
         case '>':
-            return XML.GT;
+            return XMLSpecialCharacters.getGt();
         case '/':
-            return XML.SLASH;
+            return XMLStructuralCharacters.getSlash();
         case '=':
-            return XML.EQ;
+            return XMLSpecialCharacters.getEq();
         case '!':
-            return XML.BANG;
+            return XMLSpecialCharacters.getBang();
         case '?':
-            return XML.QUEST;
+            return XMLStructuralCharacters.getQuest();
         case '"':
         case '\'':
             q = c;
@@ -272,15 +272,15 @@ public class XMLTokener extends JSONTokener {
         case '<':
             throw syntaxError("Misplaced '<'");
         case '>':
-            return XML.GT;
+            return XMLSpecialCharacters.getGt();
         case '/':
-            return XML.SLASH;
+            return XMLStructuralCharacters.getSlash();
         case '=':
-            return XML.EQ;
+            return XMLSpecialCharacters.getEq();
         case '!':
-            return XML.BANG;
+            return XMLSpecialCharacters.getBang();
         case '?':
-            return XML.QUEST;
+            return XMLStructuralCharacters.getQuest();
 
 // Quoted string
 
