@@ -1756,52 +1756,53 @@ public class JSONObject {
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
-
         boolean includeSuperClass = klass.getClassLoader() != null;
 
         Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
         for (final Method method : methods) {
-            final int modifiers = method.getModifiers();
-            if (Modifier.isPublic(modifiers)
-                    && !Modifier.isStatic(modifiers)
-                    && method.getParameterTypes().length == 0
-                    && !method.isBridge()
-                    && method.getReturnType() != Void.TYPE
-                    && isValidMethodName(method.getName())) {
+            if (isEligibleMethod(method)) {
                 final String key = getKeyNameFromMethod(method);
-                if (key != null && !key.isEmpty()) {
+                if (isValidKey(key)) {
                     try {
                         final Object result = method.invoke(bean);
                         if (result != null) {
-                            // check cyclic dependency and throw error if needed
-                            // the wrap and populateMap combination method is
-                            // itself DFS recursive
-                            if (objectsRecord.contains(result)) {
-                                throw recursivelyDefinedObjectException(key);
-                            }
-
-                            objectsRecord.add(result);
-
-                            testValidity(result);
-                            this.map.put(key, wrap(result, objectsRecord));
-
-                            objectsRecord.remove(result);
-
-                            // we don't use the result anywhere outside of wrap
-                            // if it's a resource we should be sure to close it
-                            // after calling toString
-                            if (result instanceof Closeable) {
-                                try {
-                                    ((Closeable) result).close();
-                                } catch (IOException ignore) {
-                                }
-                            }
+                            processResult(bean, objectsRecord, key, result);
                         }
-                    } catch (IllegalAccessException ignore) {
-                    } catch (IllegalArgumentException ignore) {
-                    } catch (InvocationTargetException ignore) {
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ignore) {
                     }
                 }
+            }
+        }
+    }
+
+    private boolean isEligibleMethod(Method method) {
+        final int modifiers = method.getModifiers();
+        return Modifier.isPublic(modifiers)
+                && !Modifier.isStatic(modifiers)
+                && method.getParameterTypes().length == 0
+                && !method.isBridge()
+                && method.getReturnType() != Void.TYPE
+                && isValidMethodName(method.getName());
+    }
+
+    private boolean isValidKey(String key) {
+        return key != null && !key.isEmpty();
+    }
+
+    private void processResult(Object bean, Set<Object> objectsRecord, String key, Object result) throws IllegalAccessException, InvocationTargetException {
+        if (objectsRecord.contains(result)) {
+            throw recursivelyDefinedObjectException(key);
+        }
+
+        objectsRecord.add(result);
+        testValidity(result);
+        this.map.put(key, wrap(result, objectsRecord));
+        objectsRecord.remove(result);
+
+        if (result instanceof Closeable) {
+            try {
+                ((Closeable) result).close();
+            } catch (IOException ignore) {
             }
         }
     }
