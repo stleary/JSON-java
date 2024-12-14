@@ -67,6 +67,10 @@ public class JSONArray implements Iterable<Object> {
      */
     private final ArrayList<Object> myArrayList;
 
+    private JSONTokener jsonTokener;
+
+    private JSONParserConfiguration jsonParserConfiguration;
+
     /**
      * Construct an empty JSONArray.
      */
@@ -95,6 +99,15 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
+
+        if (this.jsonParserConfiguration == null) {
+            this.jsonParserConfiguration = jsonParserConfiguration;
+        }
+        if (this.jsonTokener == null) {
+            this.jsonTokener = x;
+            this.jsonTokener.setJsonParserConfiguration(this.jsonParserConfiguration);
+        }
+
         if (x.nextClean() != '[') {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
@@ -125,6 +138,9 @@ public class JSONArray implements Iterable<Object> {
                         throw x.syntaxError("Expected a ',' or ']'");
                     }
                     if (nextChar == ']') {
+                        if (jsonParserConfiguration.isStrictMode()) {
+                            throw x.syntaxError("Expected another array element");
+                        }
                         return;
                     }
                     x.back();
@@ -136,7 +152,6 @@ public class JSONArray implements Iterable<Object> {
                 }
             }
         }
-
     }
 
     /**
@@ -151,6 +166,13 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(String source) throws JSONException {
         this(source, new JSONParserConfiguration());
+        if (this.jsonParserConfiguration.isStrictMode()) {
+                char c = jsonTokener.nextClean();
+                if (c != 0) {
+                    throw jsonTokener.syntaxError(String.format("invalid character '%s' found after end of array", c));
+
+            }
+        }
     }
 
     /**
@@ -166,6 +188,13 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this(new JSONTokener(source), jsonParserConfiguration);
+        if (this.jsonParserConfiguration.isStrictMode()) {
+            char c = jsonTokener.nextClean();
+            if (c != 0) {
+                throw jsonTokener.syntaxError(String.format("invalid character '%s' found after end of array", c));
+
+            }
+        }
     }
 
     /**

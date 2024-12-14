@@ -32,6 +32,7 @@ public class JSONTokener {
     /** the number of characters read in the previous line. */
     private long characterPreviousLine;
 
+    private JSONParserConfiguration jsonParserConfiguration;
 
     /**
      * Construct a JSONTokener from a Reader. The caller must close the Reader.
@@ -70,6 +71,21 @@ public class JSONTokener {
         this(new StringReader(s));
     }
 
+    /**
+     * Getter
+     * @return jsonParserConfiguration
+     */
+    public JSONParserConfiguration getJsonParserConfiguration() {
+        return jsonParserConfiguration;
+    }
+
+    /**
+     * Setter
+     * @param jsonParserConfiguration new value for jsonParserConfiguration
+     */
+    public void setJsonParserConfiguration(JSONParserConfiguration jsonParserConfiguration) {
+        this.jsonParserConfiguration = jsonParserConfiguration;
+    }
 
     /**
      * Back up one character. This provides a sort of lookahead capability,
@@ -409,14 +425,14 @@ public class JSONTokener {
         case '{':
             this.back();
             try {
-                return new JSONObject(this);
+                return new JSONObject(this, jsonParserConfiguration);
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
         case '[':
             this.back();
             try {
-                return new JSONArray(this);
+                return new JSONArray(this, jsonParserConfiguration);
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
@@ -427,6 +443,11 @@ public class JSONTokener {
     Object nextSimpleValue(char c) {
         String string;
 
+        if (jsonParserConfiguration != null &&
+                jsonParserConfiguration.isStrictMode() &&
+                c == '\'') {
+            throw this.syntaxError("Single quote wrap not allowed in strict mode");
+        }
         switch (c) {
         case '"':
         case '\'':
@@ -455,7 +476,13 @@ public class JSONTokener {
         if ("".equals(string)) {
             throw this.syntaxError("Missing value");
         }
-        return JSONObject.stringToValue(string);
+        Object obj = JSONObject.stringToValue(string);
+        if (jsonParserConfiguration != null &&
+                jsonParserConfiguration.isStrictMode() &&
+                obj instanceof String) {
+            throw this.syntaxError(String.format("Value '%s' is not surrounded by quotes", obj));
+        }
+        return obj;
     }
 
 

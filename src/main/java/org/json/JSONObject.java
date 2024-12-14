@@ -152,6 +152,10 @@ public class JSONObject {
      */
     public static final Object NULL = new Null();
 
+    private JSONTokener jsonTokener;
+
+    private JSONParserConfiguration jsonParserConfiguration;
+
     /**
      * Construct an empty JSONObject.
      */
@@ -211,6 +215,15 @@ public class JSONObject {
      */
     public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
+
+        if (this.jsonParserConfiguration == null) {
+            this.jsonParserConfiguration = jsonParserConfiguration;
+        }
+        if (this.jsonTokener == null) {
+            this.jsonTokener = x;
+            this.jsonTokener.setJsonParserConfiguration(this.jsonParserConfiguration);
+        }
+
         char c;
         String key;
 
@@ -433,6 +446,10 @@ public class JSONObject {
      */
     public JSONObject(String source) throws JSONException {
         this(source, new JSONParserConfiguration());
+        if (this.jsonParserConfiguration.isStrictMode() &&
+                this.jsonTokener.nextClean() != 0) {
+            throw new JSONException("Unparsed characters found at end of input text");
+        }
     }
 
     /**
