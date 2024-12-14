@@ -115,24 +115,24 @@ public class JSONArray implements Iterable<Object> {
                     this.myArrayList.add(x.nextValue());
                 }
                 switch (x.nextClean()) {
-                    case 0:
+                case 0:
+                    // array is unclosed. No ']' found, instead EOF
+                    throw x.syntaxError("Expected a ',' or ']'");
+                case ',':
+                    nextChar = x.nextClean();
+                    if (nextChar == 0) {
                         // array is unclosed. No ']' found, instead EOF
                         throw x.syntaxError("Expected a ',' or ']'");
-                    case ',':
-                        nextChar = x.nextClean();
-                        if (nextChar == 0) {
-                            // array is unclosed. No ']' found, instead EOF
-                            throw x.syntaxError("Expected a ',' or ']'");
-                        }
-                        if (nextChar == ']') {
-                            return;
-                        }
-                        x.back();
-                        break;
-                    case ']':
+                    }
+                    if (nextChar == ']') {
                         return;
-                    default:
-                        throw x.syntaxError("Expected a ',' or ']'");
+                    }
+                    x.back();
+                    break;
+                case ']':
+                    return;
+                default:
+                    throw x.syntaxError("Expected a ',' or ']'");
                 }
             }
         }
