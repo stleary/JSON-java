@@ -17,6 +17,12 @@ public class JSONParserConfiguration extends ParserConfiguration {
         this.overwriteDuplicateKey = false;
     }
 
+    /**
+     * This flag, when set to true, instructs the parser to enforce strict mode when parsing JSON text.
+     * Garbage chars at the end of the doc, unquoted string, and single-quoted strings are all disallowed.
+     */
+    private boolean strictMode;
+
     @Override
     protected JSONParserConfiguration clone() {
         JSONParserConfiguration clone = new JSONParserConfiguration();
@@ -59,6 +65,23 @@ public class JSONParserConfiguration extends ParserConfiguration {
     }
 
     /**
+     * Sets the strict mode configuration for the JSON parser.
+     * <p>
+     * When strict mode is enabled, the parser will throw a JSONException if it encounters an invalid character
+     * immediately following the final ']' character in the input. This is useful for ensuring strict adherence to the
+     * JSON syntax, as any characters after the final closing bracket of a JSON array are considered invalid.
+     *
+     * @param mode a boolean value indicating whether strict mode should be enabled or not
+     * @return a new JSONParserConfiguration instance with the updated strict mode setting
+     */
+    public JSONParserConfiguration withStrictMode(final boolean mode) {
+        JSONParserConfiguration clone = this.clone();
+        clone.strictMode = mode;
+
+        return clone;
+    }
+
+    /**
      * The parser's behavior when meeting duplicate keys, controls whether the parser should
      * overwrite duplicate keys or not.
      *
@@ -66,5 +89,18 @@ public class JSONParserConfiguration extends ParserConfiguration {
      */
     public boolean isOverwriteDuplicateKey() {
         return this.overwriteDuplicateKey;
+    }
+
+    /**
+     * Retrieves the current strict mode setting of the JSON parser.
+     * <p>
+     * Strict mode, when enabled, instructs the parser to throw a JSONException if it encounters an invalid character
+     * immediately following the final ']' character in the input. This ensures strict adherence to the JSON syntax, as
+     * any characters after the final closing bracket of a JSON array are considered invalid.
+     *
+     * @return the current strict mode setting. True if strict mode is enabled, false otherwise.
+     */
+    public boolean isStrictMode() {
+        return this.strictMode;
     }
 }
