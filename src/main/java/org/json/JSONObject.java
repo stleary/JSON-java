@@ -268,8 +268,14 @@ public class JSONObject {
 
             switch (x.nextClean()) {
             case ';':
+                if (jsonParserConfiguration.isStrictMode()) {
+                    throw x.syntaxError("Invalid character ';' found in object in strict mode");
+                }
             case ',':
                 if (x.nextClean() == '}') {
+                    if (jsonParserConfiguration.isStrictMode()) {
+                        throw x.syntaxError("Expected another object element");
+                    }
                     return;
                 }
                 if (x.end()) {
@@ -468,6 +474,13 @@ public class JSONObject {
      */
     public JSONObject(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this(new JSONTokener(source), jsonParserConfiguration);
+        if (this.jsonParserConfiguration.isStrictMode()) {
+            char c = jsonTokener.nextClean();
+            if (c != 0) {
+                throw jsonTokener.syntaxError(String.format("invalid character '%s' found after end of array", c));
+
+            }
+        }
     }
 
     /**
