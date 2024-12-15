@@ -625,7 +625,7 @@ public class JSONMLTest {
                                 "\"subValue\","+
                                 "{\"svAttr\":\"svValue\"},"+
                                 "\"abc\""+
-                            "],"+
+                            "]"+
                         "],"+
                         "[\"value\",3],"+
                         "[\"value\",4.1],"+
