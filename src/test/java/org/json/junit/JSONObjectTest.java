@@ -83,7 +83,7 @@ public class JSONObjectTest {
         Singleton.getInstance().setSomeInt(0);
         Singleton.getInstance().setSomeString(null);
     }
-    
+
     /**
      * Tests that the similar method is working as expected.
      */

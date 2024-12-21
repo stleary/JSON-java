@@ -67,8 +67,10 @@ public class JSONArray implements Iterable<Object> {
      */
     private final ArrayList<Object> myArrayList;
 
+    // strict mode checks after constructor require access to this object
     private JSONTokener jsonTokener;
 
+    // strict mode checks after constructor require access to this object
     private JSONParserConfiguration jsonParserConfiguration;
 
     /**
@@ -138,8 +140,16 @@ public class JSONArray implements Iterable<Object> {
                         throw x.syntaxError("Expected a ',' or ']'");
                     }
                     if (nextChar == ']') {
+                        // trailing commas are not allowed in strict mode
                         if (jsonParserConfiguration.isStrictMode()) {
-                            throw x.syntaxError("Expected another array element");
+                            throw x.syntaxError("Strict mode error: Expected another array element");
+                        }
+                        return;
+                    }
+                    if (nextChar == ',') {
+                        // consecutive commas are not allowed in strict mode
+                        if (jsonParserConfiguration.isStrictMode()) {
+                            throw x.syntaxError("Strict mode error: Expected a valid array element");
                         }
                         return;
                     }
@@ -166,12 +176,10 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(String source) throws JSONException {
         this(source, new JSONParserConfiguration());
-        if (this.jsonParserConfiguration.isStrictMode()) {
-                char c = jsonTokener.nextClean();
-                if (c != 0) {
-                    throw jsonTokener.syntaxError(String.format("invalid character '%s' found after end of array", c));
-
-            }
+        // Strict mode does not allow trailing chars
+        if (this.jsonParserConfiguration.isStrictMode() &&
+                this.jsonTokener.nextClean() != 0) {
+                    throw jsonTokener.syntaxError("Strict mode error: Unparsed characters found at end of input text");
         }
     }
 
@@ -188,12 +196,10 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this(new JSONTokener(source), jsonParserConfiguration);
-        if (this.jsonParserConfiguration.isStrictMode()) {
-            char c = jsonTokener.nextClean();
-            if (c != 0) {
-                throw jsonTokener.syntaxError(String.format("invalid character '%s' found after end of array", c));
-
-            }
+        // Strict mode does not allow trailing chars
+        if (this.jsonParserConfiguration.isStrictMode() &&
+                this.jsonTokener.nextClean() != 0) {
+                    throw jsonTokener.syntaxError("Strict mode error: Unparsed characters found at end of input text");
         }
     }
 

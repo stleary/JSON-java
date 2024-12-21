@@ -32,6 +32,7 @@ public class JSONTokener {
     /** the number of characters read in the previous line. */
     private long characterPreviousLine;
 
+    // access to this object is required for strict mode checking
     private JSONParserConfiguration jsonParserConfiguration;
 
     /**
@@ -443,10 +444,11 @@ public class JSONTokener {
     Object nextSimpleValue(char c) {
         String string;
 
+        // Strict mode only allows strings with explicit double quotes
         if (jsonParserConfiguration != null &&
                 jsonParserConfiguration.isStrictMode() &&
                 c == '\'') {
-            throw this.syntaxError("Single quote wrap not allowed in strict mode");
+            throw this.syntaxError("Strict mode error: Single quoted strings are not allowed");
         }
         switch (c) {
         case '"':
@@ -477,10 +479,11 @@ public class JSONTokener {
             throw this.syntaxError("Missing value");
         }
         Object obj = JSONObject.stringToValue(string);
+        // Strict mode only allows strings with explicit double quotes
         if (jsonParserConfiguration != null &&
                 jsonParserConfiguration.isStrictMode() &&
                 obj instanceof String) {
-            throw this.syntaxError(String.format("Value '%s' is not surrounded by quotes", obj));
+            throw this.syntaxError(String.format("Strict mode error: Value '%s' is not surrounded by quotes", obj));
         }
         return obj;
     }

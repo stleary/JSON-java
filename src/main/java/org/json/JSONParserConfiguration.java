@@ -65,6 +65,18 @@ public class JSONParserConfiguration extends ParserConfiguration {
     }
 
     /**
+     * Sets the strict mode configuration for the JSON parser with default true value
+     * <p>
+     * When strict mode is enabled, the parser will throw a JSONException if it encounters an invalid character
+     * immediately following the final ']' character in the input. This is useful for ensuring strict adherence to the
+     * JSON syntax, as any characters after the final closing bracket of a JSON array are considered invalid.
+     * @return a new JSONParserConfiguration instance with the updated strict mode setting
+     */
+    public JSONParserConfiguration withStrictMode() {
+        return withStrictMode(true);
+    }
+
+    /**
      * Sets the strict mode configuration for the JSON parser.
      * <p>
      * When strict mode is enabled, the parser will throw a JSONException if it encounters an invalid character
@@ -92,13 +104,7 @@ public class JSONParserConfiguration extends ParserConfiguration {
     }
 
     /**
-     * Retrieves the current strict mode setting of the JSON parser.
-     * <p>
-     * Strict mode, when enabled, instructs the parser to throw a JSONException if it encounters an invalid character
-     * immediately following the final ']' character in the input. This ensures strict adherence to the JSON syntax, as
-     * any characters after the final closing bracket of a JSON array are considered invalid.
-     *
-     * @return the current strict mode setting. True if strict mode is enabled, false otherwise.
+     * @return the current strict mode setting.
      */
     public boolean isStrictMode() {
         return this.strictMode;

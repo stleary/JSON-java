@@ -152,8 +152,10 @@ public class JSONObject {
      */
     public static final Object NULL = new Null();
 
+    // strict mode checks after constructor require access to this object
     private JSONTokener jsonTokener;
 
+    // strict mode checks after constructor require access to this object
     private JSONParserConfiguration jsonParserConfiguration;
 
     /**
@@ -268,13 +270,15 @@ public class JSONObject {
 
             switch (x.nextClean()) {
             case ';':
+                // In strict mode semicolon is not a valid separator
                 if (jsonParserConfiguration.isStrictMode()) {
-                    throw x.syntaxError("Invalid character ';' found in object in strict mode");
+                    throw x.syntaxError("Strict mode error: Invalid character ';' found");
                 }
             case ',':
                 if (x.nextClean() == '}') {
+                    // trailing commas are not allowed in strict mode
                     if (jsonParserConfiguration.isStrictMode()) {
-                        throw x.syntaxError("Expected another object element");
+                        throw x.syntaxError("Strict mode error: Expected another object element");
                     }
                     return;
                 }
@@ -452,9 +456,10 @@ public class JSONObject {
      */
     public JSONObject(String source) throws JSONException {
         this(source, new JSONParserConfiguration());
+        // Strict mode does not allow trailing chars
         if (this.jsonParserConfiguration.isStrictMode() &&
                 this.jsonTokener.nextClean() != 0) {
-            throw new JSONException("Unparsed characters found at end of input text");
+            throw new JSONException("Strict mode error: Unparsed characters found at end of input text");
         }
     }
 
@@ -474,12 +479,10 @@ public class JSONObject {
      */
     public JSONObject(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this(new JSONTokener(source), jsonParserConfiguration);
-        if (this.jsonParserConfiguration.isStrictMode()) {
-            char c = jsonTokener.nextClean();
-            if (c != 0) {
-                throw jsonTokener.syntaxError(String.format("invalid character '%s' found after end of array", c));
-
-            }
+        // Strict mode does not allow trailing chars
+        if (this.jsonParserConfiguration.isStrictMode() &&
+                this.jsonTokener.nextClean() != 0) {
+            throw new JSONException("Strict mode error: Unparsed characters found at end of input text");
         }
     }
 

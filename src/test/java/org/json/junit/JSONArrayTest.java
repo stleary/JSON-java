@@ -481,7 +481,7 @@ public class JSONArrayTest {
             System.out.println("Skipping JSONArrayTest unquotedText() when strictMode default is true");
         } else {
             String str = "[value1, something!, (parens), foo@bar.com, 23, 23+45]";
-            JSONArray jsonArray = new JSONArray(str);
+                JSONArray jsonArray = new JSONArray(str);
             List<Object> expected = Arrays.asList("value1", "something!", "(parens)", "foo@bar.com", 23, "23+45");
             assertEquals(expected, jsonArray.toList());
         }

@@ -184,7 +184,8 @@ public class JSONParserConfigurationTest {
                 .withStrictMode(true);
         String testCase = "[badString]";
         JSONException je = assertThrows(JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
-        assertEquals("Value 'badString' is not surrounded by quotes at 10 [character 11 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Value 'badString' is not surrounded by quotes at 10 [character 11 line 1]",
+                je.getMessage());
     }
 
     @Test
@@ -193,7 +194,8 @@ public class JSONParserConfigurationTest {
                 .withStrictMode(true);
         String testCase = "{\"a0\":badString}";
         JSONException je = assertThrows(JSONException.class, () -> new JSONObject(testCase, jsonParserConfiguration));
-        assertEquals("Value 'badString' is not surrounded by quotes at 15 [character 16 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Value 'badString' is not surrounded by quotes at 15 [character 16 line 1]",
+                je.getMessage());
     }
 
     @Test
@@ -289,7 +291,8 @@ public class JSONParserConfigurationTest {
         String testCase = "[1,2];[3,4]";
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
                 JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
-        assertEquals("invalid character ';' found after end of array at 6 [character 7 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Unparsed characters found at end of input text at 6 [character 7 line 1]",
+                je.getMessage());
     }
 
     @Test
@@ -299,7 +302,7 @@ public class JSONParserConfigurationTest {
         String testCase = "{\"a0\":[1,2];\"a1\":[3,4]}";
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
                 JSONException.class, () -> new JSONObject(testCase, jsonParserConfiguration));
-        assertEquals("Invalid character ';' found in object in strict mode at 12 [character 13 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Invalid character ';' found at 12 [character 13 line 1]", je.getMessage());
     }
 
     @Test
@@ -309,7 +312,8 @@ public class JSONParserConfigurationTest {
         String testCase = "[\"1\",\"2\"];[3,4]";
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
                 JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
-        assertEquals("invalid character ';' found after end of array at 10 [character 11 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Unparsed characters found at end of input text at 10 [character 11 line 1]",
+                je.getMessage());
     }
 
     @Test
@@ -319,7 +323,7 @@ public class JSONParserConfigurationTest {
         String testCase = "{\"a0\":[\"1\",\"2\"];\"a1\":[3,4]}";
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
                 JSONException.class, () -> new JSONObject(testCase, jsonParserConfiguration));
-        assertEquals("Invalid character ';' found in object in strict mode at 16 [character 17 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Invalid character ';' found at 16 [character 17 line 1]", je.getMessage());
     }
 
     @Test
@@ -329,7 +333,8 @@ public class JSONParserConfigurationTest {
         String testCase = "[{\"test\": implied}]";
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
                 JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
-        assertEquals("Value 'implied' is not surrounded by quotes at 17 [character 18 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Value 'implied' is not surrounded by quotes at 17 [character 18 line 1]",
+                je.getMessage());
     }
 
     @Test
@@ -339,7 +344,8 @@ public class JSONParserConfigurationTest {
         String testCase = "{\"a0\":{\"test\": implied}]}";
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
                 JSONException.class, () -> new JSONObject(testCase, jsonParserConfiguration));
-        assertEquals("Value 'implied' is not surrounded by quotes at 22 [character 23 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Value 'implied' is not surrounded by quotes at 22 [character 23 line 1]",
+                je.getMessage());
     }
 
     @Test
@@ -381,13 +387,13 @@ public class JSONParserConfigurationTest {
                 "Expected a ',' or ']' at 10 [character 11 line 1]",
                 jeOne.getMessage());
         assertEquals(
-                "Single quote wrap not allowed in strict mode at 2 [character 3 line 1]",
+                "Strict mode error: Single quoted strings are not allowed at 2 [character 3 line 1]",
                 jeTwo.getMessage());
         assertEquals(
-                "Single quote wrap not allowed in strict mode at 2 [character 3 line 1]",
+                "Strict mode error: Single quoted strings are not allowed at 2 [character 3 line 1]",
                 jeThree.getMessage());
         assertEquals(
-                "Single quote wrap not allowed in strict mode at 3 [character 4 line 1]",
+                "Strict mode error: Single quoted strings are not allowed at 3 [character 4 line 1]",
                 jeFour.getMessage());
     }
 
@@ -414,13 +420,13 @@ public class JSONParserConfigurationTest {
                 "Expected a ':' after a key at 10 [character 11 line 1]",
                 jeOne.getMessage());
         assertEquals(
-                "Single quote wrap not allowed in strict mode at 2 [character 3 line 1]",
+                "Strict mode error: Single quoted strings are not allowed at 2 [character 3 line 1]",
                 jeTwo.getMessage());
         assertEquals(
-                "Single quote wrap not allowed in strict mode at 6 [character 7 line 1]",
+                "Strict mode error: Single quoted strings are not allowed at 6 [character 7 line 1]",
                 jeThree.getMessage());
         assertEquals(
-                "Single quote wrap not allowed in strict mode at 2 [character 3 line 1]",
+                "Strict mode error: Single quoted strings are not allowed at 2 [character 3 line 1]",
                 jeFour.getMessage());
     }
 
@@ -467,7 +473,8 @@ public class JSONParserConfigurationTest {
         JSONException je = assertThrows("expected non-compliant array but got instead: " + testCase,
                 JSONException.class, () -> new JSONArray(testCase, jsonParserConfiguration));
 
-        assertEquals("Value 'test' is not surrounded by quotes at 6 [character 7 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Value 'test' is not surrounded by quotes at 6 [character 7 line 1]",
+                je.getMessage());
     }
 
     @Test
@@ -479,7 +486,8 @@ public class JSONParserConfigurationTest {
         JSONException je = assertThrows("expected non-compliant json but got instead: " + testCase,
                 JSONException.class, () -> new JSONObject(testCase, jsonParserConfiguration));
 
-        assertEquals("Value 'test' is not surrounded by quotes at 5 [character 6 line 1]", je.getMessage());
+        assertEquals("Strict mode error: Value 'test' is not surrounded by quotes at 5 [character 6 line 1]",
+                je.getMessage());
     }
 
     /**
@@ -492,6 +500,8 @@ public class JSONParserConfigurationTest {
         return Arrays.asList(
                 "[1],",
                 "[1,]",
+                "[,]",
+                "[,,]",
                 "[[1],\"sa\",[2]]a",
                 "[1],\"dsa\": \"test\"",
                 "[[a]]",
