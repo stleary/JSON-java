@@ -29,7 +29,7 @@ public class CDLTest {
 			"1, 2, 3, 4\t, 5, 6, 7\n" +
 			"true, false, true, true, false, false, false\n" +
 			"0.23, 57.42, 5e27, -234.879, 2.34e5, 0.0, 9e-3\n" +
-			"\"va\tl1\", \"v\bal2\", \"val3\", \"val\f4\", \"val5\", va'l6, val7\n";
+			"\"va\tl1\", \"v\bal2\", \"val3\", \"val\f4\", \"val5\", \"va'l6\", val7\n";
 
 
     /**
@@ -38,11 +38,54 @@ public class CDLTest {
      * values all must be quoted in the cases where the JSONObject parsing 
      * might normally convert the value into a non-string. 
      */
-    private static final String EXPECTED_LINES = "[{Col 1:val1, Col 2:val2, Col 3:val3, Col 4:val4, Col 5:val5, Col 6:val6, Col 7:val7}, " +
-			"{Col 1:\"1\", Col 2:\"2\", Col 3:\"3\", Col 4:\"4\", Col 5:\"5\", Col 6:\"6\", Col 7:\"7\"}, " +
-			"{Col 1:\"true\", Col 2:\"false\", Col 3:\"true\", Col 4:\"true\", Col 5:\"false\", Col 6:\"false\", Col 7:\"false\"}, " +
-			"{Col 1:\"0.23\", Col 2:\"57.42\", Col 3:\"5e27\", Col 4:\"-234.879\", Col 5:\"2.34e5\", Col 6:\"0.0\", Col 7:\"9e-3\"}, " +
-			"{Col 1:\"va\tl1\", Col 2:\"v\bal2\", Col 3:val3, Col 4:\"val\f4\", Col 5:val5, Col 6:va'l6, Col 7:val7}]";
+    private static final String EXPECTED_LINES =
+            "[  " +
+                "{" +
+                    "\"Col 1\":\"val1\", " +
+                    "\"Col 2\":\"val2\", " +
+                    "\"Col 3\":\"val3\", " +
+                    "\"Col 4\":\"val4\", " +
+                    "\"Col 5\":\"val5\", " +
+                    "\"Col 6\":\"val6\", " +
+                    "\"Col 7\":\"val7\"" +
+                "}, " +
+			"   {" +
+                    "\"Col 1\":\"1\", " +
+                    "\"Col 2\":\"2\", " +
+                    "\"Col 3\":\"3\", " +
+                    "\"Col 4\":\"4\", " +
+                    "\"Col 5\":\"5\", " +
+                    "\"Col 6\":\"6\", " +
+                    "\"Col 7\":\"7\"" +
+                "}, " +
+			"   {" +
+                    "\"Col 1\":\"true\", " +
+                    "\"Col 2\":\"false\", " +
+                    "\"Col 3\":\"true\", " +
+                    "\"Col 4\":\"true\", " +
+                    "\"Col 5\":\"false\", " +
+                    "\"Col 6\":\"false\", " +
+                    "\"Col 7\":\"false\"" +
+                "}, " +
+			    "{" +
+                    "\"Col 1\":\"0.23\", " +
+                    "\"Col 2\":\"57.42\", " +
+                    "\"Col 3\":\"5e27\", " +
+                    "\"Col 4\":\"-234.879\", " +
+                    "\"Col 5\":\"2.34e5\", " +
+                    "\"Col 6\":\"0.0\", " +
+                    "\"Col 7\":\"9e-3\"" +
+                "}, " +
+			    "{" +
+                    "\"Col 1\":\"va\tl1\", " +
+                    "\"Col 2\":\"v\bal2\", " +
+                    "\"Col 3\":\"val3\", " +
+                    "\"Col 4\":\"val\f4\", " +
+                    "\"Col 5\":\"val5\", " +
+                    "\"Col 6\":\"va'l6\", " +
+                    "\"Col 7\":\"val7\"" +
+                "}" +
+            "]";
 
     /**
      * Attempts to create a JSONArray from a null string.
@@ -283,11 +326,11 @@ public class CDLTest {
      */
     @Test
     public void jsonArrayToJSONArray() {
-        String nameArrayStr = "[Col1, Col2]";
+        String nameArrayStr = "[\"Col1\", \"Col2\"]";
         String values = "V1, V2";
         JSONArray nameJSONArray = new JSONArray(nameArrayStr);
         JSONArray jsonArray = CDL.toJSONArray(nameJSONArray, values);
-        JSONArray expectedJsonArray = new JSONArray("[{Col1:V1,Col2:V2}]");
+        JSONArray expectedJsonArray = new JSONArray("[{\"Col1\":\"V1\",\"Col2\":\"V2\"}]");
         Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
     }
 

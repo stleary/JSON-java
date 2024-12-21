@@ -476,10 +476,15 @@ public class JSONArrayTest {
      */
     @Test
     public void unquotedText() {
-        String str = "[value1, something!, (parens), foo@bar.com, 23, 23+45]";
-        JSONArray jsonArray = new JSONArray(str);
-        List<Object> expected = Arrays.asList("value1", "something!", "(parens)", "foo@bar.com", 23, "23+45");
-        assertEquals(expected, jsonArray.toList());
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+        if (jsonParserConfiguration.isStrictMode()) {
+            System.out.println("Skipping JSONArrayTest unquotedText() when strictMode default is true");
+        } else {
+            String str = "[value1, something!, (parens), foo@bar.com, 23, 23+45]";
+                JSONArray jsonArray = new JSONArray(str);
+            List<Object> expected = Arrays.asList("value1", "something!", "(parens)", "foo@bar.com", 23, "23+45");
+            assertEquals(expected, jsonArray.toList());
+        }
     }
 
     /**
@@ -690,8 +695,8 @@ public class JSONArrayTest {
 
         String jsonArrayStr =
             "["+
-                "hello,"+
-                "world"+
+                "\"hello\","+
+                "\"world\""+
             "]";
         // 2
         jsonArray.put(new JSONArray(jsonArrayStr));
@@ -768,8 +773,8 @@ public class JSONArrayTest {
 
         String jsonArrayStr =
             "["+
-                "hello,"+
-                "world"+
+                "\"hello\","+
+                "\"world\""+
             "]";
         // 2
         jsonArray.put(2, new JSONArray(jsonArrayStr));

@@ -152,6 +152,12 @@ public class JSONObject {
      */
     public static final Object NULL = new Null();
 
+    // strict mode checks after constructor require access to this object
+    private JSONTokener jsonTokener;
+
+    // strict mode checks after constructor require access to this object
+    private JSONParserConfiguration jsonParserConfiguration;
+
     /**
      * Construct an empty JSONObject.
      */
@@ -211,6 +217,15 @@ public class JSONObject {
      */
     public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
+
+        if (this.jsonParserConfiguration == null) {
+            this.jsonParserConfiguration = jsonParserConfiguration;
+        }
+        if (this.jsonTokener == null) {
+            this.jsonTokener = x;
+            this.jsonTokener.setJsonParserConfiguration(this.jsonParserConfiguration);
+        }
+
         char c;
         String key;
 
@@ -255,8 +270,16 @@ public class JSONObject {
 
             switch (x.nextClean()) {
             case ';':
+                // In strict mode semicolon is not a valid separator
+                if (jsonParserConfiguration.isStrictMode()) {
+                    throw x.syntaxError("Strict mode error: Invalid character ';' found");
+                }
             case ',':
                 if (x.nextClean() == '}') {
+                    // trailing commas are not allowed in strict mode
+                    if (jsonParserConfiguration.isStrictMode()) {
+                        throw x.syntaxError("Strict mode error: Expected another object element");
+                    }
                     return;
                 }
                 if (x.end()) {
@@ -433,6 +456,11 @@ public class JSONObject {
      */
     public JSONObject(String source) throws JSONException {
         this(source, new JSONParserConfiguration());
+        // Strict mode does not allow trailing chars
+        if (this.jsonParserConfiguration.isStrictMode() &&
+                this.jsonTokener.nextClean() != 0) {
+            throw new JSONException("Strict mode error: Unparsed characters found at end of input text");
+        }
     }
 
     /**
@@ -451,6 +479,11 @@ public class JSONObject {
      */
     public JSONObject(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this(new JSONTokener(source), jsonParserConfiguration);
+        // Strict mode does not allow trailing chars
+        if (this.jsonParserConfiguration.isStrictMode() &&
+                this.jsonTokener.nextClean() != 0) {
+            throw new JSONException("Strict mode error: Unparsed characters found at end of input text");
+        }
     }
 
     /**

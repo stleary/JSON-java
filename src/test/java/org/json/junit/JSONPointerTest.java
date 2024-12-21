@@ -384,8 +384,7 @@ public class JSONPointerTest {
     	String str = "{"+
                 "\"string\\\\\\\\Key\":\"hello world!\","+
 
-                "\"\\\\\":\"slash test\"," + 
-                "}"+
+                "\"\\\\\":\"slash test\"" +
                 "}";
             JSONObject jsonObject = new JSONObject(str);
             //Summary of issue: When a KEY in the jsonObject is "\\\\" --> it's held
