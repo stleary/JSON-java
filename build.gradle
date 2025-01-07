@@ -30,7 +30,7 @@ subprojects {
 }
 
 group = 'org.json'
-version = 'v20230618-SNAPSHOT'
+version = 'v20250107-SNAPSHOT'
 description = 'JSON in Java'
 sourceCompatibility = '1.8'
 

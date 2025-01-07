@@ -5,7 +5,10 @@ and artifactId "json". For example:
 [https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
 
 ~~~
-20241224....Strict mode opt-in feature, and recent commits.
+20250107....Restore moditect in pom.xml
+
+20241224....Strict mode opt-in feature, and recent commits. This release does not contain module-info.class.
+It is not recommended if you need this feature.
 
 20240303    Revert optLong/getLong changes, and recent commits.
 
