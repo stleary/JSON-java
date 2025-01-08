@@ -325,4 +325,11 @@ public class JSONTokenerTest {
            assertEquals("Stream closed", exception.getMessage());
        }
    }
+
+   @Test
+   public void testInvalidInput_shouldThrowJSONException() {
+       String input = "{\"invalidInput\": [],}";
+       JSONTokener tokener = new JSONTokener(input);
+       assertThrows(JSONException.class, () -> tokener.nextValue());
+   }
 }
