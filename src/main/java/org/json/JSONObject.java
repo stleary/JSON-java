@@ -255,7 +255,7 @@ public class JSONObject {
             if (key != null) {
                 // Check if key exists
                 boolean keyExists = this.opt(key) != null;
-                if (keyExists && !jsonParserConfiguration.isOverwriteDuplicateKey()) {
+                if (keyExists && jsonParserConfiguration != null && !jsonParserConfiguration.isOverwriteDuplicateKey()) {
                     throw x.syntaxError("Duplicate key \"" + key + "\"");
                 }
 
@@ -271,13 +271,13 @@ public class JSONObject {
             switch (x.nextClean()) {
             case ';':
                 // In strict mode semicolon is not a valid separator
-                if (jsonParserConfiguration.isStrictMode()) {
+                if (jsonParserConfiguration != null && jsonParserConfiguration.isStrictMode()) {
                     throw x.syntaxError("Strict mode error: Invalid character ';' found");
                 }
             case ',':
                 if (x.nextClean() == '}') {
                     // trailing commas are not allowed in strict mode
-                    if (jsonParserConfiguration.isStrictMode()) {
+                    if (jsonParserConfiguration != null && jsonParserConfiguration.isStrictMode()) {
                         throw x.syntaxError("Strict mode error: Expected another object element");
                     }
                     return;

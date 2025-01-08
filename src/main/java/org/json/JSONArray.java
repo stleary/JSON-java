@@ -141,14 +141,14 @@ public class JSONArray implements Iterable<Object> {
                     }
                     if (nextChar == ']') {
                         // trailing commas are not allowed in strict mode
-                        if (jsonParserConfiguration.isStrictMode()) {
+                        if (jsonParserConfiguration != null && jsonParserConfiguration.isStrictMode()) {
                             throw x.syntaxError("Strict mode error: Expected another array element");
                         }
                         return;
                     }
                     if (nextChar == ',') {
                         // consecutive commas are not allowed in strict mode
-                        if (jsonParserConfiguration.isStrictMode()) {
+                        if (jsonParserConfiguration != null && jsonParserConfiguration.isStrictMode()) {
                             throw x.syntaxError("Strict mode error: Expected a valid array element");
                         }
                         return;
