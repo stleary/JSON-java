@@ -1,6 +1,9 @@
 package org.json.junit;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.junit.Test;
 
 import java.io.IOException;
