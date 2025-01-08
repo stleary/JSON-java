@@ -6,7 +6,6 @@ Public Domain.
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -328,10 +327,18 @@ public class JSONTokenerTest {
    }
 
    @Test
-   public void testInvalidInput_shouldThrowJSONException() {
+   public void testInvalidInput_JSONObject_withoutStrictModel_shouldParseInput() {
        String input = "{\"invalidInput\": [],}";
        JSONTokener tokener = new JSONTokener(input);
        Object value = tokener.nextValue();
        assertEquals(new JSONObject(input).toString(), value.toString());
    }
+
+    @Test
+    public void testInvalidInput_JSONArray_withoutStrictModel_shouldParseInput() {
+        String input = "[\"invalidInput\",]";
+        JSONTokener tokener = new JSONTokener(input);
+        Object value = tokener.nextValue();
+        assertEquals(new JSONArray(input).toString(), value.toString());
+    }
 }
