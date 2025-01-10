@@ -40,7 +40,8 @@ public class JSONTokener {
      *
      * @param reader     A reader.
      */
-    public JSONTokener(Reader reader) {
+    public JSONTokener(Reader reader, JSONParserConfiguration jsonParserConfiguration) {
+        this.jsonParserConfiguration = jsonParserConfiguration;
         this.reader = reader.markSupported()
                 ? reader
                         : new BufferedReader(reader);
@@ -53,13 +54,24 @@ public class JSONTokener {
         this.line = 1;
     }
 
+    public JSONTokener(Reader reader) {
+        this(reader, new JSONParserConfiguration());
+    }
 
     /**
      * Construct a JSONTokener from an InputStream. The caller must close the input stream.
      * @param inputStream The source.
      */
     public JSONTokener(InputStream inputStream) {
-        this(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
+        this(inputStream, new JSONParserConfiguration());
+    }
+
+    /**
+     * Construct a JSONTokener from an InputStream. The caller must close the input stream.
+     * @param inputStream The source.
+     */
+    public JSONTokener(InputStream inputStream, JSONParserConfiguration jsonParserConfiguration) {
+        this(new InputStreamReader(inputStream, Charset.forName("UTF-8")),jsonParserConfiguration);
     }
 
 
@@ -70,6 +82,10 @@ public class JSONTokener {
      */
     public JSONTokener(String s) {
         this(new StringReader(s));
+    }
+
+    public JSONTokener(String s, JSONParserConfiguration jsonParserConfiguration) {
+        this(new StringReader(s), jsonParserConfiguration);
     }
 
     /**
