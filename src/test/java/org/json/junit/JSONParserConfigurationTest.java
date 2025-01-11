@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONParserConfiguration;
+import org.json.JSONTokener;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -488,6 +489,40 @@ public class JSONParserConfigurationTest {
 
         assertEquals("Strict mode error: Value 'test' is not surrounded by quotes at 5 [character 6 line 1]",
                 je.getMessage());
+    }
+
+    @Test
+    public void givenInvalidInputObject_testStrictModeTrue_JSONObjectUsingJSONTokener_shouldThrowJSONException() {
+        JSONException exception = assertThrows(JSONException.class, () -> {
+            new JSONObject(new JSONTokener("{\"key\":\"value\"} invalid trailing text"), new JSONParserConfiguration().withStrictMode(true));
+        });
+
+        assertEquals("Strict mode error: Unparsed characters found at end of input text at 17 [character 18 line 1]", exception.getMessage());
+    }
+
+    @Test
+    public void givenInvalidInputObject_testStrictModeTrue_JSONObjectUsingString_shouldThrowJSONException() {
+        JSONException exception = assertThrows(JSONException.class, () -> {
+            new JSONObject("{\"key\":\"value\"} invalid trailing text", new JSONParserConfiguration().withStrictMode(true));
+        });
+        assertEquals("Strict mode error: Unparsed characters found at end of input text at 17 [character 18 line 1]", exception.getMessage());
+    }
+
+    @Test
+    public void givenInvalidInputObject_testStrictModeTrue_JSONArrayUsingJSONTokener_shouldThrowJSONException() {
+        JSONException exception = assertThrows(JSONException.class, () -> {
+            new JSONArray(new JSONTokener("[\"value\"] invalid trailing text"), new JSONParserConfiguration().withStrictMode(true));
+        });
+
+        assertEquals("Strict mode error: Unparsed characters found at end of input text at 11 [character 12 line 1]", exception.getMessage());
+    }
+
+    @Test
+    public void givenInvalidInputObject_testStrictModeTrue_JSONArrayUsingString_shouldThrowJSONException() {
+        JSONException exception = assertThrows(JSONException.class, () -> {
+            new JSONArray("[\"value\"] invalid trailing text", new JSONParserConfiguration().withStrictMode(true));
+        });
+        assertEquals("Strict mode error: Unparsed characters found at end of input text at 11 [character 12 line 1]", exception.getMessage());
     }
 
     /**

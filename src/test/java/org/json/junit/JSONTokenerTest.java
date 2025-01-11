@@ -325,4 +325,21 @@ public class JSONTokenerTest {
            assertEquals("Stream closed", exception.getMessage());
        }
    }
+
+    @Test
+    public void testInvalidInput_JSONObject_withoutStrictModel_shouldParseInput() {
+        String input = "{\"invalidInput\": [],}";
+        JSONTokener tokener = new JSONTokener(input);
+        Object value = tokener.nextValue();
+        assertEquals(new JSONObject(input).toString(), value.toString());
+    }
+
+    @Test
+    public void testInvalidInput_JSONArray_withoutStrictModel_shouldParseInput() {
+        String input = "[\"invalidInput\",]";
+        JSONTokener tokener = new JSONTokener(input);
+        Object value = tokener.nextValue();
+        assertEquals(new JSONArray(input).toString(), value.toString());
+    }
+
 }

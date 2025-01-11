@@ -152,12 +152,6 @@ public class JSONObject {
      */
     public static final Object NULL = new Null();
 
-    // strict mode checks after constructor require access to this object
-    private JSONTokener jsonTokener;
-
-    // strict mode checks after constructor require access to this object
-    private JSONParserConfiguration jsonParserConfiguration;
-
     /**
      * Construct an empty JSONObject.
      */
@@ -217,17 +211,10 @@ public class JSONObject {
      */
     public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
-
-        if (this.jsonParserConfiguration == null) {
-            this.jsonParserConfiguration = jsonParserConfiguration;
-        }
-        if (this.jsonTokener == null) {
-            this.jsonTokener = x;
-            this.jsonTokener.setJsonParserConfiguration(this.jsonParserConfiguration);
-        }
-
         char c;
         String key;
+
+        boolean isInitial = x.getPrevious() == 0;
 
         if (x.nextClean() != '{') {
             throw x.syntaxError("A JSONObject text must begin with '{'");
@@ -238,6 +225,9 @@ public class JSONObject {
             case 0:
                 throw x.syntaxError("A JSONObject text must end with '}'");
             case '}':
+                if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
+                    throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
+                }
                 return;
             default:
                 key = x.nextSimpleValue(c).toString();
@@ -288,6 +278,9 @@ public class JSONObject {
                 x.back();
                 break;
             case '}':
+                if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
+                    throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
+                }
                 return;
             default:
                 throw x.syntaxError("Expected a ',' or '}'");
@@ -456,11 +449,6 @@ public class JSONObject {
      */
     public JSONObject(String source) throws JSONException {
         this(source, new JSONParserConfiguration());
-        // Strict mode does not allow trailing chars
-        if (this.jsonParserConfiguration.isStrictMode() &&
-                this.jsonTokener.nextClean() != 0) {
-            throw new JSONException("Strict mode error: Unparsed characters found at end of input text");
-        }
     }
 
     /**
@@ -478,12 +466,7 @@ public class JSONObject {
      *                duplicated key.
      */
     public JSONObject(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
-        this(new JSONTokener(source), jsonParserConfiguration);
-        // Strict mode does not allow trailing chars
-        if (this.jsonParserConfiguration.isStrictMode() &&
-                this.jsonTokener.nextClean() != 0) {
-            throw new JSONException("Strict mode error: Unparsed characters found at end of input text");
-        }
+        this(new JSONTokener(source, jsonParserConfiguration), jsonParserConfiguration);
     }
 
     /**
@@ -1280,7 +1263,7 @@ public class JSONObject {
     static BigDecimal objectToBigDecimal(Object val, BigDecimal defaultValue) {
         return objectToBigDecimal(val, defaultValue, true);
     }
-    
+
     /**
      * @param val value to convert
      * @param defaultValue default value to return is the conversion doesn't work or is null.

@@ -67,12 +67,6 @@ public class JSONArray implements Iterable<Object> {
      */
     private final ArrayList<Object> myArrayList;
 
-    // strict mode checks after constructor require access to this object
-    private JSONTokener jsonTokener;
-
-    // strict mode checks after constructor require access to this object
-    private JSONParserConfiguration jsonParserConfiguration;
-
     /**
      * Construct an empty JSONArray.
      */
@@ -102,14 +96,7 @@ public class JSONArray implements Iterable<Object> {
     public JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
 
-        if (this.jsonParserConfiguration == null) {
-            this.jsonParserConfiguration = jsonParserConfiguration;
-        }
-        if (this.jsonTokener == null) {
-            this.jsonTokener = x;
-            this.jsonTokener.setJsonParserConfiguration(this.jsonParserConfiguration);
-        }
-
+        boolean isInitial = x.getPrevious() == 0;
         if (x.nextClean() != '[') {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
@@ -156,10 +143,18 @@ public class JSONArray implements Iterable<Object> {
                     x.back();
                     break;
                 case ']':
+                    if (isInitial && jsonParserConfiguration.isStrictMode() &&
+                            x.nextClean() != 0) {
+                        throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
+                    }
                     return;
                 default:
                     throw x.syntaxError("Expected a ',' or ']'");
                 }
+            }
+        } else {
+            if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
+                throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
             }
         }
     }
@@ -176,11 +171,6 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(String source) throws JSONException {
         this(source, new JSONParserConfiguration());
-        // Strict mode does not allow trailing chars
-        if (this.jsonParserConfiguration.isStrictMode() &&
-                this.jsonTokener.nextClean() != 0) {
-                    throw jsonTokener.syntaxError("Strict mode error: Unparsed characters found at end of input text");
-        }
     }
 
     /**
@@ -195,12 +185,7 @@ public class JSONArray implements Iterable<Object> {
      *             If there is a syntax error.
      */
     public JSONArray(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
-        this(new JSONTokener(source), jsonParserConfiguration);
-        // Strict mode does not allow trailing chars
-        if (this.jsonParserConfiguration.isStrictMode() &&
-                this.jsonTokener.nextClean() != 0) {
-                    throw jsonTokener.syntaxError("Strict mode error: Unparsed characters found at end of input text");
-        }
+        this(new JSONTokener(source, jsonParserConfiguration), jsonParserConfiguration);
     }
 
     /**
