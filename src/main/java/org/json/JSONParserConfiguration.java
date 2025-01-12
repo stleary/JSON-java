@@ -27,7 +27,9 @@ public class JSONParserConfiguration extends ParserConfiguration {
     protected JSONParserConfiguration clone() {
         JSONParserConfiguration clone = new JSONParserConfiguration();
         clone.overwriteDuplicateKey = overwriteDuplicateKey;
+        clone.strictMode = strictMode;
         clone.maxNestingDepth = maxNestingDepth;
+        clone.keepStrings = keepStrings;
         return clone;
     }
 
