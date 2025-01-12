@@ -14,7 +14,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JSONParserConfigurationTest {
     private static final String TEST_SOURCE = "{\"key\": \"value1\", \"key\": \"value2\"}";
@@ -30,6 +33,24 @@ public class JSONParserConfigurationTest {
                 new JSONParserConfiguration().withOverwriteDuplicateKey(true));
 
         assertEquals("duplicate key should be overwritten", "value2", jsonObject.getString("key"));
+    }
+
+    @Test
+    public void strictModeIsCloned(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+                .withStrictMode(true)
+                .withMaxNestingDepth(12);
+
+        assertTrue(jsonParserConfiguration.isStrictMode());
+    }
+
+    @Test
+    public void maxNestingDepthIsCloned(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+                .<JSONParserConfiguration>withKeepStrings(true)
+                .withStrictMode(true);
+
+        assertTrue(jsonParserConfiguration.isKeepStrings());
     }
 
     @Test
