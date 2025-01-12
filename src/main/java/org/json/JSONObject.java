@@ -6,7 +6,6 @@ Public Domain.
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -15,17 +14,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -162,6 +152,12 @@ public class JSONObject {
      */
     public static final Object NULL = new Null();
 
+    // strict mode checks after constructor require access to this object
+    private JSONTokener jsonTokener;
+
+    // strict mode checks after constructor require access to this object
+    private JSONParserConfiguration jsonParserConfiguration;
+
     /**
      * Construct an empty JSONObject.
      */
@@ -205,7 +201,31 @@ public class JSONObject {
      *             duplicated key.
      */
     public JSONObject(JSONTokener x) throws JSONException {
+        this(x, new JSONParserConfiguration());
+    }
+
+    /**
+     * Construct a JSONObject from a JSONTokener with custom json parse configurations.
+     *
+     * @param x
+     *            A JSONTokener object containing the source string.
+     * @param jsonParserConfiguration
+     *            Variable to pass parser custom configuration for json parsing.
+     * @throws JSONException
+     *             If there is a syntax error in the source string or a
+     *             duplicated key.
+     */
+    public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
+
+        if (this.jsonParserConfiguration == null) {
+            this.jsonParserConfiguration = jsonParserConfiguration;
+        }
+        if (this.jsonTokener == null) {
+            this.jsonTokener = x;
+            this.jsonTokener.setJsonParserConfiguration(this.jsonParserConfiguration);
+        }
+
         char c;
         String key;
 
@@ -234,13 +254,14 @@ public class JSONObject {
 
             if (key != null) {
                 // Check if key exists
-                if (this.opt(key) != null) {
-                    // key already exists
+                boolean keyExists = this.opt(key) != null;
+                if (keyExists && !jsonParserConfiguration.isOverwriteDuplicateKey()) {
                     throw x.syntaxError("Duplicate key \"" + key + "\"");
                 }
-                // Only add value if non-null
+
                 Object value = x.nextValue();
-                if (value!=null) {
+                // Only add value if non-null
+                if (value != null) {
                     this.put(key, value);
                 }
             }
@@ -249,8 +270,16 @@ public class JSONObject {
 
             switch (x.nextClean()) {
             case ';':
+                // In strict mode semicolon is not a valid separator
+                if (jsonParserConfiguration.isStrictMode()) {
+                    throw x.syntaxError("Strict mode error: Invalid character ';' found");
+                }
             case ',':
                 if (x.nextClean() == '}') {
+                    // trailing commas are not allowed in strict mode
+                    if (jsonParserConfiguration.isStrictMode()) {
+                        throw x.syntaxError("Strict mode error: Expected another object element");
+                    }
                     return;
                 }
                 if (x.end()) {
@@ -296,7 +325,6 @@ public class JSONObject {
 
     /**
      * Construct a JSONObject from a map with recursion depth.
-     *
      */
     private JSONObject(Map<?, ?> m, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {
         if (recursionDepth > jsonParserConfiguration.getMaxNestingDepth()) {
@@ -427,7 +455,35 @@ public class JSONObject {
      *                duplicated key.
      */
     public JSONObject(String source) throws JSONException {
-        this(new JSONTokener(source));
+        this(source, new JSONParserConfiguration());
+        // Strict mode does not allow trailing chars
+        if (this.jsonParserConfiguration.isStrictMode() &&
+                this.jsonTokener.nextClean() != 0) {
+            throw new JSONException("Strict mode error: Unparsed characters found at end of input text");
+        }
+    }
+
+    /**
+     * Construct a JSONObject from a source JSON text string with custom json parse configurations.
+     * This is the most commonly used JSONObject constructor.
+     *
+     * @param source
+     *            A string beginning with <code>{</code>&nbsp;<small>(left
+     *            brace)</small> and ending with <code>}</code>
+     *            &nbsp;<small>(right brace)</small>.
+     * @param jsonParserConfiguration
+     *            Variable to pass parser custom configuration for json parsing.
+     * @exception JSONException
+     *                If there is a syntax error in the source string or a
+     *                duplicated key.
+     */
+    public JSONObject(String source, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
+        this(new JSONTokener(source), jsonParserConfiguration);
+        // Strict mode does not allow trailing chars
+        if (this.jsonParserConfiguration.isStrictMode() &&
+                this.jsonTokener.nextClean() != 0) {
+            throw new JSONException("Strict mode error: Unparsed characters found at end of input text");
+        }
     }
 
     /**
@@ -2224,7 +2280,10 @@ public class JSONObject {
      */
     @SuppressWarnings("resource")
     public static String quote(String string) {
-        StringWriter sw = new StringWriter();
+        if (string == null || string.isEmpty()) {
+            return "\"\"";
+        }
+        Writer sw = new StringBuilderWriter(string.length() + 2);
         try {
             return quote(string, sw).toString();
         } catch (IOException ignored) {
@@ -2623,7 +2682,10 @@ public class JSONObject {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        StringWriter w = new StringWriter();
+        // 6 characters are the minimum to serialise a key value pair e.g.: "k":1,
+        // and we don't want to oversize the initial capacity
+        int initialSize = map.size() * 6;
+        Writer w = new StringBuilderWriter(Math.max(initialSize, 16));
         return this.write(w, indentFactor, 0).toString();
     }
 
@@ -2766,6 +2828,7 @@ public class JSONObject {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof JSONString) {
+            // JSONString must be checked first, so it can overwrite behaviour of other types below
             Object o;
             try {
                 o = ((JSONString) value).toJSONString();
@@ -2773,6 +2836,10 @@ public class JSONObject {
                 throw new JSONException(e);
             }
             writer.write(o != null ? o.toString() : quote(value.toString()));
+        } else if (value instanceof String) {
+            // assuming most values are Strings, so testing it early
+            quote(value.toString(), writer);
+            return writer;
         } else if (value instanceof Number) {
             // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
             final String numberAsString = numberToString((Number) value);

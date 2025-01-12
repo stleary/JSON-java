@@ -270,9 +270,9 @@ public class XMLConfigurationTest {
 
         String expectedStr = 
             "{\"addresses\":{\"address\":{\"street\":\"[CDATA[Baker street 5]\","+
-            "\"name\":\"Joe Tester\",\"NothingHere\":\"\",TrueValue:true,\n"+
+            "\"name\":\"Joe Tester\",\"NothingHere\":\"\",\"TrueValue\":true,\n"+
             "\"FalseValue\":false,\"NullValue\":null,\"PositiveValue\":42,\n"+
-            "\"NegativeValue\":-23,\"DoubleValue\":-23.45,\"Nan\":-23x.45,\n"+
+            "\"NegativeValue\":-23,\"DoubleValue\":-23.45,\"Nan\":\"-23x.45\",\n"+
             "\"ArrayOfNum\":\"1, 2, 3, 4.1, 5.2\"\n"+
             "},\"xsi:noNamespaceSchemaLocation\":"+
             "\"test.xsd\",\"xmlns:xsi\":\"http://www.w3.org/2001/"+
