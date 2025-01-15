@@ -194,30 +194,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.moditect</groupId>
-                <artifactId>moditect-maven-plugin</artifactId>
-                <version>1.0.0.Final</version>
-                <executions>
-                    <execution>
-                        <id>add-module-infos</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>add-module-info</goal>
-                        </goals>
-                        <configuration>
-                            <jvmVersion>9</jvmVersion>
-                            <module>
-                                <moduleInfoSource>
-                                    module org.json {
-                                    exports org.json;
-                                    }
-                                </moduleInfoSource>
-                            </module>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
