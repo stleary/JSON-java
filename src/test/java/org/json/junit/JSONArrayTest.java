@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1507,6 +1508,14 @@ public class JSONArrayTest {
     public void testRecursiveDepthArrayFor1001Levels() {
         ArrayList<Object> array = buildNestedArray(1001);
         new JSONArray(array);
+    }
+
+    @Test
+    public void testStrictModeJSONTokener_expectException(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration().withStrictMode();
+        JSONTokener tokener = new JSONTokener("[\"value\"]invalidCharacters", jsonParserConfiguration);
+
+        assertThrows(JSONException.class, () -> { new JSONArray(tokener); });
     }
 
     public static ArrayList<Object> buildNestedArray(int maxDepth) {
