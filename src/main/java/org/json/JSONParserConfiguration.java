@@ -104,6 +104,9 @@ public class JSONParserConfiguration extends ParserConfiguration {
     }
 
     /**
+     * The parser throws an Exception when strict mode is true and tries to parse invalid JSON characters.
+     * Otherwise, the parser is more relaxed and might tolerate some invalid characters.
+     *
      * @return the current strict mode setting.
      */
     public boolean isStrictMode() {
