@@ -83,7 +83,7 @@ public class JSONArray implements Iterable<Object> {
      *             If there is a syntax error.
      */
     public JSONArray(JSONTokener x) throws JSONException {
-        this(x, new JSONParserConfiguration());
+        this(x, x.getJsonParserConfiguration());
     }
 
     /**
