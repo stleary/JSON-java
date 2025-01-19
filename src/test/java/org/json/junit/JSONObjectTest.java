@@ -3853,6 +3853,15 @@ public class JSONObjectTest {
         assertEquals(j3.getString("hex6"), "0011");
     }
 
+
+    @Test
+    public void testStrictModeJSONTokener_expectException(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration().withStrictMode();
+        JSONTokener tokener = new JSONTokener("{\"key\":\"value\"}invalidCharacters", jsonParserConfiguration);
+
+        assertThrows(JSONException.class, () -> { new JSONObject(tokener); });
+    }
+
     /**
      * Method to build nested map of max maxDepth
      *
