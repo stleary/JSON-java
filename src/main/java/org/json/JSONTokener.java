@@ -38,7 +38,18 @@ public class JSONTokener {
     /**
      * Construct a JSONTokener from a Reader. The caller must close the Reader.
      *
-     * @param reader     A reader.
+     * @param reader the source.
+     */
+    public JSONTokener(Reader reader) {
+        this(reader, new JSONParserConfiguration());
+    }
+
+    /**
+     * Construct a JSONTokener from a Reader with a given JSONParserConfiguration. The caller must close the Reader.
+     *
+     * @param reader the source.
+     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
+     *
      */
     public JSONTokener(Reader reader, JSONParserConfiguration jsonParserConfiguration) {
         this.jsonParserConfiguration = jsonParserConfiguration;
@@ -54,10 +65,6 @@ public class JSONTokener {
         this.line = 1;
     }
 
-    public JSONTokener(Reader reader) {
-        this(reader, new JSONParserConfiguration());
-    }
-
     /**
      * Construct a JSONTokener from an InputStream. The caller must close the input stream.
      * @param inputStream The source.
@@ -69,23 +76,29 @@ public class JSONTokener {
     /**
      * Construct a JSONTokener from an InputStream. The caller must close the input stream.
      * @param inputStream The source.
+     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
      */
     public JSONTokener(InputStream inputStream, JSONParserConfiguration jsonParserConfiguration) {
-        this(new InputStreamReader(inputStream, Charset.forName("UTF-8")),jsonParserConfiguration);
+        this(new InputStreamReader(inputStream, Charset.forName("UTF-8")), jsonParserConfiguration);
     }
 
 
     /**
      * Construct a JSONTokener from a string.
      *
-     * @param s     A source string.
+     * @param source A source string.
      */
-    public JSONTokener(String s) {
-        this(new StringReader(s));
+    public JSONTokener(String source) {
+        this(new StringReader(source));
     }
 
-    public JSONTokener(String s, JSONParserConfiguration jsonParserConfiguration) {
-        this(new StringReader(s), jsonParserConfiguration);
+    /**
+     * Construct a JSONTokener from an InputStream. The caller must close the input stream.
+     * @param source The source.
+     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
+     */
+    public JSONTokener(String source, JSONParserConfiguration jsonParserConfiguration) {
+        this(new StringReader(source), jsonParserConfiguration);
     }
 
     /**
