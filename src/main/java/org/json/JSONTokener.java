@@ -112,7 +112,10 @@ public class JSONTokener {
     /**
      * Setter
      * @param jsonParserConfiguration new value for jsonParserConfiguration
+     *
+     * @deprecated method should not be used
      */
+    @Deprecated
     public void setJsonParserConfiguration(JSONParserConfiguration jsonParserConfiguration) {
         this.jsonParserConfiguration = jsonParserConfiguration;
     }
