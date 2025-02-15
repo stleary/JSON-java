@@ -16,10 +16,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.json.*;
 import org.junit.Test;
 
 /**
@@ -98,7 +95,17 @@ public class JSONTokenerTest {
         checkValid(" []  ",JSONArray.class);
         checkValid("[1,2]",JSONArray.class);
         checkValid("\n\n[1,2]\n\n",JSONArray.class);
-        checkValid("1 2", String.class);
+
+        // Test should fail if default strictMode is true, pass if false
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+        if (jsonParserConfiguration.isStrictMode()) {
+            try {
+                checkValid("1 2", String.class);
+                assertEquals("Expected to throw exception due to invalid string", true, false);
+            } catch (JSONException e) { }
+        } else {
+            checkValid("1 2", String.class);
+        }
     }
     
     @Test
@@ -330,16 +337,37 @@ public class JSONTokenerTest {
     public void testInvalidInput_JSONObject_withoutStrictModel_shouldParseInput() {
         String input = "{\"invalidInput\": [],}";
         JSONTokener tokener = new JSONTokener(input);
-        Object value = tokener.nextValue();
-        assertEquals(new JSONObject(input).toString(), value.toString());
+
+        // Test should fail if default strictMode is true, pass if false
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+        if (jsonParserConfiguration.isStrictMode()) {
+            try {
+                Object value = tokener.nextValue();
+                assertEquals(new JSONObject(input).toString(), value.toString());
+                assertEquals("Expected to throw exception due to invalid string", true, false);
+            } catch (JSONException e) { }
+        } else {
+            Object value = tokener.nextValue();
+            assertEquals(new JSONObject(input).toString(), value.toString());
+        }
     }
 
     @Test
     public void testInvalidInput_JSONArray_withoutStrictModel_shouldParseInput() {
         String input = "[\"invalidInput\",]";
         JSONTokener tokener = new JSONTokener(input);
-        Object value = tokener.nextValue();
-        assertEquals(new JSONArray(input).toString(), value.toString());
-    }
 
+        // Test should fail if default strictMode is true, pass if false
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+        if (jsonParserConfiguration.isStrictMode()) {
+            try {
+                Object value = tokener.nextValue();
+                assertEquals(new JSONArray(input).toString(), value.toString());
+                assertEquals("Expected to throw exception due to invalid string", true, false);
+            } catch (JSONException e) { }
+        } else {
+            Object value = tokener.nextValue();
+            assertEquals(new JSONArray(input).toString(), value.toString());
+        }
+    }
 }
