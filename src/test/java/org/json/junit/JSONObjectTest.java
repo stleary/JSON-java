@@ -218,11 +218,16 @@ public class JSONObjectTest {
      */
     @Test
     public void unquotedText() {
+        String str = "{key1:value1, key2:42, 1.2 : 3.4, -7e5 : something!}";
+
+        // Test should fail if default strictMode is true, pass if false
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
         if (jsonParserConfiguration.isStrictMode()) {
-            System.out.println("Skipping JSONObjectTest unquotedText() when strictMode default is true");
+            try {
+                JSONObject jsonObject = new JSONObject(str);
+                assertEquals("Expected to throw exception due to invalid string", true, false);
+            } catch (JSONException e) { }
         } else {
-            String str = "{key1:value1, key2:42, 1.2 : 3.4, -7e5 : something!}";
             JSONObject jsonObject = new JSONObject(str);
             String textStr = jsonObject.toString();
             assertTrue("expected key1", textStr.contains("\"key1\""));
@@ -1074,24 +1079,29 @@ public class JSONObjectTest {
      */
     @Test
     public void jsonInvalidNumberValues() {
+        // Number-notations supported by Java and invalid as JSON
+        String str =
+                "{" +
+                        "\"hexNumber\":-0x123," +
+                        "\"tooManyZeros\":00," +
+                        "\"negativeInfinite\":-Infinity," +
+                        "\"negativeNaN\":-NaN," +
+                        "\"negativeFraction\":-.01," +
+                        "\"tooManyZerosFraction\":00.001," +
+                        "\"negativeHexFloat\":-0x1.fffp1," +
+                        "\"hexFloat\":0x1.0P-1074," +
+                        "\"floatIdentifier\":0.1f," +
+                        "\"doubleIdentifier\":0.1d" +
+                        "}";
+
+        // Test should fail if default strictMode is true, pass if false
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
         if (jsonParserConfiguration.isStrictMode()) {
-            System.out.println("Skipping JSONObjectTest jsonInvalidNumberValues() when strictMode default is true");
+            try {
+                JSONObject jsonObject = new JSONObject(str);
+                assertEquals("Expected to throw exception due to invalid string", true, false);
+            } catch (JSONException e) { }
         } else {
-            // Number-notations supported by Java and invalid as JSON
-            String str =
-                    "{" +
-                            "\"hexNumber\":-0x123," +
-                            "\"tooManyZeros\":00," +
-                            "\"negativeInfinite\":-Infinity," +
-                            "\"negativeNaN\":-NaN," +
-                            "\"negativeFraction\":-.01," +
-                            "\"tooManyZerosFraction\":00.001," +
-                            "\"negativeHexFloat\":-0x1.fffp1," +
-                            "\"hexFloat\":0x1.0P-1074," +
-                            "\"floatIdentifier\":0.1f," +
-                            "\"doubleIdentifier\":0.1d" +
-                            "}";
             JSONObject jsonObject = new JSONObject(str);
             Object obj;
             obj = jsonObject.get("hexNumber");
@@ -2274,7 +2284,7 @@ public class JSONObjectTest {
     public void jsonObjectParsingErrors() {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
         if (jsonParserConfiguration.isStrictMode()) {
-            System.out.println("Skipping JSONObjectTest jaonObjectParsingErrors() when strictMode default is true");
+            System.out.println("Skipping JSONObjectTest jsonObjectParsingErrors() when strictMode default is true");
         } else {
             try {
                 // does not start with '{'

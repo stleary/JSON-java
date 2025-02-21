@@ -477,13 +477,18 @@ public class JSONArrayTest {
      */
     @Test
     public void unquotedText() {
+        String str = "[value1, something!, (parens), foo@bar.com, 23, 23+45]";
+        List<Object> expected = Arrays.asList("value1", "something!", "(parens)", "foo@bar.com", 23, "23+45");
+
+        // Test should fail if default strictMode is true, pass if false
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
         if (jsonParserConfiguration.isStrictMode()) {
-            System.out.println("Skipping JSONArrayTest unquotedText() when strictMode default is true");
-        } else {
-            String str = "[value1, something!, (parens), foo@bar.com, 23, 23+45]";
+            try {
                 JSONArray jsonArray = new JSONArray(str);
-            List<Object> expected = Arrays.asList("value1", "something!", "(parens)", "foo@bar.com", 23, "23+45");
+                assertEquals("Expected to throw exception due to invalid string", true, false);
+            } catch (JSONException e) { }
+        } else {
+            JSONArray jsonArray = new JSONArray(str);
             assertEquals(expected, jsonArray.toList());
         }
     }
