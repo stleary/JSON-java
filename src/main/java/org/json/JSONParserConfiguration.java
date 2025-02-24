@@ -15,7 +15,7 @@ public class JSONParserConfiguration extends ParserConfiguration {
     public JSONParserConfiguration() {
         super();
         this.overwriteDuplicateKey = false;
-//        this.strictMode = true;
+        // this.strictMode = true;
     }
 
     /**

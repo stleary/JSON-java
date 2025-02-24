@@ -53,3 +53,46 @@ publishing {
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+
+def originalFile = null;
+
+task backupCode {
+    def file = file('src/main/java/org/json/JSONParserConfiguration.java')
+    originalFile = file.text
+}
+
+task firstTest {
+
+}
+
+task modifyCode {
+    doLast {
+        // Add your code modification logic here
+        def file = file('src/main/java/org/json/JSONParserConfiguration.java')
+        def text = file.text
+        text = text.replaceAll('oldCode', 'newCode')
+        file.text = text
+    }
+}
+
+task compileModifiedCode(type: JavaCompile) {
+    source = sourceSets.main.java.srcDirs
+    classpath = sourceSets.main.compileClasspath
+    destinationDirectory = sourceSets.main.java.outputDir
+}
+
+task secondTest {
+
+}
+
+task restoreCode {
+    def file = file('src/main/java/org/json/JSONParserConfiguration.java')
+    file.text = originalFile
+}
+
+// and then add it to the task list
+backupCode.finalizedBy firstTest
+firstTest.finalizedBy modifyCode
+modifyCode.finalizedBy compileModifiedCode
+compileModifiedCode.finalizedBy secondTest
+secondTest.finalizedBy restoreCode
