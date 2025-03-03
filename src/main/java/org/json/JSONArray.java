@@ -2023,4 +2023,13 @@ public class JSONArray implements Iterable<Object> {
                 , cause);
     }
 
+    /**
+     * Returns a sequential {@code Stream} with this JSONArray as its source.
+     *
+     * @return a sequential {@code Stream} over the elements in this JSONArray
+     */
+    public Stream<Object> stream() {
+        return myArrayList.stream();
+    }
+
 }
