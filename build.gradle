@@ -53,3 +53,75 @@ publishing {
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+// Add these imports at the top of your build.gradle file
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+
+// Your existing build configurations...
+
+// Add a new task to modify the file
+task modifyStrictMode {
+    doLast {
+        println "Modifying JSONParserConfiguration.java to enable strictMode..."
+
+        def filePath = project.file('src/main/java/org/json/JSONParserConfiguration.java')
+
+        if (!filePath.exists()) {
+            throw new GradleException("Could not find file: ${filePath.absolutePath}")
+        }
+
+        // Create a backup of the original file
+        def backupFile = new File(filePath.absolutePath + '.bak')
+        Files.copy(filePath.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+
+        // Read and modify the file content
+        def content = filePath.text
+        def modifiedContent = content.replace('// this.strictMode = true;', 'this.strictMode = true;')
+
+        // Write the modified content back to the file
+        filePath.text = modifiedContent
+
+        println "File modified successfully at: ${filePath.absolutePath}"
+    }
+}
+
+// Add a task to restore the original file
+task restoreStrictMode {
+    doLast {
+        println "Restoring original JSONParserConfiguration.java..."
+
+        def filePath = project.file('src/main/java/org/json/JSONParserConfiguration.java')
+        def backupFile = new File(filePath.absolutePath + '.bak')
+
+        if (backupFile.exists()) {
+            Files.copy(backupFile.toPath(), filePath.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            backupFile.delete()
+            println "Original file restored successfully at: ${filePath.absolutePath}"
+        } else {
+            println "Backup file not found at: ${backupFile.absolutePath}. No restoration performed."
+        }
+    }
+}
+
+// Create a task to run the workflow
+task testWithStrictMode {
+    dependsOn modifyStrictMode
+    finalizedBy restoreStrictMode
+
+    doLast {
+        // This will trigger a clean build and run tests with strictMode enabled
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+            exec {
+                executable 'cmd'
+                args '/c', 'gradlew.bat', 'clean', 'build'
+            }
+        } else {
+            exec {
+                executable './gradlew'
+                args 'clean', 'build'
+            }
+        }
+    }
+}
