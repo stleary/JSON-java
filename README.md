@@ -103,6 +103,12 @@ gradlew clean build test
 gradlew testWithStrictMode
 ```
 
+*Optional* Execute the test suite in strict mode with Maven:
+
+```shell
+mvn test -P test-strict-mode 
+```
+
 # Notes
 
 For more information, please see [NOTES.md](https://github.com/stleary/JSON-java/blob/master/docs/NOTES.md)
