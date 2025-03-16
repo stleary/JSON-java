@@ -169,6 +169,33 @@ public class CDLTest {
     }
 
     /**
+     * Csv parsing skip last row if last field of this row is empty #943
+     */
+    @Test
+    public void csvParsingCatchesLastRow(){
+        String data = "Field 1,Field 2,Field 3\n" +
+                "value11,value12,\n" +
+                "value21,value22,";
+
+        JSONArray jsonArray = CDL.toJSONArray(data);
+
+        JSONArray expectedJsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Field 1", "value11");
+        jsonObject.put("Field 2", "value12");
+        jsonObject.put("Field 3", "");
+        expectedJsonArray.put(jsonObject);
+
+        jsonObject = new JSONObject();
+        jsonObject.put("Field 1", "value21");
+        jsonObject.put("Field 2", "value22");
+        jsonObject.put("Field 3", "");
+        expectedJsonArray.put(jsonObject);
+
+        Util.compareActualVsExpectedJsonArrays(jsonArray, expectedJsonArray);
+    }
+
+    /**
      * Assert that there is no error for a single escaped quote within a properly embedded quote.
      */
     @Test
