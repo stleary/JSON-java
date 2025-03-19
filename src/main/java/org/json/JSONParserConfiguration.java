@@ -8,6 +8,11 @@ public class JSONParserConfiguration extends ParserConfiguration {
      * Used to indicate whether to overwrite duplicate key or not.
      */
     private boolean overwriteDuplicateKey;
+    
+    /**
+     * Used to indicate whether ignore null values when converting java maps to JSONObject or not.
+     */
+    private boolean javaNullAsJsonNull;
 
     /**
      * Configuration with the default values.
@@ -67,6 +72,21 @@ public class JSONParserConfiguration extends ParserConfiguration {
 
         return clone;
     }
+    
+    /**
+     * Controls the parser's behavior when meeting duplicate keys.
+     * If set to false, the parser will throw a JSONException when meeting a duplicate key.
+     * Or the duplicate key's value will be overwritten.
+     *
+     * @param javaNullAsJsonNull define, if the parser should ignore null values in Java maps
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    public JSONParserConfiguration withJavaNullAsJsonNull(final boolean javaNullAsJsonNull) {
+        JSONParserConfiguration clone = this.clone();
+        clone.javaNullAsJsonNull = javaNullAsJsonNull;
+
+        return clone;
+    }
 
     /**
      * Sets the strict mode configuration for the JSON parser with default true value
@@ -106,6 +126,17 @@ public class JSONParserConfiguration extends ParserConfiguration {
     public boolean isOverwriteDuplicateKey() {
         return this.overwriteDuplicateKey;
     }
+    
+    /**
+     * The parser's behavior when meeting a null value in a java map, controls whether the parser should ignore 
+     * that map entry or write a JSON entry with a null value.
+     *
+     * @return The <code>javaNullAsJsonNull</code> configuration value.
+     */
+    public boolean isJavaNullAsJsonNull() {
+        return this.javaNullAsJsonNull;
+    }
+    
 
     /**
      * The parser throws an Exception when strict mode is true and tries to parse invalid JSON characters.

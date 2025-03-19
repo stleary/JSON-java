@@ -616,6 +616,46 @@ public class JSONObjectTest {
         assertTrue("expected \"doubleKey\":-23.45e67", Double.valueOf("-23.45e67").equals(jsonObject.query("/doubleKey")));
         Util.checkJSONObjectMaps(jsonObject);
     }
+    
+    @Test
+    public void jsonObjectByMapWithNullValueAndParserConfiguration() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("nullKey", null);
+        
+        // by default, null values are ignored
+        JSONObject obj1 = new JSONObject(map);
+        assertTrue("expected null value to be ignored by default", obj1.isEmpty());
+
+        // if configured, null values are written as such into the JSONObject.
+        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withJavaNullAsJsonNull(true);
+        JSONObject obj2 = new JSONObject(map, parserConfiguration);
+        assertFalse("expected null value to accepted when configured", obj2.isEmpty());
+        assertTrue(obj2.has("nullKey"));
+        assertEquals(JSONObject.NULL, obj2.get("nullKey"));
+    }
+    
+    @Test
+    public void jsonObjectByMapWithNestedNullValueAndParserConfiguration() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> nestedMap = new HashMap<String, Object>();
+        nestedMap.put("nullKey", null);
+        map.put("nestedMap", nestedMap);
+        List<Map<String, Object>> nestedList = new ArrayList<Map<String,Object>>();
+        nestedList.add(nestedMap);        
+        map.put("nestedList", nestedList);
+        
+        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withJavaNullAsJsonNull(true);
+        JSONObject jsonObject = new JSONObject(map, parserConfiguration);
+
+        JSONObject nestedObject = jsonObject.getJSONObject("nestedMap");
+        assertTrue(nestedObject.has("nullKey"));
+        assertEquals(JSONObject.NULL, nestedObject.get("nullKey"));
+        
+        JSONArray nestedArray = jsonObject.getJSONArray("nestedList");
+        assertEquals(1, nestedArray.length());
+        assertTrue(nestedArray.getJSONObject(0).has("nullKey"));
+        assertEquals(JSONObject.NULL, nestedArray.getJSONObject(0).get("nullKey"));
+    }
 
     /**
      * JSONObject built from a bean. In this case all but one of the 
