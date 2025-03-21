@@ -37,6 +37,7 @@ public class JSONParserConfiguration extends ParserConfiguration {
         clone.strictMode = strictMode;
         clone.maxNestingDepth = maxNestingDepth;
         clone.keepStrings = keepStrings;
+        clone.useNativeNulls = useNativeNulls;
         return clone;
     }
 

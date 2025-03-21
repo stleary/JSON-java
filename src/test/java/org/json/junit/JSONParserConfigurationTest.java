@@ -53,6 +53,14 @@ public class JSONParserConfigurationTest {
 
         assertTrue(jsonParserConfiguration.isKeepStrings());
     }
+    
+    @Test
+    public void useNativeNullsIsCloned() {
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration()
+                .withUseNativeNulls(true)
+                .withStrictMode(true);
+        assertTrue(jsonParserConfiguration.isUseNativeNulls());
+    }
 
     @Test
     public void verifyDuplicateKeyThenMaxDepth() {
