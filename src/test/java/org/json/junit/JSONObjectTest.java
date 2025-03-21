@@ -627,7 +627,7 @@ public class JSONObjectTest {
         assertTrue("expected null value to be ignored by default", obj1.isEmpty());
 
         // if configured, null values are written as such into the JSONObject.
-        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withJavaNullAsJsonNull(true);
+        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withUseNativeNulls(true);
         JSONObject obj2 = new JSONObject(map, parserConfiguration);
         assertFalse("expected null value to accepted when configured", obj2.isEmpty());
         assertTrue(obj2.has("nullKey"));
@@ -644,7 +644,7 @@ public class JSONObjectTest {
         nestedList.add(nestedMap);        
         map.put("nestedList", nestedList);
         
-        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withJavaNullAsJsonNull(true);
+        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withUseNativeNulls(true);
         JSONObject jsonObject = new JSONObject(map, parserConfiguration);
 
         JSONObject nestedObject = jsonObject.getJSONObject("nestedMap");

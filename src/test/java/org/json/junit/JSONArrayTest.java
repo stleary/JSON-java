@@ -235,7 +235,7 @@ public class JSONArrayTest {
         Map<String, Object> sub = new HashMap<String, Object>();
         sub.put("nullKey", null);	
         list.add(sub);
-        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withJavaNullAsJsonNull(true);
+        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withUseNativeNulls(true);
         JSONArray jsonArray = new JSONArray(list, parserConfiguration);
         JSONObject subObject = jsonArray.getJSONObject(0);
         assertTrue(subObject.has("nullKey"));

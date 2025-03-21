@@ -10,9 +10,9 @@ public class JSONParserConfiguration extends ParserConfiguration {
     private boolean overwriteDuplicateKey;
     
     /**
-     * Used to indicate whether ignore null values when converting java maps to JSONObject or not.
+     * Used to indicate whether to convert java null values to JSONObject.NULL or ignoring the entry when converting java maps.
      */
-    private boolean javaNullAsJsonNull;
+    private boolean useNativeNulls;
 
     /**
      * Configuration with the default values.
@@ -74,16 +74,16 @@ public class JSONParserConfiguration extends ParserConfiguration {
     }
     
     /**
-     * Controls the parser's behavior when meeting duplicate keys.
-     * If set to false, the parser will throw a JSONException when meeting a duplicate key.
-     * Or the duplicate key's value will be overwritten.
+     * Controls the parser's behavior when meeting Java null values while converting maps.
+     * If set to true, the parser will put a JSONObject.NULL into the resulting JSONObject.
+     * Or the map entry will be ignored.
      *
-     * @param javaNullAsJsonNull define, if the parser should ignore null values in Java maps
+     * @param useNativeNulls defines if the parser should convert null values in Java maps
      * @return The existing configuration will not be modified. A new configuration is returned.
      */
-    public JSONParserConfiguration withJavaNullAsJsonNull(final boolean javaNullAsJsonNull) {
+    public JSONParserConfiguration withUseNativeNulls(final boolean useNativeNulls) {
         JSONParserConfiguration clone = this.clone();
-        clone.javaNullAsJsonNull = javaNullAsJsonNull;
+        clone.useNativeNulls = useNativeNulls;
 
         return clone;
     }
@@ -128,13 +128,14 @@ public class JSONParserConfiguration extends ParserConfiguration {
     }
     
     /**
-     * The parser's behavior when meeting a null value in a java map, controls whether the parser should ignore 
-     * that map entry or write a JSON entry with a null value.
+     * The parser's behavior when meeting a null value in a java map, controls whether the parser should 
+     * write a JSON entry with a null value (<code>isUseNativeNulls() == true</code>) 
+     * or ignore that map entry (<code>isUseNativeNulls() == false</code>).
      *
-     * @return The <code>javaNullAsJsonNull</code> configuration value.
+     * @return The <code>useNativeNulls</code> configuration value.
      */
-    public boolean isJavaNullAsJsonNull() {
-        return this.javaNullAsJsonNull;
+    public boolean isUseNativeNulls() {
+        return this.useNativeNulls;
     }
     
 
