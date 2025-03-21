@@ -200,4 +200,55 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>test-strict-mode</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>1.5.3</version>
+                        <executions>
+                            <!-- Enable strict mode -->
+                            <execution>
+                                <id>enable-strict-mode</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <file>src/main/java/org/json/JSONParserConfiguration.java</file>
+                                    <replacements>
+                                        <replacement>
+                                            <token>// this.strictMode = true;</token>
+                                            <value>this.strictMode = true;</value>
+                                        </replacement>
+                                    </replacements>
+                                </configuration>
+                            </execution>
+                            <!-- Restore original code after tests -->
+                            <execution>
+                                <id>restore-original</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <file>src/main/java/org/json/JSONParserConfiguration.java</file>
+                                    <replacements>
+                                        <replacement>
+                                            <token>this.strictMode = true;</token>
+                                            <value>// this.strictMode = true;</value>
+                                        </replacement>
+                                    </replacements>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
