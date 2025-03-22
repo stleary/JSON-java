@@ -1763,77 +1763,133 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Write the contents of the JSONArray as JSON text to a writer.
-     * 
-     * <p>If <pre>{@code indentFactor > 0}</pre> and the {@link JSONArray} has only
-     * one element, then the array will be output on a single line:
-     * <pre>{@code [1]}</pre>
-     * 
-     * <p>If an array has 2 or more elements, then it will be output across
-     * multiple lines: <pre>{@code
-     * [
-     * 1,
-     * "value 2",
-     * 3
-     * ]
-     * }</pre>
-     * <p><b>
-     * Warning: This method assumes that the data structure is acyclical.
-     * </b>
+     * Writes the contents of the JSONArray as JSON text to a writer.
      *
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indentation of the top level.
+     * <p>If {@code indentFactor > 0} and the JSONArray has only one element,
+     * the array will be output on a single line (e.g., {@code [1]}). If the array
+     * has 2 or more elements, it will be output across multiple lines with proper
+     * indentation.</p>
+     *
+     * <p><b>Warning:</b> This method assumes that the data structure is acyclical.</p>
+     *
+     * @param writer       The writer to which the JSON text is written.
+     * @param indentFactor The number of spaces to add to each level of indentation.
+     * @param indent       The indentation level of the top level.
      * @return The writer.
-     * @throws JSONException if a called function fails or unable to write
+     * @throws JSONException If an error occurs while writing the JSON text.
      */
     @SuppressWarnings("resource")
-    public Writer write(Writer writer, int indentFactor, int indent)
-            throws JSONException {
+    public Writer write(Writer writer, int indentFactor, int indent) throws JSONException {
         try {
-            boolean needsComma = false;
-            int length = this.length();
-            writer.write('[');
-
-            if (length == 1) {
-                try {
-                    JSONObject.writeValue(writer, this.myArrayList.get(0),
-                            indentFactor, indent);
-                } catch (Exception e) {
-                    throw new JSONException("Unable to write JSONArray value at index: 0", e);
-                }
-            } else if (length != 0) {
-                final int newIndent = indent + indentFactor;
-
-                for (int i = 0; i < length; i += 1) {
-                    if (needsComma) {
-                        writer.write(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.write('\n');
-                    }
-                    JSONObject.indent(writer, newIndent);
-                    try {
-                        JSONObject.writeValue(writer, this.myArrayList.get(i),
-                                indentFactor, newIndent);
-                    } catch (Exception e) {
-                        throw new JSONException("Unable to write JSONArray value at index: " + i, e);
-                    }
-                    needsComma = true;
-                }
-                if (indentFactor > 0) {
-                    writer.write('\n');
-                }
-                JSONObject.indent(writer, indent);
-            }
-            writer.write(']');
+            writeArrayStart(writer);
+            writeArrayContents(writer, indentFactor, indent);
+            writeArrayEnd(writer);
             return writer;
         } catch (IOException e) {
             throw new JSONException(e);
         }
+    }
+
+    /**
+     * Writes the opening bracket '[' of the JSONArray to the writer.
+     *
+     * @param writer The writer to which the opening bracket is written.
+     * @throws IOException If an I/O error occurs while writing.
+     */
+    private void writeArrayStart(Writer writer) throws IOException {
+        writer.write('[');
+    }
+
+    /**
+     * Writes the contents of the JSONArray to the writer, handling single and multiple elements.
+     *
+     * @param writer       The writer to which the contents are written.
+     * @param indentFactor The number of spaces to add to each level of indentation.
+     * @param indent       The indentation level of the top level.
+     * @throws JSONException If an error occurs while writing the contents.
+     * @throws IOException  If an I/O error occurs while writing.
+     */
+    private void writeArrayContents(Writer writer, int indentFactor, int indent) throws JSONException, IOException {
+        int length = this.length();
+        if (length == 1) {
+            writeSingleElement(writer, indentFactor, indent);
+        } else if (length != 0) {
+            writeMultipleElements(writer, indentFactor, indent);
+        }
+    }
+
+    /**
+     * Writes a single element of the JSONArray to the writer.
+     *
+     * @param writer       The writer to which the element is written.
+     * @param indentFactor The number of spaces to add to each level of indentation.
+     * @param indent       The indentation level of the top level.
+     * @throws JSONException If an error occurs while writing the element.
+     */
+    private void writeSingleElement(Writer writer, int indentFactor, int indent) throws JSONException {
+        try {
+            JSONObject.writeValue(writer, this.myArrayList.get(0), indentFactor, indent);
+        } catch (Exception e) {
+            throw new JSONException("Unable to write JSONArray value at index: 0", e);
+        }
+    }
+
+    /**
+     * Writes multiple elements of the JSONArray to the writer, formatting them with proper indentation.
+     *
+     * @param writer       The writer to which the elements are written.
+     * @param indentFactor The number of spaces to add to each level of indentation.
+     * @param indent       The indentation level of the top level.
+     * @throws JSONException If an error occurs while writing the elements.
+     * @throws IOException  If an I/O error occurs while writing.
+     */
+    private void writeMultipleElements(Writer writer, int indentFactor, int indent) throws JSONException, IOException {
+        final int newIndent = indent + indentFactor;
+        boolean needsComma = false;
+
+        for (int i = 0; i < this.length(); i += 1) {
+            if (needsComma) {
+                writer.write(',');
+            }
+            if (indentFactor > 0) {
+                writer.write('\n');
+            }
+            JSONObject.indent(writer, newIndent);
+            writeElement(writer, i, indentFactor, newIndent);
+            needsComma = true;
+        }
+
+        if (indentFactor > 0) {
+            writer.write('\n');
+        }
+        JSONObject.indent(writer, indent);
+    }
+
+    /**
+     * Writes a specific element of the JSONArray to the writer.
+     *
+     * @param writer       The writer to which the element is written.
+     * @param index        The index of the element to write.
+     * @param indentFactor The number of spaces to add to each level of indentation.
+     * @param indent       The indentation level of the top level.
+     * @throws JSONException If an error occurs while writing the element.
+     */
+    private void writeElement(Writer writer, int index, int indentFactor, int indent) throws JSONException {
+        try {
+            JSONObject.writeValue(writer, this.myArrayList.get(index), indentFactor, indent);
+        } catch (Exception e) {
+            throw new JSONException("Unable to write JSONArray value at index: " + index, e);
+        }
+    }
+
+    /**
+     * Writes the closing bracket ']' of the JSONArray to the writer.
+     *
+     * @param writer       The writer to which the closing bracket is written.
+     * @throws IOException If an I/O error occurs while writing.
+     */
+    private void writeArrayEnd(Writer writer) throws IOException {
+        writer.write(']');
     }
 
     /**
