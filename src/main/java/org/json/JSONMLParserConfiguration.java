@@ -1,4 +1,5 @@
 package org.json;
+
 /*
 Public Domain.
 */
@@ -10,16 +11,43 @@ Public Domain.
 public class JSONMLParserConfiguration extends ParserConfiguration {
 
     /**
-     * We can override the default maximum nesting depth if needed.
+     * Default maximum nesting depth for the XML to JSONML parser.
      */
-    public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = ParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH;
+    private static final int DEFAULT_MAXIMUM_NESTING_DEPTH = ParserConfiguration.DEFAULT_MAXIMUM_NESTING_DEPTH;
 
     /** Original Configuration of the XML to JSONML Parser. */
-    public static final JSONMLParserConfiguration ORIGINAL
-        = new JSONMLParserConfiguration();
+    private static final JSONMLParserConfiguration ORIGINAL
+            = new JSONMLParserConfiguration();
     /** Original configuration of the XML to JSONML Parser except that values are kept as strings. */
-    public static final JSONMLParserConfiguration KEEP_STRINGS
-        = new JSONMLParserConfiguration().withKeepStrings(true);
+    private static final JSONMLParserConfiguration KEEP_STRINGS
+            = new JSONMLParserConfiguration().withKeepStrings(true);
+
+    /**
+     * Returns the default maximum nesting depth for the XML to JSONML parser.
+     *
+     * @return The default maximum nesting depth.
+     */
+    public static int getDefaultMaximumNestingDepth() {
+        return DEFAULT_MAXIMUM_NESTING_DEPTH;
+    }
+
+    /**
+     * Returns the original configuration of the XML to JSONML parser.
+     *
+     * @return The original configuration.
+     */
+    public static JSONMLParserConfiguration getOriginalConfiguration() {
+        return ORIGINAL;
+    }
+
+    /**
+     * Returns the configuration of the XML to JSONML parser that keeps values as strings.
+     *
+     * @return The configuration that keeps values as strings.
+     */
+    public static JSONMLParserConfiguration getKeepStringsConfiguration() {
+        return KEEP_STRINGS;
+    }
 
     /**
      * Default parser configuration. Does not keep strings (tries to implicitly convert values).
@@ -31,6 +59,7 @@ public class JSONMLParserConfiguration extends ParserConfiguration {
 
     /**
      * Configure the parser string processing and use the default CDATA Tag Name as "content".
+     *
      * @param keepStrings <code>true</code> to parse all values as string.
      *      <code>false</code> to try and convert XML string values into a JSON value.
      * @param maxNestingDepth <code>int</code> to limit the nesting depth
@@ -44,11 +73,6 @@ public class JSONMLParserConfiguration extends ParserConfiguration {
      */
     @Override
     protected JSONMLParserConfiguration clone() {
-        // future modifications to this method should always ensure a "deep"
-        // clone in the case of collections. i.e. if a Map is added as a configuration
-        // item, a new map instance should be created and if possible each value in the
-        // map should be cloned as well. If the values of the map are known to also
-        // be immutable, then a shallow clone of the map is acceptable.
         return new JSONMLParserConfiguration(
                 this.keepStrings,
                 this.maxNestingDepth

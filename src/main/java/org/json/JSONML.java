@@ -38,7 +38,7 @@ public class JSONML {
         int currentNestingDepth
     ) throws JSONException {
         return parse(x,arrayForm, ja,
-            keepStrings ? JSONMLParserConfiguration.KEEP_STRINGS : JSONMLParserConfiguration.ORIGINAL,
+            keepStrings ? JSONMLParserConfiguration.getKeepStringsConfiguration() : JSONMLParserConfiguration.getOriginalConfiguration(),
             currentNestingDepth);
     }
 
@@ -261,7 +261,7 @@ public class JSONML {
      * @throws JSONException Thrown on error converting to a JSONArray
      */
     public static JSONArray toJSONArray(String string) throws JSONException {
-        return (JSONArray)parse(new XMLTokener(string), true, null, JSONMLParserConfiguration.ORIGINAL, 0);
+        return (JSONArray)parse(new XMLTokener(string), true, null, JSONMLParserConfiguration.getOriginalConfiguration(), 0);
     }
 
 
