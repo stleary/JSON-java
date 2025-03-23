@@ -228,6 +228,19 @@ public class JSONArrayTest {
         Util.checkJSONArrayMaps(jaRaw);
         Util.checkJSONArrayMaps(jaInt);
     }
+    
+    @Test
+    public void jsonArrayByListWithNestedNullValue() {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        Map<String, Object> sub = new HashMap<String, Object>();
+        sub.put("nullKey", null);	
+        list.add(sub);
+        JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withUseNativeNulls(true);
+        JSONArray jsonArray = new JSONArray(list, parserConfiguration);
+        JSONObject subObject = jsonArray.getJSONObject(0);
+        assertTrue(subObject.has("nullKey"));
+        assertEquals(JSONObject.NULL, subObject.get("nullKey"));
+    }
 
     /**
      * Tests consecutive calls to putAll with array and collection.

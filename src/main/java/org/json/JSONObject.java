@@ -332,7 +332,7 @@ public class JSONObject {
         	        throw new NullPointerException("Null key.");
         	    }
                 final Object value = e.getValue();
-                if (value != null) {
+                if (value != null || jsonParserConfiguration.isUseNativeNulls()) {
                     testValidity(value);
                     this.map.put(String.valueOf(e.getKey()), wrap(value, recursionDepth + 1, jsonParserConfiguration));
                 }

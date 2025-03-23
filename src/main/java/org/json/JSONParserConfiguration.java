@@ -8,6 +8,11 @@ public class JSONParserConfiguration extends ParserConfiguration {
      * Used to indicate whether to overwrite duplicate key or not.
      */
     private boolean overwriteDuplicateKey;
+    
+    /**
+     * Used to indicate whether to convert java null values to JSONObject.NULL or ignoring the entry when converting java maps.
+     */
+    private boolean useNativeNulls;
 
     /**
      * Configuration with the default values.
@@ -32,6 +37,7 @@ public class JSONParserConfiguration extends ParserConfiguration {
         clone.strictMode = strictMode;
         clone.maxNestingDepth = maxNestingDepth;
         clone.keepStrings = keepStrings;
+        clone.useNativeNulls = useNativeNulls;
         return clone;
     }
 
@@ -64,6 +70,21 @@ public class JSONParserConfiguration extends ParserConfiguration {
     public JSONParserConfiguration withOverwriteDuplicateKey(final boolean overwriteDuplicateKey) {
         JSONParserConfiguration clone = this.clone();
         clone.overwriteDuplicateKey = overwriteDuplicateKey;
+
+        return clone;
+    }
+    
+    /**
+     * Controls the parser's behavior when meeting Java null values while converting maps.
+     * If set to true, the parser will put a JSONObject.NULL into the resulting JSONObject.
+     * Or the map entry will be ignored.
+     *
+     * @param useNativeNulls defines if the parser should convert null values in Java maps
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    public JSONParserConfiguration withUseNativeNulls(final boolean useNativeNulls) {
+        JSONParserConfiguration clone = this.clone();
+        clone.useNativeNulls = useNativeNulls;
 
         return clone;
     }
@@ -106,6 +127,18 @@ public class JSONParserConfiguration extends ParserConfiguration {
     public boolean isOverwriteDuplicateKey() {
         return this.overwriteDuplicateKey;
     }
+    
+    /**
+     * The parser's behavior when meeting a null value in a java map, controls whether the parser should 
+     * write a JSON entry with a null value (<code>isUseNativeNulls() == true</code>) 
+     * or ignore that map entry (<code>isUseNativeNulls() == false</code>).
+     *
+     * @return The <code>useNativeNulls</code> configuration value.
+     */
+    public boolean isUseNativeNulls() {
+        return this.useNativeNulls;
+    }
+    
 
     /**
      * The parser throws an Exception when strict mode is true and tries to parse invalid JSON characters.
