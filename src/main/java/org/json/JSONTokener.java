@@ -400,25 +400,14 @@ public class JSONTokener {
     /**
      * Get the text up but not including the specified character or the
      * end of line, whichever comes first.
-     * @param  delimiter A delimiter character.
-     * @return   A string.
+     * @param delimiter A delimiter character.
+     * @return A string.
      * @throws JSONException Thrown if there is an error while searching
      *  for the delimiter
      */
     public String nextTo(char delimiter) throws JSONException {
-        StringBuilder sb = new StringBuilder();
-        for (;;) {
-            char c = this.next();
-            if (c == delimiter || c == 0 || c == '\n' || c == '\r') {
-                if (c != 0) {
-                    this.back();
-                }
-                return sb.toString().trim();
-            }
-            sb.append(c);
-        }
+        return nextToInternal(c -> c == delimiter);
     }
-
 
     /**
      * Get the text up but not including one of the specified delimiter
@@ -429,19 +418,58 @@ public class JSONTokener {
      *  for the delimiter
      */
     public String nextTo(String delimiters) throws JSONException {
-        char c;
+        return nextToInternal(c -> delimiters.indexOf(c) >= 0);
+    }
+
+    /**
+     * Internal implementation for nextTo operations.
+     * @param delimiterCheck Function to check if character is a delimiter
+     * @return Collected string up to delimiter
+     * @throws JSONException Thrown if there is an error while reading
+     */
+    private String nextToInternal(java.util.function.Predicate<Character> delimiterCheck)
+            throws JSONException {
         StringBuilder sb = new StringBuilder();
         for (;;) {
-            c = this.next();
-            if (delimiters.indexOf(c) >= 0 || c == 0 ||
-                    c == '\n' || c == '\r') {
-                if (c != 0) {
+            char c = this.next();
+            if (shouldStopReading(c, delimiterCheck)) {
+                if (!isEndOfInput(c)) {
                     this.back();
                 }
                 return sb.toString().trim();
             }
             sb.append(c);
         }
+    }
+
+    /**
+     * Determines whether reading should stop based on the current character.
+     * @param c The current character to check
+     * @param delimiterCheck Predicate to test for delimiter matches
+     * @return true if reading should stop, false otherwise
+     */
+    private boolean shouldStopReading(char c, java.util.function.Predicate<Character> delimiterCheck) {
+        boolean isEndOfInput = isEndOfInput(c);
+        boolean isNewLine = isNewLineCharacter(c);
+        return delimiterCheck.test(c) || isEndOfInput || isNewLine;
+    }
+
+    /**
+     * Checks if a character represents the end of input.
+     * @param c The character to check
+     * @return true if the character is the end-of-input marker (0), false otherwise
+     */
+    private boolean isEndOfInput(char c) {
+        return c == 0;
+    }
+
+    /**
+     * Checks if a character represents a newline.
+     * @param c The character to check
+     * @return true if the character is a newline (\n or \r), false otherwise
+     */
+    private boolean isNewLineCharacter(char c) {
+        return c == '\n' || c == '\r';
     }
 
 
