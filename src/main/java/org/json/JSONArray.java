@@ -325,25 +325,44 @@ public class JSONArray implements Iterable<Object> {
      * Get the boolean value associated with an index. The string values "true"
      * and "false" are converted to boolean.
      *
-     * @param index
-     *            The index must be between 0 and length() - 1.
+     * @param index The index must be between 0 and length() - 1.
      * @return The truth.
-     * @throws JSONException
-     *             If there is no value for the index or if the value is not
-     *             convertible to boolean.
+     * @throws JSONException If there is no value for the index or if the value is not
+     *         convertible to boolean.
      */
     public boolean getBoolean(int index) throws JSONException {
         Object object = this.get(index);
-        if (object.equals(Boolean.FALSE)
-                || (object instanceof String && ((String) object)
-                        .equalsIgnoreCase("false"))) {
+
+        if (isFalse(object)) {
             return false;
-        } else if (object.equals(Boolean.TRUE)
-                || (object instanceof String && ((String) object)
-                        .equalsIgnoreCase("true"))) {
+        }
+        if (isTrue(object)) {
             return true;
         }
+
         throw wrongValueFormatException(index, "boolean", object, null);
+    }
+
+    /**
+     * Checks if the object represents a false value
+     * @param object The object to check
+     * @return true if the object represents false
+     */
+    private boolean isFalse(Object object) {
+        if (object.equals(Boolean.FALSE)) return true;
+        if (!(object instanceof String)) return false;
+        return ((String) object).equalsIgnoreCase("false");
+    }
+
+    /**
+     * Checks if the object represents a true value
+     * @param object The object to check
+     * @return true if the object represents true
+     */
+    private boolean isTrue(Object object) {
+        if (object.equals(Boolean.TRUE)) return true;
+        if (!(object instanceof String)) return false;
+        return ((String) object).equalsIgnoreCase("true");
     }
 
     /**
