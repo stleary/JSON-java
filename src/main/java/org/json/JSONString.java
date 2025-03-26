@@ -12,7 +12,7 @@ Public Domain.
  * <code>toJSONString</code> method will be used instead of the default behavior
  * of using the Object's <code>toString()</code> method and quoting the result.
  */
-public interface JSONString {
+public interface JSONString extends JSONSimilar {
     /**
      * The <code>toJSONString</code> method allows a class to produce its own JSON
      * serialization.
@@ -20,4 +20,17 @@ public interface JSONString {
      * @return A strictly syntactically correct JSON text.
      */
     public String toJSONString();
+
+    /**
+     * Determine if two JSONStrings are similar by comparing their serialized forms.
+     * @param other The other JSONString
+     * @return true if their JSON representations are equal
+     */
+    @Override
+    default boolean similar(Object other) {
+        if (!(other instanceof JSONString)) {
+            return false;
+        }
+        return this.toJSONString().equals(((JSONString)other).toJSONString());
+    }
 }

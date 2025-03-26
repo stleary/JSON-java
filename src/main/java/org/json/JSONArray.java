@@ -60,7 +60,7 @@ import java.util.Map;
  * @author JSON.org
  * @version 2016-08/15
  */
-public class JSONArray implements Iterable<Object> {
+public class JSONArray implements Iterable<Object>, JSONSimilar {
 
     /**
      * The arrayList where the JSONArray's properties are kept.
@@ -1643,44 +1643,21 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Determine if two JSONArrays are similar.
      * They must contain similar sequences.
-     *
      * @param other The other JSONArray
      * @return true if they are equal
      */
+    @Override
     public boolean similar(Object other) {
         if (!(other instanceof JSONArray)) {
             return false;
         }
+        JSONArray otherArray = (JSONArray)other;
         int len = this.length();
-        if (len != ((JSONArray)other).length()) {
+        if (len != otherArray.length()) {
             return false;
         }
         for (int i = 0; i < len; i += 1) {
-            Object valueThis = this.myArrayList.get(i);
-            Object valueOther = ((JSONArray)other).myArrayList.get(i);
-            if(valueThis == valueOther) {
-            	continue;
-            }
-            if(valueThis == null) {
-            	return false;
-            }
-            if (valueThis instanceof JSONObject) {
-                if (!((JSONObject)valueThis).similar(valueOther)) {
-                    return false;
-                }
-            } else if (valueThis instanceof JSONArray) {
-                if (!((JSONArray)valueThis).similar(valueOther)) {
-                    return false;
-                }
-            } else if (valueThis instanceof Number && valueOther instanceof Number) {
-                if (!JSONObject.isNumberSimilar((Number)valueThis, (Number)valueOther)) {
-                	return false;
-                }
-            } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
-                if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
-                    return false;
-                }
-            } else if (!valueThis.equals(valueOther)) {
+            if (!JSONSimilar.compare(this.myArrayList.get(i), otherArray.myArrayList.get(i))) {
                 return false;
             }
         }

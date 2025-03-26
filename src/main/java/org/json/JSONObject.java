@@ -71,7 +71,7 @@ import java.util.regex.Pattern;
  * @author JSON.org
  * @version 2016-08-15
  */
-public class JSONObject {
+public class JSONObject implements JSONSimilar {
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
      * whilst Java's null is equivalent to the value that JavaScript calls
@@ -2358,45 +2358,21 @@ public class JSONObject {
      * Determine if two JSONObjects are similar.
      * They must contain the same set of names which must be associated with
      * similar values.
-     *
      * @param other The other JSONObject
      * @return true if they are equal
      */
+    @Override
     public boolean similar(Object other) {
         try {
             if (!(other instanceof JSONObject)) {
                 return false;
             }
-            if (!this.keySet().equals(((JSONObject)other).keySet())) {
+            JSONObject otherObj = (JSONObject)other;
+            if (!this.keySet().equals(otherObj.keySet())) {
                 return false;
             }
-            for (final Entry<String,?> entry : this.entrySet()) {
-                String name = entry.getKey();
-                Object valueThis = entry.getValue();
-                Object valueOther = ((JSONObject)other).get(name);
-                if(valueThis == valueOther) {
-                	continue;
-                }
-                if(valueThis == null) {
-                	return false;
-                }
-                if (valueThis instanceof JSONObject) {
-                    if (!((JSONObject)valueThis).similar(valueOther)) {
-                        return false;
-                    }
-                } else if (valueThis instanceof JSONArray) {
-                    if (!((JSONArray)valueThis).similar(valueOther)) {
-                        return false;
-                    }
-                } else if (valueThis instanceof Number && valueOther instanceof Number) {
-                    if (!isNumberSimilar((Number)valueThis, (Number)valueOther)) {
-                    	return false;
-                    }
-                } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
-                    if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
-                    	return false;
-                    }
-                } else if (!valueThis.equals(valueOther)) {
+            for (Map.Entry<String,?> entry : this.entrySet()) {
+                if (!JSONSimilar.compare(entry.getValue(), otherObj.get(entry.getKey()))) {
                     return false;
                 }
             }
