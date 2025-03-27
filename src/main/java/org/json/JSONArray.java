@@ -62,6 +62,9 @@ import java.util.Map;
  */
 public class JSONArray implements Iterable<Object>, JSONSimilar {
 
+    private static final int commaMultiplier = 2; // Each value requires a comma in output
+    private static final int minimumBufferSize = 16; // Minimum reasonable buffer size for small arrays
+
     /**
      * The arrayList where the JSONArray's properties are kept.
      */
@@ -1739,8 +1742,8 @@ public class JSONArray implements Iterable<Object>, JSONSimilar {
     public String toString(int indentFactor) throws JSONException {
         // each value requires a comma, so multiply the count by 2
         // We don't want to oversize the initial capacity
-        int initialSize = myArrayList.size() * 2;
-        Writer sw = new StringBuilderWriter(Math.max(initialSize, 16));
+        int initialSize = myArrayList.size() * commaMultiplier;
+        Writer sw = new StringBuilderWriter(Math.max(initialSize, minimumBufferSize));
         return this.write(sw, indentFactor, 0).toString();
     }
 
