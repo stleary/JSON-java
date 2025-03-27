@@ -100,11 +100,15 @@ public class CDL {
         for (;;) {
             String value = getValue(x,delimiter);
             char c = x.next();
-            if (value == null ||
-                    (ja.length() == 0 && value.length() == 0 && c != delimiter)) {
+            if (value != null) {
+                ja.put(value);
+            } else if (ja.length() == 0 && c != delimiter) {
                 return null;
+            } else {
+                // This line accounts for CSV ending with no newline
+                ja.put("");
             }
-            ja.put(value);
+
             for (;;) {
                 if (c == delimiter) {
                     break;
@@ -306,6 +310,17 @@ public class CDL {
         }
         if (ja.length() == 0) {
             return null;
+        }
+
+        // The following block accounts for empty datasets (no keys or vals)
+        if (ja.length() == 1) {
+            JSONObject j = ja.getJSONObject(0);
+            if (j.length() == 1) {
+                String key = j.keys().next();
+                if ("".equals(key) && "".equals(j.get(key))) {
+                    return null;
+                }
+            }
         }
         return ja;
     }
