@@ -63,6 +63,12 @@ import java.util.Map;
 public class JSONArray implements Iterable<Object>, JSONSimilar {
 
     /**
+     * The constants used for the method toString to eliminate magic number code smell.
+     */
+    private static final int commaMultiplier = 2; // Each value requires a comma in output
+    private static final int minimumBufferSize = 16; // Minimum reasonable buffer size for small arrays
+
+    /**
      * The arrayList where the JSONArray's properties are kept.
      */
     private final ArrayList<Object> myArrayList;
@@ -1710,11 +1716,11 @@ public class JSONArray implements Iterable<Object>, JSONSimilar {
 
     /**
      * Make a pretty-printed JSON text of this JSONArray.
-     * 
+     *
      * <p>If <pre> {@code indentFactor > 0}</pre> and the {@link JSONArray} has only
      * one element, then the array will be output on a single line:
      * <pre>{@code [1]}</pre>
-     * 
+     *
      * <p>If an array has 2 or more elements, then it will be output across
      * multiple lines: <pre>{@code
      * [
@@ -1726,9 +1732,8 @@ public class JSONArray implements Iterable<Object>, JSONSimilar {
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      * </b>
-     * 
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
+     *
+     * @param indentFactor The number of spaces to add to each level of indentation.
      * @return a printable, displayable, transmittable representation of the
      *         object, beginning with <code>[</code>&nbsp;<small>(left
      *         bracket)</small> and ending with <code>]</code>
@@ -1737,25 +1742,18 @@ public class JSONArray implements Iterable<Object>, JSONSimilar {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        // each value requires a comma, so multiply the count by 2
-        // We don't want to oversize the initial capacity
-        int initialSize = myArrayList.size() * 2;
-        Writer sw = new StringBuilderWriter(Math.max(initialSize, 16));
-        return this.write(sw, indentFactor, 0).toString();
+        int initialSize = calculateInitialBufferSize(commaMultiplier);
+        Writer stringWriter = new StringBuilderWriter(Math.max(initialSize, minimumBufferSize));
+        return this.write(stringWriter, indentFactor, 0).toString();
     }
 
     /**
-     * Write the contents of the JSONArray as JSON text to a writer. For
-     * compactness, no whitespace is added.
-     * <p><b>
-     * Warning: This method assumes that the data structure is acyclical.
-     *</b>
-     * @param writer the writer object
-     * @return The writer.
-     * @throws JSONException if a called function fails
+     * Calculates the initial buffer size needed for JSON string representation.
+     * @param elementsPerItem Multiplier accounting for commas between elements
+     * @return Calculated initial size based on array contents
      */
-    public Writer write(Writer writer) throws JSONException {
-        return this.write(writer, 0, 0);
+    private int calculateInitialBufferSize(int elementsPerItem) {
+        return myArrayList.size() * elementsPerItem;
     }
 
     /**
