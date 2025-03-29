@@ -26,16 +26,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-import org.json.CDL;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
-import org.json.JSONParserConfiguration;
-import org.json.JSONString;
-import org.json.JSONTokener;
-import org.json.ParserConfiguration;
-import org.json.XML;
+import org.json.*;
 import org.json.junit.data.BrokenToString;
 import org.json.junit.data.ExceptionalBean;
 import org.json.junit.data.Fraction;
@@ -2041,18 +2032,18 @@ public class JSONObjectTest {
     }
 
     /**
-     * Exercises the JSONObject.valueToString() method for various types
+     * Exercises the JSONWriter.valueToString() method for various types
      */
     @Test
     public void valueToString() {
         
         assertTrue("null valueToString() incorrect",
-                "null".equals(JSONObject.valueToString(null)));
+                "null".equals(JSONWriter.valueToString(null)));
         MyJsonString jsonString = new MyJsonString();
         assertTrue("jsonstring valueToString() incorrect",
-                "my string".equals(JSONObject.valueToString(jsonString)));
+                "my string".equals(JSONWriter.valueToString(jsonString)));
         assertTrue("boolean valueToString() incorrect",
-                "true".equals(JSONObject.valueToString(Boolean.TRUE)));
+                "true".equals(JSONWriter.valueToString(Boolean.TRUE)));
         assertTrue("non-numeric double",
                 "null".equals(JSONObject.doubleToString(Double.POSITIVE_INFINITY)));
         String jsonObjectStr = 
@@ -2063,32 +2054,32 @@ public class JSONObjectTest {
              "}";
         JSONObject jsonObject = new JSONObject(jsonObjectStr);
         assertTrue("jsonObject valueToString() incorrect",
-            new JSONObject(JSONObject.valueToString(jsonObject))
+            new JSONObject(JSONWriter.valueToString(jsonObject))
                 .similar(new JSONObject(jsonObject.toString()))
             );
         String jsonArrayStr = 
             "[1,2,3]";
         JSONArray jsonArray = new JSONArray(jsonArrayStr);
         assertTrue("jsonArray valueToString() incorrect",
-                JSONObject.valueToString(jsonArray).equals(jsonArray.toString()));
+                JSONWriter.valueToString(jsonArray).equals(jsonArray.toString()));
         Map<String, String> map = new HashMap<String, String>();
         map.put("key1", "val1");
         map.put("key2", "val2");
         map.put("key3", "val3");
         assertTrue("map valueToString() incorrect",
          new JSONObject(jsonObject.toString())
-         .similar(new JSONObject(JSONObject.valueToString(map))));
+         .similar(new JSONObject(JSONWriter.valueToString(map))));
         Collection<Integer> collection = new ArrayList<Integer>();
         collection.add(Integer.valueOf(1));
         collection.add(Integer.valueOf(2));
         collection.add(Integer.valueOf(3));
         assertTrue("collection valueToString() expected: "+
                 jsonArray.toString()+ " actual: "+
-                JSONObject.valueToString(collection),
-                jsonArray.toString().equals(JSONObject.valueToString(collection))); 
+                JSONWriter.valueToString(collection),
+                jsonArray.toString().equals(JSONWriter.valueToString(collection)));
         Integer[] array = { Integer.valueOf(1), Integer.valueOf(2), Integer.valueOf(3) };
         assertTrue("array valueToString() incorrect",
-                jsonArray.toString().equals(JSONObject.valueToString(array)));
+                jsonArray.toString().equals(JSONWriter.valueToString(array)));
         Util.checkJSONObjectMaps(jsonObject);
         Util.checkJSONArrayMaps(jsonArray, jsonObject.getMapType());
     }
@@ -2104,7 +2095,7 @@ public class JSONObjectTest {
         Map<Integer, String> myMap = new HashMap<Integer, String>();
         myMap.put(1,  "myValue");
         // this is the test, it should not throw an exception
-        String str = JSONObject.valueToString(myMap);
+        String str = JSONWriter.valueToString(myMap);
         // confirm result, just in case
         Object doc = Configuration.defaultConfiguration().jsonProvider().parse(str);
         assertTrue("expected 1 top level item", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 1);

@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONStringer;
+import org.json.JSONWriter;
 import org.json.junit.data.MyEnum;
 import org.json.junit.data.MyEnumClass;
 import org.json.junit.data.MyEnumField;
@@ -191,10 +193,10 @@ public class EnumTest {
         MyEnumField myEnumField = MyEnumField.VAL1;
         MyEnumClass myEnumClass = new MyEnumClass();
         
-        String str1 = JSONObject.valueToString(myEnum);
+        String str1 = JSONWriter.valueToString(myEnum);
         assertTrue("actual myEnum: "+str1+" expected: "+expectedStr1,
                 str1.equals(expectedStr1));
-        String str2 = JSONObject.valueToString(myEnumField);
+        String str2 = JSONWriter.valueToString(myEnumField);
         assertTrue("actual myEnumField: "+str2+" expected: "+expectedStr2,
                 str2.equals(expectedStr2));
 
@@ -205,7 +207,7 @@ public class EnumTest {
         String expectedStr3 = "\"org.json.junit.data.MyEnumClass@";
         myEnumClass.setMyEnum(MyEnum.VAL1);
         myEnumClass.setMyEnumField(MyEnumField.VAL1);
-        String str3 = JSONObject.valueToString(myEnumClass);
+        String str3 = JSONWriter.valueToString(myEnumClass);
         assertTrue("actual myEnumClass: "+str3+" expected: "+expectedStr3,
                 str3.startsWith(expectedStr3));
     }

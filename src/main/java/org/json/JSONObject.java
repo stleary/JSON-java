@@ -2607,7 +2607,7 @@ public class JSONObject implements JSONSimilar {
     @Override
     public String toString() {
         try {
-            return JSONStringer.format(this, 0);
+            return JSONWriter.format(this, 0);
         } catch (Exception e) {
             return null;
         }
@@ -2641,39 +2641,7 @@ public class JSONObject implements JSONSimilar {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        return JSONStringer.format(this, indentFactor);
-    }
-
-    /**
-     * Make a JSON text of an Object value. If the object has an
-     * value.toJSONString() method, then that method will be used to produce the
-     * JSON text. The method is required to produce a strictly conforming text.
-     * If the object does not contain a toJSONString method (which is the most
-     * common case), then a text will be produced by other means. If the value
-     * is an array or Collection, then a JSONArray will be made from it and its
-     * toJSONString method will be called. If the value is a MAP, then a
-     * JSONObject will be made from it and its toJSONString method will be
-     * called. Otherwise, the value's toString method will be called, and the
-     * result will be quoted.
-     *
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     *
-     * @param value
-     *            The value to be serialized.
-     * @return a printable, displayable, transmittable representation of the
-     *         object, beginning with <code>{</code>&nbsp;<small>(left
-     *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
-     *         brace)</small>.
-     * @throws JSONException
-     *             If the value is or contains an invalid number.
-     */
-    public static String valueToString(Object value) throws JSONException {
-    	// moves the implementation to JSONWriter as:
-    	// 1. It makes more sense to be part of the writer class
-    	// 2. For Android support this method is not available. By implementing it in the Writer
-    	//    Android users can use the writer with the built in Android JSONObject implementation.
-        return JSONWriter.valueToString(value);
+        return JSONWriter.format(this, indentFactor);
     }
 
     /**
@@ -2774,63 +2742,7 @@ public class JSONObject implements JSONSimilar {
      * @throws JSONException if a called function has an error
      */
     public Writer write(Writer writer) throws JSONException {
-        return this.write(writer, 0, 0);
-    }
-
-    @SuppressWarnings("resource")
-    static final Writer writeValue(Writer writer, Object value,
-            int indentFactor, int indent) throws JSONException, IOException {
-        if (value == null || value.equals(null)) {
-            writer.write("null");
-        } else if (value instanceof JSONString) {
-            // JSONString must be checked first, so it can overwrite behaviour of other types below
-            Object o;
-            try {
-                o = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
-        } else if (value instanceof String) {
-            // assuming most values are Strings, so testing it early
-            quote(value.toString(), writer);
-            return writer;
-        } else if (value instanceof Number) {
-            // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
-            final String numberAsString = numberToString((Number) value);
-            if(NUMBER_PATTERN.matcher(numberAsString).matches()) {
-                writer.write(numberAsString);
-            } else {
-                // The Number value is not a valid JSON number.
-                // Instead we will quote it as a string
-                quote(numberAsString, writer);
-            }
-        } else if (value instanceof Boolean) {
-            writer.write(value.toString());
-        } else if (value instanceof Enum<?>) {
-            writer.write(quote(((Enum<?>)value).name()));
-        } else if (value instanceof JSONObject) {
-            ((JSONObject) value).write(writer, indentFactor, indent);
-        } else if (value instanceof JSONArray) {
-            ((JSONArray) value).write(writer, indentFactor, indent);
-        } else if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            new JSONObject(map).write(writer, indentFactor, indent);
-        } else if (value instanceof Collection) {
-            Collection<?> coll = (Collection<?>) value;
-            new JSONArray(coll).write(writer, indentFactor, indent);
-        } else if (value.getClass().isArray()) {
-            new JSONArray(value).write(writer, indentFactor, indent);
-        } else {
-            quote(value.toString(), writer);
-        }
-        return writer;
-    }
-
-    static final void indent(Writer writer, int indent) throws IOException {
-        for (int i = 0; i < indent; i += 1) {
-            writer.write(' ');
-        }
+        return JSONWriter.format(this, writer, 0, 0);
     }
 
     /**
@@ -2861,59 +2773,8 @@ public class JSONObject implements JSONSimilar {
      * occurs
      */
     @SuppressWarnings("resource")
-    public Writer write(Writer writer, int indentFactor, int indent)
-            throws JSONException {
-        try {
-            boolean needsComma = false;
-            final int length = this.length();
-            writer.write('{');
-
-            if (length == 1) {
-            	final Entry<String,?> entry = this.entrySet().iterator().next();
-                final String key = entry.getKey();
-                writer.write(quote(key));
-                writer.write(':');
-                if (indentFactor > 0) {
-                    writer.write(' ');
-                }
-                try{
-                    writeValue(writer, entry.getValue(), indentFactor, indent);
-                } catch (Exception e) {
-                    throw new JSONException("Unable to write JSONObject value for key: " + key, e);
-                }
-            } else if (length != 0) {
-                final int newIndent = indent + indentFactor;
-                for (final Entry<String,?> entry : this.entrySet()) {
-                    if (needsComma) {
-                        writer.write(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.write('\n');
-                    }
-                    indent(writer, newIndent);
-                    final String key = entry.getKey();
-                    writer.write(quote(key));
-                    writer.write(':');
-                    if (indentFactor > 0) {
-                        writer.write(' ');
-                    }
-                    try {
-                        writeValue(writer, entry.getValue(), indentFactor, newIndent);
-                    } catch (Exception e) {
-                        throw new JSONException("Unable to write JSONObject value for key: " + key, e);
-                    }
-                    needsComma = true;
-                }
-                if (indentFactor > 0) {
-                    writer.write('\n');
-                }
-                indent(writer, indent);
-            }
-            writer.write('}');
-            return writer;
-        } catch (IOException exception) {
-            throw new JSONException(exception);
-        }
+    public Writer write(Writer writer, int indentFactor, int indent) throws JSONException {
+        return JSONWriter.format(this, writer, indentFactor, indent);
     }
 
     /**
