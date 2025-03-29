@@ -2607,7 +2607,7 @@ public class JSONObject implements JSONSimilar {
     @Override
     public String toString() {
         try {
-            return this.toString(0);
+            return JSONStringer.format(this, 0);
         } catch (Exception e) {
             return null;
         }
@@ -2641,11 +2641,7 @@ public class JSONObject implements JSONSimilar {
      */
     @SuppressWarnings("resource")
     public String toString(int indentFactor) throws JSONException {
-        // 6 characters are the minimum to serialise a key value pair e.g.: "k":1,
-        // and we don't want to oversize the initial capacity
-        int initialSize = map.size() * 6;
-        Writer w = new StringBuilderWriter(Math.max(initialSize, 16));
-        return this.write(w, indentFactor, 0).toString();
+        return JSONStringer.format(this, indentFactor);
     }
 
     /**

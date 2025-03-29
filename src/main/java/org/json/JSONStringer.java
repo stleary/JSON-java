@@ -4,7 +4,11 @@ package org.json;
 Public Domain.
 */
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * JSONStringer provides a quick and convenient way of producing JSON text
@@ -149,5 +153,109 @@ public class JSONStringer {
     @Override
     public String toString() {
         return writer.mode == 'd' ? stringWriter.toString() : null;
+    }
+
+    /**
+     * Format a JSONObject to string with indentation
+     */
+    public static String format(JSONObject jsonObject, int indentFactor) throws JSONException {
+        StringBuilderWriter w = new StringBuilderWriter(Math.max(jsonObject.length() * 6, 16));
+        format(jsonObject, w, indentFactor, 0);
+        return w.toString();
+    }
+
+    /**
+     * Format a JSONObject to a Writer with indentation
+     */
+    public static Writer format(JSONObject jsonObject, Writer writer,
+                                int indentFactor, int indent) throws JSONException {
+        try {
+            boolean needsComma = false;
+            final int length = jsonObject.length();
+            writer.write('{');
+
+            if (length == 1) {
+                Map.Entry<String,?> entry = jsonObject.entrySet().iterator().next();
+                writeEntry(writer, entry, indentFactor, indent);
+            } else if (length != 0) {
+                final int newIndent = indent + indentFactor;
+                for (Map.Entry<String,?> entry : jsonObject.entrySet()) {
+                    if (needsComma) {
+                        writer.write(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.write('\n');
+                    }
+                    indent(writer, newIndent);
+                    writeEntry(writer, entry, indentFactor, newIndent);
+                    needsComma = true;
+                }
+                if (indentFactor > 0) {
+                    writer.write('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.write('}');
+            return writer;
+        } catch (IOException exception) {
+            throw new JSONException(exception);
+        }
+    }
+
+    private static void writeEntry(Writer writer, Map.Entry<String,?> entry,
+                                   int indentFactor, int indent) throws IOException, JSONException {
+        String key = entry.getKey();
+        writer.write(JSONObject.quote(key));
+        writer.write(':');
+        if (indentFactor > 0) {
+            writer.write(' ');
+        }
+        writeValue(writer, entry.getValue(), indentFactor, indent);
+    }
+
+    private static void writeValue(Writer writer, Object value,
+                                   int indentFactor, int indent) throws JSONException, IOException {
+        if (value == null || value.equals(null)) {
+            writer.write("null");
+        } else if (value instanceof JSONString) {
+            Object o;
+            try {
+                o = ((JSONString) value).toJSONString();
+            } catch (Exception e) {
+                throw new JSONException(e);
+            }
+            writer.write(o != null ? o.toString() : JSONObject.quote(value.toString()));
+        } else if (value instanceof String) {
+            JSONObject.quote(value.toString(), writer);
+        } else if (value instanceof Number) {
+            String numberAsString = JSONObject.numberToString((Number) value);
+            if(JSONObject.NUMBER_PATTERN.matcher(numberAsString).matches()) {
+                writer.write(numberAsString);
+            } else {
+                JSONObject.quote(numberAsString, writer);
+            }
+        } else if (value instanceof Boolean) {
+            writer.write(value.toString());
+        } else if (value instanceof Enum<?>) {
+            writer.write(JSONObject.quote(((Enum<?>)value).name()));
+        } else if (value instanceof JSONObject) {
+            format((JSONObject) value, writer, indentFactor, indent);
+        } else if (value instanceof JSONArray) {
+            ((JSONArray) value).write(writer, indentFactor, indent);
+        } else if (value instanceof Map) {
+            new JSONObject((Map<?,?>) value).write(writer, indentFactor, indent);
+        } else if (value instanceof Collection) {
+            new JSONArray((Collection<?>) value).write(writer, indentFactor, indent);
+        } else if (value.getClass().isArray()) {
+            new JSONArray(value).write(writer, indentFactor, indent);
+        } else {
+            JSONObject.quote(value.toString(), writer);
+        }
+    }
+
+    private static void indent(Writer writer, int indent) throws IOException {
+        for (int i = 0; i < indent; i += 1) {
+            writer.write(' ');
+        }
     }
 }
