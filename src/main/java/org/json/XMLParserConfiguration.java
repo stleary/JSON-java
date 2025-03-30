@@ -22,6 +22,16 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
 //    public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = 512; // We could override
 
+    /**
+     * Allow user to control how numbers are parsed
+     */
+    private boolean keepNumberAsString;
+
+    /**
+     * Allow user to control how booleans are parsed
+     */
+    private boolean keepBooleanAsString;
+
     /** Original Configuration of the XML Parser. */
     public static final XMLParserConfiguration ORIGINAL
         = new XMLParserConfiguration();
@@ -142,7 +152,9 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
     @Deprecated
     public XMLParserConfiguration (final boolean keepStrings, final String cDataTagName, final boolean convertNilAttributeToNull) {
-        super(keepStrings, DEFAULT_MAXIMUM_NESTING_DEPTH);
+        super(false, DEFAULT_MAXIMUM_NESTING_DEPTH);
+        this.keepNumberAsString = keepStrings;
+        this.keepBooleanAsString = keepStrings;
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
     }
@@ -163,8 +175,10 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
     private XMLParserConfiguration (final boolean keepStrings, final String cDataTagName,
             final boolean convertNilAttributeToNull, final Map<String, XMLXsiTypeConverter<?>> xsiTypeMap, final Set<String> forceList,
-            final int maxNestingDepth, final boolean closeEmptyTag) {
-        super(keepStrings, maxNestingDepth);
+            final int maxNestingDepth, final boolean closeEmptyTag, final boolean keepNumberAsString, final boolean keepBooleanAsString) {
+        super(false, maxNestingDepth);
+        this.keepNumberAsString = keepNumberAsString;
+        this.keepBooleanAsString = keepBooleanAsString;
         this.cDataTagName = cDataTagName;
         this.convertNilAttributeToNull = convertNilAttributeToNull;
         this.xsiTypeMap = Collections.unmodifiableMap(xsiTypeMap);
@@ -189,7 +203,9 @@ public class XMLParserConfiguration extends ParserConfiguration {
                 this.xsiTypeMap,
                 this.forceList,
                 this.maxNestingDepth,
-                this.closeEmptyTag
+                this.closeEmptyTag,
+                this.keepNumberAsString,
+                this.keepBooleanAsString
         );
         config.shouldTrimWhiteSpace = this.shouldTrimWhiteSpace;
         return config;
@@ -207,7 +223,40 @@ public class XMLParserConfiguration extends ParserConfiguration {
     @SuppressWarnings("unchecked")
     @Override
     public XMLParserConfiguration withKeepStrings(final boolean newVal) {
-        return super.withKeepStrings(newVal);
+        XMLParserConfiguration newConfig = this.clone();
+        newConfig.keepNumberAsString = newVal;
+        newConfig.keepBooleanAsString = newVal;
+        return newConfig;
+    }
+
+    /**
+     * When parsing the XML into JSON, specifies if numbers should be kept as strings (<code>1</code>), or if
+     * they should try to be guessed into JSON values (numeric, boolean, string)
+     *
+     * @param newVal
+     *      new value to use for the <code>keepNumberAsString</code> configuration option.
+     *
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    public XMLParserConfiguration withKeepNumberAsString(final boolean newVal) {
+        XMLParserConfiguration newConfig = this.clone();
+        newConfig.keepNumberAsString = newVal;
+        return newConfig;
+    }
+
+    /**
+     * When parsing the XML into JSON, specifies if booleans should be kept as strings (<code>true</code>), or if
+     * they should try to be guessed into JSON values (numeric, boolean, string)
+     *
+     * @param newVal
+     *      new value to use for the <code>withKeepBooleanAsString</code> configuration option.
+     *
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    public XMLParserConfiguration withKeepBooleanAsString(final boolean newVal) {
+        XMLParserConfiguration newConfig = this.clone();
+        newConfig.keepBooleanAsString = newVal;
+        return newConfig;
     }
 
     /**
@@ -219,6 +268,26 @@ public class XMLParserConfiguration extends ParserConfiguration {
      */
     public String getcDataTagName() {
         return this.cDataTagName;
+    }
+
+    /**
+     * When parsing the XML into JSONML, specifies if numbers should be kept as strings (<code>true</code>), or if
+     * they should try to be guessed into JSON values (numeric, boolean, string).
+     *
+     * @return The <code>keepStrings</code> configuration value.
+     */
+    public boolean isKeepNumberAsString() {
+        return this.keepNumberAsString;
+    }
+
+    /**
+     * When parsing the XML into JSONML, specifies if booleans should be kept as strings (<code>true</code>), or if
+     * they should try to be guessed into JSON values (numeric, boolean, string).
+     *
+     * @return The <code>keepStrings</code> configuration value.
+     */
+    public boolean isKeepBooleanAsString() {
+        return this.keepBooleanAsString;
     }
 
     /**

@@ -574,15 +574,18 @@ public class XMLConfigurationTest {
         XMLParserConfiguration keepStringsAndCloseEmptyTag = keepStrings.withCloseEmptyTag(true);
         XMLParserConfiguration keepDigits = keepStringsAndCloseEmptyTag.withKeepStrings(false);
         XMLParserConfiguration keepDigitsAndNoCloseEmptyTag = keepDigits.withCloseEmptyTag(false);
-        assertTrue(keepStrings.isKeepStrings());
+        assertTrue(keepStrings.isKeepNumberAsString());
+        assertTrue(keepStrings.isKeepBooleanAsString());
         assertFalse(keepStrings.isCloseEmptyTag());
-        assertTrue(keepStringsAndCloseEmptyTag.isKeepStrings());
+        assertTrue(keepStringsAndCloseEmptyTag.isKeepNumberAsString());
+        assertTrue(keepStringsAndCloseEmptyTag.isKeepBooleanAsString());
         assertTrue(keepStringsAndCloseEmptyTag.isCloseEmptyTag());
-        assertFalse(keepDigits.isKeepStrings());
+        assertFalse(keepDigits.isKeepNumberAsString());
+        assertFalse(keepDigits.isKeepBooleanAsString());
         assertTrue(keepDigits.isCloseEmptyTag());
-        assertFalse(keepDigitsAndNoCloseEmptyTag.isKeepStrings());
+        assertFalse(keepDigitsAndNoCloseEmptyTag.isKeepNumberAsString());
+        assertFalse(keepDigitsAndNoCloseEmptyTag.isKeepBooleanAsString());
         assertFalse(keepDigitsAndNoCloseEmptyTag.isCloseEmptyTag());
-
     }
 
     /**
@@ -764,6 +767,30 @@ public class XMLConfigurationTest {
         final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":true}}");
         final JSONObject actualJsonOutput = XML.toJSONObject(originalXml, 
                 new XMLParserConfiguration().withKeepStrings(false));
+        Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
+    }
+
+    /**
+     * JSON string lost leading zero and converted "True" to true.
+     */
+    @Test
+    public void testToJSONArray_jsonOutput_withKeepNumberAsString() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":true}}");
+        final JSONObject actualJsonOutput = XML.toJSONObject(originalXml,
+                new XMLParserConfiguration().withKeepNumberAsString(true));
+        Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
+    }
+
+    /**
+     * JSON string lost leading zero and converted "True" to true.
+     */
+    @Test
+    public void testToJSONArray_jsonOutput_withKeepBooleanAsString() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":\"True\"}}");
+        final JSONObject actualJsonOutput = XML.toJSONObject(originalXml,
+                new XMLParserConfiguration().withKeepBooleanAsString(true));
         Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
     }
 

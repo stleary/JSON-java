@@ -355,10 +355,20 @@ public class XML {
                                 && TYPE_ATTR.equals(string)) {
                             xmlXsiTypeConverter = config.getXsiTypeMap().get(token);
                         } else if (!nilAttributeFound) {
-                            jsonObject.accumulate(string,
-                                    config.isKeepStrings()
-                                            ? ((String) token)
-                                            : stringToValue((String) token));
+                            Object obj = stringToValue((String) token);
+                            if (obj instanceof Boolean) {
+                                jsonObject.accumulate(string,
+                                        config.isKeepBooleanAsString()
+                                                ? ((String) token)
+                                                : obj);
+                            } else if (obj instanceof Number) {
+                                jsonObject.accumulate(string,
+                                        config.isKeepNumberAsString()
+                                                ? ((String) token)
+                                                : obj);
+                            } else {
+                                jsonObject.accumulate(string, stringToValue((String) token));
+                            }
                         }
                         token = null;
                     } else {
@@ -407,8 +417,20 @@ public class XML {
                                     jsonObject.accumulate(config.getcDataTagName(),
                                             stringToValue(string, xmlXsiTypeConverter));
                                 } else {
-                                    jsonObject.accumulate(config.getcDataTagName(),
-                                            config.isKeepStrings() ? string : stringToValue(string));
+                                    Object obj = stringToValue((String) token);
+                                    if (obj instanceof Boolean) {
+                                        jsonObject.accumulate(config.getcDataTagName(),
+                                                config.isKeepBooleanAsString()
+                                                        ? ((String) token)
+                                                        : obj);
+                                    } else if (obj instanceof Number) {
+                                        jsonObject.accumulate(config.getcDataTagName(),
+                                                config.isKeepNumberAsString()
+                                                        ? ((String) token)
+                                                        : obj);
+                                    } else {
+                                        jsonObject.accumulate(config.getcDataTagName(), stringToValue((String) token));
+                                    }
                                 }
                             }
 
@@ -700,6 +722,44 @@ public class XML {
      * &lt;[ [ ]]>}</pre>
      * are ignored.
      *
+     * All numbers are converted as strings, for 1, 01, 29.0 will not be coerced to
+     * numbers but will instead be the exact value as seen in the XML document depending
+     * on how flag is set.
+     * All booleans are converted as strings, for true, false will not be coerced to
+     * booleans but will instead be the exact value as seen in the XML document depending
+     * on how flag is set.
+     *
+     * @param reader The XML source reader.
+     * @param keepNumberAsString If true, then numeric values will not be coerced into
+     *  numeric values and will instead be left as strings
+     * @param keepBooleanAsString If true, then boolean values will not be coerced into
+     *      *  numeric values and will instead be left as strings
+     * @return A JSONObject containing the structured data from the XML string.
+     * @throws JSONException Thrown if there is an errors while parsing the string
+     */
+    public static JSONObject toJSONObject(Reader reader, boolean keepNumberAsString, boolean keepBooleanAsString) throws JSONException {
+        XMLParserConfiguration xmlParserConfiguration = new XMLParserConfiguration();
+        if(keepNumberAsString) {
+            xmlParserConfiguration = xmlParserConfiguration.withKeepNumberAsString(keepNumberAsString);
+        }
+        if(keepBooleanAsString) {
+            xmlParserConfiguration = xmlParserConfiguration.withKeepBooleanAsString(keepBooleanAsString);
+        }
+        return toJSONObject(reader, xmlParserConfiguration);
+    }
+
+    /**
+     * Convert a well-formed (but not necessarily valid) XML into a
+     * JSONObject. Some information may be lost in this transformation because
+     * JSON is a data format and XML is a document format. XML uses elements,
+     * attributes, and content text, while JSON uses unordered collections of
+     * name/value pairs and arrays of values. JSON does not does not like to
+     * distinguish between elements and attributes. Sequences of similar
+     * elements are represented as JSONArrays. Content text may be placed in a
+     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * &lt;[ [ ]]>}</pre>
+     * are ignored.
+     *
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
      * numbers but will instead be the exact value as seen in the XML document.
      *
@@ -744,6 +804,38 @@ public class XML {
      */
     public static JSONObject toJSONObject(String string, boolean keepStrings) throws JSONException {
         return toJSONObject(new StringReader(string), keepStrings);
+    }
+
+    /**
+     * Convert a well-formed (but not necessarily valid) XML string into a
+     * JSONObject. Some information may be lost in this transformation because
+     * JSON is a data format and XML is a document format. XML uses elements,
+     * attributes, and content text, while JSON uses unordered collections of
+     * name/value pairs and arrays of values. JSON does not does not like to
+     * distinguish between elements and attributes. Sequences of similar
+     * elements are represented as JSONArrays. Content text may be placed in a
+     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * &lt;[ [ ]]>}</pre>
+     * are ignored.
+     *
+     * All numbers are converted as strings, for 1, 01, 29.0 will not be coerced to
+     * numbers but will instead be the exact value as seen in the XML document depending
+     * on how flag is set.
+     * All booleans are converted as strings, for true, false will not be coerced to
+     * booleans but will instead be the exact value as seen in the XML document depending
+     * on how flag is set.
+     *
+     * @param string
+     *            The source string.
+     * @param keepNumberAsString If true, then numeric values will not be coerced into
+     *  numeric values and will instead be left as strings
+     * @param keepBooleanAsString If true, then boolean values will not be coerced into
+     *  numeric values and will instead be left as strings
+     * @return A JSONObject containing the structured data from the XML string.
+     * @throws JSONException Thrown if there is an errors while parsing the string
+     */
+    public static JSONObject toJSONObject(String string, boolean keepNumberAsString, boolean keepBooleanAsString) throws JSONException {
+        return toJSONObject(new StringReader(string), keepNumberAsString, keepBooleanAsString);
     }
 
     /**
