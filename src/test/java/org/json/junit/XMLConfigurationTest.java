@@ -795,6 +795,31 @@ public class XMLConfigurationTest {
     }
 
     /**
+     * Test keepStrings behavior when setting keepBooleanAsString, keepNumberAsString
+     */
+    @Test
+    public void test_keepStringBehavior() {
+        XMLParserConfiguration xpc = new XMLParserConfiguration().withKeepStrings(true);
+        assertEquals(xpc.isKeepStrings(), true);
+
+        xpc = xpc.withKeepBooleanAsString(true);
+        xpc = xpc.withKeepNumberAsString(false);
+        assertEquals(xpc.isKeepStrings(), false);
+
+        xpc = xpc.withKeepBooleanAsString(false);
+        xpc = xpc.withKeepNumberAsString(true);
+        assertEquals(xpc.isKeepStrings(), false);
+
+        xpc = xpc.withKeepBooleanAsString(true);
+        xpc = xpc.withKeepNumberAsString(true);
+        assertEquals(xpc.isKeepStrings(), true);
+
+        xpc = xpc.withKeepBooleanAsString(false);
+        xpc = xpc.withKeepNumberAsString(false);
+        assertEquals(xpc.isKeepStrings(), false);
+    }
+
+    /**
      * JSON string cannot be reverted to original xml.
      */
     @Test

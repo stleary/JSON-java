@@ -224,6 +224,7 @@ public class XMLParserConfiguration extends ParserConfiguration {
     @Override
     public XMLParserConfiguration withKeepStrings(final boolean newVal) {
         XMLParserConfiguration newConfig = this.clone();
+        newConfig.keepStrings = newVal;
         newConfig.keepNumberAsString = newVal;
         newConfig.keepBooleanAsString = newVal;
         return newConfig;
@@ -241,6 +242,7 @@ public class XMLParserConfiguration extends ParserConfiguration {
     public XMLParserConfiguration withKeepNumberAsString(final boolean newVal) {
         XMLParserConfiguration newConfig = this.clone();
         newConfig.keepNumberAsString = newVal;
+        newConfig.keepStrings = newConfig.keepBooleanAsString && newConfig.keepNumberAsString;
         return newConfig;
     }
 
@@ -256,6 +258,7 @@ public class XMLParserConfiguration extends ParserConfiguration {
     public XMLParserConfiguration withKeepBooleanAsString(final boolean newVal) {
         XMLParserConfiguration newConfig = this.clone();
         newConfig.keepBooleanAsString = newVal;
+        newConfig.keepStrings = newConfig.keepBooleanAsString && newConfig.keepNumberAsString;
         return newConfig;
     }
 
