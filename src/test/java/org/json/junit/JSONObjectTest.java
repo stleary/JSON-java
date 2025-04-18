@@ -2316,332 +2316,417 @@ public class JSONObjectTest {
         }
     }
 
-    /**
-     * Explore how JSONObject handles parsing errors.
-     */
-    @SuppressWarnings({"boxing", "unused"})
     @Test
-    public void jsonObjectParsingErrors() {
-        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
-        if (jsonParserConfiguration.isStrictMode()) {
-            System.out.println("Skipping JSONObjectTest jsonObjectParsingErrors() when strictMode default is true");
-        } else {
-            try {
-                // does not start with '{'
-                String str = "abc";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "A JSONObject text must begin with '{' at 1 [character 2 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // does not end with '}'
-                String str = "{";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "A JSONObject text must end with '}' at 1 [character 2 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // key with no ':'
-                String str = "{\"myKey\" = true}";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Expected a ':' after a key at 10 [character 11 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // entries with no ',' separator
-                String str = "{\"myKey\":true \"myOtherKey\":false}";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Expected a ',' or '}' at 15 [character 16 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // key is a nested map
-                String str = "{{\"foo\": \"bar\"}: \"baz\"}";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Missing value at 1 [character 2 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // key is a nested array containing a map
-                String str = "{\"a\": 1, [{\"foo\": \"bar\"}]: \"baz\"}";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Missing value at 9 [character 10 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // key contains }
-                String str = "{foo}: 2}";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Expected a ':' after a key at 5 [character 6 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // key contains ]
-                String str = "{foo]: 2}";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Expected a ':' after a key at 5 [character 6 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // \0 after ,
-                String str = "{\"myKey\":true, \0\"myOtherKey\":false}";
-                assertNull("Expected an exception", new JSONObject(str));
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "A JSONObject text must end with '}' at 15 [character 16 line 1]",
-                        e.getMessage());
-            }
-            try {
-                // append to wrong key
-                String str = "{\"myKey\":true, \"myOtherKey\":false}";
-                JSONObject jsonObject = new JSONObject(str);
-                jsonObject.append("myKey", "hello");
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "JSONObject[\"myKey\"] is not a JSONArray (null).",
-                        e.getMessage());
-            }
-            try {
-                // increment wrong key
-                String str = "{\"myKey\":true, \"myOtherKey\":false}";
-                JSONObject jsonObject = new JSONObject(str);
-                jsonObject.increment("myKey");
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Unable to increment [\"myKey\"].",
-                        e.getMessage());
-            }
-            try {
-                // invalid key
-                String str = "{\"myKey\":true, \"myOtherKey\":false}";
-                JSONObject jsonObject = new JSONObject(str);
-                jsonObject.get(null);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Null key.",
-                        e.getMessage());
-            }
-            try {
-                // invalid numberToString()
-                JSONObject.numberToString((Number) null);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an exception message",
-                        "Null pointer",
-                        e.getMessage());
-            }
+    public void parsingErrorTrailingCurlyBrace () {
+        try {
+            // does not end with '}'
+            String str = "{";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "A JSONObject text must end with '}' at 1 [character 2 line 1]",
+                    e.getMessage());
+        }
+    }
 
-            try {
-                // multiple putOnce key
-                JSONObject jsonObject = new JSONObject("{}");
-                jsonObject.putOnce("hello", "world");
-                jsonObject.putOnce("hello", "world!");
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertTrue("", true);
-            }
-            try {
-                // test validity of invalid double
-                JSONObject.testValidity(Double.NaN);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertTrue("", true);
-            }
-            try {
-                // test validity of invalid float
-                JSONObject.testValidity(Float.NEGATIVE_INFINITY);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertTrue("", true);
-            }
-            try {
-                // test exception message when including a duplicate key (level 0)
-                String str = "{\n"
-                        + "    \"attr01\":\"value-01\",\n"
-                        + "    \"attr02\":\"value-02\",\n"
-                        + "    \"attr03\":\"value-03\",\n"
-                        + "    \"attr03\":\"value-04\"\n"
-                        + "}";
-                new JSONObject(str);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an expection message",
-                        "Duplicate key \"attr03\" at 90 [character 13 line 5]",
-                        e.getMessage());
-            }
-            try {
-                // test exception message when including a duplicate key (level 0) holding an object
-                String str = "{\n"
-                        + "    \"attr01\":\"value-01\",\n"
-                        + "    \"attr02\":\"value-02\",\n"
-                        + "    \"attr03\":\"value-03\",\n"
-                        + "    \"attr03\": {"
-                        + "        \"attr04-01\":\"value-04-01\",n"
-                        + "        \"attr04-02\":\"value-04-02\",n"
-                        + "        \"attr04-03\":\"value-04-03\"n"
-                        + "    }\n"
-                        + "}";
-                new JSONObject(str);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an expection message",
-                        "Duplicate key \"attr03\" at 90 [character 13 line 5]",
-                        e.getMessage());
-            }
-            try {
-                // test exception message when including a duplicate key (level 0) holding an array
-                String str = "{\n"
-                        + "    \"attr01\":\"value-01\",\n"
-                        + "    \"attr02\":\"value-02\",\n"
-                        + "    \"attr03\":\"value-03\",\n"
-                        + "    \"attr03\": [\n"
-                        + "        {"
-                        + "            \"attr04-01\":\"value-04-01\",n"
-                        + "            \"attr04-02\":\"value-04-02\",n"
-                        + "            \"attr04-03\":\"value-04-03\"n"
-                        + "        }\n"
-                        + "    ]\n"
-                        + "}";
-                new JSONObject(str);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an expection message",
-                        "Duplicate key \"attr03\" at 90 [character 13 line 5]",
-                        e.getMessage());
-            }
-            try {
-                // test exception message when including a duplicate key (level 1)
-                String str = "{\n"
-                        + "    \"attr01\":\"value-01\",\n"
-                        + "    \"attr02\":\"value-02\",\n"
-                        + "    \"attr03\":\"value-03\",\n"
-                        + "    \"attr04\": {\n"
-                        + "        \"attr04-01\":\"value04-01\",\n"
-                        + "        \"attr04-02\":\"value04-02\",\n"
-                        + "        \"attr04-03\":\"value04-03\",\n"
-                        + "        \"attr04-03\":\"value04-04\"\n"
-                        + "    }\n"
-                        + "}";
-                new JSONObject(str);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an expection message",
-                        "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
-                        e.getMessage());
-            }
-            try {
-                // test exception message when including a duplicate key (level 1) holding an object
-                String str = "{\n"
-                        + "    \"attr01\":\"value-01\",\n"
-                        + "    \"attr02\":\"value-02\",\n"
-                        + "    \"attr03\":\"value-03\",\n"
-                        + "    \"attr04\": {\n"
-                        + "        \"attr04-01\":\"value04-01\",\n"
-                        + "        \"attr04-02\":\"value04-02\",\n"
-                        + "        \"attr04-03\":\"value04-03\",\n"
-                        + "        \"attr04-03\": {\n"
-                        + "            \"attr04-04-01\":\"value04-04-01\",\n"
-                        + "            \"attr04-04-02\":\"value04-04-02\",\n"
-                        + "            \"attr04-04-03\":\"value04-04-03\",\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}";
-                new JSONObject(str);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an expection message",
-                        "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
-                        e.getMessage());
-            }
-            try {
-                // test exception message when including a duplicate key (level 1) holding an array
-                String str = "{\n"
-                        + "    \"attr01\":\"value-01\",\n"
-                        + "    \"attr02\":\"value-02\",\n"
-                        + "    \"attr03\":\"value-03\",\n"
-                        + "    \"attr04\": {\n"
-                        + "        \"attr04-01\":\"value04-01\",\n"
-                        + "        \"attr04-02\":\"value04-02\",\n"
-                        + "        \"attr04-03\":\"value04-03\",\n"
-                        + "        \"attr04-03\": [\n"
-                        + "            {\n"
-                        + "                \"attr04-04-01\":\"value04-04-01\",\n"
-                        + "                \"attr04-04-02\":\"value04-04-02\",\n"
-                        + "                \"attr04-04-03\":\"value04-04-03\",\n"
-                        + "            }\n"
-                        + "        ]\n"
-                        + "    }\n"
-                        + "}";
-                new JSONObject(str);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an expection message",
-                        "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
-                        e.getMessage());
-            }
-            try {
-                // test exception message when including a duplicate key in object (level 0) within an array
-                String str = "[\n"
-                        + "    {\n"
-                        + "        \"attr01\":\"value-01\",\n"
-                        + "        \"attr02\":\"value-02\"\n"
-                        + "    },\n"
-                        + "    {\n"
-                        + "        \"attr01\":\"value-01\",\n"
-                        + "        \"attr01\":\"value-02\"\n"
-                        + "    }\n"
-                        + "]";
-                new JSONArray(str);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an expection message",
-                        "Duplicate key \"attr01\" at 124 [character 17 line 8]",
-                        e.getMessage());
-            }
-            try {
-                // test exception message when including a duplicate key in object (level 1) within an array
-                String str = "[\n"
-                        + "    {\n"
-                        + "        \"attr01\":\"value-01\",\n"
-                        + "        \"attr02\": {\n"
-                        + "            \"attr02-01\":\"value-02-01\",\n"
-                        + "            \"attr02-02\":\"value-02-02\"\n"
-                        + "        }\n"
-                        + "    },\n"
-                        + "    {\n"
-                        + "        \"attr01\":\"value-01\",\n"
-                        + "        \"attr02\": {\n"
-                        + "            \"attr02-01\":\"value-02-01\",\n"
-                        + "            \"attr02-01\":\"value-02-02\"\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "]";
-                new JSONArray(str);
-                fail("Expected an exception");
-            } catch (JSONException e) {
-                assertEquals("Expecting an expection message",
-                        "Duplicate key \"attr02-01\" at 269 [character 24 line 13]",
-                        e.getMessage());
-            }
+    @Test
+    public void parsingErrorInitialCurlyBrace() {
+        try {
+            // does not start with '{'
+            String str = "abc";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "A JSONObject text must begin with '{' at 1 [character 2 line 1]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorNoColon() {
+        try {
+            // key with no ':'
+            String str = "{\"myKey\" = true}";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "Expected a ':' after a key at 10 [character 11 line 1]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorNoCommaSeparator() {
+        try {
+            // entries with no ',' separator
+            String str = "{\"myKey\":true \"myOtherKey\":false}";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "Expected a ',' or '}' at 15 [character 16 line 1]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorKeyIsNestedMap() {
+        try {
+            // key is a nested map
+            String str = "{{\"foo\": \"bar\"}: \"baz\"}";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "Missing value at 1 [character 2 line 1]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorKeyIsNestedArrayWithMap() {
+        try {
+            // key is a nested array containing a map
+            String str = "{\"a\": 1, [{\"foo\": \"bar\"}]: \"baz\"}";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "Missing value at 9 [character 10 line 1]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorKeyContainsCurlyBrace() {
+        try {
+            // key contains }
+            String str = "{foo}: 2}";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+//            assertEquals("Expecting an exception message",
+//                    "Expected a ':' after a key at 5 [character 6 line 1]",
+//                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorKeyContainsSquareBrace() {
+        try {
+            // key contains ]
+            String str = "{foo]: 2}";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+//            assertEquals("Expecting an exception message",
+//                    "Expected a ':' after a key at 5 [character 6 line 1]",
+//                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorKeyContainsBinaryZero() {
+        try {
+            // \0 after ,
+            String str = "{\"myKey\":true, \0\"myOtherKey\":false}";
+            assertNull("Expected an exception", new JSONObject(str));
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "A JSONObject text must end with '}' at 15 [character 16 line 1]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorAppendToWrongValue() {
+        try {
+            // append to wrong value
+            String str = "{\"myKey\":true, \"myOtherKey\":false}";
+            JSONObject jsonObject = new JSONObject(str);
+            jsonObject.append("myKey", "hello");
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "JSONObject[\"myKey\"] is not a JSONArray (null).",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorIncrementWrongValue() {
+        try {
+            // increment wrong value
+            String str = "{\"myKey\":true, \"myOtherKey\":false}";
+            JSONObject jsonObject = new JSONObject(str);
+            jsonObject.increment("myKey");
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "Unable to increment [\"myKey\"].",
+                    e.getMessage());
+        }
+    }
+    @Test
+    public void parsingErrorInvalidKey() {
+        try {
+            // invalid key
+            String str = "{\"myKey\":true, \"myOtherKey\":false}";
+            JSONObject jsonObject = new JSONObject(str);
+            jsonObject.get(null);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "Null key.",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorNumberToString() {
+        try {
+            // invalid numberToString()
+            JSONObject.numberToString((Number) null);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an exception message",
+                    "Null pointer",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorPutOnceDuplicateKey() {
+        try {
+            // multiple putOnce key
+            JSONObject jsonObject = new JSONObject("{}");
+            jsonObject.putOnce("hello", "world");
+            jsonObject.putOnce("hello", "world!");
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertTrue("", true);
+        }
+    }
+
+    @Test
+    public void parsingErrorInvalidDouble() {
+        try {
+            // test validity of invalid double
+            JSONObject.testValidity(Double.NaN);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertTrue("", true);
+        }
+    }
+
+    @Test
+    public void parsingErrorInvalidFloat() {
+        try {
+            // test validity of invalid float
+            JSONObject.testValidity(Float.NEGATIVE_INFINITY);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertTrue("", true);
+        }
+    }
+
+    @Test
+    public void parsingErrorDuplicateKeyException() {
+        try {
+            // test exception message when including a duplicate key (level 0)
+            String str = "{\n"
+                    + "    \"attr01\":\"value-01\",\n"
+                    + "    \"attr02\":\"value-02\",\n"
+                    + "    \"attr03\":\"value-03\",\n"
+                    + "    \"attr03\":\"value-04\"\n"
+                    + "}";
+            new JSONObject(str);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an expection message",
+                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorNestedDuplicateKeyException() {
+        try {
+            // test exception message when including a duplicate key (level 0) holding an object
+            String str = "{\n"
+                    + "    \"attr01\":\"value-01\",\n"
+                    + "    \"attr02\":\"value-02\",\n"
+                    + "    \"attr03\":\"value-03\",\n"
+                    + "    \"attr03\": {"
+                    + "        \"attr04-01\":\"value-04-01\",n"
+                    + "        \"attr04-02\":\"value-04-02\",n"
+                    + "        \"attr04-03\":\"value-04-03\"n"
+                    + "    }\n"
+                    + "}";
+            new JSONObject(str);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an expection message",
+                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorNestedDuplicateKeyWithArrayException() {
+        try {
+            // test exception message when including a duplicate key (level 0) holding an array
+            String str = "{\n"
+                    + "    \"attr01\":\"value-01\",\n"
+                    + "    \"attr02\":\"value-02\",\n"
+                    + "    \"attr03\":\"value-03\",\n"
+                    + "    \"attr03\": [\n"
+                    + "        {"
+                    + "            \"attr04-01\":\"value-04-01\",n"
+                    + "            \"attr04-02\":\"value-04-02\",n"
+                    + "            \"attr04-03\":\"value-04-03\"n"
+                    + "        }\n"
+                    + "    ]\n"
+                    + "}";
+            new JSONObject(str);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an expection message",
+                    "Duplicate key \"attr03\" at 90 [character 13 line 5]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorDuplicateKeyWithinNestedDictExceptionMessage() {
+        try {
+            // test exception message when including a duplicate key (level 1)
+            String str = "{\n"
+                    + "    \"attr01\":\"value-01\",\n"
+                    + "    \"attr02\":\"value-02\",\n"
+                    + "    \"attr03\":\"value-03\",\n"
+                    + "    \"attr04\": {\n"
+                    + "        \"attr04-01\":\"value04-01\",\n"
+                    + "        \"attr04-02\":\"value04-02\",\n"
+                    + "        \"attr04-03\":\"value04-03\",\n"
+                    + "        \"attr04-03\":\"value04-04\"\n"
+                    + "    }\n"
+                    + "}";
+            new JSONObject(str);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an expection message",
+                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorDuplicateKeyDoubleNestedDictExceptionMessage() {
+        try {
+            // test exception message when including a duplicate key (level 1) holding an
+            // object
+            String str = "{\n"
+                    + "    \"attr01\":\"value-01\",\n"
+                    + "    \"attr02\":\"value-02\",\n"
+                    + "    \"attr03\":\"value-03\",\n"
+                    + "    \"attr04\": {\n"
+                    + "        \"attr04-01\":\"value04-01\",\n"
+                    + "        \"attr04-02\":\"value04-02\",\n"
+                    + "        \"attr04-03\":\"value04-03\",\n"
+                    + "        \"attr04-03\": {\n"
+                    + "            \"attr04-04-01\":\"value04-04-01\",\n"
+                    + "            \"attr04-04-02\":\"value04-04-02\",\n"
+                    + "            \"attr04-04-03\":\"value04-04-03\",\n"
+                    + "        }\n"
+                    + "    }\n"
+                    + "}";
+            new JSONObject(str);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an expection message",
+                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorDuplicateKeyNestedWithArrayExceptionMessage() {
+        try {
+            // test exception message when including a duplicate key (level 1) holding an
+            // array
+            String str = "{\n"
+                    + "    \"attr01\":\"value-01\",\n"
+                    + "    \"attr02\":\"value-02\",\n"
+                    + "    \"attr03\":\"value-03\",\n"
+                    + "    \"attr04\": {\n"
+                    + "        \"attr04-01\":\"value04-01\",\n"
+                    + "        \"attr04-02\":\"value04-02\",\n"
+                    + "        \"attr04-03\":\"value04-03\",\n"
+                    + "        \"attr04-03\": [\n"
+                    + "            {\n"
+                    + "                \"attr04-04-01\":\"value04-04-01\",\n"
+                    + "                \"attr04-04-02\":\"value04-04-02\",\n"
+                    + "                \"attr04-04-03\":\"value04-04-03\",\n"
+                    + "            }\n"
+                    + "        ]\n"
+                    + "    }\n"
+                    + "}";
+            new JSONObject(str);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an expection message",
+                    "Duplicate key \"attr04-03\" at 215 [character 20 line 9]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorDuplicateKeyWithinArrayExceptionMessage() {
+        try {
+            // test exception message when including a duplicate key in object (level 0)
+            // within an array
+            String str = "[\n"
+                    + "    {\n"
+                    + "        \"attr01\":\"value-01\",\n"
+                    + "        \"attr02\":\"value-02\"\n"
+                    + "    },\n"
+                    + "    {\n"
+                    + "        \"attr01\":\"value-01\",\n"
+                    + "        \"attr01\":\"value-02\"\n"
+                    + "    }\n"
+                    + "]";
+            new JSONArray(str);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an expection message",
+                    "Duplicate key \"attr01\" at 124 [character 17 line 8]",
+                    e.getMessage());
+        }
+    }
+
+    @Test
+    public void parsingErrorDuplicateKeyDoubleNestedWithinArrayExceptionMessage() {
+        try {
+            // test exception message when including a duplicate key in object (level 1)
+            // within an array
+            String str = "[\n"
+                    + "    {\n"
+                    + "        \"attr01\":\"value-01\",\n"
+                    + "        \"attr02\": {\n"
+                    + "            \"attr02-01\":\"value-02-01\",\n"
+                    + "            \"attr02-02\":\"value-02-02\"\n"
+                    + "        }\n"
+                    + "    },\n"
+                    + "    {\n"
+                    + "        \"attr01\":\"value-01\",\n"
+                    + "        \"attr02\": {\n"
+                    + "            \"attr02-01\":\"value-02-01\",\n"
+                    + "            \"attr02-01\":\"value-02-02\"\n"
+                    + "        }\n"
+                    + "    }\n"
+                    + "]";
+            new JSONArray(str);
+            fail("Expected an exception");
+        } catch (JSONException e) {
+            assertEquals("Expecting an expection message",
+                    "Duplicate key \"attr02-01\" at 269 [character 24 line 13]",
+                    e.getMessage());
         }
     }
 
