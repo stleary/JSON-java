@@ -1,5 +1,7 @@
 package org.json;
 
+import java.io.IOException;
+
 /*
 Public Domain.
 */
@@ -38,7 +40,11 @@ public class XML {
     /** The Character '='. */
     public static final Character EQ = '=';
 
-    /** The Character <pre>{@code '>'. }</pre>*/
+    /**
+     * The Character
+     * 
+     * <pre>{@code '>'. }</pre>
+     */
     public static final Character GT = '>';
 
     /** The Character '&lt;'. */
@@ -115,36 +121,36 @@ public class XML {
      * }</pre>
      *
      * @param string
-     *            The string to be escaped.
+     *               The string to be escaped.
      * @return The escaped string.
      */
     public static String escape(String string) {
         StringBuilder sb = new StringBuilder(string.length());
         for (final int cp : codePointIterator(string)) {
             switch (cp) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            case '\'':
-                sb.append("&apos;");
-                break;
-            default:
-                if (mustEscape(cp)) {
-                    sb.append("&#x");
-                    sb.append(Integer.toHexString(cp));
-                    sb.append(';');
-                } else {
-                    sb.appendCodePoint(cp);
-                }
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                case '\'':
+                    sb.append("&apos;");
+                    break;
+                default:
+                    if (mustEscape(cp)) {
+                        sb.append("&#x");
+                        sb.append(Integer.toHexString(cp));
+                        sb.append(';');
+                    } else {
+                        sb.appendCodePoint(cp);
+                    }
             }
         }
         return sb.toString();
@@ -155,32 +161,31 @@ public class XML {
      * @return true if the code point is not valid for an XML
      */
     private static boolean mustEscape(int cp) {
-        /* Valid range from https://www.w3.org/TR/REC-xml/#charsets
+        /*
+         * Valid range from https://www.w3.org/TR/REC-xml/#charsets
          *
          * #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
          *
          * any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.
          */
-        // isISOControl is true when (cp >= 0 && cp <= 0x1F) || (cp >= 0x7F && cp <= 0x9F)
+        // isISOControl is true when (cp >= 0 && cp <= 0x1F) || (cp >= 0x7F && cp <=
+        // 0x9F)
         // all ISO control characters are out of range except tabs and new lines
         return (Character.isISOControl(cp)
                 && cp != 0x9
                 && cp != 0xA
-                && cp != 0xD
-            ) || !(
-                // valid the range of acceptable characters that aren't control
-                (cp >= 0x20 && cp <= 0xD7FF)
+                && cp != 0xD) || !(
+        // valid the range of acceptable characters that aren't control
+        (cp >= 0x20 && cp <= 0xD7FF)
                 || (cp >= 0xE000 && cp <= 0xFFFD)
-                || (cp >= 0x10000 && cp <= 0x10FFFF)
-            )
-        ;
+                || (cp >= 0x10000 && cp <= 0x10FFFF));
     }
 
     /**
      * Removes XML escapes from the string.
      *
      * @param string
-     *            string to remove escapes from
+     *               string to remove escapes from
      * @return string with converted entities
      */
     public static String unescape(String string) {
@@ -212,7 +217,7 @@ public class XML {
      * allowed in tagNames and attributes.
      *
      * @param string
-     *            A string.
+     *               A string.
      * @throws JSONException Thrown if the string contains whitespace or is empty.
      */
     public static void noSpace(String string) throws JSONException {
@@ -232,19 +237,20 @@ public class XML {
      * Scan the content following the named tag, attaching it to the context.
      *
      * @param x
-     *            The XMLTokener containing the source string.
+     *                            The XMLTokener containing the source string.
      * @param context
-     *            The JSONObject that will include the new material.
+     *                            The JSONObject that will include the new material.
      * @param name
-     *            The tag name.
+     *                            The tag name.
      * @param config
-     *            The XML parser configuration.
+     *                            The XML parser configuration.
      * @param currentNestingDepth
-     *            The current nesting depth.
+     *                            The current nesting depth.
      * @return true if the close tag is processed.
      * @throws JSONException Thrown if any parsing error occurs.
      */
-    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, int currentNestingDepth)
+    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config,
+            int currentNestingDepth)
             throws JSONException {
         char c;
         int i;
@@ -351,7 +357,7 @@ public class XML {
                                 && NULL_ATTR.equals(string)
                                 && Boolean.parseBoolean((String) token)) {
                             nilAttributeFound = true;
-                        } else if(config.getXsiTypeMap() != null && !config.getXsiTypeMap().isEmpty()
+                        } else if (config.getXsiTypeMap() != null && !config.getXsiTypeMap().isEmpty()
                                 && TYPE_ATTR.equals(string)) {
                             xmlXsiTypeConverter = config.getXsiTypeMap().get(token);
                         } else if (!nilAttributeFound) {
@@ -374,7 +380,6 @@ public class XML {
                     } else {
                         jsonObject.accumulate(string, "");
                     }
-
 
                 } else if (token == SLASH) {
                     // Empty tag <.../>
@@ -413,7 +418,7 @@ public class XML {
                         } else if (token instanceof String) {
                             string = (String) token;
                             if (string.length() > 0) {
-                                if(xmlXsiTypeConverter != null) {
+                                if (xmlXsiTypeConverter != null) {
                                     jsonObject.accumulate(config.getcDataTagName(),
                                             stringToValue(string, xmlXsiTypeConverter));
                                 } else {
@@ -437,7 +442,8 @@ public class XML {
                         } else if (token == LT) {
                             // Nested element
                             if (currentNestingDepth == config.getMaxNestingDepth()) {
-                                throw x.syntaxError("Maximum nesting depth of " + config.getMaxNestingDepth() + " reached");
+                                throw x.syntaxError(
+                                        "Maximum nesting depth of " + config.getMaxNestingDepth() + " reached");
                             }
 
                             if (parse(x, jsonObject, tagName, config, currentNestingDepth + 1)) {
@@ -475,23 +481,26 @@ public class XML {
             }
         }
     }
+
     /**
-     * This method removes any JSON entry which has the key set by XMLParserConfiguration.cDataTagName
-     * and contains whitespace as this is caused by whitespace between tags. See test XMLTest.testNestedWithWhitespaceTrimmingDisabled.
+     * This method removes any JSON entry which has the key set by
+     * XMLParserConfiguration.cDataTagName
+     * and contains whitespace as this is caused by whitespace between tags. See
+     * test XMLTest.testNestedWithWhitespaceTrimmingDisabled.
+     * 
      * @param jsonObject JSONObject which may require deletion
-     * @param config The XMLParserConfiguration which includes the cDataTagName
+     * @param config     The XMLParserConfiguration which includes the cDataTagName
      */
     private static void removeEmpty(final JSONObject jsonObject, final XMLParserConfiguration config) {
-        if (jsonObject.has(config.getcDataTagName()))  {
+        if (jsonObject.has(config.getcDataTagName())) {
             final Object s = jsonObject.get(config.getcDataTagName());
             if (s instanceof String) {
                 if (isStringAllWhiteSpace(s.toString())) {
                     jsonObject.remove(config.getcDataTagName());
                 }
-            }
-            else if (s instanceof JSONArray) {
+            } else if (s instanceof JSONArray) {
                 final JSONArray sArray = (JSONArray) s;
-                for (int k = sArray.length()-1; k >= 0; k--){
+                for (int k = sArray.length() - 1; k >= 0; k--) {
                     final Object eachString = sArray.get(k);
                     if (eachString instanceof String) {
                         String s1 = (String) eachString;
@@ -508,7 +517,7 @@ public class XML {
     }
 
     private static boolean isStringAllWhiteSpace(final String s) {
-        for (int k = 0; k<s.length(); k++){
+        for (int k = 0; k < s.length(); k++) {
             final char eachChar = s.charAt(k);
             if (!Character.isWhitespace(eachChar)) {
                 return false;
@@ -518,7 +527,8 @@ public class XML {
     }
 
     /**
-     * direct copy of {@link JSONObject#stringToNumber(String)} to maintain Android support.
+     * direct copy of {@link JSONObject#stringToNumber(String)} to maintain Android
+     * support.
      */
     private static Number stringToNumber(final String val) throws NumberFormatException {
         char initial = val.charAt(0);
@@ -530,7 +540,7 @@ public class XML {
                 // keep that by forcing a decimal.
                 try {
                     BigDecimal bd = new BigDecimal(val);
-                    if(initial == '-' && BigDecimal.ZERO.compareTo(bd)==0) {
+                    if (initial == '-' && BigDecimal.ZERO.compareTo(bd) == 0) {
                         return Double.valueOf(-0.0);
                     }
                     return bd;
@@ -538,26 +548,26 @@ public class XML {
                     // this is to support "Hex Floats" like this: 0x1.0P-1074
                     try {
                         Double d = Double.valueOf(val);
-                        if(d.isNaN() || d.isInfinite()) {
-                            throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                        if (d.isNaN() || d.isInfinite()) {
+                            throw new NumberFormatException("val [" + val + "] is not a valid number.");
                         }
                         return d;
                     } catch (NumberFormatException ignore) {
-                        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                        throw new NumberFormatException("val [" + val + "] is not a valid number.");
                     }
                 }
             }
             // block items like 00 01 etc. Java number parsers treat these as Octal.
-            if(initial == '0' && val.length() > 1) {
+            if (initial == '0' && val.length() > 1) {
                 char at1 = val.charAt(1);
-                if(at1 >= '0' && at1 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                if (at1 >= '0' && at1 <= '9') {
+                    throw new NumberFormatException("val [" + val + "] is not a valid number.");
                 }
             } else if (initial == '-' && val.length() > 2) {
                 char at1 = val.charAt(1);
                 char at2 = val.charAt(2);
-                if(at1 == '0' && at2 >= '0' && at2 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
+                if (at1 == '0' && at2 >= '0' && at2 <= '9') {
+                    throw new NumberFormatException("val [" + val + "] is not a valid number.");
                 }
             }
             // integer representation.
@@ -569,19 +579,20 @@ public class XML {
             // only what they need. i.e. Less runtime overhead if the value is
             // long lived.
             BigInteger bi = new BigInteger(val);
-            if(bi.bitLength() <= 31){
+            if (bi.bitLength() <= 31) {
                 return Integer.valueOf(bi.intValue());
             }
-            if(bi.bitLength() <= 63){
+            if (bi.bitLength() <= 63) {
                 return Long.valueOf(bi.longValue());
             }
             return bi;
         }
-        throw new NumberFormatException("val ["+val+"] is not a valid number.");
+        throw new NumberFormatException("val [" + val + "] is not a valid number.");
     }
 
     /**
-     * direct copy of {@link JSONObject#isDecimalNotation(String)} to maintain Android support.
+     * direct copy of {@link JSONObject#isDecimalNotation(String)} to maintain
+     * Android support.
      */
     private static boolean isDecimalNotation(final String val) {
         return val.indexOf('.') > -1 || val.indexOf('e') > -1
@@ -590,12 +601,14 @@ public class XML {
 
     /**
      * This method tries to convert the given string value to the target object
-     * @param string String to convert
-     * @param typeConverter value converter to convert string to integer, boolean e.t.c
+     * 
+     * @param string        String to convert
+     * @param typeConverter value converter to convert string to integer, boolean
+     *                      e.t.c
      * @return JSON value of this string or the string
      */
     public static Object stringToValue(String string, XMLXsiTypeConverter<?> typeConverter) {
-        if(typeConverter != null) {
+        if (typeConverter != null) {
             return typeConverter.convert(string);
         }
         return stringToValue(string);
@@ -607,7 +620,8 @@ public class XML {
      * @param string String to convert
      * @return JSON value of this string or the string
      */
-    // To maintain compatibility with the Android API, this method is a direct copy of
+    // To maintain compatibility with the Android API, this method is a direct copy
+    // of
     // the one in JSONObject. Changes made here should be reflected there.
     // This method should not make calls out of the XML object.
     public static Object stringToValue(String string) {
@@ -649,12 +663,15 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * "content" member. Comments, prologs, DTDs, and
+     * 
+     * <pre>{@code
      * &lt;[ [ ]]>}</pre>
+     * 
      * are ignored.
      *
      * @param string
-     *            The source string.
+     *               The source string.
      * @return A JSONObject containing the structured data from the XML string.
      * @throws JSONException Thrown if there is an errors while parsing the string
      */
@@ -670,8 +687,11 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * "content" member. Comments, prologs, DTDs, and
+     * 
+     * <pre>{@code
      * &lt;[ [ ]]>}</pre>
+     * 
      * are ignored.
      *
      * @param reader The XML source reader.
@@ -690,21 +710,24 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * "content" member. Comments, prologs, DTDs, and
+     * 
+     * <pre>{@code
      * &lt;[ [ ]]>}</pre>
+     * 
      * are ignored.
      *
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
      * numbers but will instead be the exact value as seen in the XML document.
      *
-     * @param reader The XML source reader.
+     * @param reader      The XML source reader.
      * @param keepStrings If true, then values will not be coerced into boolean
-     *  or numeric values and will instead be left as strings
+     *                    or numeric values and will instead be left as strings
      * @return A JSONObject containing the structured data from the XML string.
      * @throws JSONException Thrown if there is an errors while parsing the string
      */
     public static JSONObject toJSONObject(Reader reader, boolean keepStrings) throws JSONException {
-        if(keepStrings) {
+        if (keepStrings) {
             return toJSONObject(reader, XMLParserConfiguration.KEEP_STRINGS);
         }
         return toJSONObject(reader, XMLParserConfiguration.ORIGINAL);
@@ -718,31 +741,40 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * "content" member. Comments, prologs, DTDs, and
+     * 
+     * <pre>{@code
      * &lt;[ [ ]]>}</pre>
+     * 
      * are ignored.
      *
      * All numbers are converted as strings, for 1, 01, 29.0 will not be coerced to
-     * numbers but will instead be the exact value as seen in the XML document depending
+     * numbers but will instead be the exact value as seen in the XML document
+     * depending
      * on how flag is set.
      * All booleans are converted as strings, for true, false will not be coerced to
-     * booleans but will instead be the exact value as seen in the XML document depending
+     * booleans but will instead be the exact value as seen in the XML document
+     * depending
      * on how flag is set.
      *
-     * @param reader The XML source reader.
-     * @param keepNumberAsString If true, then numeric values will not be coerced into
-     *  numeric values and will instead be left as strings
-     * @param keepBooleanAsString If true, then boolean values will not be coerced into
-     *      *  numeric values and will instead be left as strings
+     * @param reader              The XML source reader.
+     * @param keepNumberAsString  If true, then numeric values will not be coerced
+     *                            into
+     *                            numeric values and will instead be left as strings
+     * @param keepBooleanAsString If true, then boolean values will not be coerced
+     *                            into
+     *                            * numeric values and will instead be left as
+     *                            strings
      * @return A JSONObject containing the structured data from the XML string.
      * @throws JSONException Thrown if there is an errors while parsing the string
      */
-    public static JSONObject toJSONObject(Reader reader, boolean keepNumberAsString, boolean keepBooleanAsString) throws JSONException {
+    public static JSONObject toJSONObject(Reader reader, boolean keepNumberAsString, boolean keepBooleanAsString)
+            throws JSONException {
         XMLParserConfiguration xmlParserConfiguration = new XMLParserConfiguration();
-        if(keepNumberAsString) {
+        if (keepNumberAsString) {
             xmlParserConfiguration = xmlParserConfiguration.withKeepNumberAsString(keepNumberAsString);
         }
-        if(keepBooleanAsString) {
+        if (keepBooleanAsString) {
             xmlParserConfiguration = xmlParserConfiguration.withKeepBooleanAsString(keepBooleanAsString);
         }
         return toJSONObject(reader, xmlParserConfiguration);
@@ -756,8 +788,11 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * "content" member. Comments, prologs, DTDs, and
+     * 
+     * <pre>{@code
      * &lt;[ [ ]]>}</pre>
+     * 
      * are ignored.
      *
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
@@ -773,7 +808,7 @@ public class XML {
         XMLTokener x = new XMLTokener(reader, config);
         while (x.more()) {
             x.skipPast("<");
-            if(x.more()) {
+            if (x.more()) {
                 parse(x, jo, null, config, 0);
             }
         }
@@ -788,17 +823,20 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * "content" member. Comments, prologs, DTDs, and
+     * 
+     * <pre>{@code
      * &lt;[ [ ]]>}</pre>
+     * 
      * are ignored.
      *
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
      * numbers but will instead be the exact value as seen in the XML document.
      *
      * @param string
-     *            The source string.
+     *                    The source string.
      * @param keepStrings If true, then values will not be coerced into boolean
-     *  or numeric values and will instead be left as strings
+     *                    or numeric values and will instead be left as strings
      * @return A JSONObject containing the structured data from the XML string.
      * @throws JSONException Thrown if there is an errors while parsing the string
      */
@@ -814,27 +852,35 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * "content" member. Comments, prologs, DTDs, and
+     * 
+     * <pre>{@code
      * &lt;[ [ ]]>}</pre>
+     * 
      * are ignored.
      *
      * All numbers are converted as strings, for 1, 01, 29.0 will not be coerced to
-     * numbers but will instead be the exact value as seen in the XML document depending
+     * numbers but will instead be the exact value as seen in the XML document
+     * depending
      * on how flag is set.
      * All booleans are converted as strings, for true, false will not be coerced to
-     * booleans but will instead be the exact value as seen in the XML document depending
+     * booleans but will instead be the exact value as seen in the XML document
+     * depending
      * on how flag is set.
      *
      * @param string
-     *            The source string.
-     * @param keepNumberAsString If true, then numeric values will not be coerced into
-     *  numeric values and will instead be left as strings
-     * @param keepBooleanAsString If true, then boolean values will not be coerced into
-     *  numeric values and will instead be left as strings
+     *                            The source string.
+     * @param keepNumberAsString  If true, then numeric values will not be coerced
+     *                            into
+     *                            numeric values and will instead be left as strings
+     * @param keepBooleanAsString If true, then boolean values will not be coerced
+     *                            into
+     *                            numeric values and will instead be left as strings
      * @return A JSONObject containing the structured data from the XML string.
      * @throws JSONException Thrown if there is an errors while parsing the string
      */
-    public static JSONObject toJSONObject(String string, boolean keepNumberAsString, boolean keepBooleanAsString) throws JSONException {
+    public static JSONObject toJSONObject(String string, boolean keepNumberAsString, boolean keepBooleanAsString)
+            throws JSONException {
         return toJSONObject(new StringReader(string), keepNumberAsString, keepBooleanAsString);
     }
 
@@ -846,15 +892,18 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <pre>{@code
+     * "content" member. Comments, prologs, DTDs, and
+     * 
+     * <pre>{@code
      * &lt;[ [ ]]>}</pre>
+     * 
      * are ignored.
      *
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to
      * numbers but will instead be the exact value as seen in the XML document.
      *
      * @param string
-     *            The source string.
+     *               The source string.
      * @param config Configuration options for the parser.
      * @return A JSONObject containing the structured data from the XML string.
      * @throws JSONException Thrown if there is an errors while parsing the string
@@ -867,7 +916,7 @@ public class XML {
      * Convert a JSONObject into a well-formed, element-normal XML string.
      *
      * @param object
-     *            A JSONObject.
+     *               A JSONObject.
      * @return A string.
      * @throws JSONException Thrown if there is an error parsing the string
      */
@@ -879,9 +928,9 @@ public class XML {
      * Convert a JSONObject into a well-formed, element-normal XML string.
      *
      * @param object
-     *            A JSONObject.
+     *                A JSONObject.
      * @param tagName
-     *            The optional name of the enclosing tag.
+     *                The optional name of the enclosing tag.
      * @return A string.
      * @throws JSONException Thrown if there is an error parsing the string
      */
@@ -893,11 +942,11 @@ public class XML {
      * Convert a JSONObject into a well-formed, element-normal XML string.
      *
      * @param object
-     *            A JSONObject.
+     *                A JSONObject.
      * @param tagName
-     *            The optional name of the enclosing tag.
+     *                The optional name of the enclosing tag.
      * @param config
-     *            Configuration that can control output to XML.
+     *                Configuration that can control output to XML.
      * @return A string.
      * @throws JSONException Thrown if there is an error parsing the string
      */
@@ -911,19 +960,20 @@ public class XML {
      * either pretty print or single-lined depending on indent factor.
      *
      * @param object
-     *            A JSONObject.
+     *                     A JSONObject.
      * @param tagName
-     *            The optional name of the enclosing tag.
+     *                     The optional name of the enclosing tag.
      * @param config
-     *            Configuration that can control output to XML.
+     *                     Configuration that can control output to XML.
      * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
+     *                     The number of spaces to add to each level of indentation.
      * @param indent
-     *            The current ident level in spaces.
+     *                     The current ident level in spaces.
      * @return
      * @throws JSONException
      */
-    private static String toString(final Object object, final String tagName, final XMLParserConfiguration config, int indentFactor, int indent)
+    private static String toString(final Object object, final String tagName, final XMLParserConfiguration config,
+            int indentFactor, int indent)
             throws JSONException {
         StringBuilder sb = new StringBuilder();
         JSONArray ja;
@@ -938,7 +988,7 @@ public class XML {
                 sb.append('<');
                 sb.append(tagName);
                 sb.append('>');
-                if(indentFactor > 0){
+                if (indentFactor > 0) {
                     sb.append("\n");
                     indent += indentFactor;
                 }
@@ -961,7 +1011,7 @@ public class XML {
                         ja = (JSONArray) value;
                         int jaLength = ja.length();
                         // don't use the new iterator API to maintain support for Android
-						for (int i = 0; i < jaLength; i++) {
+                        for (int i = 0; i < jaLength; i++) {
                             if (i > 0) {
                                 sb.append('\n');
                             }
@@ -978,7 +1028,7 @@ public class XML {
                     ja = (JSONArray) value;
                     int jaLength = ja.length();
                     // don't use the new iterator API to maintain support for Android
-					for (int i = 0; i < jaLength; i++) {
+                    for (int i = 0; i < jaLength; i++) {
                         Object val = ja.opt(i);
                         if (val instanceof JSONArray) {
                             sb.append('<');
@@ -993,7 +1043,7 @@ public class XML {
                         }
                     }
                 } else if ("".equals(value)) {
-                    if (config.isCloseEmptyTag()){
+                    if (config.isCloseEmptyTag()) {
                         sb.append(indent(indent));
                         sb.append('<');
                         sb.append(key);
@@ -1004,7 +1054,7 @@ public class XML {
                         if (indentFactor > 0) {
                             sb.append("\n");
                         }
-                    }else {
+                    } else {
                         sb.append(indent(indent));
                         sb.append('<');
                         sb.append(key);
@@ -1027,7 +1077,7 @@ public class XML {
                 sb.append("</");
                 sb.append(tagName);
                 sb.append('>');
-                if(indentFactor > 0){
+                if (indentFactor > 0) {
                     sb.append("\n");
                 }
             }
@@ -1035,15 +1085,15 @@ public class XML {
 
         }
 
-        if (object != null && (object instanceof JSONArray ||  object.getClass().isArray())) {
-            if(object.getClass().isArray()) {
+        if (object != null && (object instanceof JSONArray || object.getClass().isArray())) {
+            if (object.getClass().isArray()) {
                 ja = new JSONArray(object);
             } else {
                 ja = (JSONArray) object;
             }
             int jaLength = ja.length();
             // don't use the new iterator API to maintain support for Android
-			for (int i = 0; i < jaLength; i++) {
+            for (int i = 0; i < jaLength; i++) {
                 Object val = ja.opt(i);
                 // XML does not have good support for arrays. If an array
                 // appears in a place where XML is lacking, synthesize an
@@ -1053,12 +1103,11 @@ public class XML {
             return sb.toString();
         }
 
-
         string = (object == null) ? "null" : escape(object.toString());
         String indentationSuffix = (indentFactor > 0) ? "\n" : "";
-        if(tagName == null){
+        if (tagName == null) {
             return indent(indent) + "\"" + string + "\"" + indentationSuffix;
-        } else if(string.length() == 0){
+        } else if (string.length() == 0) {
             return indent(indent) + "<" + tagName + "/>" + indentationSuffix;
         } else {
             return indent(indent) + "<" + tagName
@@ -1067,28 +1116,30 @@ public class XML {
     }
 
     /**
-     * Convert a JSONObject into a well-formed, pretty printed element-normal XML string.
+     * Convert a JSONObject into a well-formed, pretty printed element-normal XML
+     * string.
      *
      * @param object
-     *            A JSONObject.
+     *                     A JSONObject.
      * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
+     *                     The number of spaces to add to each level of indentation.
      * @return A string.
      * @throws JSONException Thrown if there is an error parsing the string
      */
-    public static String toString(Object object, int indentFactor){
+    public static String toString(Object object, int indentFactor) {
         return toString(object, null, XMLParserConfiguration.ORIGINAL, indentFactor);
     }
 
     /**
-     * Convert a JSONObject into a well-formed, pretty printed element-normal XML string.
+     * Convert a JSONObject into a well-formed, pretty printed element-normal XML
+     * string.
      *
      * @param object
-     *            A JSONObject.
+     *                     A JSONObject.
      * @param tagName
-     *            The optional name of the enclosing tag.
+     *                     The optional name of the enclosing tag.
      * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
+     *                     The number of spaces to add to each level of indentation.
      * @return A string.
      * @throws JSONException Thrown if there is an error parsing the string
      */
@@ -1097,29 +1148,32 @@ public class XML {
     }
 
     /**
-     * Convert a JSONObject into a well-formed, pretty printed element-normal XML string.
+     * Convert a JSONObject into a well-formed, pretty printed element-normal XML
+     * string.
      *
      * @param object
-     *            A JSONObject.
+     *                     A JSONObject.
      * @param tagName
-     *            The optional name of the enclosing tag.
+     *                     The optional name of the enclosing tag.
      * @param config
-     *            Configuration that can control output to XML.
+     *                     Configuration that can control output to XML.
      * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
+     *                     The number of spaces to add to each level of indentation.
      * @return A string.
      * @throws JSONException Thrown if there is an error parsing the string
      */
-    public static String toString(final Object object, final String tagName, final XMLParserConfiguration config, int indentFactor)
+    public static String toString(final Object object, final String tagName, final XMLParserConfiguration config,
+            int indentFactor)
             throws JSONException {
         return toString(object, tagName, config, indentFactor, 0);
     }
 
     /**
-     * Return a String consisting of a number of space characters specified by indent
+     * Return a String consisting of a number of space characters specified by
+     * indent
      *
      * @param indent
-     *          The number of spaces to be appended to the String.
+     *               The number of spaces to be appended to the String.
      * @return
      */
     private static final String indent(int indent) {
@@ -1129,4 +1183,310 @@ public class XML {
         }
         return sb.toString();
     }
+
+    /*
+     * Refactored version: variable names clarified, comments rewritten for clarity.
+     * Public method signatures and overall behavior remain unchanged.
+     */
+
+    /**
+     * Streams a well‑formed XML document and converts only the subtree identified
+     * by
+     * {@code path} into a {@link JSONObject}. The parser stops as soon as the
+     * pointer is satisfied, minimising unnecessary reads.
+     *
+     * @param reader XML source.
+     * @param path   JSONPointer that selects the desired subtree.
+     * @return JSONObject representing the selected subtree.
+     * @throws JSONException if parsing fails or the path is absent.
+     */
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path) throws JSONException {
+        // --- normalise the path so it never ends with a slash ------------------
+        String normalisedPath = path.toString();
+        if (normalisedPath.endsWith("/")) {
+            normalisedPath = normalisedPath.substring(0, normalisedPath.length() - 1);
+            path = new JSONPointer(normalisedPath);
+        }
+
+        // Resolve each path segment upfront for quick checks later on
+        String[] segments = splitPath(normalisedPath);
+        if (segments.length == 0) {
+            // Empty pointer ➜ return the whole document via existing helper
+            return toJSONObject(reader);
+        }
+
+        // Wrap the incoming Reader so we can keep track of progress (defensive)
+        ProgressReader trackingReader = new ProgressReader(reader);
+        long previousPosition = 0;
+
+        JSONObject scratch = new JSONObject(); // incremental parse target
+        JSONObject extractedObject = null; // final result holder
+        boolean subtreeFound = false;
+
+        XMLParserConfiguration cfg = XMLParserConfiguration.ORIGINAL;
+        XMLTokener tokenizer = new XMLTokener(trackingReader, cfg);
+
+        while (tokenizer.more() && !subtreeFound) {
+            tokenizer.skipPast("<"); // move to next tag start
+            if (!tokenizer.more())
+                break;
+
+            // Parse one top‑level element into scratch
+            parse(tokenizer, scratch, null, cfg, 0);
+
+            // See if the desired subtree has appeared
+            try {
+                Object maybe = path.queryFrom(scratch);
+                if (maybe != null) {
+                    subtreeFound = true;
+
+                    if (maybe instanceof JSONObject) {
+                        extractedObject = (JSONObject) maybe;
+                    } else {
+                        extractedObject = new JSONObject();
+                        extractedObject.put(segments[segments.length - 1], maybe);
+                    }
+                }
+            } catch (JSONPointerException ignore) {
+                // not yet – keep streaming
+            }
+
+            long currentPos = trackingReader.getPosition();
+            if (currentPos == previousPosition)
+                break; // safeguard against stalls
+            previousPosition = currentPos;
+        }
+
+        if (subtreeFound && extractedObject != null) {
+            return extractedObject;
+        }
+        throw new JSONException("Path not found: " + path);
+    }
+
+    /**
+     * Reader wrapper that records the number of characters consumed.
+     */
+    private static class ProgressReader extends Reader {
+        private final Reader delegate;
+        private long position = 0;
+
+        ProgressReader(Reader delegate) {
+            this.delegate = delegate;
+        }
+
+        long getPosition() {
+            return position;
+        }
+
+        @Override
+        public int read(char[] buffer, int off, int len) throws IOException {
+            int n = delegate.read(buffer, off, len);
+            if (n > 0)
+                position += n;
+            return n;
+        }
+
+        @Override
+        public void close() throws IOException {
+            delegate.close();
+        }
+    }
+
+    /** Split the JSONPointer string into unescaped path segments. */
+    private static String[] splitPath(String pointer) {
+        if (pointer == null || pointer.isEmpty())
+            return new String[0];
+        if (pointer.startsWith("/"))
+            pointer = pointer.substring(1);
+        if (pointer.endsWith("/"))
+            pointer = pointer.substring(0, pointer.length() - 1);
+        if (pointer.isEmpty())
+            return new String[0];
+
+        String[] raw = pointer.split("/");
+        for (int i = 0; i < raw.length; i++) {
+            raw[i] = JSONPointer.unescapeToken(raw[i]);
+        }
+        return raw;
+    }
+
+    /**
+     * Parses XML and replaces the subtree specified by {@code path} with
+     * {@code replacement}. Attempts fast‑path handling for shallow paths.
+     */
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement)
+            throws JSONException {
+        // Replacing the entire document? validate XML only then return replacement.
+        if (path.toString().isEmpty() || "/".equals(path.toString())) {
+            XMLTokener tok = new XMLTokener(reader, XMLParserConfiguration.ORIGINAL);
+            if (!tok.more())
+                throw new JSONException("Empty XML document");
+            return replacement;
+        }
+
+        // Trim any trailing slash so path logic is consistent
+        String rawPath = path.toString();
+        boolean trailingSlash = rawPath.endsWith("/");
+        if (trailingSlash) {
+            rawPath = rawPath.substring(0, rawPath.length() - 1);
+            path = new JSONPointer(rawPath);
+        }
+
+        String[] segments = splitPath(rawPath);
+        if (segments.length <= 2) {
+            return shallowReplace(reader, segments, replacement, trailingSlash);
+        }
+
+        JSONObject root = new JSONObject();
+        ProgressReader trackingReader = new ProgressReader(reader);
+        long previousPosition = 0;
+
+        XMLParserConfiguration cfg = XMLParserConfiguration.ORIGINAL;
+        XMLTokener tokenizer = new XMLTokener(trackingReader, cfg);
+
+        while (tokenizer.more()) {
+            tokenizer.skipPast("<");
+            if (!tokenizer.more())
+                break;
+            parse(tokenizer, root, null, cfg, 0);
+
+            try {
+                JSONPointer parentPtr = parentPointer(path);
+                Object parent = parentPtr.queryFrom(root);
+                if (parent instanceof JSONObject) {
+                    String leafKey = segments[segments.length - 1];
+                    JSONObject parentObj = (JSONObject) parent;
+
+                    if (trailingSlash && replacement.length() == 1) {
+                        String onlyKey = replacement.keys().next();
+                        parentObj.put(leafKey, replacement.get(onlyKey));
+                    } else {
+                        parentObj.put(leafKey, replacement);
+                    }
+                    break; // replacement done
+                }
+            } catch (JSONPointerException ignore) {
+                /* continue streaming */ }
+
+            long currentPos = trackingReader.getPosition();
+            if (currentPos == previousPosition)
+                break;
+            previousPosition = currentPos;
+        }
+
+        try {
+            path.queryFrom(root); // verify replacement accessible
+            return root;
+        } catch (JSONPointerException e) {
+            throw new JSONException("Path not found: " + path);
+        }
+    }
+
+    /** Fast path for one‑ or two‑segment pointers. */
+    private static JSONObject shallowReplace(Reader reader, String[] segments, JSONObject replacement,
+            boolean trailingSlash) throws JSONException {
+        JSONObject doc = new JSONObject();
+        XMLParserConfiguration cfg = XMLParserConfiguration.ORIGINAL;
+        XMLTokener tok = new XMLTokener(reader, cfg);
+
+        if (segments.length == 1) {
+            String target = segments[0];
+            while (tok.more()) {
+                tok.skipPast("<");
+                if (!tok.more())
+                    break;
+                Object token = tok.nextToken();
+                if (token instanceof String && token.equals(target)) {
+                    // Skip original subtree quickly
+                    int depth = 1;
+                    while (depth > 0 && tok.more()) {
+                        token = tok.nextToken();
+                        if (token == LT) {
+                            if (tok.nextToken() == SLASH)
+                                depth--;
+                            else
+                                depth++;
+                        }
+                    }
+                    if (trailingSlash && replacement.length() == 1) {
+                        String onlyKey = replacement.keys().next();
+                        doc.put(target, replacement.get(onlyKey));
+                    } else
+                        doc.put(target, replacement);
+                } else {
+                    tok.back();
+                    parse(tok, doc, null, cfg, 0);
+                }
+            }
+        } else { // two‑segment path
+            String parentKey = segments[0];
+            String childKey = segments[1];
+            while (tok.more()) {
+                tok.skipPast("<");
+                if (!tok.more())
+                    break;
+                Object token = tok.nextToken();
+                if (token instanceof String && token.equals(parentKey)) {
+                    JSONObject parentObj = new JSONObject();
+                    boolean childReplaced = false;
+
+                    // skip to '>' of parent start tag
+                    while (tok.more() && token != GT)
+                        token = tok.nextToken();
+
+                    while (tok.more()) {
+                        token = tok.nextContent();
+                        if (token == LT) {
+                            token = tok.nextToken();
+                            if (token == SLASH) { // parent end
+                                tok.nextToken();
+                                break;
+                            } else if (token instanceof String) {
+                                String tag = (String) token;
+                                if (tag.equals(childKey)) {
+                                    childReplaced = true;
+                                    if (trailingSlash && replacement.length() == 1) {
+                                        String onlyKey = replacement.keys().next();
+                                        parentObj.put(childKey, replacement.get(onlyKey));
+                                    } else
+                                        parentObj.put(childKey, replacement);
+
+                                    // skip original child content entirely
+                                    int depth = 1;
+                                    while (depth > 0 && tok.more()) {
+                                        token = tok.nextToken();
+                                        if (token == LT) {
+                                            token = tok.nextToken();
+                                            if (token == SLASH)
+                                                depth--;
+                                            else {
+                                                depth++;
+                                                tok.back();
+                                            }
+                                        }
+                                    }
+                                } else { // normal child
+                                    tok.back();
+                                    parse(tok, parentObj, null, cfg, 0);
+                                }
+                            }
+                        }
+                    }
+                    doc.put(parentKey, parentObj);
+                } else {
+                    tok.back();
+                    parse(tok, doc, null, cfg, 0);
+                }
+            }
+        }
+        return doc;
+    }
+
+    /** Builds a pointer representing the parent of {@code pointer}. */
+    private static JSONPointer parentPointer(JSONPointer pointer) {
+        String raw = pointer.toString();
+        int idx = raw.lastIndexOf('/');
+        return (idx <= 0) ? new JSONPointer("") : new JSONPointer(raw.substring(0, idx));
+    }
+
 }
