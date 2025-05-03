@@ -1,4 +1,4 @@
-package org.json.junit;
+package org.json.junit.milestone2.tests;
 
 import org.json.JSONObject;
 import org.json.JSONPointer;

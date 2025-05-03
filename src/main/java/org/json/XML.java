@@ -786,6 +786,513 @@ public class XML {
         }
         return jo;
     }
+
+    /**
+     *
+     * @param reader, a reader with XML content inside
+     * @param path, a Json path for querying the inside object
+     * @return a Json object which matches the given JsonPointer path, or throw an error if not found
+     * @throws JSONException
+     */
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path) throws JSONException {
+        XMLTokener x = new XMLTokener(reader);
+        // parse the JSONPointer
+        String pointerExpr = path.toString();
+        List<Object> tokens = new ArrayList<>();
+        if (!pointerExpr.isEmpty()) {
+            String[] parts = pointerExpr.split("/", -1);
+            for (int i = (pointerExpr.startsWith("/") ? 1 : 0); i < parts.length; i++) {
+                String part = parts[i].replace("~1", "/").replace("~0", "~");
+                if (part.isEmpty()) {
+                    tokens.add("");
+                } else if (part.matches("-?\\d+") && !(part.startsWith("0") && part.length() > 1)) {
+                    try {
+                        int index = Integer.parseInt(part);
+                        if (index < 0) {
+                            tokens.add(part);
+                        } else {
+                            tokens.add(index);
+                            continue;
+                        }
+                    } catch (NumberFormatException e) {
+                    }
+                }
+                tokens.add(part);
+            }
+        }
+        // pointer is empty, then parse the whole document
+        if (tokens.isEmpty()) {
+            return XML.toJSONObject(reader);
+        }
+
+        JSONObject result = null;
+        Object firstToken = tokens.get(0);
+        if (!(firstToken instanceof String)) {
+            throw new JSONException("Path not found: " + path);
+        }
+        String targetRoot = (String) firstToken;
+        Integer targetRootIndex = null;
+        int nextTokenIndex = 1;
+        if (nextTokenIndex < tokens.size() && tokens.get(nextTokenIndex) instanceof Integer) {
+            targetRootIndex = (Integer) tokens.get(nextTokenIndex);
+            nextTokenIndex++;
+        }
+        int currentIndexCount = 0;
+
+        while (x.more()) {
+            x.skipPast("<");
+            if (!x.more()) break;
+            char c = x.next();
+            if (c == '?') {
+                // XML announcement
+                x.skipPast("?>");
+                continue;
+            }
+            if (c == '!') {
+                if (x.more()) {
+                    char c2 = x.next();
+                    if (c2 == '-' && x.more() && x.next() == '-') {
+                        x.skipPast("-->");
+                    } else if (c2 == '[') {
+                        x.skipPast("]]>");
+                    } else {
+                        // skip <! announcement (can be comments)
+                        x.skipPast(">");
+                    }
+                }
+                continue;
+            }
+            if (c == '/') {
+                // unexpected closing tag
+                continue;
+            }
+            x.back();
+            Object token = x.nextToken();
+            if (!(token instanceof String)) {
+                throw x.syntaxError("Misshaped element");
+            }
+            String tagName = (String) token;
+            // if the top level matches
+            if (tagName.equals(targetRoot)) {
+                // get the index
+                if (targetRootIndex != null) {
+                    if (currentIndexCount < targetRootIndex) {
+                        // skip the whole tree if not reached yet
+                        skipElement(x, tagName);
+                        currentIndexCount++;
+                        continue;
+                    } else if (currentIndexCount > targetRootIndex) {
+                        break;
+                    }
+                }
+                currentIndexCount++;
+                // path only contains root element itself
+                if (nextTokenIndex >= tokens.size()) {
+                    // parse the whole root element as JSONObject
+                    result = parseElement(x, tagName);
+                    break;
+                }
+                boolean selfClosing = false;
+                JSONObject currentObj = new JSONObject();
+                while (true) {
+                    token = x.nextToken();
+                    if (token == null) {
+                        throw x.syntaxError("Misshaped tag");
+                    }
+                    if (token instanceof Character) {
+                        char ch = (Character) token;
+                        if (ch == '>') {
+                            break;
+                        }
+                        if (ch == '/') {
+                            // end of element
+                            if (x.next() != '>') {
+                                throw x.syntaxError("Misshaped tag");
+                            }
+                            selfClosing = true;
+                            break;
+                        }
+                    } else {
+                        String attrName = (String) token;
+                        Object nextTok = x.nextToken();
+                        if (nextTok == XML.EQ) {
+                            Object attrValueToken = x.nextToken();
+                            if (!(attrValueToken instanceof String)) {
+                                throw x.syntaxError("Missing value for attribute " + attrName);
+                            }
+                            String attrValue = (String) attrValueToken;
+                            currentObj.accumulate(attrName, XML.stringToValue(attrValue));
+                        } else {
+                            currentObj.accumulate(attrName, "");
+                            token = nextTok;
+                            if (token instanceof Character) {
+                                x.back();
+                            }
+                        }
+                    }
+                }
+                if (selfClosing) {
+                    // if tag is empty and path does not end here
+                    result = null;
+                } else {
+                    result = findInElement(x, tagName, nextTokenIndex, tokens);
+                }
+                // if result already found
+                if (result != null) {
+                    break;
+                } else {
+                    // continue searching for the element
+                    continue;
+                }
+            } else {
+                // if the top level does not match
+                skipElement(x, tagName);
+            }
+        }
+        if (result == null) {
+            throw new JSONException("Path not found: " + path.toString());
+        }
+        return result;
+    }
+
+    /**
+     * Helper method: skip the current element and its entire subtree without
+     * building any JSON output.
+     *
+     * Preconditions:
+     *   The caller has already read the element name (we are positioned
+     *     right after the `<name` token).
+     *   The tokenizer cursor is at the first token after the element name.
+     */
+    private static void skipElement(XMLTokener x, String tagName) throws JSONException {
+        // Consume attributes until we hit the end of the start‑tag
+        Object token;
+        boolean selfClosing = false;
+        while ((token = x.nextToken()) != null) {
+            if (token instanceof Character) {
+                char ch = (Character) token;
+                if (ch == '>') {           // normal end of start‑tag
+                    break;
+                }
+                if (ch == '/') {           // empty‑element tag `/>`
+                    if (x.next() != '>') {
+                        throw x.syntaxError("Misshaped tag");
+                    }
+                    selfClosing = true;
+                    break;
+                }
+            }
+            // Otherwise ‑– attribute name or value, ignore
+        }
+        if (!selfClosing) {
+            // Skip everything until we see the matching close tag
+            int depth = 0;
+            while (true) {
+                x.skipPast("<");
+                if (!x.more()) {
+                    throw x.syntaxError("Unclosed tag " + tagName);
+                }
+                char c = x.next();
+                if (c == '/') {
+                    // Found a closing tag
+                    Object nameToken = x.nextToken();
+                    if (!(nameToken instanceof String)) {
+                        throw x.syntaxError("Missing close name");
+                    }
+                    String closeName = (String) nameToken;
+                    if (x.next() != '>') {
+                        throw x.syntaxError("Misshaped close tag");
+                    }
+                    if (closeName.equals(tagName)) {
+                        if (depth == 0) {
+                            // Reached the matching close tag – done
+                            break;
+                        } else {
+                            // Closing an inner tag with the same name
+                            depth--;
+                            continue;
+                        }
+                    } else {
+                        // Closing some other tag – ignore
+                        continue;
+                    }
+                } else if (c == '!') {
+                    // Comment / CDATA / DOCTYPE – skip
+                    if (x.more()) {
+                        char c2 = x.next();
+                        if (c2 == '-' && x.more() && x.next() == '-') {
+                            x.skipPast("-->");
+                        } else if (c2 == '[') {
+                            x.skipPast("]]>");
+                        } else {
+                            x.skipPast(">");
+                        }
+                    }
+                    continue;
+                } else if (c == '?') {
+                    // Processing instruction – skip
+                    x.skipPast("?>");
+                    continue;
+                } else {
+                    // New child element – recurse to skip it
+                    x.back();
+                    Object newName = x.nextToken();
+                    if (!(newName instanceof String)) {
+                        throw x.syntaxError("Misshaped tag");
+                    }
+                    skipElement(x, (String) newName);
+                    // If the child has the same tag name, track nesting depth
+                    if (((String) newName).equals(tagName)) {
+                        depth++;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Search within the current element for the sub‑path specified by `tokens`,
+     * starting at `tokenIndex`.  Stops as soon as the desired node is found.
+     *
+     * @param x          XMLTokener – cursor is right after the parent start‑tag.
+     * @param parentName The name of the element we are currently inside.
+     * @param tokenIndex Index of the current JSONPointer token to match.
+     * @param tokens     Full list of JSONPointer tokens.
+     * @return           The matched JSONObject, or {@code null} if not found here.
+     */
+    private static JSONObject findInElement(XMLTokener x,
+                                            String parentName,
+                                            int tokenIndex,
+                                            List<Object> tokens) throws JSONException {
+        String  targetName  = null;   // child element name to look for
+        Integer targetIndex = null;   // optional array index
+        int     nextIndex   = tokenIndex;
+
+        if (tokenIndex < tokens.size()) {
+            Object tk = tokens.get(tokenIndex);
+            if (tk instanceof String) {
+                targetName = (String) tk;
+                if (tokenIndex + 1 < tokens.size()
+                        && tokens.get(tokenIndex + 1) instanceof Integer) {
+                    targetIndex = (Integer) tokens.get(tokenIndex + 1);
+                    nextIndex   = tokenIndex + 2;
+                } else {
+                    nextIndex   = tokenIndex + 1;
+                }
+            } else { // JSONPointer should not give a number at an object level
+                return null;
+            }
+        }
+
+        int       count  = 0;      // how many <targetName> siblings seen
+        JSONObject result = null;
+
+        while (true) {
+            Object contentToken = x.nextContent();
+            if (contentToken == null) {
+                throw x.syntaxError("Unclosed tag " + parentName);
+            }
+            if (contentToken instanceof String) {
+                // Ignore plain text (unless pointer explicitly targets "content")
+                continue;
+            }
+            if (contentToken instanceof Character && (Character) contentToken == '<') {
+                char c = x.next();
+                if (c == '/') {              // end‑tag for parent
+                    Object closeName = x.nextToken();
+                    if (!(closeName instanceof String) || !closeName.equals(parentName)) {
+                        throw x.syntaxError("Mismatched close tag for " + parentName);
+                    }
+                    if (x.next() != '>') {
+                        throw x.syntaxError("Misshaped close tag");
+                    }
+                    break;                   // search in this parent finished
+                }
+                if (c == '?') { x.skipPast("?>"); continue; }
+                if (c == '!') {
+                    // comment / CDATA – skip
+                    if (x.more()) {
+                        char c2 = x.next();
+                        if (c2 == '-' && x.more() && x.next() == '-') {
+                            x.skipPast("-->");
+                        } else if (c2 == '[') {
+                            x.skipPast("]]>");
+                        } else {
+                            x.skipPast(">");
+                        }
+                    }
+                    continue;
+                }
+                // Child element start
+                x.back();
+                Object childToken = x.nextToken();
+                if (!(childToken instanceof String)) {
+                    throw x.syntaxError("Bad tag syntax");
+                }
+                String childName = (String) childToken;
+
+                if (targetName != null && childName.equals(targetName)) {
+                    // Found desired child name
+                    if (targetIndex != null) {          // need a specific index
+                        if (count < targetIndex) {
+                            skipElement(x, childName);  // not yet reached – skip
+                            count++;
+                            continue;
+                        }
+                        count++;                        // now at the right sibling
+                    } else {                            // first match is enough
+                        count++;
+                        if (count > 1) {                // ambiguous path
+                            skipElement(x, childName);
+                            continue;
+                        }
+                    }
+
+                    // Dive into this child
+                    if (nextIndex >= tokens.size()) {
+                        result = parseElement(x, childName);  // path ends here
+                    } else {
+                        result = findInElement(x, childName, nextIndex, tokens);
+                    }
+                    return result;  // regardless of success, stop searching siblings
+                } else {
+                    // Not the target child – skip whole subtree
+                    skipElement(x, childName);
+                }
+            }
+        }
+        return null;  // target not found in this element
+    }
+
+    /**
+     * Parse the current element (including its subtree) into a JSONObject.
+     *
+     * Preconditions:
+     *   – Caller has already consumed the element name; tokenizer cursor is
+     *     positioned immediately after that name token.
+     */
+    private static JSONObject parseElement(XMLTokener x, String tagName) throws JSONException {
+        JSONObject jo = new JSONObject();
+        Object token;
+        boolean selfClosing = false;
+
+        /* ---------- Parse attributes ---------- */
+        while ((token = x.nextToken()) != null) {
+            if (token instanceof Character) {
+                char ch = (Character) token;
+                if (ch == '>') { break; }                  // end of start‑tag
+                if (ch == '/') {                           // empty element
+                    if (x.next() != '>') {
+                        throw x.syntaxError("Misshaped tag");
+                    }
+                    selfClosing = true;
+                    break;
+                }
+            } else {
+                String attrName = (String) token;
+                Object nextTok  = x.nextToken();
+                if (nextTok == XML.EQ) {
+                    Object valTok = x.nextToken();
+                    if (!(valTok instanceof String)) {
+                        throw x.syntaxError("Missing value for attribute " + attrName);
+                    }
+                    jo.accumulate(attrName, XML.stringToValue((String) valTok));
+                } else {
+                    // Attribute without value
+                    jo.accumulate(attrName, "");
+                    if (nextTok instanceof Character) {
+                        char ch2 = (Character) nextTok;
+                        if (ch2 == '>') { break; }
+                        if (ch2 == '/') {
+                            if (x.next() != '>') throw x.syntaxError("Misshaped tag");
+                            selfClosing = true;
+                            break;
+                        }
+                    }
+                    token = nextTok; // nextTok could be another attribute name
+                    continue;
+                }
+            }
+        }
+        if (selfClosing) {
+            return jo; // nothing more to parse
+        }
+
+        /* ---------- Parse children / text ---------- */
+        StringBuilder textBuf = null;
+        while (true) {
+            Object contentToken = x.nextContent();
+            if (contentToken == null) {
+                throw x.syntaxError("Unclosed tag " + tagName);
+            }
+            if (contentToken instanceof String) {
+                String txt = (String) contentToken;
+                if (!txt.isEmpty()) {
+                    if (textBuf == null) textBuf = new StringBuilder();
+                    textBuf.append(XML.stringToValue(txt));
+                }
+            } else if (contentToken instanceof Character
+                    && (Character) contentToken == '<') {
+                char c = x.next();
+                if (c == '/') {                          // end‑tag
+                    Object closeTok = x.nextToken();
+                    String closeName = (closeTok instanceof String) ? (String) closeTok : "";
+                    if (!closeName.equals(tagName)) {
+                        throw x.syntaxError("Mismatched close tag for " + tagName);
+                    }
+                    if (x.next() != '>') {
+                        throw x.syntaxError("Misshaped close tag");
+                    }
+                    if (textBuf != null && textBuf.length() > 0) {
+                        jo.accumulate("content", textBuf.toString());
+                    }
+                    return jo;
+                }
+                if (c == '?') { x.skipPast("?>"); continue; }
+                if (c == '!') {
+                    if (x.more()) {
+                        char c2 = x.next();
+                        if (c2 == '-' && x.more() && x.next() == '-') {
+                            x.skipPast("-->");
+                        } else if (c2 == '[') {
+                            x.skipPast("]]>");
+                        } else {
+                            x.skipPast(">");
+                        }
+                    }
+                    continue;
+                }
+                // Child element
+                x.back();
+                Object childNameTok = x.nextToken();
+                if (!(childNameTok instanceof String)) {
+                    throw x.syntaxError("Bad tag syntax");
+                }
+                String childName = (String) childNameTok;
+                JSONObject childObj = parseElement(x, childName);
+
+                // Merge child into current object (array‑if‑needed semantics)
+                Object existing = jo.opt(childName);
+                if (existing == null) {
+                    jo.accumulate(childName, childObj.length() > 0 ? childObj : "");
+                } else if (existing instanceof JSONArray) {
+                    ((JSONArray) existing).put(childObj.length() > 0 ? childObj : "");
+                } else {
+                    JSONArray arr = new JSONArray();
+                    arr.put(existing);
+                    arr.put(childObj.length() > 0 ? childObj : "");
+                    jo.put(childName, arr);
+                }
+
+                // Flush buffered text, if any
+                if (textBuf != null && textBuf.length() > 0) {
+                    jo.accumulate("content", textBuf.toString());
+                    textBuf.setLength(0);
+                }
+            }
+        }
+    }
+
     /** SWE262P MileStone2 project, Task2 by Jiacheng Zhuo **/
 
     /** Edit the parse method, add functions for the replacement implement **/
