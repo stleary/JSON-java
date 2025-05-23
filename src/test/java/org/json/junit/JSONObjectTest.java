@@ -4011,5 +4011,23 @@ public class JSONObjectTest {
         nestedMap.put("t", buildNestedMap(maxDepth - 1));
         return nestedMap;
     }
+    
 
+    /**
+     * Tests the behavior of the {@link JSONObject} when parsing a bean with null fields
+     * using a custom {@link JSONParserConfiguration} that enables the use of native nulls.
+     * 
+     * <p>This test ensures that uninitialized fields in the bean are serialized correctly
+     * into the resulting JSON object, and their keys are present in the JSON string output.</p>
+     */
+    @Test
+    public void jsonObjectParseNullFieldsWithParserConfiguration() {
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+        RecursiveBean bean = new RecursiveBean(null);
+        JSONObject jsonObject = new JSONObject(bean, jsonParserConfiguration.withUseNativeNulls(true));
+        String textStr = jsonObject.toString();
+        assertTrue("name(uninitialized field) should be serialized", textStr.contains("\"name\""));
+        assertTrue("ref(uninitialized field) should be serialized", textStr.contains("\"ref\""));
+        assertTrue("ref2(uninitialized field) should be serialized", textStr.contains("\"ref2\""));
+    }
 }
