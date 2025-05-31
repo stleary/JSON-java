@@ -401,12 +401,17 @@ public class JSONObject {
      */
     public JSONObject(Object bean) {
         this();
-        this.populateMap(bean);
+        this.populateMap(bean, new JSONParserConfiguration());
+    }
+
+    public JSONObject(Object bean, JSONParserConfiguration jsonParserConfiguration) {
+        this();
+        this.populateMap(bean, jsonParserConfiguration);
     }
 
     private JSONObject(Object bean, Set<Object> objectsRecord) {
         this();
-        this.populateMap(bean, objectsRecord);
+        this.populateMap(bean, objectsRecord, new JSONParserConfiguration());
     }
 
     /**
@@ -1764,11 +1769,11 @@ public class JSONObject {
      * @throws JSONException
      *            If a getter returned a non-finite number.
      */
-    private void populateMap(Object bean) {
-        populateMap(bean, Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>()));
+    private void populateMap(Object bean, JSONParserConfiguration jsonParserConfiguration) {
+        populateMap(bean, Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>()), jsonParserConfiguration);
     }
 
-    private void populateMap(Object bean, Set<Object> objectsRecord) {
+    private void populateMap(Object bean, Set<Object> objectsRecord, JSONParserConfiguration jsonParserConfiguration) {
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
@@ -1788,7 +1793,7 @@ public class JSONObject {
                 if (key != null && !key.isEmpty()) {
                     try {
                         final Object result = method.invoke(bean);
-                        if (result != null) {
+                        if (result != null || jsonParserConfiguration.isUseNativeNulls()) {
                             // check cyclic dependency and throw error if needed
                             // the wrap and populateMap combination method is
                             // itself DFS recursive

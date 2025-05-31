@@ -4011,5 +4011,37 @@ public class JSONObjectTest {
         nestedMap.put("t", buildNestedMap(maxDepth - 1));
         return nestedMap;
     }
+    
+
+    /**
+     * Tests the behavior of the {@link JSONObject} when parsing a bean with null fields
+     * using a custom {@link JSONParserConfiguration} that enables the use of native nulls.
+     * 
+     * <p>This test ensures that uninitialized fields in the bean are serialized correctly
+     * into the resulting JSON object, and their keys are present in the JSON string output.</p>
+     */
+    @Test
+    public void jsonObjectParseNullFieldsWithParserConfiguration() {
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+        RecursiveBean bean = new RecursiveBean(null);
+        JSONObject jsonObject = new JSONObject(bean, jsonParserConfiguration.withUseNativeNulls(true));
+        assertTrue("name key should be present", jsonObject.has("name"));
+        assertTrue("ref key should be present", jsonObject.has("ref"));
+        assertTrue("ref2 key should be present", jsonObject.has("ref2"));
+    }
+
+    /**
+     * Tests the behavior of the {@link JSONObject} when parsing a bean with null fields
+     * without using a custom {@link JSONParserConfiguration}.
+     * 
+     * <p>This test ensures that uninitialized fields in the bean are not serialized
+     * into the resulting JSON object, and the object remains empty.</p>
+     */
+    @Test
+    public void jsonObjectParseNullFieldsWithoutParserConfiguration() {
+        RecursiveBean bean = new RecursiveBean(null);
+        JSONObject jsonObject = new JSONObject(bean);
+        assertTrue("JSONObject should be empty", jsonObject.isEmpty());
+    }
 
 }
