@@ -679,13 +679,11 @@ public class JSONObject {
      */
     public boolean getBoolean(String key) throws JSONException {
         Object object = this.get(key);
-        if (object.equals(Boolean.FALSE)
-                || (object instanceof String && ((String) object)
-                        .equalsIgnoreCase("false"))) {
+        if (Boolean.FALSE.equals(object)
+                || (object instanceof String && "false".equalsIgnoreCase((String) object))) {
             return false;
-        } else if (object.equals(Boolean.TRUE)
-                || (object instanceof String && ((String) object)
-                        .equalsIgnoreCase("true"))) {
+        } else if (Boolean.TRUE.equals(object)
+                || (object instanceof String && "true".equalsIgnoreCase((String) object))) {
             return true;
         }
         throw wrongValueFormatException(key, "Boolean", object, null);
@@ -1911,7 +1909,7 @@ public class JSONObject {
         }
 
         //If the superclass is Object, no annotations will be found any more
-        if (c.getSuperclass().equals(Object.class))
+        if (Object.class.equals(c.getSuperclass()))
             return null;
 
         try {
@@ -1969,7 +1967,7 @@ public class JSONObject {
         }
 
         //If the superclass is Object, no annotations will be found any more
-        if (c.getSuperclass().equals(Object.class))
+        if (Object.class.equals(c.getSuperclass()))
             return -1;
 
         try {
@@ -3022,7 +3020,7 @@ public class JSONObject {
      * @return number without leading zeros
      */
     private static String removeLeadingZerosOfNumber(String value){
-        if (value.equals("-")){return value;}
+        if ("-".equals(value)){return value;}
         boolean negativeFirstChar = (value.charAt(0) == '-');
         int counter = negativeFirstChar ? 1:0;
         while (counter < value.length()){
