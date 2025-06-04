@@ -1782,49 +1782,46 @@ public class JSONObject {
 
         Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
         for (final Method method : methods) {
-            final int modifiers = method.getModifiers();
-            if (Modifier.isPublic(modifiers)
-                    && !Modifier.isStatic(modifiers)
-                    && method.getParameterTypes().length == 0
-                    && !method.isBridge()
-                    && method.getReturnType() != Void.TYPE
-                    && isValidMethodName(method.getName())) {
-                final String key = getKeyNameFromMethod(method);
+            final String key = getKeyNameFromMethod(method);
+            try {
                 if (key != null && !key.isEmpty()) {
-                    try {
-                        final Object result = method.invoke(bean);
-                        if (result != null || jsonParserConfiguration.isUseNativeNulls()) {
-                            // check cyclic dependency and throw error if needed
-                            // the wrap and populateMap combination method is
-                            // itself DFS recursive
-                            if (objectsRecord.contains(result)) {
-                                throw recursivelyDefinedObjectException(key);
-                            }
-
-                            objectsRecord.add(result);
-
-                            testValidity(result);
-                            this.map.put(key, wrap(result, objectsRecord));
-
-                            objectsRecord.remove(result);
-
-                            // we don't use the result anywhere outside of wrap
-                            // if it's a resource we should be sure to close it
-                            // after calling toString
-                            if (result instanceof Closeable) {
-                                try {
-                                    ((Closeable) result).close();
-                                } catch (IOException ignore) {
-                                }
-                            }
+                    final Object result = method.invoke(bean);
+                    if (result != null || jsonParserConfiguration.isUseNativeNulls()) {
+                        // check cyclic dependency and throw error if needed
+                        // the wrap and populateMap combination method is
+                        // itself DFS recursive
+                        if (objectsRecord.contains(result)) {
+                            throw recursivelyDefinedObjectException(key);
                         }
-                    } catch (IllegalAccessException ignore) {
-                    } catch (IllegalArgumentException ignore) {
-                    } catch (InvocationTargetException ignore) {
+
+                        objectsRecord.add(result);
+
+                        testValidity(result);
+                        this.map.put(key, wrap(result, objectsRecord));
+
+                        objectsRecord.remove(result);
+
+                    }
+                    // we don't use the result anywhere outside of wrap
+                    // if it's a resource we should be sure to close it
+                    // after calling toString
+                    if (result instanceof Closeable) {
+                        ((Closeable) result).close();
                     }
                 }
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | IOException ignore) {
             }
         }
+    }
+
+    private static boolean isValidGetterMethod(final Method method) {
+        final int modifiers = method.getModifiers();
+        return Modifier.isPublic(modifiers)
+                && !Modifier.isStatic(modifiers)
+                && method.getParameterTypes().length == 0
+                && !method.isBridge()
+                && method.getReturnType() != Void.TYPE
+                && isValidMethodName(method.getName());
     }
 
     private static boolean isValidMethodName(String name) {
@@ -1832,6 +1829,9 @@ public class JSONObject {
     }
 
     private static String getKeyNameFromMethod(Method method) {
+        if (!isValidGetterMethod(method)) {
+            return null;
+        }
         final int ignoreDepth = getAnnotationDepth(method, JSONPropertyIgnore.class);
         if (ignoreDepth > 0) {
             final int forcedNameDepth = getAnnotationDepth(method, JSONPropertyName.class);
