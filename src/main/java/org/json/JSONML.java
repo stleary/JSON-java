@@ -111,7 +111,7 @@ public class JSONML {
                             }
                         } else if (c == '[') {
                             token = x.nextToken();
-                            if (token.equals("CDATA") && x.next() == '[') {
+                            if ("CDATA".equals(token) && x.next() == '[') {
                                 if (ja != null) {
                                     ja.put(x.nextCDATA());
                                 }
