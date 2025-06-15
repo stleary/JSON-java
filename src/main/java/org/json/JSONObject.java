@@ -136,6 +136,24 @@ public class JSONObject {
     private final Map<String, Object> map;
 
     /**
+     * An internal factory method that can be overridden if the
+     * user desires JSONObject to use a specific map type.
+     * <p>
+     * The default is HashMap to ensure that elements are unordered per the specification.
+     * JSON tends to be a portable transfer format that allows container
+     * implementations to rearrange their items for faster element
+     * retrieval based on associative access.
+     * Therefore, an implementation ought not rely on the order of items.
+     * @param capacity starting capacity. If < 0 then use the default capacity/constructor
+     * @return a new Map
+     */
+    protected Map<String, Object> newInternalMap(int capacity) {
+        if (capacity < 0)
+            return new HashMap<>();
+        return new HashMap<>(capacity);
+    }
+
+    /**
      * Retrieves the type of the underlying Map in this class.
      *
      * @return The class object representing the type of the underlying Map.
@@ -156,13 +174,7 @@ public class JSONObject {
      * Construct an empty JSONObject.
      */
     public JSONObject() {
-        // HashMap is used on purpose to ensure that elements are unordered by
-        // the specification.
-        // JSON tends to be a portable transfer format to allows the container
-        // implementations to rearrange their items for a faster element
-        // retrieval based on associative access.
-        // Therefore, an implementation mustn't rely on the order of the item.
-        this.map = new HashMap<String, Object>();
+        this.map = newInternalMap(-1);
     }
 
     /**
@@ -324,9 +336,9 @@ public class JSONObject {
           throw new JSONException("JSONObject has reached recursion depth limit of " + jsonParserConfiguration.getMaxNestingDepth());
         }
         if (m == null) {
-            this.map = new HashMap<String, Object>();
+            this.map = newInternalMap(-1);
         } else {
-            this.map = new HashMap<String, Object>(m.size());
+            this.map = newInternalMap(m.size());
         	for (final Entry<?, ?> e : m.entrySet()) {
         	    if(e.getKey() == null) {
         	        throw new NullPointerException("Null key.");
@@ -525,7 +537,7 @@ public class JSONObject {
      * @param initialCapacity initial capacity of the internal map.
      */
     protected JSONObject(int initialCapacity){
-        this.map = new HashMap<String, Object>(initialCapacity);
+        this.map = newInternalMap(initialCapacity);
     }
 
     /**
