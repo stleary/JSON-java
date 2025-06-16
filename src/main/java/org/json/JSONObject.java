@@ -3013,24 +3013,4 @@ public class JSONObject {
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
     }
-
-    /**
-     * For a prospective number, remove the leading zeros
-     * @param value prospective number
-     * @return number without leading zeros
-     */
-    private static String removeLeadingZerosOfNumber(String value){
-        if ("-".equals(value)){return value;}
-        boolean negativeFirstChar = (value.charAt(0) == '-');
-        int counter = negativeFirstChar ? 1:0;
-        while (counter < value.length()){
-            if (value.charAt(counter) != '0'){
-                if (negativeFirstChar) {return "-".concat(value.substring(counter));}
-                return value.substring(counter);
-            }
-            ++counter;
-        }
-        if (negativeFirstChar) {return "-0";}
-        return "0";
-    }
 }
