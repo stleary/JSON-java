@@ -1828,7 +1828,7 @@ public class JSONObject {
             }
         }
         JSONPropertyName annotation = getAnnotation(method, JSONPropertyName.class);
-        if (annotation != null && annotation.value() != null && !annotation.value().isEmpty()) {
+        if (annotationValueNotEmpty(annotation)) {
             return annotation.value();
         }
         String key;
@@ -1852,6 +1852,15 @@ public class JSONObject {
             key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
         }
         return key;
+    }
+
+    /**
+     * checks if the annotation is not null and the {@link JSONPropertyName#value()} is not null and is not empty.
+     * @param annotation the annotation to check
+     * @return true if the annotation and the value is not null and not empty, false otherwise.
+     */
+    private static boolean annotationValueNotEmpty(JSONPropertyName annotation) {
+        return annotation != null && annotation.value() != null && !annotation.value().isEmpty();
     }
 
     /**
