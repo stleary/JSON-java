@@ -2752,13 +2752,14 @@ public class JSONObject {
             if (NULL.equals(object)) {
                 return NULL;
             }
-            if (object instanceof JSONObject || object instanceof JSONArray || object instanceof JSONString
+            if (object instanceof JSONObject || object instanceof JSONArray
+                    || object instanceof JSONString || object instanceof String
                     || object instanceof Byte || object instanceof Character
                     || object instanceof Short || object instanceof Integer
                     || object instanceof Long || object instanceof Boolean
                     || object instanceof Float || object instanceof Double
-                    || object instanceof String || object instanceof BigInteger
-                    || object instanceof BigDecimal || object instanceof Enum) {
+                    || object instanceof BigInteger || object instanceof BigDecimal
+                    || object instanceof Enum) {
                 return object;
             }
 
