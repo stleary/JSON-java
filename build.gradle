@@ -3,9 +3,10 @@
  */
 apply plugin: 'java'
 apply plugin: 'eclipse'
-// apply plugin: 'jacoco'
+apply plugin: 'jacoco'
 apply plugin: 'maven-publish'
 
+// for now, publishing to maven is still a manual process
 //plugins {
     // id 'java'
     //id 'maven-publish'
@@ -17,6 +18,17 @@ repositories {
     maven {
         url = uri('https://oss.sonatype.org/content/repositories/snapshots')
     }
+}
+
+// To view the report open build/reports/jacoco/test/html/index.html
+jacocoTestReport {
+    reports {
+        html.required = true
+    }
+}
+
+test {
+    finalizedBy jacocoTestReport
 }
 
 dependencies {
