@@ -1780,30 +1780,32 @@ public class JSONObject {
 
         Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
         for (final Method method : methods) {
-            final String key = getKeyNameFromMethod(method);
-            if (key != null && !key.isEmpty()) {
-                try {
-                    final Object result = method.invoke(bean);
-                    if (result != null || jsonParserConfiguration.isUseNativeNulls()) {
-                        // check cyclic dependency and throw error if needed
-                        // the wrap and populateMap combination method is
-                        // itself DFS recursive
-                        if (objectsRecord.contains(result)) {
-                            throw recursivelyDefinedObjectException(key);
+            if (isValidMethod(method)) {
+                final String key = getKeyNameFromMethod(method);
+                if (key != null && !key.isEmpty()) {
+                    try {
+                        final Object result = method.invoke(bean);
+                        if (result != null || jsonParserConfiguration.isUseNativeNulls()) {
+                            // check cyclic dependency and throw error if needed
+                            // the wrap and populateMap combination method is
+                            // itself DFS recursive
+                            if (objectsRecord.contains(result)) {
+                                throw recursivelyDefinedObjectException(key);
+                            }
+
+                            objectsRecord.add(result);
+
+                            testValidity(result);
+                            this.map.put(key, wrap(result, objectsRecord));
+
+                            objectsRecord.remove(result);
+
+                            closeClosable(result);
                         }
-
-                        objectsRecord.add(result);
-
-                        testValidity(result);
-                        this.map.put(key, wrap(result, objectsRecord));
-
-                        objectsRecord.remove(result);
-
-                        closeClosable(result);
+                    } catch (IllegalAccessException ignore) {
+                    } catch (IllegalArgumentException ignore) {
+                    } catch (InvocationTargetException ignore) {
                     }
-                } catch (IllegalAccessException ignore) {
-                } catch (IllegalArgumentException ignore) {
-                } catch (InvocationTargetException ignore) {
                 }
             }
         }
@@ -1814,10 +1816,6 @@ public class JSONObject {
     }
 
     private static String getKeyNameFromMethod(Method method) {
-        if (!isValidMethod(method)) {
-            return null;
-        }
-
         final int ignoreDepth = getAnnotationDepth(method, JSONPropertyIgnore.class);
         if (ignoreDepth > 0) {
             final int forcedNameDepth = getAnnotationDepth(method, JSONPropertyName.class);
