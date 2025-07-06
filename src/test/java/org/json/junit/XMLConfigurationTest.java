@@ -795,6 +795,18 @@ public class XMLConfigurationTest {
     }
 
     /**
+     * null is "null" when keepStrings == true
+     */
+    @Test
+    public void testToJSONArray_jsonOutput_null_withKeepString() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>null</title></root>";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"null\"}}");
+        final JSONObject actualJsonOutput = XML.toJSONObject(originalXml,
+                new XMLParserConfiguration().withKeepStrings(true));
+        Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
+    }
+
+    /**
      * Test keepStrings behavior when setting keepBooleanAsString, keepNumberAsString
      */
     @Test

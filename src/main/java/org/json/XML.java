@@ -428,6 +428,9 @@ public class XML {
                                                 config.isKeepNumberAsString()
                                                         ? ((String) token)
                                                         : obj);
+                                    } else if (obj == JSONObject.NULL) {
+                                        jsonObject.accumulate(config.getcDataTagName(),
+                                                config.isKeepStrings() ? ((String) token) : obj);
                                     } else {
                                         jsonObject.accumulate(config.getcDataTagName(), stringToValue((String) token));
                                     }
