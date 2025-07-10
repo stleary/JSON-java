@@ -775,8 +775,8 @@ public class XMLConfigurationTest {
      */
     @Test
     public void testToJSONArray_jsonOutput_withKeepNumberAsString() {
-        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":true}}");
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><id>null</id><item id=\"01\"/><title>True</title></root>";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\",null],\"title\":true}}");
         final JSONObject actualJsonOutput = XML.toJSONObject(originalXml,
                 new XMLParserConfiguration().withKeepNumberAsString(true));
         Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
@@ -787,10 +787,22 @@ public class XMLConfigurationTest {
      */
     @Test
     public void testToJSONArray_jsonOutput_withKeepBooleanAsString() {
-        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>True</title></root>";
-        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0],\"title\":\"True\"}}");
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><id>null</id><item id=\"01\"/><title>True</title></root>";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",1,\"00\",0,null],\"title\":\"True\"}}");
         final JSONObject actualJsonOutput = XML.toJSONObject(originalXml,
                 new XMLParserConfiguration().withKeepBooleanAsString(true));
+        Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
+    }
+
+    /**
+     * null is "null" when keepStrings == true
+     */
+    @Test
+    public void testToJSONArray_jsonOutput_null_withKeepString() {
+        final String originalXml = "<root><id>01</id><id>1</id><id>00</id><id>0</id><item id=\"01\"/><title>null</title></root>";
+        final JSONObject expected = new JSONObject("{\"root\":{\"item\":{\"id\":\"01\"},\"id\":[\"01\",\"1\",\"00\",\"0\"],\"title\":\"null\"}}");
+        final JSONObject actualJsonOutput = XML.toJSONObject(originalXml,
+                new XMLParserConfiguration().withKeepStrings(true));
         Util.compareActualVsExpectedJsonObjects(actualJsonOutput,expected);
     }
 
