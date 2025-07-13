@@ -4044,4 +4044,21 @@ public class JSONObjectTest {
         assertTrue("JSONObject should be empty", jsonObject.isEmpty());
     }
 
+    /**
+     * Testing that a custom map extension works.
+     */
+    @Test
+    public void jsonObjectOrderedTest() {
+        JSONObject jsonObject = new JSONObject() {
+            @Override
+            public Map<String, Object> newInternalMap(int capacity) {
+                return new LinkedHashMap<>();
+            }
+        };
+        jsonObject.put("a", 1)
+                .put("c", 2)
+                .put("b", 3)
+                .put("d", 4);
+        assertEquals("{\"a\":1,\"c\":2,\"b\":3,\"d\":4}", jsonObject.toString());
+    }
 }
