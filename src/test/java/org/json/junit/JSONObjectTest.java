@@ -3998,7 +3998,7 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void test_strictModeWithMisCasedBooleanValue(){
+    public void test_strictModeWithMisCasedBooleanOrNullValue(){
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration().withStrictMode();
 
         try{
@@ -4007,6 +4007,10 @@ public class JSONObjectTest {
         } catch (JSONException e) { }
         try{
             JSONObject j2 = new JSONObject("{\"a\":TRUE}", jsonParserConfiguration);
+            fail("Expected an exception");
+        } catch (JSONException e) { }
+        try{
+            JSONObject j2 = new JSONObject("{\"a\":nUlL}", jsonParserConfiguration);
             fail("Expected an exception");
         } catch (JSONException e) { }
     }
