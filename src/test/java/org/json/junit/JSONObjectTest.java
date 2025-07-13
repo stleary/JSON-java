@@ -3997,6 +3997,41 @@ public class JSONObjectTest {
         assertThrows(JSONException.class, () -> { new JSONObject(tokener); });
     }
 
+    @Test
+    public void test_strictModeWithMisCasedBooleanValue(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration().withStrictMode();
+
+        try{
+            JSONObject j1 = new JSONObject("{\"a\":True}", jsonParserConfiguration);
+            fail("Expected an exception");
+        } catch (JSONException e) { }
+        try{
+            JSONObject j2 = new JSONObject("{\"a\":TRUE}", jsonParserConfiguration);
+            fail("Expected an exception");
+        } catch (JSONException e) { }
+    }
+
+    @Test
+    public void test_strictModeWithInappropriateKey(){
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration().withStrictMode();
+
+        // Parsing the following objects should fail
+        try{
+            JSONObject j3 = new JSONObject("{true : 3}", jsonParserConfiguration);
+            fail("Expected an exception");
+        } catch (JSONException e) { }
+        try{
+            JSONObject j4 = new JSONObject("{TRUE : 3}", jsonParserConfiguration);
+            fail("Expected an exception");
+        } catch (JSONException e) { }
+        try{
+            JSONObject j5 = new JSONObject("{1 : 3}", jsonParserConfiguration);
+            fail("Expected an exception");
+        } catch (JSONException e) { }
+
+    }
+
+
     /**
      * Method to build nested map of max maxDepth
      *

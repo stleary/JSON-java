@@ -511,6 +511,15 @@ public class JSONTokener {
             throw this.syntaxError("Missing value");
         }
         Object obj = JSONObject.stringToValue(string);
+        // if obj is a boolean, look at string
+        if (jsonParserConfiguration != null &&
+                jsonParserConfiguration.isStrictMode() && obj instanceof Boolean) {
+            if (!"true".equals(string) && !"false".equals(string)) {
+                throw this.syntaxError(String.format("Strict mode error: Value '%s' is not lowercase boolean", obj));
+            }
+        }
+
+
         // Strict mode only allows strings with explicit double quotes
         if (jsonParserConfiguration != null &&
                 jsonParserConfiguration.isStrictMode() &&
