@@ -4052,7 +4052,7 @@ public class JSONObjectTest {
         JSONObject jsonObject = new JSONObject() {
             @Override
             public Map<String, Object> newInternalMap(int capacity) {
-                return new LinkedHashMap<>();
+                return new LinkedHashMap<String, Object>();
             }
         };
         jsonObject.put("a", 1)

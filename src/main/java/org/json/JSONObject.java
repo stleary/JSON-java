@@ -149,8 +149,8 @@ public class JSONObject {
      */
     protected Map<String, Object> newInternalMap(int capacity) {
         if (capacity < 0)
-            return new HashMap<>();
-        return new HashMap<>(capacity);
+            return new HashMap<String, Object>();
+        return new HashMap<String, Object>(capacity);
     }
 
     /**
