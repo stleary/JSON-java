@@ -144,7 +144,7 @@ public class JSONObject {
      * implementations to rearrange their items for faster element
      * retrieval based on associative access.
      * Therefore, an implementation ought not rely on the order of items.
-     * @param capacity starting capacity. If < 0 then use the default capacity/constructor
+     * @param capacity starting capacity. If less than 0, then use the default capacity/constructor
      * @return a new Map
      */
     protected Map<String, Object> newInternalMap(int capacity) {
