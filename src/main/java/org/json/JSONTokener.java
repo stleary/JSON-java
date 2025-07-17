@@ -511,11 +511,21 @@ public class JSONTokener {
             throw this.syntaxError("Missing value");
         }
         Object obj = JSONObject.stringToValue(string);
-        // Strict mode only allows strings with explicit double quotes
+        // if obj is a boolean, look at string
         if (jsonParserConfiguration != null &&
-                jsonParserConfiguration.isStrictMode() &&
-                obj instanceof String) {
-            throw this.syntaxError(String.format("Strict mode error: Value '%s' is not surrounded by quotes", obj));
+                jsonParserConfiguration.isStrictMode()) {
+            if (obj instanceof Boolean && !"true".equals(string) && !"false".equals(string)) {
+                // Strict mode only allows lowercase true or false
+                throw this.syntaxError(String.format("Strict mode error: Value '%s' is not lowercase boolean", obj));
+            }
+            else if (obj == JSONObject.NULL && !"null".equals(string)) {
+                // Strint mode only allows lowercase null
+                throw this.syntaxError(String.format("Strict mode error: Value '%s' is not lowercase null", obj));
+            }
+            else if (obj instanceof String) {
+                // Strict mode only allows strings with explicit double quotes
+                throw this.syntaxError(String.format("Strict mode error: Value '%s' is not surrounded by quotes", obj));
+            }
         }
         return obj;
     }

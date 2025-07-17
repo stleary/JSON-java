@@ -213,6 +213,7 @@ public class JSONObject {
         this();
         char c;
         String key;
+        Object obj;
 
         boolean isInitial = x.getPrevious() == 0;
 
@@ -230,7 +231,20 @@ public class JSONObject {
                 }
                 return;
             default:
-                key = x.nextSimpleValue(c).toString();
+                obj = x.nextSimpleValue(c);
+                key = obj.toString();
+            }
+
+            if (jsonParserConfiguration != null && jsonParserConfiguration.isStrictMode()) {
+                if(obj instanceof Boolean) {
+                    throw x.syntaxError(String.format("Strict mode error: key '%s' cannot be boolean", key));
+                }
+                if(obj == JSONObject.NULL) {
+                    throw x.syntaxError(String.format("Strict mode error: key '%s' cannot be null", key));
+                }
+                if(obj instanceof Number) {
+                    throw x.syntaxError(String.format("Strict mode error: key '%s' cannot be number", key));
+                }
             }
 
             // The key is followed by ':'.
