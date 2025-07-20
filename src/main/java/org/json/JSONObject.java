@@ -1853,8 +1853,7 @@ public class JSONObject {
     private static Method[] getMethods(Class<?> klass) {
         boolean includeSuperClass = klass.getClassLoader() != null;
 
-        Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
-        return methods;
+        return includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
     }
 
     private static boolean isValidMethodName(String name) {
