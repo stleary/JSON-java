@@ -1785,44 +1785,75 @@ public class JSONObject {
         populateMap(bean, Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>()), jsonParserConfiguration);
     }
 
+    /**
+     * Convert a bean into a json object
+     * @param bean object tobe converted
+     * @param objectsRecord set of all objects for this method
+     * @param jsonParserConfiguration json parser settings
+     */
     private void populateMap(Object bean, Set<Object> objectsRecord, JSONParserConfiguration jsonParserConfiguration) {
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
 
-        boolean includeSuperClass = klass.getClassLoader() != null;
-
-        Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
+        Method[] methods = getMethods(klass);
         for (final Method method : methods) {
             if (isValidMethod(method)) {
                 final String key = getKeyNameFromMethod(method);
                 if (key != null && !key.isEmpty()) {
-                    try {
-                        final Object result = method.invoke(bean);
-                        if (result != null || jsonParserConfiguration.isUseNativeNulls()) {
-                            // check cyclic dependency and throw error if needed
-                            // the wrap and populateMap combination method is
-                            // itself DFS recursive
-                            if (objectsRecord.contains(result)) {
-                                throw recursivelyDefinedObjectException(key);
-                            }
-
-                            objectsRecord.add(result);
-
-                            testValidity(result);
-                            this.map.put(key, wrap(result, objectsRecord));
-
-                            objectsRecord.remove(result);
-
-                            closeClosable(result);
-                        }
-                    } catch (IllegalAccessException ignore) {
-                    } catch (IllegalArgumentException ignore) {
-                    } catch (InvocationTargetException ignore) {
-                    }
+                    processMethod(bean, objectsRecord, jsonParserConfiguration, method, key);
                 }
             }
         }
+    }
+
+    /**
+     * Processes method into json object entry if appropriate
+     * @param bean object being processed (owns the method)
+     * @param objectsRecord set of all objects for this method
+     * @param jsonParserConfiguration json parser settings
+     * @param method method being processed
+     * @param key name of the method
+     */
+    private void processMethod(Object bean, Set<Object> objectsRecord, JSONParserConfiguration jsonParserConfiguration,
+                               Method method, String key) {
+        try {
+            final Object result = method.invoke(bean);
+            if (result != null || jsonParserConfiguration.isUseNativeNulls()) {
+                // check cyclic dependency and throw error if needed
+                // the wrap and populateMap combination method is
+                // itself DFS recursive
+                if (objectsRecord.contains(result)) {
+                    throw recursivelyDefinedObjectException(key);
+                }
+
+                objectsRecord.add(result);
+
+                testValidity(result);
+                this.map.put(key, wrap(result, objectsRecord));
+
+                objectsRecord.remove(result);
+
+                closeClosable(result);
+            }
+        } catch (IllegalAccessException ignore) {
+            // ignore exception
+        } catch (IllegalArgumentException ignore) {
+            // ignore exception
+        } catch (InvocationTargetException ignore) {
+            // ignore exception
+        }
+    }
+
+    /**
+     * This is a convenience method to simplify populate maps
+     * @param klass the name of the object being checked
+     * @return methods of klass
+     */
+    private static Method[] getMethods(Class<?> klass) {
+        boolean includeSuperClass = klass.getClassLoader() != null;
+
+        return includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
     }
 
     private static boolean isValidMethodName(String name) {

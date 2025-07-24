@@ -4000,19 +4000,24 @@ public class JSONObjectTest {
     @Test
     public void test_strictModeWithMisCasedBooleanOrNullValue(){
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration().withStrictMode();
-
         try{
-            JSONObject j1 = new JSONObject("{\"a\":True}", jsonParserConfiguration);
+            new JSONObject("{\"a\":True}", jsonParserConfiguration);
             fail("Expected an exception");
-        } catch (JSONException e) { }
+        } catch (JSONException e) {
+            // No action, expected outcome
+        }
         try{
-            JSONObject j2 = new JSONObject("{\"a\":TRUE}", jsonParserConfiguration);
+            new JSONObject("{\"a\":TRUE}", jsonParserConfiguration);
             fail("Expected an exception");
-        } catch (JSONException e) { }
+        } catch (JSONException e) {
+            // No action, expected outcome
+        }
         try{
-            JSONObject j2 = new JSONObject("{\"a\":nUlL}", jsonParserConfiguration);
+            new JSONObject("{\"a\":nUlL}", jsonParserConfiguration);
             fail("Expected an exception");
-        } catch (JSONException e) { }
+        } catch (JSONException e) {
+            // No action, expected outcome
+        }
     }
 
     @Test
@@ -4021,17 +4026,23 @@ public class JSONObjectTest {
 
         // Parsing the following objects should fail
         try{
-            JSONObject j3 = new JSONObject("{true : 3}", jsonParserConfiguration);
+            new JSONObject("{true : 3}", jsonParserConfiguration);
             fail("Expected an exception");
-        } catch (JSONException e) { }
+        } catch (JSONException e) {
+            // No action, expected outcome
+        }
         try{
-            JSONObject j4 = new JSONObject("{TRUE : 3}", jsonParserConfiguration);
+            new JSONObject("{TRUE : 3}", jsonParserConfiguration);
             fail("Expected an exception");
-        } catch (JSONException e) { }
+        } catch (JSONException e) {
+            // No action, expected outcome
+        }
         try{
-            JSONObject j5 = new JSONObject("{1 : 3}", jsonParserConfiguration);
+            new JSONObject("{1 : 3}", jsonParserConfiguration);
             fail("Expected an exception");
-        } catch (JSONException e) { }
+        } catch (JSONException e) {
+            // No action, expected outcome
+        }
 
     }
 
