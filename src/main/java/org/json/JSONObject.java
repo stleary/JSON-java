@@ -80,17 +80,6 @@ public class JSONObject {
     private static final class Null {
 
         /**
-         * There is only intended to be a single instance of the NULL object,
-         * so the clone method returns itself.
-         *
-         * @return NULL.
-         */
-        @Override
-        protected final Object clone() {
-            return this;
-        }
-
-        /**
          * A Null object is equal to the null value and to itself.
          *
          * @param object
@@ -180,7 +169,7 @@ public class JSONObject {
         for (int i = 0; i < names.length; i += 1) {
             try {
                 this.putOnce(names[i], jo.opt(names[i]));
-            } catch (Exception ignore) {
+            } catch (Exception ignore) { // exception thrown for missing key
             }
         }
     }
@@ -221,83 +210,128 @@ public class JSONObject {
             throw x.syntaxError("A JSONObject text must begin with '{'");
         }
         for (;;) {
-            c = x.nextClean();
-            switch (c) {
-            case 0:
-                throw x.syntaxError("A JSONObject text must end with '}'");
-            case '}':
-                if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
-                    throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
-                }
+            if (parseJSONObject(x, jsonParserConfiguration, isInitial)) {
                 return;
+            }
+        }
+    }
+
+    /**
+     * Parses entirety of JSON object
+     *
+     * @param jsonTokener Parses text as tokens
+     * @param jsonParserConfiguration Variable to pass parser custom configuration for json parsing.
+     * @param isInitial True if start of document, else false
+     * @return True if done building object, else false
+     */
+    private boolean parseJSONObject(JSONTokener jsonTokener, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) {
+        Object obj;
+        String key;
+        char c;
+        c = jsonTokener.nextClean();
+
+        switch (c) {
+            case 0:
+                throw jsonTokener.syntaxError("A JSONObject text must end with '}'");
+            case '}':
+                if (isInitial && jsonParserConfiguration.isStrictMode() && jsonTokener.nextClean() != 0) {
+                    throw jsonTokener.syntaxError("Strict mode error: Unparsed characters found at end of input text");
+                }
+                return true;
             default:
-                obj = x.nextSimpleValue(c);
+                obj = jsonTokener.nextSimpleValue(c);
                 key = obj.toString();
+        }
+
+        checkKeyForStrictMode(jsonTokener, jsonParserConfiguration, obj);
+
+        // The key is followed by ':'.
+        c = jsonTokener.nextClean();
+        if (c != ':') {
+            throw jsonTokener.syntaxError("Expected a ':' after a key");
+        }
+
+        // Use syntaxError(..) to include error location
+        if (key != null) {
+            // Check if key exists
+            boolean keyExists = this.opt(key) != null;
+            if (keyExists && !jsonParserConfiguration.isOverwriteDuplicateKey()) {
+                throw jsonTokener.syntaxError("Duplicate key \"" + key + "\"");
             }
 
-            if (jsonParserConfiguration != null && jsonParserConfiguration.isStrictMode()) {
-                if(obj instanceof Boolean) {
-                    throw x.syntaxError(String.format("Strict mode error: key '%s' cannot be boolean", key));
-                }
-                if(obj == JSONObject.NULL) {
-                    throw x.syntaxError(String.format("Strict mode error: key '%s' cannot be null", key));
-                }
-                if(obj instanceof Number) {
-                    throw x.syntaxError(String.format("Strict mode error: key '%s' cannot be number", key));
-                }
+            Object value = jsonTokener.nextValue();
+            // Only add value if non-null
+            if (value != null) {
+                this.put(key, value);
             }
+        }
 
-            // The key is followed by ':'.
+        // Pairs are separated by ','.
+        if (parseEndOfKeyValuePair(jsonTokener, jsonParserConfiguration, isInitial)) {
+            return true;
+        }
+        // Not finished parsing
+        return false;
+    }
 
-            c = x.nextClean();
-            if (c != ':') {
-                throw x.syntaxError("Expected a ':' after a key");
-            }
-
-            // Use syntaxError(..) to include error location
-
-            if (key != null) {
-                // Check if key exists
-                boolean keyExists = this.opt(key) != null;
-                if (keyExists && !jsonParserConfiguration.isOverwriteDuplicateKey()) {
-                    throw x.syntaxError("Duplicate key \"" + key + "\"");
-                }
-
-                Object value = x.nextValue();
-                // Only add value if non-null
-                if (value != null) {
-                    this.put(key, value);
-                }
-            }
-
-            // Pairs are separated by ','.
-
-            switch (x.nextClean()) {
+    /**
+     * Checks for valid end of key:value pair
+     * @param jsonTokener Parses text as tokens
+     * @param jsonParserConfiguration Variable to pass parser custom configuration for json parsing.
+     * @param isInitial True if end of JSON object, else false
+     * @return
+     */
+    private static boolean parseEndOfKeyValuePair(JSONTokener jsonTokener, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) {
+        switch (jsonTokener.nextClean()) {
             case ';':
                 // In strict mode semicolon is not a valid separator
                 if (jsonParserConfiguration.isStrictMode()) {
-                    throw x.syntaxError("Strict mode error: Invalid character ';' found");
+                    throw jsonTokener.syntaxError("Strict mode error: Invalid character ';' found");
                 }
+                break;
             case ',':
-                if (x.nextClean() == '}') {
+                if (jsonTokener.nextClean() == '}') {
                     // trailing commas are not allowed in strict mode
                     if (jsonParserConfiguration.isStrictMode()) {
-                        throw x.syntaxError("Strict mode error: Expected another object element");
+                        throw jsonTokener.syntaxError("Strict mode error: Expected another object element");
                     }
-                    return;
+                    // End of JSON object
+                    return true;
                 }
-                if (x.end()) {
-                    throw x.syntaxError("A JSONObject text must end with '}'");
+                if (jsonTokener.end()) {
+                    throw jsonTokener.syntaxError("A JSONObject text must end with '}'");
                 }
-                x.back();
+                jsonTokener.back();
                 break;
             case '}':
-                if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
-                    throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
+                if (isInitial && jsonParserConfiguration.isStrictMode() && jsonTokener.nextClean() != 0) {
+                    throw jsonTokener.syntaxError("Strict mode error: Unparsed characters found at end of input text");
                 }
-                return;
+                // End of JSON object
+                return true;
             default:
-                throw x.syntaxError("Expected a ',' or '}'");
+                throw jsonTokener.syntaxError("Expected a ',' or '}'");
+        }
+        // Not at end of JSON object
+        return false;
+    }
+
+    /**
+     * Throws error if key violates strictMode
+     * @param jsonTokener Parses text as tokens
+     * @param jsonParserConfiguration Variable to pass parser custom configuration for json parsing.
+     * @param obj Value to be checked
+     */
+    private static void checkKeyForStrictMode(JSONTokener jsonTokener, JSONParserConfiguration jsonParserConfiguration, Object obj) {
+        if (jsonParserConfiguration != null && jsonParserConfiguration.isStrictMode()) {
+            if(obj instanceof Boolean) {
+                throw jsonTokener.syntaxError(String.format("Strict mode error: key '%s' cannot be boolean", obj.toString()));
+            }
+            if(obj == JSONObject.NULL) {
+                throw jsonTokener.syntaxError(String.format("Strict mode error: key '%s' cannot be null", obj.toString()));
+            }
+            if(obj instanceof Number) {
+                throw jsonTokener.syntaxError(String.format("Strict mode error: key '%s' cannot be number", obj.toString()));
             }
         }
     }
