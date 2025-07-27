@@ -200,10 +200,6 @@ public class JSONObject {
      */
     public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
         this();
-        char c;
-        String key;
-        Object obj;
-
         boolean isInitial = x.getPrevious() == 0;
 
         if (x.nextClean() != '{') {
@@ -227,8 +223,8 @@ public class JSONObject {
     private boolean parseJSONObject(JSONTokener jsonTokener, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) {
         Object obj;
         String key;
-        char c;
-        c = jsonTokener.nextClean();
+        boolean doneParsing = false;
+        char c = jsonTokener.nextClean();
 
         switch (c) {
             case 0:
@@ -268,10 +264,10 @@ public class JSONObject {
 
         // Pairs are separated by ','.
         if (parseEndOfKeyValuePair(jsonTokener, jsonParserConfiguration, isInitial)) {
-            return true;
+            doneParsing = true;
         }
-        // Not finished parsing
-        return false;
+
+        return doneParsing;
     }
 
     /**
