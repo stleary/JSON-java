@@ -480,6 +480,7 @@ public class JSONObject {
             try {
                 this.putOpt(name, c.getField(name).get(object));
             } catch (Exception ignore) {
+                // if invalid, do not include key:value pair in JSONObject
             }
         }
     }
@@ -651,9 +652,9 @@ public class JSONObject {
             return "null";
         }
 
-// Shave off trailing zeros and decimal point, if possible.
-
+        // Shave off trailing zeros and decimal point, if possible.
         String string = Double.toString(d);
+        // idx = 0 case is covered by behavior of Double.toString()
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                 && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
@@ -1130,8 +1131,8 @@ public class JSONObject {
         testValidity(number);
 
         // Shave off trailing zeros and decimal point, if possible.
-
         String string = number.toString();
+        // idx = 0 case is covered by behavior of .toString()
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                 && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
