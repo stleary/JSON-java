@@ -480,6 +480,7 @@ public class JSONObject {
             try {
                 this.putOpt(name, c.getField(name).get(object));
             } catch (Exception ignore) {
+                // if invalid, do not include key:value pair in JSONObject
             }
         }
     }
@@ -651,9 +652,9 @@ public class JSONObject {
             return "null";
         }
 
-// Shave off trailing zeros and decimal point, if possible.
-
+        // Shave off trailing zeros and decimal point, if possible.
         String string = Double.toString(d);
+        // idx = 0 case is covered by behavior of Double.toString()
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                 && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
@@ -1130,8 +1131,8 @@ public class JSONObject {
         testValidity(number);
 
         // Shave off trailing zeros and decimal point, if possible.
-
         String string = number.toString();
+        // idx = 0 case is covered by behavior of .toString()
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                 && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
@@ -1397,11 +1398,13 @@ public class JSONObject {
         }
         // don't check if it's a string in case of unchecked Number subclasses
         try {
-            // the other opt functions handle implicit conversions, i.e.
-            // jo.put("double",1.1d);
-            // jo.optInt("double"); -- will return 1, not an error
-            // this conversion to BigDecimal then to BigInteger is to maintain
-            // that type cast support that may truncate the decimal.
+            /**
+             * the other opt functions handle implicit conversions, i.e.
+             * jo.put("double",1.1d);
+             * jo.optInt("double"); -- will return 1, not an error
+             * this conversion to BigDecimal then to BigInteger is to maintain
+             * that type cast support that may truncate the decimal.
+             */
             final String valStr = val.toString();
             if(isDecimalNotation(valStr)) {
                 return new BigDecimal(valStr).toBigInteger();
@@ -1505,11 +1508,7 @@ public class JSONObject {
         if (val == null) {
             return defaultValue;
         }
-        final float floatValue = val.floatValue();
-        // if (Float.isNaN(floatValue) || Float.isInfinite(floatValue)) {
-        // return defaultValue;
-        // }
-        return floatValue;
+        return val.floatValue();
     }
 
     /**
@@ -1541,11 +1540,7 @@ public class JSONObject {
         if (val == null) {
             return defaultValue;
         }
-        final Float floatValue = val.floatValue();
-        // if (Float.isNaN(floatValue) || Float.isInfinite(floatValue)) {
-        // return defaultValue;
-        // }
-        return floatValue;
+        return val.floatValue();
     }
 
     /**
@@ -1916,7 +1911,7 @@ public class JSONObject {
         // if the first letter in the key is not uppercase, then skip.
         // This is to maintain backwards compatibility before PR406
         // (https://github.com/stleary/JSON-java/pull/406/)
-        if (key.length() == 0 || Character.isLowerCase(key.charAt(0))) {
+        if (key.isEmpty() || Character.isLowerCase(key.charAt(0))) {
             return null;
         }
         if (key.length() == 1) {
@@ -1963,6 +1958,7 @@ public class JSONObject {
             try {
                 ((Closeable) input).close();
             } catch (IOException ignore) {
+                // close has failed; best effort has been made
             }
         }
     }
@@ -1982,7 +1978,7 @@ public class JSONObject {
      *         or one of its super class definitions
      */
     private static <A extends Annotation> A getAnnotation(final Method m, final Class<A> annotationClass) {
-        // if we have invalid data the result is null
+        // If we have invalid data the result is null
         if (m == null || annotationClass == null) {
             return null;
         }
@@ -1991,7 +1987,7 @@ public class JSONObject {
             return m.getAnnotation(annotationClass);
         }
 
-        // if we've already reached the Object class, return null;
+        // If we've already reached the Object class, return null;
         Class<?> c = m.getDeclaringClass();
         if (c.getSuperclass() == null) {
             return null;
@@ -2003,13 +1999,13 @@ public class JSONObject {
                 Method im = i.getMethod(m.getName(), m.getParameterTypes());
                 return getAnnotation(im, annotationClass);
             } catch (final SecurityException ex) {
-                continue;
+                // ignore this exception
             } catch (final NoSuchMethodException ex) {
-                continue;
+                // ignore this excpetion
             }
         }
 
-        //If the superclass is Object, no annotations will be found any more
+        // If the superclass is Object, no annotations will be found any more
         if (Object.class.equals(c.getSuperclass()))
             return null;
 
