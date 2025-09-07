@@ -3019,11 +3019,8 @@ public class JSONObject {
                 if (indentFactor > 0) {
                     writer.write(' ');
                 }
-                try{
-                    writeValue(writer, entry.getValue(), indentFactor, indent);
-                } catch (Exception e) {
-                    throw new JSONException("Unable to write JSONObject value for key: " + key, e);
-                }
+                // might throw an exception
+                attemptWriteValue(writer, indentFactor, indent, entry, key);
             } else if (length != 0) {
                 final int newIndent = indent + indentFactor;
                 for (final Entry<String,?> entry : this.entrySet()) {
@@ -3056,6 +3053,30 @@ public class JSONObject {
             return writer;
         } catch (IOException exception) {
             throw new JSONException(exception);
+        }
+    }
+
+    /**
+     * Convenience function. Writer attempts to write a value.
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indentation of the top level.
+     * @param entry
+     *            Contains the value being written
+     * @param key
+     *            Identifies the value
+     * @throws JSONException if a called function has an error or a write error
+     * occurs
+
+     */
+    private static void attemptWriteValue(Writer writer, int indentFactor, int indent, Entry<String, ?> entry, String key) {
+        try{
+            writeValue(writer, entry.getValue(), indentFactor, indent);
+        } catch (Exception e) {
+            throw new JSONException("Unable to write JSONObject value for key: " + key, e);
         }
     }
 
