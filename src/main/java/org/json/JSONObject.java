@@ -1390,7 +1390,7 @@ public class JSONObject {
             if (!numberIsFinite((Number)val)) {
                 return defaultValue;
             }
-            return new BigDecimal(((Number) val).doubleValue()).toBigInteger();
+            return BigDecimal.valueOf(((Number) val).doubleValue()).toBigInteger();
         }
         if (val instanceof Long || val instanceof Integer
                 || val instanceof Short || val instanceof Byte){
@@ -2041,7 +2041,7 @@ public class JSONObject {
             return 1;
         }
 
-        // if we've already reached the Object class, return -1;
+        // since we've already reached the Object class, return -1;
         Class<?> c = m.getDeclaringClass();
         if (c.getSuperclass() == null) {
             return -1;
@@ -2057,9 +2057,9 @@ public class JSONObject {
                     return d + 1;
                 }
             } catch (final SecurityException ex) {
-                continue;
+                // Nothing to do here
             } catch (final NoSuchMethodException ex) {
-                continue;
+                // Nothing to do here
             }
         }
 
@@ -2427,19 +2427,30 @@ public class JSONObject {
                 w.write("\\r");
                 break;
             default:
-                if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                        || (c >= '\u2000' && c < '\u2100')) {
-                    w.write("\\u");
-                    hhhh = Integer.toHexString(c);
-                    w.write("0000", 0, 4 - hhhh.length());
-                    w.write(hhhh);
-                } else {
-                    w.write(c);
-                }
+                writeAsHex(w, c);
             }
         }
         w.write('"');
         return w;
+    }
+
+    /**
+     * Convenience method to reduce cognitive complexity of quote()
+     * @param w      The Writer to which the quoted string will be appended.
+     * @param c      Character to write
+     * @throws IOException
+     */
+    private static void writeAsHex(Writer w, char c) throws IOException {
+        String hhhh;
+        if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                || (c >= '\u2000' && c < '\u2100')) {
+            w.write("\\u");
+            hhhh = Integer.toHexString(c);
+            w.write("0000", 0, 4 - hhhh.length());
+            w.write(hhhh);
+        } else {
+            w.write(c);
+        }
     }
 
     /**
@@ -2470,40 +2481,44 @@ public class JSONObject {
             if (!this.keySet().equals(((JSONObject)other).keySet())) {
                 return false;
             }
-            for (final Entry<String,?> entry : this.entrySet()) {
-                String name = entry.getKey();
-                Object valueThis = entry.getValue();
-                Object valueOther = ((JSONObject)other).get(name);
-                if(valueThis == valueOther) {
-                	continue;
-                }
-                if(valueThis == null) {
-                	return false;
-                }
-                if (valueThis instanceof JSONObject) {
-                    if (!((JSONObject)valueThis).similar(valueOther)) {
-                        return false;
-                    }
-                } else if (valueThis instanceof JSONArray) {
-                    if (!((JSONArray)valueThis).similar(valueOther)) {
-                        return false;
-                    }
-                } else if (valueThis instanceof Number && valueOther instanceof Number) {
-                    if (!isNumberSimilar((Number)valueThis, (Number)valueOther)) {
-                    	return false;
-                    }
-                } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
-                    if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
-                    	return false;
-                    }
-                } else if (!valueThis.equals(valueOther)) {
-                    return false;
-                }
-            }
-            return true;
+            return checkSimilarEntries(other);
         } catch (Throwable exception) {
             return false;
         }
+    }
+
+    private boolean checkSimilarEntries(Object other) {
+        for (final Entry<String,?> entry : this.entrySet()) {
+            String name = entry.getKey();
+            Object valueThis = entry.getValue();
+            Object valueOther = ((JSONObject)other).get(name);
+            if(valueThis == valueOther) {
+                continue;
+            }
+            if(valueThis == null) {
+                return false;
+            }
+
+            if (!checkThis(valueThis, valueOther)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkThis(Object valueThis, Object valueOther) {
+        if (valueThis instanceof JSONObject) {
+            return ((JSONObject)valueThis).similar(valueOther);
+        } else if (valueThis instanceof JSONArray) {
+            return ((JSONArray)valueThis).similar(valueOther);
+        } else if (valueThis instanceof Number && valueOther instanceof Number) {
+            return isNumberSimilar((Number)valueThis, (Number)valueOther);
+        } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
+            return ((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString());
+        } else if (!valueThis.equals(valueOther)) {
+            return false;
+        }
+        return true;
     }
 
     /**
