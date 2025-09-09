@@ -17,6 +17,10 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -119,6 +123,12 @@ public class JSONObject {
      */
     static final Pattern NUMBER_PATTERN = Pattern.compile("-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?");
 
+
+    /**
+     * A Builder class for handling the conversion of JSON to Object.
+     */
+    private JSONBuilder builder;
+
     /**
      * The map where the JSONObject's properties are kept.
      */
@@ -210,6 +220,25 @@ public class JSONObject {
                 return;
             }
         }
+    }
+
+    /**
+     * Construct a JSONObject with JSONBuilder for conversion from JSON to POJO
+     *
+     * @param builder builder option for json to POJO
+     */
+    public JSONObject(JSONBuilder builder) {
+      this();
+      this.builder = builder;
+    }
+
+    /**
+     * Method to set JSONBuilder.
+     *
+     * @param builder
+     */
+    public void setJSONBuilder(JSONBuilder builder) {
+      this.builder = builder;
     }
 
     /**
@@ -3206,5 +3235,122 @@ public class JSONObject {
         return new JSONException(
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
+    }
+
+    /**
+     * Deserializes a JSON string into an instance of the specified class.
+     *
+     * <p>This method attempts to map JSON key-value pairs to the corresponding fields
+     * of the given class. It supports basic data types including int, double, float,
+     * long, and boolean (as well as their boxed counterparts). The class must have a 
+     * no-argument constructor, and the field names in the class must match the keys 
+     * in the JSON string.
+     *
+     * @param clazz the class of the object to be returned
+     * @param <T> the type of the object
+     * @return an instance of type T with fields populated from the JSON string
+     */
+    public <T> T fromJson(Class<T> clazz) {
+      try {
+        T obj = clazz.getDeclaredConstructor().newInstance();
+        if (this.builder == null) {
+          this.builder = new JSONBuilder();
+        }
+        Map<Class<?>, Function<Object, ?>> classMapping = this.builder.getClassMapping();
+
+        for (Field field: clazz.getDeclaredFields()) {
+          field.setAccessible(true);
+          String fieldName = field.getName();
+          if (this.has(fieldName)) {
+            Object value = this.get(fieldName);
+            Class<?> pojoClass = field.getType();
+            if (classMapping.containsKey(pojoClass)) {
+              field.set(obj, classMapping.get(pojoClass).apply(value));
+            } else {
+              if (value.getClass() == JSONObject.class) {
+                field.set(obj, fromJson((JSONObject) value, pojoClass));
+              } else if (value.getClass() == JSONArray.class) {
+                if (Collection.class.isAssignableFrom(pojoClass)) {
+
+                  Collection<?> nestedCollection = fromJsonArray((JSONArray) value,
+                      (Class<? extends Collection>) pojoClass,
+                      field.getGenericType());
+
+                  field.set(obj, nestedCollection);
+                }
+              } 
+            }
+          }
+        }
+        return obj;
+      } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        throw new JSONException(e);
+      }
+    }
+
+    private <T> Collection<T> fromJsonArray(JSONArray jsonArray, Class<?> collectionType, Type elementType) throws JSONException {
+      try {
+        Map<Class<?>, Function<Object, ?>> classMapping = this.builder.getClassMapping();
+        Map<Class<?>, Supplier<?>> collectionMapping = this.builder.getCollectionMapping();
+        Collection<T> collection = (Collection<T>) (collectionMapping.containsKey(collectionType) ? 
+            collectionMapping.get(collectionType).get() 
+            : collectionType.getDeclaredConstructor().newInstance());
+
+
+        Class<?> innerElementClass = null;
+        Type innerElementType = null;
+        if (elementType instanceof ParameterizedType) {
+          ParameterizedType pType = (ParameterizedType) elementType;
+          innerElementType = pType.getActualTypeArguments()[0];
+          innerElementClass = (innerElementType instanceof Class) ? 
+              (Class<?>) innerElementType 
+            : (Class<?>) ((ParameterizedType) innerElementType).getRawType();
+        } else {
+          innerElementClass = (Class<?>) elementType;
+        }
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+          Object jsonElement = jsonArray.get(i);
+          if (classMapping.containsKey(innerElementClass)) {
+            collection.add((T) classMapping.get(innerElementClass).apply(jsonElement));
+          } else if (jsonElement.getClass() == JSONObject.class) {
+            collection.add((T) ((JSONObject) jsonElement).fromJson(innerElementClass));
+          } else if (jsonElement.getClass() == JSONArray.class) {
+            if (Collection.class.isAssignableFrom(innerElementClass)) {
+
+              Collection<?> nestedCollection = fromJsonArray((JSONArray) jsonElement,
+                  innerElementClass,
+                  innerElementType);
+
+              collection.add((T) nestedCollection);
+            } else {
+              throw new JSONException("Expected collection type for nested JSONArray, but got: " + innerElementClass);
+            }
+          } else {
+            collection.add((T) jsonElement.toString());
+          }
+        }
+        return collection;
+      } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        throw new JSONException(e);
+      }
+    }
+
+    /**
+     * Deserializes a JSON string into an instance of the specified class.
+     *
+     * <p>This method attempts to map JSON key-value pairs to the corresponding fields
+     * of the given class. It supports basic data types including int, double, float,
+     * long, and boolean (as well as their boxed counterparts). The class must have a 
+     * no-argument constructor, and the field names in the class must match the keys 
+     * in the JSON string.
+     *
+     * @param object JSONObject of internal class
+     * @param clazz the class of the object to be returned
+     * @param <T> the type of the object
+     * @return an instance of type T with fields populated from the JSON string
+     */
+    private <T> T fromJson(JSONObject object, Class<T> clazz) {
+      return object.fromJson(clazz);
     }
 }

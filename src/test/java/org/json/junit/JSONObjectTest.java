@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import org.json.JSONPointerException;
 import org.json.JSONParserConfiguration;
 import org.json.JSONString;
+import org.json.JSONBuilder;
 import org.json.JSONTokener;
 import org.json.ParserConfiguration;
 import org.json.XML;
@@ -4095,4 +4096,219 @@ public class JSONObjectTest {
         assertTrue("JSONObject should be empty", jsonObject.isEmpty());
     }
 
+
+    @Test
+    public void jsonObjectParseFromJson_0() {
+      JSONObject object = new JSONObject();
+      object.put("number", 12);
+      object.put("name", "Alex");
+      object.put("longNumber", 1500000000L);
+      String jsonObject = object.toString();
+      CustomClass customClass = object.fromJson(CustomClass.class);
+      CustomClass compareClass = new CustomClass(12, "Alex", 1500000000L);
+      assertEquals(customClass, compareClass);
+    }
+
+    public static class CustomClass {
+      public int number;
+      public String name;
+      public Long longNumber;
+
+      public CustomClass() {}
+      public CustomClass (int number, String name, Long longNumber) {
+        this.number = number;
+        this.name = name;
+        this.longNumber = longNumber;
+      }
+      @Override
+      public boolean equals(Object o) {
+        CustomClass customClass = (CustomClass) o;
+
+        return (this.number == customClass.number
+          && this.name.equals(customClass.name)
+          && this.longNumber.equals(customClass.longNumber));
+      }
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_1() {
+      JSONBuilder builder = new JSONBuilder();
+      builder.setClassMapping(java.time.LocalDateTime.class, s -> java.time.LocalDateTime.parse((String)s));
+      JSONObject object = new JSONObject(builder);
+      java.time.LocalDateTime localDateTime = java.time.LocalDateTime.now();
+      object.put("localDate", localDateTime.toString());
+      CustomClassA customClassA = object.fromJson(CustomClassA.class);
+      CustomClassA compareClassClassA = new CustomClassA(localDateTime);
+      assertEquals(customClassA, compareClassClassA);
+    }
+
+    public static class CustomClassA {
+      public java.time.LocalDateTime localDate;
+
+      public CustomClassA() {}
+      public CustomClassA(java.time.LocalDateTime localDate) {
+        this.localDate = localDate;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        CustomClassA classA = (CustomClassA) o;
+        return this.localDate.equals(classA.localDate);
+      }
+    }
+    
+    @Test
+    public void jsonObjectParseFromJson_2() {
+      JSONObject object = new JSONObject();
+      object.put("number", 12);
+
+      JSONObject classC = new JSONObject();
+      classC.put("stringName", "Alex");
+      classC.put("longNumber", 123456L);
+
+      object.put("classC", classC);
+
+      CustomClassB customClassB = object.fromJson(CustomClassB.class);
+      CustomClassC classCObject = new CustomClassC("Alex", 123456L);
+      CustomClassB compareClassB = new CustomClassB(12, classCObject);
+      assertEquals(customClassB, compareClassB);
+    }
+
+    public static class CustomClassB {
+      public int number;
+      public CustomClassC classC;
+
+      public CustomClassB() {}
+      public CustomClassB(int number, CustomClassC classC) {
+        this.number = number;
+        this.classC = classC;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        CustomClassB classB = (CustomClassB) o;
+        return this.number == classB.number
+          && this.classC.equals(classB.classC);
+      }
+    }
+
+    public static class CustomClassC {
+      public String stringName;
+      public Long longNumber;
+
+      public CustomClassC() {}
+      public CustomClassC(String stringName, Long longNumber) {
+        this.stringName = stringName;
+        this.longNumber = longNumber;
+      }
+
+      public JSONObject toJSON() {
+        JSONObject object = new JSONObject();
+        object.put("stringName", this.stringName);
+        object.put("longNumber", this.longNumber);
+        return object;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        CustomClassC classC = (CustomClassC) o;
+        return this.stringName.equals(classC.stringName)
+          && this.longNumber.equals(classC.longNumber);
+      }
+
+      @Override
+      public int hashCode() {
+        return java.util.Objects.hash(stringName, longNumber);
+      }
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_3() {
+      JSONObject object = new JSONObject();
+      JSONArray array = new JSONArray();
+      array.put("test1");
+      array.put("test2");
+      array.put("test3");
+      object.put("stringList", array);
+
+      CustomClassD customClassD = object.fromJson(CustomClassD.class);
+      CustomClassD compareClassD = new CustomClassD(Arrays.asList("test1", "test2", "test3"));
+      assertEquals(customClassD, compareClassD);
+    }
+
+    public static class CustomClassD {
+      public List<String> stringList;
+
+      public CustomClassD() {}
+      public CustomClassD(List<String> stringList) {
+        this.stringList = stringList;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        CustomClassD classD = (CustomClassD) o;
+        return this.stringList.equals(classD.stringList);
+      }
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_4() {
+      JSONObject object = new JSONObject();
+      JSONArray array = new JSONArray();
+      array.put(new CustomClassC("test1", 1L).toJSON());
+      array.put(new CustomClassC("test2", 2L).toJSON());
+      object.put("listClassC", array);
+
+      CustomClassE customClassE = object.fromJson(CustomClassE.class);
+      CustomClassE compareClassE = new CustomClassE(java.util.Arrays.asList(
+      new CustomClassC("test1", 1L),
+      new CustomClassC("test2", 2L)));
+      assertEquals(customClassE, compareClassE);
+    }
+
+    public static class CustomClassE {
+      public List<CustomClassC> listClassC;
+
+      public CustomClassE() {}
+      public CustomClassE(List<CustomClassC> listClassC) {
+        this.listClassC = listClassC;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        CustomClassE classE = (CustomClassE) o;
+        return this.listClassC.equals(classE.listClassC);
+      }
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_5() {
+      JSONObject object = new JSONObject();
+      JSONArray array = new JSONArray();
+      array.put(Arrays.asList("A", "B", "C"));
+      array.put(Arrays.asList("D", "E"));
+      object.put("listOfString", array);
+
+      CustomClassF customClassF = object.fromJson(CustomClassF.class);
+      List<List<String>> listOfString = new ArrayList<>();
+      listOfString.add(Arrays.asList("A", "B", "C"));
+      listOfString.add(Arrays.asList("D", "E"));
+      CustomClassF compareClassF = new CustomClassF(listOfString);
+      assertEquals(customClassF, compareClassF);
+    }
+
+    public static class CustomClassF {
+      public List<List<String>> listOfString;
+
+      public CustomClassF() {}
+      public CustomClassF(List<List<String>> listOfString) {
+        this.listOfString = listOfString;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+        CustomClassF classF = (CustomClassF) o;
+        return this.listOfString.equals(classF.listOfString);
+      }
+    }
 }
