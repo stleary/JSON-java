@@ -40,14 +40,14 @@ public class JSONBuilder {
    *   <li>{@code String.class} -> Identity function</li>
    * </ul>
    */
-  private static final Map<Class<?>,  TypeConverter<?>> classMapping = new HashMap<>();
+  private static final Map<Class<?>,  TypeConverter<?>> classMapping = new HashMap<Class<?>,  TypeConverter<?>>();
 
   /**
    * A mapping from collection interface types to suppliers that produce
    * instances of concrete collection implementations.
    *
    */
-  private static final Map<Class<?>, InstanceCreator<?>> collectionMapping = new HashMap<>();
+  private static final Map<Class<?>, InstanceCreator<?>> collectionMapping = new HashMap<Class<?>, InstanceCreator<?>>();
   
    // Static initializer block to populate default mappings
    static {

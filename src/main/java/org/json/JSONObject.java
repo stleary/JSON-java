@@ -3283,7 +3283,13 @@ public class JSONObject {
           }
         }
         return obj;
-      } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+      } catch (NoSuchMethodException e) {
+        throw new JSONException(e);
+      } catch (InstantiationException e) {
+        throw new JSONException(e);
+      } catch (IllegalAccessException e) {
+        throw new JSONException(e);
+      } catch (InvocationTargetException e) {
         throw new JSONException(e);
       }
     }
@@ -3331,7 +3337,13 @@ public class JSONObject {
           }
         }
         return collection;
-      } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+      } catch (NoSuchMethodException e) {
+        throw new JSONException(e);
+      } catch (InstantiationException e) {
+        throw new JSONException(e);
+      } catch (IllegalAccessException e) {
+        throw new JSONException(e);
+      } catch (InvocationTargetException e) {
         throw new JSONException(e);
       }
     }
