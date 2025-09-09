@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Collection;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * The {@code JSONBuilder} class provides a configurable mechanism for
@@ -42,38 +40,88 @@ public class JSONBuilder {
    *   <li>{@code String.class} -> Identity function</li>
    * </ul>
    */
-  private static final Map<Class<?>, Function<Object, ?>> classMapping = new HashMap<>();
+  private static final Map<Class<?>,  TypeConverter<?>> classMapping = new HashMap<>();
 
   /**
    * A mapping from collection interface types to suppliers that produce
    * instances of concrete collection implementations.
    *
-   * <p>Examples of default mappings:
-   * <ul>
-   *   <li>{@code List.class} -> {@code ArrayList::new}</li>
-   *   <li>{@code Set.class} -> {@code HashSet::new}</li>
-   *   <li>{@code Map.class} -> {@code HashMap::new}</li>
-   * </ul>
    */
-  private static final Map<Class<?>, Supplier<?>> collectionMapping = new HashMap<>();
+  private static final Map<Class<?>, InstanceCreator<?>> collectionMapping = new HashMap<>();
   
    // Static initializer block to populate default mappings
    static {
-    classMapping.put(int.class, s -> ((Number) s).intValue());
-    classMapping.put(Integer.class, s -> ((Number) s).intValue());
-    classMapping.put(double.class, s -> ((Number) s).doubleValue());
-    classMapping.put(Double.class, s -> ((Number) s).doubleValue());
-    classMapping.put(float.class, s -> ((Number) s).floatValue());
-    classMapping.put(Float.class, s -> ((Number) s).floatValue());
-    classMapping.put(long.class, s -> ((Number) s).longValue());
-    classMapping.put(Long.class, s -> ((Number) s).longValue());
-    classMapping.put(boolean.class, s -> s);
-    classMapping.put(Boolean.class, s -> s);
-    classMapping.put(String.class, s -> s);
+    classMapping.put(int.class, new TypeConverter<Integer>() {
+      public Integer convert(Object input) {
+        return ((Number) input).intValue();
+      }
+    });
+    classMapping.put(Integer.class, new TypeConverter<Integer>() {
+      public Integer convert(Object input) {
+        return ((Number) input).intValue();
+      }
+    });
+    classMapping.put(double.class, new TypeConverter<Double>() {
+      public Double convert(Object input) {
+        return ((Number) input).doubleValue();
+      }
+    });
+    classMapping.put(Double.class, new TypeConverter<Double>() {
+      public Double convert(Object input) {
+        return ((Number) input).doubleValue();
+      }
+    });
+    classMapping.put(float.class, new TypeConverter<Float>() {
+      public Float convert(Object input) {
+        return ((Number) input).floatValue();
+      }
+    });
+    classMapping.put(Float.class, new TypeConverter<Float>() {
+      public Float convert(Object input) {
+        return ((Number) input).floatValue();
+      }
+    });
+    classMapping.put(long.class, new TypeConverter<Long>() {
+      public Long convert(Object input) {
+        return ((Number) input).longValue();
+      }
+    });
+    classMapping.put(Long.class, new TypeConverter<Long>() {
+      public Long convert(Object input) {
+        return ((Number) input).longValue();
+      }
+    });
+    classMapping.put(boolean.class, new TypeConverter<Boolean>() {
+      public Boolean convert(Object input) {
+        return (Boolean) input;
+      }
+    });
+    classMapping.put(Boolean.class, new TypeConverter<Boolean>() {
+      public Boolean convert(Object input) {
+        return (Boolean) input;
+      }
+    });
+    classMapping.put(String.class, new TypeConverter<String>() {
+      public String convert(Object input) {
+        return (String) input;
+      }
+    });
 
-    collectionMapping.put(List.class, ArrayList::new);
-    collectionMapping.put(Set.class, HashSet::new);
-    collectionMapping.put(Map.class, HashMap::new);
+    collectionMapping.put(List.class, new InstanceCreator<List>() {
+      public List create() {
+        return new ArrayList();
+      }
+    });
+    collectionMapping.put(Set.class, new InstanceCreator<Set>() {
+      public Set create() {
+        return new HashSet();
+      }
+    });
+    collectionMapping.put(Map.class, new InstanceCreator<Map>() {
+      public Map create() {
+        return new HashMap(); 
+      }
+    });
    }
 
   /**
@@ -81,7 +129,7 @@ public class JSONBuilder {
    *
    * @return a map of classes to functions that convert an {@code Object} to that class
    */
-   public Map<Class<?>, Function<Object, ?>> getClassMapping() {
+   public Map<Class<?>, TypeConverter<?>> getClassMapping() {
      return this.classMapping;
    }
 
@@ -90,7 +138,7 @@ public class JSONBuilder {
    *
    * @return a map of collection interface types to suppliers of concrete implementations
    */
-   public Map<Class<?>, Supplier<?>> getCollectionMapping() {
+   public Map<Class<?>, InstanceCreator<?>> getCollectionMapping() {
      return this.collectionMapping;
    }
 
@@ -103,7 +151,7 @@ public class JSONBuilder {
    * @param clazz the target class for which the conversion function is to be set
    * @param function a function that takes an {@code Object} and returns an instance of {@code clazz}
    */
-   public void setClassMapping(Class<?> clazz, Function<Object, ?> function) {
+   public void setClassMapping(Class<?> clazz, TypeConverter<?> function) {
      classMapping.put(clazz, function);
    }
 
@@ -116,7 +164,7 @@ public class JSONBuilder {
    * @param clazz the collection interface class (e.g., {@code List.class})
    * @param function a supplier that creates a new instance of a concrete implementation
    */
-   public void setCollectionMapping(Class<?> clazz, Supplier<?> function) {
+   public void setCollectionMapping(Class<?> clazz, InstanceCreator<?> function) {
      collectionMapping.put(clazz, function);
    }
 }

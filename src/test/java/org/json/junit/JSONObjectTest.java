@@ -37,6 +37,7 @@ import org.json.JSONBuilder;
 import org.json.JSONTokener;
 import org.json.ParserConfiguration;
 import org.json.XML;
+import org.json.TypeConverter;
 import org.json.junit.data.BrokenToString;
 import org.json.junit.data.ExceptionalBean;
 import org.json.junit.data.Fraction;
@@ -4133,7 +4134,11 @@ public class JSONObjectTest {
     @Test
     public void jsonObjectParseFromJson_1() {
       JSONBuilder builder = new JSONBuilder();
-      builder.setClassMapping(java.time.LocalDateTime.class, s -> java.time.LocalDateTime.parse((String)s));
+      builder.setClassMapping(java.time.LocalDateTime.class, new TypeConverter<java.time.LocalDateTime>() {
+        public java.time.LocalDateTime convert(Object input) {
+          return java.time.LocalDateTime.parse((String) input);
+        }
+      });
       JSONObject object = new JSONObject(builder);
       java.time.LocalDateTime localDateTime = java.time.LocalDateTime.now();
       object.put("localDate", localDateTime.toString());

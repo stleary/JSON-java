@@ -3256,7 +3256,7 @@ public class JSONObject {
         if (this.builder == null) {
           this.builder = new JSONBuilder();
         }
-        Map<Class<?>, Function<Object, ?>> classMapping = this.builder.getClassMapping();
+        Map<Class<?>, TypeConverter<?>> classMapping = this.builder.getClassMapping();
 
         for (Field field: clazz.getDeclaredFields()) {
           field.setAccessible(true);
@@ -3265,7 +3265,7 @@ public class JSONObject {
             Object value = this.get(fieldName);
             Class<?> pojoClass = field.getType();
             if (classMapping.containsKey(pojoClass)) {
-              field.set(obj, classMapping.get(pojoClass).apply(value));
+              field.set(obj, classMapping.get(pojoClass).convert(value));
             } else {
               if (value.getClass() == JSONObject.class) {
                 field.set(obj, fromJson((JSONObject) value, pojoClass));
@@ -3290,10 +3290,10 @@ public class JSONObject {
 
     private <T> Collection<T> fromJsonArray(JSONArray jsonArray, Class<?> collectionType, Type elementType) throws JSONException {
       try {
-        Map<Class<?>, Function<Object, ?>> classMapping = this.builder.getClassMapping();
-        Map<Class<?>, Supplier<?>> collectionMapping = this.builder.getCollectionMapping();
+        Map<Class<?>, TypeConverter<?>> classMapping = this.builder.getClassMapping();
+        Map<Class<?>, InstanceCreator<?>> collectionMapping = this.builder.getCollectionMapping();
         Collection<T> collection = (Collection<T>) (collectionMapping.containsKey(collectionType) ? 
-            collectionMapping.get(collectionType).get() 
+            collectionMapping.get(collectionType).create() 
             : collectionType.getDeclaredConstructor().newInstance());
 
 
@@ -3312,7 +3312,7 @@ public class JSONObject {
         for (int i = 0; i < jsonArray.length(); i++) {
           Object jsonElement = jsonArray.get(i);
           if (classMapping.containsKey(innerElementClass)) {
-            collection.add((T) classMapping.get(innerElementClass).apply(jsonElement));
+            collection.add((T) classMapping.get(innerElementClass).convert(jsonElement));
           } else if (jsonElement.getClass() == JSONObject.class) {
             collection.add((T) ((JSONObject) jsonElement).fromJson(innerElementClass));
           } else if (jsonElement.getClass() == JSONArray.class) {
