@@ -1390,7 +1390,7 @@ public class JSONObject {
             if (!numberIsFinite((Number)val)) {
                 return defaultValue;
             }
-            return new BigDecimal(((Number) val).doubleValue()).toBigInteger();
+            return BigDecimal.valueOf(((Number) val).doubleValue()).toBigInteger();
         }
         if (val instanceof Long || val instanceof Integer
                 || val instanceof Short || val instanceof Byte){
@@ -2041,7 +2041,7 @@ public class JSONObject {
             return 1;
         }
 
-        // if we've already reached the Object class, return -1;
+        // since we've already reached the Object class, return -1;
         Class<?> c = m.getDeclaringClass();
         if (c.getSuperclass() == null) {
             return -1;
@@ -2057,9 +2057,9 @@ public class JSONObject {
                     return d + 1;
                 }
             } catch (final SecurityException ex) {
-                continue;
+                // Nothing to do here
             } catch (final NoSuchMethodException ex) {
-                continue;
+                // Nothing to do here
             }
         }
 
@@ -2427,19 +2427,30 @@ public class JSONObject {
                 w.write("\\r");
                 break;
             default:
-                if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                        || (c >= '\u2000' && c < '\u2100')) {
-                    w.write("\\u");
-                    hhhh = Integer.toHexString(c);
-                    w.write("0000", 0, 4 - hhhh.length());
-                    w.write(hhhh);
-                } else {
-                    w.write(c);
-                }
+                writeAsHex(w, c);
             }
         }
         w.write('"');
         return w;
+    }
+
+    /**
+     * Convenience method to reduce cognitive complexity of quote()
+     * @param w      The Writer to which the quoted string will be appended.
+     * @param c      Character to write
+     * @throws IOException
+     */
+    private static void writeAsHex(Writer w, char c) throws IOException {
+        String hhhh;
+        if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                || (c >= '\u2000' && c < '\u2100')) {
+            w.write("\\u");
+            hhhh = Integer.toHexString(c);
+            w.write("0000", 0, 4 - hhhh.length());
+            w.write(hhhh);
+        } else {
+            w.write(c);
+        }
     }
 
     /**
@@ -2470,40 +2481,44 @@ public class JSONObject {
             if (!this.keySet().equals(((JSONObject)other).keySet())) {
                 return false;
             }
-            for (final Entry<String,?> entry : this.entrySet()) {
-                String name = entry.getKey();
-                Object valueThis = entry.getValue();
-                Object valueOther = ((JSONObject)other).get(name);
-                if(valueThis == valueOther) {
-                	continue;
-                }
-                if(valueThis == null) {
-                	return false;
-                }
-                if (valueThis instanceof JSONObject) {
-                    if (!((JSONObject)valueThis).similar(valueOther)) {
-                        return false;
-                    }
-                } else if (valueThis instanceof JSONArray) {
-                    if (!((JSONArray)valueThis).similar(valueOther)) {
-                        return false;
-                    }
-                } else if (valueThis instanceof Number && valueOther instanceof Number) {
-                    if (!isNumberSimilar((Number)valueThis, (Number)valueOther)) {
-                    	return false;
-                    }
-                } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
-                    if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
-                    	return false;
-                    }
-                } else if (!valueThis.equals(valueOther)) {
-                    return false;
-                }
-            }
-            return true;
+            return checkSimilarEntries(other);
         } catch (Throwable exception) {
             return false;
         }
+    }
+
+    private boolean checkSimilarEntries(Object other) {
+        for (final Entry<String,?> entry : this.entrySet()) {
+            String name = entry.getKey();
+            Object valueThis = entry.getValue();
+            Object valueOther = ((JSONObject)other).get(name);
+            if(valueThis == valueOther) {
+                continue;
+            }
+            if(valueThis == null) {
+                return false;
+            }
+
+            if (!checkThis(valueThis, valueOther)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkThis(Object valueThis, Object valueOther) {
+        if (valueThis instanceof JSONObject) {
+            return ((JSONObject)valueThis).similar(valueOther);
+        } else if (valueThis instanceof JSONArray) {
+            return ((JSONArray)valueThis).similar(valueOther);
+        } else if (valueThis instanceof Number && valueOther instanceof Number) {
+            return isNumberSimilar((Number)valueThis, (Number)valueOther);
+        } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
+            return ((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString());
+        } else if (!valueThis.equals(valueOther)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -2911,28 +2926,15 @@ public class JSONObject {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof JSONString) {
-            // JSONString must be checked first, so it can overwrite behaviour of other types below
-            Object o;
-            try {
-                o = ((JSONString) value).toJSONString();
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
+            // may throw an exception
+            processJsonStringToWriteValue(writer, value);
         } else if (value instanceof String) {
             // assuming most values are Strings, so testing it early
             quote(value.toString(), writer);
             return writer;
         } else if (value instanceof Number) {
-            // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
-            final String numberAsString = numberToString((Number) value);
-            if(NUMBER_PATTERN.matcher(numberAsString).matches()) {
-                writer.write(numberAsString);
-            } else {
-                // The Number value is not a valid JSON number.
-                // Instead we will quote it as a string
-                quote(numberAsString, writer);
-            }
+            // may throw an exception
+            processNumberToWriteValue(writer, (Number) value);
         } else if (value instanceof Boolean) {
             writer.write(value.toString());
         } else if (value instanceof Enum<?>) {
@@ -2953,6 +2955,41 @@ public class JSONObject {
             quote(value.toString(), writer);
         }
         return writer;
+    }
+
+    /**
+     * Convenience function to reduce cog complexity of calling method; writes value if string is valid
+     * @param writer    Object doing the writing
+     * @param value     Value to be written
+     * @throws IOException if something goes wrong
+     */
+    private static void processJsonStringToWriteValue(Writer writer, Object value) throws IOException {
+        // JSONString must be checked first, so it can overwrite behaviour of other types below
+        Object o;
+        try {
+            o = ((JSONString) value).toJSONString();
+        } catch (Exception e) {
+            throw new JSONException(e);
+        }
+        writer.write(o != null ? o.toString() : quote(value.toString()));
+    }
+
+    /**
+     * Convenience function to reduce cog complexity of calling method; writes value if number is valid
+     * @param writer    Object doing the writing
+     * @param value     Value to be written
+     * @throws IOException if something goes wrong
+     */
+    private static void processNumberToWriteValue(Writer writer, Number value) throws IOException {
+        // not all Numbers may match actual JSON Numbers. i.e. fractions or Imaginary
+        final String numberAsString = numberToString(value);
+        if(NUMBER_PATTERN.matcher(numberAsString).matches()) {
+            writer.write(numberAsString);
+        } else {
+            // The Number value is not a valid JSON number.
+            // Instead we will quote it as a string
+            quote(numberAsString, writer);
+        }
     }
 
     static final void indent(Writer writer, int indent) throws IOException {
@@ -3004,11 +3041,8 @@ public class JSONObject {
                 if (indentFactor > 0) {
                     writer.write(' ');
                 }
-                try{
-                    writeValue(writer, entry.getValue(), indentFactor, indent);
-                } catch (Exception e) {
-                    throw new JSONException("Unable to write JSONObject value for key: " + key, e);
-                }
+                // might throw an exception
+                attemptWriteValue(writer, indentFactor, indent, entry, key);
             } else if (length != 0) {
                 final int newIndent = indent + indentFactor;
                 for (final Entry<String,?> entry : this.entrySet()) {
@@ -3025,11 +3059,7 @@ public class JSONObject {
                     if (indentFactor > 0) {
                         writer.write(' ');
                     }
-                    try {
-                        writeValue(writer, entry.getValue(), indentFactor, newIndent);
-                    } catch (Exception e) {
-                        throw new JSONException("Unable to write JSONObject value for key: " + key, e);
-                    }
+                    attemptWriteValue(writer, indentFactor, newIndent, entry, key);
                     needsComma = true;
                 }
                 if (indentFactor > 0) {
@@ -3041,6 +3071,30 @@ public class JSONObject {
             return writer;
         } catch (IOException exception) {
             throw new JSONException(exception);
+        }
+    }
+
+    /**
+     * Convenience function. Writer attempts to write a value.
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indentation of the top level.
+     * @param entry
+     *            Contains the value being written
+     * @param key
+     *            Identifies the value
+     * @throws JSONException if a called function has an error or a write error
+     * occurs
+
+     */
+    private static void attemptWriteValue(Writer writer, int indentFactor, int indent, Entry<String, ?> entry, String key) {
+        try{
+            writeValue(writer, entry.getValue(), indentFactor, indent);
+        } catch (Exception e) {
+            throw new JSONException("Unable to write JSONObject value for key: " + key, e);
         }
     }
 

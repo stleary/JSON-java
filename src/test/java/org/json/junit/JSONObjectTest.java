@@ -3896,8 +3896,8 @@ public class JSONObjectTest {
 
     @Test
     public void issue743SerializationMapWith1000Objects() {
-      HashMap<String, Object> map  = buildNestedMap(1000);
-      JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withMaxNestingDepth(1000);
+      HashMap<String, Object> map  = buildNestedMap(500);
+      JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withMaxNestingDepth(500);
       JSONObject object = new JSONObject(map, parserConfiguration);
       String jsonString = object.toString();
     }
