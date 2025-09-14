@@ -2041,7 +2041,7 @@ public class JSONObject {
             return 1;
         }
 
-        // since we've already reached the Object class, return -1;
+        // we've already reached the Object class
         Class<?> c = m.getDeclaringClass();
         if (c.getSuperclass() == null) {
             return -1;
@@ -2391,7 +2391,6 @@ public class JSONObject {
 
         char b;
         char c = 0;
-        String hhhh;
         int i;
         int len = string.length();
 
@@ -2482,7 +2481,7 @@ public class JSONObject {
                 return false;
             }
             return checkSimilarEntries(other);
-        } catch (Throwable exception) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -2499,14 +2498,20 @@ public class JSONObject {
                 return false;
             }
 
-            if (!checkThis(valueThis, valueOther)) {
+            if (!checkObjectType(valueThis, valueOther)) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean checkThis(Object valueThis, Object valueOther) {
+    /**
+     * Convenience function. Compares types of two objects.
+     * @param valueThis     Object whose type is being checked
+     * @param valueOther    Reference object
+     * @return  true if match, else false
+     */
+    private boolean checkObjectType(Object valueThis, Object valueOther) {
         if (valueThis instanceof JSONObject) {
             return ((JSONObject)valueThis).similar(valueOther);
         } else if (valueThis instanceof JSONArray) {
@@ -2619,6 +2624,7 @@ public class JSONObject {
             try {
                 return stringToNumber(string);
             } catch (Exception ignore) {
+                // Do nothing
             }
         }
         return string;
@@ -2639,41 +2645,10 @@ public class JSONObject {
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             // decimal representation
             if (isDecimalNotation(val)) {
-                // Use a BigDecimal all the time so we keep the original
-                // representation. BigDecimal doesn't support -0.0, ensure we
-                // keep that by forcing a decimal.
-                try {
-                    BigDecimal bd = new BigDecimal(val);
-                    if(initial == '-' && BigDecimal.ZERO.compareTo(bd)==0) {
-                        return Double.valueOf(-0.0);
-                    }
-                    return bd;
-                } catch (NumberFormatException retryAsDouble) {
-                    // this is to support "Hex Floats" like this: 0x1.0P-1074
-                    try {
-                        Double d = Double.valueOf(val);
-                        if(d.isNaN() || d.isInfinite()) {
-                            throw new NumberFormatException("val ["+val+"] is not a valid number.");
-                        }
-                        return d;
-                    } catch (NumberFormatException ignore) {
-                        throw new NumberFormatException("val ["+val+"] is not a valid number.");
-                    }
-                }
+                return getNumber(val, initial);
             }
             // block items like 00 01 etc. Java number parsers treat these as Octal.
-            if(initial == '0' && val.length() > 1) {
-                char at1 = val.charAt(1);
-                if(at1 >= '0' && at1 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
-                }
-            } else if (initial == '-' && val.length() > 2) {
-                char at1 = val.charAt(1);
-                char at2 = val.charAt(2);
-                if(at1 == '0' && at2 >= '0' && at2 <= '9') {
-                    throw new NumberFormatException("val ["+val+"] is not a valid number.");
-                }
-            }
+            checkForInvalidNumberFormat(val, initial);
             // integer representation.
             // This will narrow any values to the smallest reasonable Object representation
             // (Integer, Long, or BigInteger)
@@ -2692,6 +2667,57 @@ public class JSONObject {
             return bi;
         }
         throw new NumberFormatException("val ["+val+"] is not a valid number.");
+    }
+
+    /**
+     * Convenience function. Block items like 00 01 etc. Java number parsers treat these as Octal.
+     * @param val value to convert
+     * @param initial first char of val
+     * @throws exceptions if numbers are formatted incorrectly
+     */
+    private static void checkForInvalidNumberFormat(String val, char initial) {
+        if(initial == '0' && val.length() > 1) {
+            char at1 = val.charAt(1);
+            if(at1 >= '0' && at1 <= '9') {
+                throw new NumberFormatException("val ["+ val +"] is not a valid number.");
+            }
+        } else if (initial == '-' && val.length() > 2) {
+            char at1 = val.charAt(1);
+            char at2 = val.charAt(2);
+            if(at1 == '0' && at2 >= '0' && at2 <= '9') {
+                throw new NumberFormatException("val ["+ val +"] is not a valid number.");
+            }
+        }
+    }
+
+    /**
+     * Convenience function. Handles val if it is a number
+     * @param val value to convert
+     * @param initial first char of val
+     * @return val as a BigDecimal
+     */
+    private static Number getNumber(String val, char initial) {
+        // Use a BigDecimal all the time so we keep the original
+        // representation. BigDecimal doesn't support -0.0, ensure we
+        // keep that by forcing a decimal.
+        try {
+            BigDecimal bd = new BigDecimal(val);
+            if(initial == '-' && BigDecimal.ZERO.compareTo(bd)==0) {
+                return Double.valueOf(-0.0);
+            }
+            return bd;
+        } catch (NumberFormatException retryAsDouble) {
+            // this is to support "Hex Floats" like this: 0x1.0P-1074
+            try {
+                Double d = Double.valueOf(val);
+                if(d.isNaN() || d.isInfinite()) {
+                    throw new NumberFormatException("val ["+ val +"] is not a valid number.");
+                }
+                return d;
+            } catch (NumberFormatException ignore) {
+                throw new NumberFormatException("val ["+ val +"] is not a valid number.");
+            }
+        }
     }
 
     /**
@@ -3044,34 +3070,51 @@ public class JSONObject {
                 // might throw an exception
                 attemptWriteValue(writer, indentFactor, indent, entry, key);
             } else if (length != 0) {
-                final int newIndent = indent + indentFactor;
-                for (final Entry<String,?> entry : this.entrySet()) {
-                    if (needsComma) {
-                        writer.write(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.write('\n');
-                    }
-                    indent(writer, newIndent);
-                    final String key = entry.getKey();
-                    writer.write(quote(key));
-                    writer.write(':');
-                    if (indentFactor > 0) {
-                        writer.write(' ');
-                    }
-                    attemptWriteValue(writer, indentFactor, newIndent, entry, key);
-                    needsComma = true;
-                }
-                if (indentFactor > 0) {
-                    writer.write('\n');
-                }
-                indent(writer, indent);
+                writeContent(writer, indentFactor, indent, needsComma);
             }
             writer.write('}');
             return writer;
         } catch (IOException exception) {
             throw new JSONException(exception);
         }
+    }
+
+    /**
+     * Convenience function. Writer attempts to write formatted content
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indentation of the top level.
+     * @param needsComma
+     *            Boolean flag indicating a comma is needed
+     * @throws IOException
+     *            If something goes wrong
+     */
+    private void writeContent(Writer writer, int indentFactor, int indent, boolean needsComma) throws IOException {
+        final int newIndent = indent + indentFactor;
+        for (final Entry<String,?> entry : this.entrySet()) {
+            if (needsComma) {
+                writer.write(',');
+            }
+            if (indentFactor > 0) {
+                writer.write('\n');
+            }
+            indent(writer, newIndent);
+            final String key = entry.getKey();
+            writer.write(quote(key));
+            writer.write(':');
+            if (indentFactor > 0) {
+                writer.write(' ');
+            }
+            attemptWriteValue(writer, indentFactor, newIndent, entry, key);
+            needsComma = true;
+        }
+        if (indentFactor > 0) {
+            writer.write('\n');
+        }
+        indent(writer, indent);
     }
 
     /**
