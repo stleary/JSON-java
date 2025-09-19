@@ -3895,7 +3895,8 @@ public class JSONObjectTest {
     }
 
     @Test
-    public void issue743SerializationMapWith1000Objects() {
+    public void issue743SerializationMapWith500Objects() {
+      // TODO: find out why 1000 objects no longer works
       HashMap<String, Object> map  = buildNestedMap(500);
       JSONParserConfiguration parserConfiguration = new JSONParserConfiguration().withMaxNestingDepth(500);
       JSONObject object = new JSONObject(map, parserConfiguration);
