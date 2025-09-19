@@ -105,6 +105,8 @@ public class JSONArray implements Iterable<Object> {
         if (nextChar == 0) {
             // array is unclosed. No ']' found, instead EOF
             throw x.syntaxError("Expected a ',' or ']'");
+        } else if (nextChar==',' && jsonParserConfiguration.isStrictMode()) {
+        	 throw x.syntaxError("Array content starts with a ','");
         }
         if (nextChar != ']') {
             x.back();
