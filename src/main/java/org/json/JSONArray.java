@@ -116,47 +116,59 @@ public class JSONArray implements Iterable<Object> {
                     x.back();
                     this.myArrayList.add(x.nextValue());
                 }
-                switch (x.nextClean()) {
-                case 0:
-                    // array is unclosed. No ']' found, instead EOF
-                    throw x.syntaxError("Expected a ',' or ']'");
-                case ',':
-                    nextChar = x.nextClean();
-                    if (nextChar == 0) {
-                        // array is unclosed. No ']' found, instead EOF
-                        throw x.syntaxError("Expected a ',' or ']'");
-                    }
-                    if (nextChar == ']') {
-                        // trailing commas are not allowed in strict mode
-                        if (jsonParserConfiguration.isStrictMode()) {
-                            throw x.syntaxError("Strict mode error: Expected another array element");
-                        }
-                        return;
-                    }
-                    if (nextChar == ',') {
-                        // consecutive commas are not allowed in strict mode
-                        if (jsonParserConfiguration.isStrictMode()) {
-                            throw x.syntaxError("Strict mode error: Expected a valid array element");
-                        }
-                        return;
-                    }
-                    x.back();
-                    break;
-                case ']':
-                    if (isInitial && jsonParserConfiguration.isStrictMode() &&
-                            x.nextClean() != 0) {
-                        throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
-                    }
-                    return;
-                default:
-                    throw x.syntaxError("Expected a ',' or ']'");
-                }
+                if (checkForSyntaxError(x, jsonParserConfiguration, isInitial)) return;
             }
         } else {
             if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
                 throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
             }
         }
+    }
+
+    /** Convenience function. Checks for JSON syntax error.
+     * @param x                       A JSONTokener instance from which the JSONArray is constructed.
+     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
+     * @param isInitial               Boolean indicating position of char
+     * @return
+     */
+    private static boolean checkForSyntaxError(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) {
+        char nextChar;
+        switch (x.nextClean()) {
+        case 0:
+            // array is unclosed. No ']' found, instead EOF
+            throw x.syntaxError("Expected a ',' or ']'");
+        case ',':
+            nextChar = x.nextClean();
+            if (nextChar == 0) {
+                // array is unclosed. No ']' found, instead EOF
+                throw x.syntaxError("Expected a ',' or ']'");
+            }
+            if (nextChar == ']') {
+                // trailing commas are not allowed in strict mode
+                if (jsonParserConfiguration.isStrictMode()) {
+                    throw x.syntaxError("Strict mode error: Expected another array element");
+                }
+                return true;
+            }
+            if (nextChar == ',') {
+                // consecutive commas are not allowed in strict mode
+                if (jsonParserConfiguration.isStrictMode()) {
+                    throw x.syntaxError("Strict mode error: Expected a valid array element");
+                }
+                return true;
+            }
+            x.back();
+            break;
+        case ']':
+            if (isInitial && jsonParserConfiguration.isStrictMode() &&
+                    x.nextClean() != 0) {
+                throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
+            }
+            return true;
+        default:
+            throw x.syntaxError("Expected a ',' or ']'");
+        }
+        return false;
     }
 
     /**
@@ -733,11 +745,7 @@ public class JSONArray implements Iterable<Object> {
         if (val == null) {
             return defaultValue;
         }
-        final double doubleValue = val.doubleValue();
-        // if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue)) {
-        // return defaultValue;
-        // }
-        return doubleValue;
+        return val.doubleValue();
     }
 
     /**
@@ -769,11 +777,7 @@ public class JSONArray implements Iterable<Object> {
         if (val == null) {
             return defaultValue;
         }
-        final Double doubleValue = val.doubleValue();
-        // if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue)) {
-        // return defaultValue;
-        // }
-        return doubleValue;
+        return val.doubleValue();
     }
 
     /**
@@ -805,11 +809,7 @@ public class JSONArray implements Iterable<Object> {
         if (val == null) {
             return defaultValue;
         }
-        final float floatValue = val.floatValue();
-        // if (Float.isNaN(floatValue) || Float.isInfinite(floatValue)) {
-        // return floatValue;
-        // }
-        return floatValue;
+        return val.floatValue();
     }
 
     /**
@@ -841,11 +841,7 @@ public class JSONArray implements Iterable<Object> {
         if (val == null) {
             return defaultValue;
         }
-        final Float floatValue = val.floatValue();
-        // if (Float.isNaN(floatValue) || Float.isInfinite(floatValue)) {
-        // return floatValue;
-        // }
-        return floatValue;
+        return val.floatValue();
     }
 
     /**
@@ -1643,25 +1639,40 @@ public class JSONArray implements Iterable<Object> {
             if(valueThis == null) {
             	return false;
             }
-            if (valueThis instanceof JSONObject) {
-                if (!((JSONObject)valueThis).similar(valueOther)) {
-                    return false;
-                }
-            } else if (valueThis instanceof JSONArray) {
-                if (!((JSONArray)valueThis).similar(valueOther)) {
-                    return false;
-                }
-            } else if (valueThis instanceof Number && valueOther instanceof Number) {
-                if (!JSONObject.isNumberSimilar((Number)valueThis, (Number)valueOther)) {
-                	return false;
-                }
-            } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
-                if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
-                    return false;
-                }
-            } else if (!valueThis.equals(valueOther)) {
+            if (!isSimilar(valueThis, valueOther)) {
                 return false;
             }
+        }
+        return true;
+    }
+
+    /**
+     * Convenience function; checks for object similarity
+     * @param valueThis
+     *      Initial object to compare
+     * @param valueOther
+     *      Comparison object
+     * @return  boolean
+     */
+    private boolean isSimilar(Object valueThis, Object valueOther) {
+        if (valueThis instanceof JSONObject) {
+            if (!((JSONObject)valueThis).similar(valueOther)) {
+                return false;
+            }
+        } else if (valueThis instanceof JSONArray) {
+            if (!((JSONArray)valueThis).similar(valueOther)) {
+                return false;
+            }
+        } else if (valueThis instanceof Number && valueOther instanceof Number) {
+            if (!JSONObject.isNumberSimilar((Number)valueThis, (Number)valueOther)) {
+                return false;
+            }
+        } else if (valueThis instanceof JSONString && valueOther instanceof JSONString) {
+            if (!((JSONString) valueThis).toJSONString().equals(((JSONString) valueOther).toJSONString())) {
+                return false;
+            }
+        } else if (!valueThis.equals(valueOther)) {
+            return false;
         }
         return true;
     }
@@ -1797,12 +1808,7 @@ public class JSONArray implements Iterable<Object> {
             writer.write('[');
 
             if (length == 1) {
-                try {
-                    JSONObject.writeValue(writer, this.myArrayList.get(0),
-                            indentFactor, indent);
-                } catch (Exception e) {
-                    throw new JSONException("Unable to write JSONArray value at index: 0", e);
-                }
+                writeArrayAttempt(writer, indentFactor, indent, 0);
             } else if (length != 0) {
                 final int newIndent = indent + indentFactor;
 
@@ -1814,12 +1820,7 @@ public class JSONArray implements Iterable<Object> {
                         writer.write('\n');
                     }
                     JSONObject.indent(writer, newIndent);
-                    try {
-                        JSONObject.writeValue(writer, this.myArrayList.get(i),
-                                indentFactor, newIndent);
-                    } catch (Exception e) {
-                        throw new JSONException("Unable to write JSONArray value at index: " + i, e);
-                    }
+                    writeArrayAttempt(writer, indentFactor, newIndent, i);
                     needsComma = true;
                 }
                 if (indentFactor > 0) {
@@ -1831,6 +1832,26 @@ public class JSONArray implements Iterable<Object> {
             return writer;
         } catch (IOException e) {
             throw new JSONException(e);
+        }
+    }
+
+    /**
+     * Convenience function. Attempts to write
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indentation of the top level.
+     * @param i
+     *            Index in array to be added
+     */
+    private void writeArrayAttempt(Writer writer, int indentFactor, int indent, int i) {
+        try {
+            JSONObject.writeValue(writer, this.myArrayList.get(i),
+                    indentFactor, indent);
+        } catch (Exception e) {
+            throw new JSONException("Unable to write JSONArray value at index: " + i, e);
         }
     }
 
