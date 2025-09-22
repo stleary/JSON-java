@@ -509,6 +509,9 @@ public class JSONTokener {
         string = sb.toString().trim();
         if ("".equals(string)) {
             throw this.syntaxError("Missing value");
+        }  else if (jsonParserConfiguration != null &&
+                jsonParserConfiguration.isStrictMode() && string.endsWith(".")) {
+            throw this.syntaxError(String.format("Strict mode error: Value '%s' ends with dot", string));
         }
         Object obj = JSONObject.stringToValue(string);
         // if obj is a boolean, look at string
