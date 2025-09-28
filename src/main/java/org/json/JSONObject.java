@@ -258,7 +258,7 @@ public class JSONObject {
    * @return a map of classes to functions that convert an {@code Object} to that class
    */
    public Map<Class<?>, TypeConverter<?>> getClassMapping() {
-     return this.classMapping;
+     return classMapping;
    }
 
   /**
@@ -3446,20 +3446,6 @@ public class JSONObject {
     }
 
     /**
-     * Handles non-primitive types (Enum, Map, JSONObject, JSONArray) during deserialization.
-     * Now dispatches to the recursive convertValue for consistency.
-     */
-    private <T> void handleNonDataTypes(Class<?> pojoClass, Object value, Field field, T obj) throws JSONException {
-        try {
-            Type fieldType = field.getGenericType();
-            Object convertedValue = convertValue(value, fieldType);
-            field.set(obj, convertedValue);
-        } catch (IllegalAccessException e) {
-            throw new JSONException("Failed to set field: " + field.getName(), e);
-        }
-    }
-
-    /**
      * Recursively converts a value to the target Type, handling nested generics for Collections and Maps.
      */
     private Object convertValue(Object value, Type targetType) throws JSONException {
@@ -3492,20 +3478,16 @@ public class JSONObject {
             }
         } 
         // Map handling (e.g., Map<Integer, List<String>>)
-        else if (Map.class.isAssignableFrom(rawType)) {
-            if (value instanceof JSONObject) {
-                Type[] mapTypes = getMapTypes(targetType);
-                Type keyType = mapTypes[0];
-                Type valueType = mapTypes[1];
-                return convertToMap((JSONObject) value, keyType, valueType, rawType);
-            }
+        else if (Map.class.isAssignableFrom(rawType) && value instanceof JSONObject) {
+            Type[] mapTypes = getMapTypes(targetType);
+            Type keyType = mapTypes[0];
+            Type valueType = mapTypes[1];
+            return convertToMap((JSONObject) value, keyType, valueType, rawType);
         } 
         // POJO handling (including custom classes like Tuple<Integer, String, Integer>)
-        else if (!rawType.isPrimitive() && !rawType.isEnum()) {
-            if (value instanceof JSONObject) {
-                // Recurse with the raw class for POJO deserialization
-                return ((JSONObject) value).fromJson(rawType);
-            }
+        else if (!rawType.isPrimitive() && !rawType.isEnum() && value instanceof JSONObject) {
+            // Recurse with the raw class for POJO deserialization
+            return ((JSONObject) value).fromJson(rawType);
         }
 
         // Fallback
@@ -3520,7 +3502,7 @@ public class JSONObject {
         try {
             InstanceCreator<?> creator = collectionMapping.getOrDefault(mapType, () -> new HashMap<>());
             @SuppressWarnings("unchecked")
-            Map<Object, Object> map = (Map<Object, Object>) creator.create();
+            Map<Object, Object> createdMap = (Map<Object, Object>) creator.create();
 
             for (Object keyObj : jsonMap.keySet()) {
                 String keyStr = (String) keyObj;
@@ -3529,9 +3511,9 @@ public class JSONObject {
                 Object convertedKey = convertValue(keyStr, keyType);
                 // Convert value recursively (handles nesting)
                 Object convertedValue = convertValue(mapValue, valueType);
-                map.put(convertedKey, convertedValue);
+                createdMap.put(convertedKey, convertedValue);
             }
-            return map;
+            return createdMap;
         } catch (Exception e) {
             throw new JSONException("Failed to convert JSONObject to Map: " + mapType.getName(), e);
         }
@@ -3557,7 +3539,11 @@ public class JSONObject {
     @SuppressWarnings("unchecked")
     private <T> Collection<T> fromJsonArray(JSONArray jsonArray, Class<?> collectionType, Type elementType) throws JSONException {
         try {
-            InstanceCreator<?> creator = collectionMapping.getOrDefault(collectionType, () -> new ArrayList<>());
+            InstanceCreator<?> creator = collectionMapping.getOrDefault(collectionType, new InstanceCreator<List>() {
+                    public List create() {
+                        return new ArrayList();
+                    }
+                });
             Collection<T> collection = (Collection<T>) creator.create();
 
             for (int i = 0; i < jsonArray.length(); i++) {

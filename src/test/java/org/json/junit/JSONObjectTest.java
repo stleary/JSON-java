@@ -4114,7 +4114,6 @@ public class JSONObjectTest {
       object.put("number", 12);
       object.put("name", "Alex");
       object.put("longNumber", 1500000000L);
-      String jsonObject = object.toString();
       CustomClass customClass = object.fromJson(CustomClass.class);
       CustomClass compareClass = new CustomClass(12, "Alex", 1500000000L);
       assertEquals(customClass, compareClass);
