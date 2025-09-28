@@ -33,7 +33,6 @@ import org.json.JSONObject;
 import org.json.JSONPointerException;
 import org.json.JSONParserConfiguration;
 import org.json.JSONString;
-import org.json.JSONBuilder;
 import org.json.JSONTokener;
 import org.json.ParserConfiguration;
 import org.json.XML;
@@ -58,6 +57,17 @@ import org.json.junit.data.RecursiveBeanEquals;
 import org.json.junit.data.Singleton;
 import org.json.junit.data.SingletonEnum;
 import org.json.junit.data.WeirdList;
+import org.json.junit.data.CustomClass;
+import org.json.junit.data.CustomClassA;
+import org.json.junit.data.CustomClassB;
+import org.json.junit.data.CustomClassC;
+import org.json.junit.data.CustomClassD;
+import org.json.junit.data.CustomClassE;
+import org.json.junit.data.CustomClassF;
+import org.json.junit.data.CustomClassG;
+import org.json.junit.data.CustomClassH;
+import org.json.junit.data.CustomClassI;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -4110,36 +4120,14 @@ public class JSONObjectTest {
       assertEquals(customClass, compareClass);
     }
 
-    public static class CustomClass {
-      public int number;
-      public String name;
-      public Long longNumber;
-
-      public CustomClass() {}
-      public CustomClass (int number, String name, Long longNumber) {
-        this.number = number;
-        this.name = name;
-        this.longNumber = longNumber;
-      }
-      @Override
-      public boolean equals(Object o) {
-        CustomClass customClass = (CustomClass) o;
-
-        return (this.number == customClass.number
-          && this.name.equals(customClass.name)
-          && this.longNumber.equals(customClass.longNumber));
-      }
-    }
-
     @Test
     public void jsonObjectParseFromJson_1() {
-      JSONBuilder builder = new JSONBuilder();
-      builder.setClassMapping(java.time.LocalDateTime.class, new TypeConverter<java.time.LocalDateTime>() {
+      JSONObject object = new JSONObject();
+      object.setClassMapping(java.time.LocalDateTime.class, new TypeConverter<java.time.LocalDateTime>() {
         public java.time.LocalDateTime convert(Object input) {
           return java.time.LocalDateTime.parse((String) input);
         }
       });
-      JSONObject object = new JSONObject(builder);
       java.time.LocalDateTime localDateTime = java.time.LocalDateTime.now();
       object.put("localDate", localDateTime.toString());
       CustomClassA customClassA = object.fromJson(CustomClassA.class);
@@ -4147,21 +4135,6 @@ public class JSONObjectTest {
       assertEquals(customClassA, compareClassClassA);
     }
 
-    public static class CustomClassA {
-      public java.time.LocalDateTime localDate;
-
-      public CustomClassA() {}
-      public CustomClassA(java.time.LocalDateTime localDate) {
-        this.localDate = localDate;
-      }
-
-      @Override
-      public boolean equals(Object o) {
-        CustomClassA classA = (CustomClassA) o;
-        return this.localDate.equals(classA.localDate);
-      }
-    }
-    
     @Test
     public void jsonObjectParseFromJson_2() {
       JSONObject object = new JSONObject();
@@ -4179,54 +4152,6 @@ public class JSONObjectTest {
       assertEquals(customClassB, compareClassB);
     }
 
-    public static class CustomClassB {
-      public int number;
-      public CustomClassC classC;
-
-      public CustomClassB() {}
-      public CustomClassB(int number, CustomClassC classC) {
-        this.number = number;
-        this.classC = classC;
-      }
-
-      @Override
-      public boolean equals(Object o) {
-        CustomClassB classB = (CustomClassB) o;
-        return this.number == classB.number
-          && this.classC.equals(classB.classC);
-      }
-    }
-
-    public static class CustomClassC {
-      public String stringName;
-      public Long longNumber;
-
-      public CustomClassC() {}
-      public CustomClassC(String stringName, Long longNumber) {
-        this.stringName = stringName;
-        this.longNumber = longNumber;
-      }
-
-      public JSONObject toJSON() {
-        JSONObject object = new JSONObject();
-        object.put("stringName", this.stringName);
-        object.put("longNumber", this.longNumber);
-        return object;
-      }
-
-      @Override
-      public boolean equals(Object o) {
-        CustomClassC classC = (CustomClassC) o;
-        return this.stringName.equals(classC.stringName)
-          && this.longNumber.equals(classC.longNumber);
-      }
-
-      @Override
-      public int hashCode() {
-        return java.util.Objects.hash(stringName, longNumber);
-      }
-    }
-
     @Test
     public void jsonObjectParseFromJson_3() {
       JSONObject object = new JSONObject();
@@ -4239,21 +4164,6 @@ public class JSONObjectTest {
       CustomClassD customClassD = object.fromJson(CustomClassD.class);
       CustomClassD compareClassD = new CustomClassD(Arrays.asList("test1", "test2", "test3"));
       assertEquals(customClassD, compareClassD);
-    }
-
-    public static class CustomClassD {
-      public List<String> stringList;
-
-      public CustomClassD() {}
-      public CustomClassD(List<String> stringList) {
-        this.stringList = stringList;
-      }
-
-      @Override
-      public boolean equals(Object o) {
-        CustomClassD classD = (CustomClassD) o;
-        return this.stringList.equals(classD.stringList);
-      }
     }
 
     @Test
@@ -4269,21 +4179,6 @@ public class JSONObjectTest {
       new CustomClassC("test1", 1L),
       new CustomClassC("test2", 2L)));
       assertEquals(customClassE, compareClassE);
-    }
-
-    public static class CustomClassE {
-      public List<CustomClassC> listClassC;
-
-      public CustomClassE() {}
-      public CustomClassE(List<CustomClassC> listClassC) {
-        this.listClassC = listClassC;
-      }
-
-      @Override
-      public boolean equals(Object o) {
-        CustomClassE classE = (CustomClassE) o;
-        return this.listClassC.equals(classE.listClassC);
-      }
     }
 
     @Test
@@ -4302,18 +4197,43 @@ public class JSONObjectTest {
       assertEquals(customClassF, compareClassF);
     }
 
-    public static class CustomClassF {
-      public List<List<String>> listOfString;
+    @Test
+    public void jsonObjectParseFromJson_6() {
+        JSONObject object = new JSONObject();
+        Map<String, String> dataList = new HashMap<>();
+        dataList.put("A", "Aa");
+        dataList.put("B", "Bb");
+        dataList.put("C", "Cc");
+        object.put("dataList", dataList);
 
-      public CustomClassF() {}
-      public CustomClassF(List<List<String>> listOfString) {
-        this.listOfString = listOfString;
-      }
+        CustomClassG customClassG = object.fromJson(CustomClassG.class);
+        CustomClassG compareClassG = new CustomClassG(dataList);
+        assertEquals(customClassG, compareClassG);
+    }
 
-      @Override
-      public boolean equals(Object o) {
-        CustomClassF classF = (CustomClassF) o;
-        return this.listOfString.equals(classF.listOfString);
-      }
+    @Test
+    public void jsonObjectParseFromJson_7() {
+        JSONObject object = new JSONObject();
+        Map<String, List<Integer>> dataList = new HashMap<>();
+        dataList.put("1", Arrays.asList(1, 2, 3, 4));
+        dataList.put("2", Arrays.asList(2, 3, 4, 5));
+        object.put("integerMap", dataList);
+
+        CustomClassH customClassH = object.fromJson(CustomClassH.class);
+        CustomClassH compareClassH = new CustomClassH(dataList);
+        assertEquals(customClassH.integerMap.toString(), compareClassH.integerMap.toString());
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_8() {
+        JSONObject object = new JSONObject();
+        Map<String, Map<String, Integer>> dataList = new HashMap<>();
+        dataList.put("1", Collections.singletonMap("1", 1));
+        dataList.put("2", Collections.singletonMap("2", 2));
+        object.put("integerMap", dataList);
+
+        CustomClassI customClassI = object.fromJson(CustomClassI.class);
+        CustomClassI compareClassI = new CustomClassI(dataList);
+        assertEquals(customClassI.integerMap.toString(), compareClassI.integerMap.toString());
     }
 }
