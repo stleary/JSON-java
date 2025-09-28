@@ -3440,7 +3440,7 @@ public class JSONObject {
             return obj;
         } catch (NoSuchMethodException e) {
             throw new JSONException("No no-arg constructor for class: " + clazz.getName(), e);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (Exception e) {
             throw new JSONException("Failed to instantiate or set field for class: " + clazz.getName(), e);
         }
     }
@@ -3500,7 +3500,11 @@ public class JSONObject {
      */
     private Map<?, ?> convertToMap(JSONObject jsonMap, Type keyType, Type valueType, Class<?> mapType) throws JSONException {
         try {
-            InstanceCreator<?> creator = collectionMapping.getOrDefault(mapType, () -> new HashMap<>());
+            InstanceCreator<?> creator = collectionMapping.get(mapType) != null ? collectionMapping.get(mapType) : new InstanceCreator<Map>() {
+                    public Map create() {
+                        return new HashMap();
+                    }
+                };
             @SuppressWarnings("unchecked")
             Map<Object, Object> createdMap = (Map<Object, Object>) creator.create();
 
@@ -3522,12 +3526,13 @@ public class JSONObject {
     /**
      * Converts a String to an Enum value.
      */
-    private <E extends Enum<E>> E stringToEnum(Class<?> enumClass, String value) throws JSONException {
+    private <E> E stringToEnum(Class<?> enumClass, String value) throws JSONException {
         try {
             @SuppressWarnings("unchecked")
-            Method valueOfMethod = enumClass.getMethod("valueOf", String.class);
+            Class<E> enumType = (Class<E>) enumClass;
+            Method valueOfMethod = enumType.getMethod("valueOf", String.class);
             return (E) valueOfMethod.invoke(null, value);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (Exception e) {
             throw new JSONException("Failed to convert string to enum: " + value + " for " + enumClass.getName(), e);
         }
     }
@@ -3539,11 +3544,11 @@ public class JSONObject {
     @SuppressWarnings("unchecked")
     private <T> Collection<T> fromJsonArray(JSONArray jsonArray, Class<?> collectionType, Type elementType) throws JSONException {
         try {
-            InstanceCreator<?> creator = collectionMapping.getOrDefault(collectionType, new InstanceCreator<List>() {
+            InstanceCreator<?> creator = collectionMapping.get(collectionType) != null ? collectionMapping.get(collectionType) : new InstanceCreator<List>() {
                     public List create() {
                         return new ArrayList();
                     }
-                });
+                };
             Collection<T> collection = (Collection<T>) creator.create();
 
             for (int i = 0; i < jsonArray.length(); i++) {
