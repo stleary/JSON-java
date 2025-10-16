@@ -1,17 +1,19 @@
 package org.json.junit.data;
 
+import java.math.BigInteger;
+
 public class CustomClassA {
-  public java.time.LocalDateTime localDate;
+  public BigInteger largeInt;
 
   public CustomClassA() {}
-  public CustomClassA(java.time.LocalDateTime localDate) {
-    this.localDate = localDate;
+  public CustomClassA(BigInteger largeInt) {
+    this.largeInt = largeInt;
   }
 
   @Override
   public boolean equals(Object o) {
     CustomClassA classA = (CustomClassA) o;
-    return this.localDate.equals(classA.localDate);
+    return this.largeInt.equals(classA.largeInt);
   }
 }
 

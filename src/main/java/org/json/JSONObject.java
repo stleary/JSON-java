@@ -234,6 +234,16 @@ public class JSONObject {
         return (String) input;
       }
     });
+    classMapping.put(BigDecimal.class, new TypeConverter<BigDecimal>() {
+      public BigDecimal convert(Object input) {
+          return new BigDecimal((String) input);
+      }
+    });
+    classMapping.put(BigInteger.class, new TypeConverter<BigInteger>() {
+      public BigInteger convert(Object input) {
+          return new BigInteger((String) input);
+      }
+    });
 
     collectionMapping.put(List.class, new InstanceCreator<List>() {
       public List create() {
@@ -250,50 +260,6 @@ public class JSONObject {
         return new HashMap(); 
       }
     });
-   }
-
-  /**
-   * Returns the current class-to-function mapping used for type conversions.
-   *
-   * @return a map of classes to functions that convert an {@code Object} to that class
-   */
-   public Map<Class<?>, TypeConverter<?>> getClassMapping() {
-     return classMapping;
-   }
-
-  /**
-   * Returns the current collection-to-supplier mapping used for instantiating collections.
-   *
-   * @return a map of collection interface types to suppliers of concrete implementations
-   */
-   public Map<Class<?>, InstanceCreator<?>> getCollectionMapping() {
-     return collectionMapping;
-   }
-
-  /**
-   * Adds or updates a type conversion function for a given class.
-   *
-   * <p>This allows users to customize how objects are converted into specific types
-   * during processing (e.g., JSON deserialization).
-   *
-   * @param clazz the target class for which the conversion function is to be set
-   * @param function a function that takes an {@code Object} and returns an instance of {@code clazz}
-   */
-   public void setClassMapping(Class<?> clazz, TypeConverter<?> function) {
-     classMapping.put(clazz, function);
-   }
-
-  /**
-   * Adds or updates a supplier function for instantiating a collection type.
-   *
-   * <p>This allows customization of which concrete implementation is used for
-   * interface types like {@code List}, {@code Set}, or {@code Map}.
-   *
-   * @param clazz the collection interface class (e.g., {@code List.class})
-   * @param function a supplier that creates a new instance of a concrete implementation
-   */
-   public void setCollectionMapping(Class<?> clazz, InstanceCreator<?> function) {
-     collectionMapping.put(clazz, function);
    }
 
     /**

@@ -5,7 +5,7 @@ package org.json;
  *
  * @param <T> the type of instances created
  */
-public interface InstanceCreator<T> {
+interface InstanceCreator<T> {
 
   /**
    * Creates a new instance of type {@code T}.

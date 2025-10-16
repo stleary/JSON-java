@@ -6,7 +6,7 @@ package org.json;
  *
  * @param <T> the target type to convert to
  */
-public interface TypeConverter<T> {
+interface TypeConverter<T> {
 
   /**
    * Converts the given input object to an instance of type {@code T}.
