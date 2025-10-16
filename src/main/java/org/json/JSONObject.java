@@ -3376,13 +3376,20 @@ public class JSONObject {
      * Deserializes a JSON string into an instance of the specified class.
      *
      * <p>This method attempts to map JSON key-value pairs to the corresponding fields
-     * of the given class. It supports basic data types including int, double, float,
-     * long, and boolean (as well as their boxed counterparts). The class must have a 
-     * no-argument constructor, and the field names in the class must match the keys 
-     * in the JSON string.
+     * of the given class. It supports basic data types including {@code int}, {@code double},
+     * {@code float}, {@code long}, and {@code boolean}, as well as their boxed counterparts.
+     * The target class must have a no-argument constructor, and its field names must match
+     * the keys in the JSON string.
+     *
+     * <p><strong>Note:</strong> Only classes that are explicitly supported and registered within
+     * the {@code JSONObject} context can be deserialized. If the provided class is not among those,
+     * this method will not be able to deserialize it. This ensures that only a limited and
+     * controlled set of types can be instantiated from JSON for safety and predictability.
      *
      * @param clazz the class of the object to be returned
-     * @return an instance of type T with fields populated from the JSON string
+     * @param <T> the type of the object
+     * @return an instance of type {@code T} with fields populated from the JSON string
+     * @throws IllegalArgumentException if the class is not supported for deserialization
      */
     @SuppressWarnings("unchecked")
     public <T> T fromJson(Class<T> clazz) {
