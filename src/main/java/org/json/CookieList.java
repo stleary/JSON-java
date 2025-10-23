@@ -14,7 +14,7 @@ public class CookieList {
     /**
      * Constructs a new CookieList object.
      */
-    public CookieList() {
+    private CookieList() {
     }
  
     /**
