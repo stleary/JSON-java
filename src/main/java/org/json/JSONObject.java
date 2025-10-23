@@ -3450,9 +3450,9 @@ public class JSONObject {
     */
     private Collection getCollection(Class<?> collectionType) throws JSONException {
         if (collectionType == List.class || collectionType == ArrayList.class) {
-            return new ArrayList<>();
+            return new ArrayList();
         } else if (collectionType == Set.class || collectionType == HashSet.class) {
-            return new HashSet<>();
+            return new HashSet();
         } else {
             throw new JSONException("Unsupported Collection type: " + collectionType.getName());
         }
