@@ -189,21 +189,30 @@ public class Cookie {
      * @return The unescaped string.
      */
     public static String unescape(String string) {
+        int i = 0;
         int length = string.length();
         StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; ++i) {
+
+        while (i < length) {
             char c = string.charAt(i);
             if (c == '+') {
-                c = ' ';
+                sb.append(' ');
+                i++;
             } else if (c == '%' && i + 2 < length) {
                 int d = JSONTokener.dehexchar(string.charAt(i + 1));
                 int e = JSONTokener.dehexchar(string.charAt(i + 2));
+
                 if (d >= 0 && e >= 0) {
-                    c = (char)(d * 16 + e);
-                    i += 2;
+                    sb.append((char)(d * 16 + e));
+                    i += 3;
+                } else {
+                    sb.append(c);
+                    i++;
                 }
+            } else {
+                sb.append(c);
+                i++;
             }
-            sb.append(c);
         }
         return sb.toString();
     }
