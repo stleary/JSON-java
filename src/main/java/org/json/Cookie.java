@@ -18,7 +18,7 @@ public class Cookie {
     /**
      * Constructs a new Cookie object.
      */
-    public Cookie() {
+    private Cookie() {
     }
 
     /**
