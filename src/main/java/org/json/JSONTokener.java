@@ -454,15 +454,16 @@ public class JSONTokener {
      */
     public Object nextValue() throws JSONException {
         char c = this.nextClean();
-        switch (c) {
-        case '{':
+
+        if (c == '{') {
             this.back();
             try {
                 return new JSONObject(this, jsonParserConfiguration);
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
-        case '[':
+
+        } else if (c == '[') {
             this.back();
             try {
                 return new JSONArray(this, jsonParserConfiguration);
@@ -470,8 +471,10 @@ public class JSONTokener {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
         }
+
         return nextSimpleValue(c);
     }
+
 
     Object nextSimpleValue(char c) {
         String string;
@@ -482,9 +485,8 @@ public class JSONTokener {
                 c == '\'') {
             throw this.syntaxError("Strict mode error: Single quoted strings are not allowed");
         }
-        switch (c) {
-        case '"':
-        case '\'':
+
+        if (c == '"' || c == '\'') {
             return this.nextString(c);
         }
 
