@@ -157,111 +157,6 @@ public class JSONObject {
         this.map = new HashMap<String, Object>();
     }
 
-  /**
-   * A mapping from Java classes to functions that convert a generic {@code Object}
-   * into an instance of the target class.
-   *
-   * <p>Examples of default mappings:
-   * <ul>
-   *   <li>{@code int.class} or {@code Integer.class} -> Converts a {@code Number} to {@code int}</li>
-   *   <li>{@code boolean.class} or {@code Boolean.class} -> Identity function</li>
-   *   <li>{@code String.class} -> Identity function</li>
-   * </ul>
-   */
-  private static final Map<Class<?>, TypeConverter<?>> classMapping = new HashMap<Class<?>, TypeConverter<?>>();
-
-  /**
-   * A mapping from collection interface types to suppliers that produce
-   * instances of concrete collection implementations.
-   *
-   */
-  private static final Map<Class<?>, InstanceCreator<?>> collectionMapping = new HashMap<Class<?>, InstanceCreator<?>>();
-
-   // Static initializer block to populate default mappings
-   static {
-    classMapping.put(int.class, new TypeConverter<Integer>() {
-      public Integer convert(Object input) {
-        return ((Number) input).intValue();
-      }
-    });
-    classMapping.put(Integer.class, new TypeConverter<Integer>() {
-      public Integer convert(Object input) {
-        return ((Number) input).intValue();
-      }
-    });
-    classMapping.put(double.class, new TypeConverter<Double>() {
-      public Double convert(Object input) {
-        return ((Number) input).doubleValue();
-      }
-    });
-    classMapping.put(Double.class, new TypeConverter<Double>() {
-      public Double convert(Object input) {
-        return ((Number) input).doubleValue();
-      }
-    });
-    classMapping.put(float.class, new TypeConverter<Float>() {
-      public Float convert(Object input) {
-        return ((Number) input).floatValue();
-      }
-    });
-    classMapping.put(Float.class, new TypeConverter<Float>() {
-      public Float convert(Object input) {
-        return ((Number) input).floatValue();
-      }
-    });
-    classMapping.put(long.class, new TypeConverter<Long>() {
-      public Long convert(Object input) {
-        return ((Number) input).longValue();
-      }
-    });
-    classMapping.put(Long.class, new TypeConverter<Long>() {
-      public Long convert(Object input) {
-        return ((Number) input).longValue();
-      }
-    });
-    classMapping.put(boolean.class, new TypeConverter<Boolean>() {
-      public Boolean convert(Object input) {
-        return (Boolean) input;
-      }
-    });
-    classMapping.put(Boolean.class, new TypeConverter<Boolean>() {
-      public Boolean convert(Object input) {
-        return (Boolean) input;
-      }
-    });
-    classMapping.put(String.class, new TypeConverter<String>() {
-      public String convert(Object input) {
-        return (String) input;
-      }
-    });
-    classMapping.put(BigDecimal.class, new TypeConverter<BigDecimal>() {
-      public BigDecimal convert(Object input) {
-          return new BigDecimal((String) input);
-      }
-    });
-    classMapping.put(BigInteger.class, new TypeConverter<BigInteger>() {
-      public BigInteger convert(Object input) {
-          return new BigInteger((String) input);
-      }
-    });
-
-    collectionMapping.put(List.class, new InstanceCreator<List>() {
-      public List create() {
-        return new ArrayList();
-      }
-    });
-    collectionMapping.put(Set.class, new InstanceCreator<Set>() {
-      public Set create() {
-        return new HashSet();
-      }
-    });
-    collectionMapping.put(Map.class, new InstanceCreator<Map>() {
-      public Map create() {
-        return new HashMap(); 
-      }
-    });
-   }
-
     /**
      * Construct a JSONObject from a subset of another JSONObject. An array of
      * strings is used to identify the keys that should be copied. Missing keys
@@ -3359,8 +3254,8 @@ public class JSONObject {
      *
      * <p>This method attempts to map JSON key-value pairs to the corresponding fields
      * of the given class. It supports basic data types including int, double, float,
-     * long, and boolean (as well as their boxed counterparts). The class must have a 
-     * no-argument constructor, and the field names in the class must match the keys 
+     * long, and boolean (as well as their boxed counterparts). The class must have a
+     * no-argument constructor, and the field names in the class must match the keys
      * in the JSON string.
      *
      * @param jsonString json in string format
@@ -3402,12 +3297,8 @@ public class JSONObject {
                     Object value = get(fieldName);
                     Type fieldType = field.getGenericType();
                     Class<?> rawType = getRawType(fieldType);
-                    if (classMapping.containsKey(rawType)) {
-                        field.set(obj, classMapping.get(rawType).convert(value));
-                    } else {
-                        Object convertedValue = convertValue(value, fieldType);
-                        field.set(obj, convertedValue);
-                    }
+                    Object convertedValue = convertValue(value, fieldType);
+                    field.set(obj, convertedValue);
                 }
             }
             return obj;
@@ -3433,9 +3324,22 @@ public class JSONObject {
             return value;
         }
 
-        // Use registered type converter
-        if (classMapping.containsKey(rawType)) {
-            return classMapping.get(rawType).convert(value);
+        if (rawType == int.class || rawType == Integer.class) {
+            return ((Number) value).intValue();
+        } else if (rawType == double.class || rawType == Double.class) {
+            return ((Number) value).doubleValue();
+        } else if (rawType == float.class || rawType == Float.class) {
+            return ((Number) value).floatValue();
+        } else if (rawType == long.class || rawType == Long.class) {
+            return ((Number) value).longValue();
+        } else if (rawType == boolean.class || rawType == Boolean.class) {
+            return (Boolean) value;
+        } else if (rawType == String.class) {
+            return (String) value;
+        } else if (rawType == BigDecimal.class) {
+            return new BigDecimal((String) value);
+        } else if (rawType == BigInteger.class) {
+            return new BigInteger((String) value);
         }
 
         // Enum conversion
@@ -3473,13 +3377,8 @@ public class JSONObject {
      */
     private Map<?, ?> convertToMap(JSONObject jsonMap, Type keyType, Type valueType, Class<?> mapType) throws JSONException {
         try {
-            InstanceCreator<?> creator = collectionMapping.get(mapType) != null ? collectionMapping.get(mapType) : new InstanceCreator<Map>() {
-                    public Map create() {
-                        return new HashMap();
-                    }
-                };
             @SuppressWarnings("unchecked")
-            Map<Object, Object> createdMap = (Map<Object, Object>) creator.create();
+            Map<Object, Object> createdMap = new HashMap();
 
             for (Object keyObj : jsonMap.keySet()) {
                 String keyStr = (String) keyObj;
@@ -3517,12 +3416,7 @@ public class JSONObject {
     @SuppressWarnings("unchecked")
     private <T> Collection<T> fromJsonArray(JSONArray jsonArray, Class<?> collectionType, Type elementType) throws JSONException {
         try {
-            InstanceCreator<?> creator = collectionMapping.get(collectionType) != null ? collectionMapping.get(collectionType) : new InstanceCreator<List>() {
-                    public List create() {
-                        return new ArrayList();
-                    }
-                };
-            Collection<T> collection = (Collection<T>) creator.create();
+            Collection<T> collection = getCollection(collectionType);
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 Object jsonElement = jsonArray.get(i);
@@ -3536,4 +3430,31 @@ public class JSONObject {
         }
     }
 
+    /**
+    * Creates and returns a new instance of a supported {@link Collection} implementation
+    * based on the specified collection type.
+    * <p>
+    * This method currently supports the following collection types:
+    * <ul>
+    *   <li>{@code List.class}</li>
+    *   <li>{@code ArrayList.class}</li>
+    *   <li>{@code Set.class}</li>
+    *   <li>{@code HashSet.class}</li>
+    * </ul>
+    * If the provided type does not match any of the supported types, a {@link JSONException}
+    * is thrown.
+    *
+    * @param collectionType the {@link Class} object representing the desired collection type
+    * @return a new empty instance of the specified collection type
+    * @throws JSONException if the specified type is not a supported collection type
+    */
+    private Collection getCollection(Class<?> collectionType) throws JSONException {
+        if (collectionType == List.class || collectionType == ArrayList.class) {
+            return new ArrayList<>();
+        } else if (collectionType == Set.class || collectionType == HashSet.class) {
+            return new HashSet<>();
+        } else {
+            throw new JSONException("Unsupported Collection type: " + collectionType.getName());
+        }
+    }
 }
