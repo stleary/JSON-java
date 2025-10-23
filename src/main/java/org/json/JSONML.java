@@ -17,8 +17,9 @@ public class JSONML {
     /**
      * Constructs a new JSONML object.
      */
-    public JSONML() {
+    private JSONML() {
     }
+
 
     /**
      * Parse XML values and store them in a JSONArray.
@@ -239,9 +240,21 @@ public class JSONML {
                 }
             } else {
                 if (ja != null) {
-                    ja.put(token instanceof String
-                        ? (config.isKeepStrings() ? XML.unescape((String)token) : XML.stringToValue((String)token))
-                        : token);
+                    Object value;
+
+                    if (token instanceof String) {
+                        String strToken = (String) token;
+                        if (config.isKeepStrings()) {
+                            value = XML.unescape(strToken);
+                        } else {
+                            value = XML.stringToValue(strToken);
+                        }
+                    } else {
+                        value = token;
+                    }
+
+                    ja.put(value);
+
                 }
             }
         }
