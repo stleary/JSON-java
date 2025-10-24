@@ -2,6 +2,7 @@ package org.json.junit;
 
 /*
 Public Domain.
+
 */
 
 import static org.junit.Assert.*;
