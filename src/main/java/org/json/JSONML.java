@@ -16,6 +16,7 @@ public class JSONML {
 
     /**
      * Constructs a new JSONML object.
+     * @deprecated (Utility class cannot be instantiated)
      */
     @Deprecated
     public JSONML() {

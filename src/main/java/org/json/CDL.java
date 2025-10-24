@@ -23,12 +23,13 @@ Public Domain.
  * @author JSON.org
  * @version 2016-05-01
  */
-@Deprecated
 public class CDL {
 
     /**
      * Constructs a new CDL object.
+     * @deprecated (Utility class cannot be instantiated)
      */
+    @Deprecated
     public CDL() {
     }
 
