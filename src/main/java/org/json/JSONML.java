@@ -17,7 +17,8 @@ public class JSONML {
     /**
      * Constructs a new JSONML object.
      */
-    private JSONML() {
+    @Deprecated
+    public JSONML() {
     }
 
 

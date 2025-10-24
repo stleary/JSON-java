@@ -14,7 +14,8 @@ public class CookieList {
     /**
      * Constructs a new CookieList object.
      */
-    private CookieList() {
+    @Deprecated
+    public CookieList() {
     }
  
     /**
