@@ -1915,25 +1915,7 @@ public class JSONObject {
             // They must start with a lowercase letter and should be declared in the class itself
             // (not inherited from Object, Enum, Number, or any java.* class)
             // Also exclude common Object/bean method names
-            Class<?> declaringClass = method.getDeclaringClass();
-            if (name.length() > 0 && Character.isLowerCase(name.charAt(0)) 
-                    && !"get".equals(name)
-                    && !"is".equals(name)
-                    && !"set".equals(name)
-                    && !"toString".equals(name)
-                    && !"hashCode".equals(name)
-                    && !"equals".equals(name)
-                    && !"clone".equals(name)
-                    && !"notify".equals(name)
-                    && !"notifyAll".equals(name)
-                    && !"wait".equals(name)
-                    && declaringClass != null
-                    && declaringClass != Object.class
-                    && !Enum.class.isAssignableFrom(declaringClass)
-                    && !Number.class.isAssignableFrom(declaringClass)
-                    && !declaringClass.getName().startsWith("java.")
-                    && !declaringClass.getName().startsWith("javax.")) {
-                // This is a record-style accessor - return the method name as-is
+            if (isRecordStyleAccessor(name, method)) {
                 return name;
             }
             return null;
@@ -1950,6 +1932,41 @@ public class JSONObject {
             key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
         }
         return key;
+    }
+
+    /**
+     * Checks if a method is a record-style accessor.
+     * Record accessors have lowercase names without get/is prefixes and are not inherited from standard Java classes.
+     * 
+     * @param methodName the name of the method
+     * @param method the method to check
+     * @return true if this is a record-style accessor, false otherwise
+     */
+    private static boolean isRecordStyleAccessor(String methodName, Method method) {
+        if (methodName.isEmpty() || !Character.isLowerCase(methodName.charAt(0))) {
+            return false;
+        }
+        
+        // Exclude common bean/Object method names
+        if ("get".equals(methodName) || "is".equals(methodName) || "set".equals(methodName)
+                || "toString".equals(methodName) || "hashCode".equals(methodName)
+                || "equals".equals(methodName) || "clone".equals(methodName)
+                || "notify".equals(methodName) || "notifyAll".equals(methodName)
+                || "wait".equals(methodName)) {
+            return false;
+        }
+        
+        Class<?> declaringClass = method.getDeclaringClass();
+        if (declaringClass == null || declaringClass == Object.class) {
+            return false;
+        }
+        
+        if (Enum.class.isAssignableFrom(declaringClass) || Number.class.isAssignableFrom(declaringClass)) {
+            return false;
+        }
+        
+        String className = declaringClass.getName();
+        return !className.startsWith("java.") && !className.startsWith("javax.");
     }
 
     /**
