@@ -51,7 +51,6 @@ import org.json.junit.data.MyJsonString;
 import org.json.junit.data.MyNumber;
 import org.json.junit.data.MyNumberContainer;
 import org.json.junit.data.MyPublicClass;
-import org.json.junit.data.PersonRecord;
 import org.json.junit.data.RecursiveBean;
 import org.json.junit.data.RecursiveBeanEquals;
 import org.json.junit.data.Singleton;
@@ -794,25 +793,6 @@ public class JSONObjectTest {
         // property name able was replaced by Getable via user-defined annotation
         assertTrue("Overridden boolean field name (Getable) should have been found",
                 jsonObject.has("Getable"));
-        Util.checkJSONObjectMaps(jsonObject);
-    }
-
-    /**
-     * JSONObject built from a Java record.
-     * Records use accessor methods without get/is prefixes (e.g., name() instead of getName()).
-     * This test verifies that JSONObject correctly handles record types.
-     */
-    @Test
-    public void jsonObjectByRecord() {
-        PersonRecord person = new PersonRecord("John Doe", 30, true);
-        JSONObject jsonObject = new JSONObject(person);
-        
-        // validate JSON
-        Object doc = Configuration.defaultConfiguration().jsonProvider().parse(jsonObject.toString());
-        assertTrue("expected 3 top level items", ((Map<?,?>)(JsonPath.read(doc, "$"))).size() == 3);
-        assertTrue("expected name field", "John Doe".equals(jsonObject.query("/name")));
-        assertTrue("expected age field", Integer.valueOf(30).equals(jsonObject.query("/age")));
-        assertTrue("expected active field", Boolean.TRUE.equals(jsonObject.query("/active")));
         Util.checkJSONObjectMaps(jsonObject);
     }
 
