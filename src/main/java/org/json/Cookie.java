@@ -20,7 +20,7 @@ public class Cookie {
      * @deprecated (Utility class cannot be instantiated)
      */
     @Deprecated()
-    private Cookie() {
+    public Cookie() {
     }
 
     /**
