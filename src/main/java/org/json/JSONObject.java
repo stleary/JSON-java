@@ -1885,7 +1885,8 @@ public class JSONObject {
     }
 
     private static boolean isValidMethodName(String name) {
-        return !"getClass".equals(name) && !"getDeclaringClass".equals(name);
+        return !"getClass".equals(name) 
+                && !"getDeclaringClass".equals(name);
     }
 
     private static String getKeyNameFromMethod(Method method) {
@@ -1909,6 +1910,32 @@ public class JSONObject {
         } else if (name.startsWith("is") && name.length() > 2) {
             key = name.substring(2);
         } else {
+            // Check if this is a record-style accessor (no prefix)
+            // Record accessors are simple method names that match field names
+            // They must start with a lowercase letter and should be declared in the class itself
+            // (not inherited from Object, Enum, Number, or any java.* class)
+            // Also exclude common Object/bean method names
+            Class<?> declaringClass = method.getDeclaringClass();
+            if (name.length() > 0 && Character.isLowerCase(name.charAt(0)) 
+                    && !"get".equals(name)
+                    && !"is".equals(name)
+                    && !"set".equals(name)
+                    && !"toString".equals(name)
+                    && !"hashCode".equals(name)
+                    && !"equals".equals(name)
+                    && !"clone".equals(name)
+                    && !"notify".equals(name)
+                    && !"notifyAll".equals(name)
+                    && !"wait".equals(name)
+                    && declaringClass != null
+                    && declaringClass != Object.class
+                    && !Enum.class.isAssignableFrom(declaringClass)
+                    && !Number.class.isAssignableFrom(declaringClass)
+                    && !declaringClass.getName().startsWith("java.")
+                    && !declaringClass.getName().startsWith("javax.")) {
+                // This is a record-style accessor - return the method name as-is
+                return name;
+            }
             return null;
         }
         // if the first letter in the key is not uppercase, then skip.
