@@ -3296,7 +3296,6 @@ public class JSONObject {
                 if (has(fieldName)) {
                     Object value = get(fieldName);
                     Type fieldType = field.getGenericType();
-                    Class<?> rawType = getRawType(fieldType);
                     Object convertedValue = convertValue(value, fieldType);
                     field.set(obj, convertedValue);
                 }
@@ -3333,9 +3332,9 @@ public class JSONObject {
         } else if (rawType == long.class || rawType == Long.class) {
             return ((Number) value).longValue();
         } else if (rawType == boolean.class || rawType == Boolean.class) {
-            return (Boolean) value;
+            return value;
         } else if (rawType == String.class) {
-            return (String) value;
+            return value;
         } else if (rawType == BigDecimal.class) {
             return new BigDecimal((String) value);
         } else if (rawType == BigInteger.class) {
@@ -3353,14 +3352,14 @@ public class JSONObject {
                 Type elementType = getElementType(targetType);
                 return fromJsonArray((JSONArray) value, rawType, elementType);
             }
-        } 
+        }
         // Map handling (e.g., Map<Integer, List<String>>)
         else if (Map.class.isAssignableFrom(rawType) && value instanceof JSONObject) {
             Type[] mapTypes = getMapTypes(targetType);
             Type keyType = mapTypes[0];
             Type valueType = mapTypes[1];
             return convertToMap((JSONObject) value, keyType, valueType, rawType);
-        } 
+        }
         // POJO handling (including custom classes like Tuple<Integer, String, Integer>)
         else if (!rawType.isPrimitive() && !rawType.isEnum() && value instanceof JSONObject) {
             // Recurse with the raw class for POJO deserialization
