@@ -145,6 +145,18 @@ public class JSONObject {
     public static final Object NULL = new Null();
 
     /**
+     * Set of method names that should be excluded when identifying record-style accessors.
+     * These are common bean/Object method names that are not property accessors.
+     */
+    private static final Set<String> EXCLUDED_RECORD_METHOD_NAMES = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList(
+                    "get", "is", "set",
+                    "toString", "hashCode", "equals", "clone",
+                    "notify", "notifyAll", "wait"
+            ))
+    );
+
+    /**
      * Construct an empty JSONObject.
      */
     public JSONObject() {
@@ -1948,11 +1960,7 @@ public class JSONObject {
         }
         
         // Exclude common bean/Object method names
-        if ("get".equals(methodName) || "is".equals(methodName) || "set".equals(methodName)
-                || "toString".equals(methodName) || "hashCode".equals(methodName)
-                || "equals".equals(methodName) || "clone".equals(methodName)
-                || "notify".equals(methodName) || "notifyAll".equals(methodName)
-                || "wait".equals(methodName)) {
+        if (EXCLUDED_RECORD_METHOD_NAMES.contains(methodName)) {
             return false;
         }
         
