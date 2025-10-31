@@ -56,6 +56,17 @@ import org.json.junit.data.RecursiveBeanEquals;
 import org.json.junit.data.Singleton;
 import org.json.junit.data.SingletonEnum;
 import org.json.junit.data.WeirdList;
+import org.json.junit.data.CustomClass;
+import org.json.junit.data.CustomClassA;
+import org.json.junit.data.CustomClassB;
+import org.json.junit.data.CustomClassC;
+import org.json.junit.data.CustomClassD;
+import org.json.junit.data.CustomClassE;
+import org.json.junit.data.CustomClassF;
+import org.json.junit.data.CustomClassG;
+import org.json.junit.data.CustomClassH;
+import org.json.junit.data.CustomClassI;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -4095,4 +4106,128 @@ public class JSONObjectTest {
         assertTrue("JSONObject should be empty", jsonObject.isEmpty());
     }
 
+
+    @Test
+    public void jsonObjectParseFromJson_0() {
+      JSONObject object = new JSONObject();
+      object.put("number", 12);
+      object.put("name", "Alex");
+      object.put("longNumber", 1500000000L);
+      CustomClass customClass = object.fromJson(CustomClass.class);
+      CustomClass compareClass = new CustomClass(12, "Alex", 1500000000L);
+      assertEquals(customClass, compareClass);
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_1() {
+        JSONObject object = new JSONObject();
+
+        BigInteger largeInt = new BigInteger("123");
+        object.put("largeInt", largeInt.toString());
+        CustomClassA customClassA = object.fromJson(CustomClassA.class);
+        CustomClassA compareClassClassA = new CustomClassA(largeInt);
+        assertEquals(customClassA, compareClassClassA);
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_2() {
+      JSONObject object = new JSONObject();
+      object.put("number", 12);
+
+      JSONObject classC = new JSONObject();
+      classC.put("stringName", "Alex");
+      classC.put("longNumber", 123456L);
+
+      object.put("classC", classC);
+
+      CustomClassB customClassB = object.fromJson(CustomClassB.class);
+      CustomClassC classCObject = new CustomClassC("Alex", 123456L);
+      CustomClassB compareClassB = new CustomClassB(12, classCObject);
+      assertEquals(customClassB, compareClassB);
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_3() {
+      JSONObject object = new JSONObject();
+      JSONArray array = new JSONArray();
+      array.put("test1");
+      array.put("test2");
+      array.put("test3");
+      object.put("stringList", array);
+
+      CustomClassD customClassD = object.fromJson(CustomClassD.class);
+      CustomClassD compareClassD = new CustomClassD(Arrays.asList("test1", "test2", "test3"));
+      assertEquals(customClassD, compareClassD);
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_4() {
+      JSONObject object = new JSONObject();
+      JSONArray array = new JSONArray();
+      array.put(new CustomClassC("test1", 1L).toJSON());
+      array.put(new CustomClassC("test2", 2L).toJSON());
+      object.put("listClassC", array);
+
+      CustomClassE customClassE = object.fromJson(CustomClassE.class);
+      CustomClassE compareClassE = new CustomClassE(java.util.Arrays.asList(
+      new CustomClassC("test1", 1L),
+      new CustomClassC("test2", 2L)));
+      assertEquals(customClassE, compareClassE);
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_5() {
+      JSONObject object = new JSONObject();
+      JSONArray array = new JSONArray();
+      array.put(Arrays.asList("A", "B", "C"));
+      array.put(Arrays.asList("D", "E"));
+      object.put("listOfString", array);
+
+      CustomClassF customClassF = object.fromJson(CustomClassF.class);
+      List<List<String>> listOfString = new ArrayList<>();
+      listOfString.add(Arrays.asList("A", "B", "C"));
+      listOfString.add(Arrays.asList("D", "E"));
+      CustomClassF compareClassF = new CustomClassF(listOfString);
+      assertEquals(customClassF, compareClassF);
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_6() {
+        JSONObject object = new JSONObject();
+        Map<String, String> dataList = new HashMap<>();
+        dataList.put("A", "Aa");
+        dataList.put("B", "Bb");
+        dataList.put("C", "Cc");
+        object.put("dataList", dataList);
+
+        CustomClassG customClassG = object.fromJson(CustomClassG.class);
+        CustomClassG compareClassG = new CustomClassG(dataList);
+        assertEquals(customClassG, compareClassG);
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_7() {
+        JSONObject object = new JSONObject();
+        Map<String, List<Integer>> dataList = new HashMap<>();
+        dataList.put("1", Arrays.asList(1, 2, 3, 4));
+        dataList.put("2", Arrays.asList(2, 3, 4, 5));
+        object.put("integerMap", dataList);
+
+        CustomClassH customClassH = object.fromJson(CustomClassH.class);
+        CustomClassH compareClassH = new CustomClassH(dataList);
+        assertEquals(customClassH.integerMap.toString(), compareClassH.integerMap.toString());
+    }
+
+    @Test
+    public void jsonObjectParseFromJson_8() {
+        JSONObject object = new JSONObject();
+        Map<String, Map<String, Integer>> dataList = new HashMap<>();
+        dataList.put("1", Collections.singletonMap("1", 1));
+        dataList.put("2", Collections.singletonMap("2", 2));
+        object.put("integerMap", dataList);
+
+        CustomClassI customClassI = object.fromJson(CustomClassI.class);
+        CustomClassI compareClassI = new CustomClassI(dataList);
+        assertEquals(customClassI.integerMap.toString(), compareClassI.integerMap.toString());
+    }
 }

@@ -17,6 +17,9 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.GenericArrayType;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -3206,5 +3209,251 @@ public class JSONObject {
         return new JSONException(
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
+    }
+
+    /**
+     * Helper method to extract the raw Class from Type.
+     */
+    private Class<?> getRawType(Type type) {
+        if (type instanceof Class) {
+            return (Class<?>) type;
+        } else if (type instanceof ParameterizedType) {
+            return (Class<?>) ((ParameterizedType) type).getRawType();
+        } else if (type instanceof GenericArrayType) {
+            return Object[].class; // Simplified handling for arrays
+        }
+        return Object.class; // Fallback
+    }
+
+    /**
+     * Extracts the element Type for a Collection Type.
+     */
+    private Type getElementType(Type type) {
+        if (type instanceof ParameterizedType) {
+            Type[] args = ((ParameterizedType) type).getActualTypeArguments();
+            return args.length > 0 ? args[0] : Object.class;
+        }
+        return Object.class;
+    }
+
+    /**
+     * Extracts the key and value Types for a Map Type.
+     */
+    private Type[] getMapTypes(Type type) {
+        if (type instanceof ParameterizedType) {
+            Type[] args = ((ParameterizedType) type).getActualTypeArguments();
+            if (args.length == 2) {
+                return args;
+            }
+        }
+        return new Type[]{Object.class, Object.class}; // Default: String keys, Object values
+    }
+
+    /**
+     * Deserializes a JSON string into an instance of the specified class.
+     *
+     * <p>This method attempts to map JSON key-value pairs to the corresponding fields
+     * of the given class. It supports basic data types including int, double, float,
+     * long, and boolean (as well as their boxed counterparts). The class must have a
+     * no-argument constructor, and the field names in the class must match the keys
+     * in the JSON string.
+     *
+     * @param jsonString json in string format
+     * @param clazz the class of the object to be returned
+     * @return an instance of Object T with fields populated from the JSON string
+     */
+    public static <T> T fromJson(String jsonString, Class<T> clazz) {
+        JSONObject jsonObject = new JSONObject(jsonString);
+        return jsonObject.fromJson(clazz);
+    }
+
+    /**
+     * Deserializes a JSON string into an instance of the specified class.
+     *
+     * <p>This method attempts to map JSON key-value pairs to the corresponding fields
+     * of the given class. It supports basic data types including {@code int}, {@code double},
+     * {@code float}, {@code long}, and {@code boolean}, as well as their boxed counterparts.
+     * The target class must have a no-argument constructor, and its field names must match
+     * the keys in the JSON string.
+     *
+     * <p><strong>Note:</strong> Only classes that are explicitly supported and registered within
+     * the {@code JSONObject} context can be deserialized. If the provided class is not among those,
+     * this method will not be able to deserialize it. This ensures that only a limited and
+     * controlled set of types can be instantiated from JSON for safety and predictability.
+     *
+     * @param clazz the class of the object to be returned
+     * @param <T> the type of the object
+     * @return an instance of type {@code T} with fields populated from the JSON string
+     * @throws IllegalArgumentException if the class is not supported for deserialization
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T fromJson(Class<T> clazz) {
+        try {
+            T obj = clazz.getDeclaredConstructor().newInstance();
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                String fieldName = field.getName();
+                if (has(fieldName)) {
+                    Object value = get(fieldName);
+                    Type fieldType = field.getGenericType();
+                    Object convertedValue = convertValue(value, fieldType);
+                    field.set(obj, convertedValue);
+                }
+            }
+            return obj;
+        } catch (NoSuchMethodException e) {
+            throw new JSONException("No no-arg constructor for class: " + clazz.getName(), e);
+        } catch (Exception e) {
+            throw new JSONException("Failed to instantiate or set field for class: " + clazz.getName(), e);
+        }
+    }
+
+    /**
+     * Recursively converts a value to the target Type, handling nested generics for Collections and Maps.
+     */
+    private Object convertValue(Object value, Type targetType) throws JSONException {
+        if (value == null) {
+            return null;
+        }
+
+        Class<?> rawType = getRawType(targetType);
+
+        // Direct assignment
+        if (rawType.isAssignableFrom(value.getClass())) {
+            return value;
+        }
+
+        if (rawType == int.class || rawType == Integer.class) {
+            return ((Number) value).intValue();
+        } else if (rawType == double.class || rawType == Double.class) {
+            return ((Number) value).doubleValue();
+        } else if (rawType == float.class || rawType == Float.class) {
+            return ((Number) value).floatValue();
+        } else if (rawType == long.class || rawType == Long.class) {
+            return ((Number) value).longValue();
+        } else if (rawType == boolean.class || rawType == Boolean.class) {
+            return value;
+        } else if (rawType == String.class) {
+            return value;
+        } else if (rawType == BigDecimal.class) {
+            return new BigDecimal((String) value);
+        } else if (rawType == BigInteger.class) {
+            return new BigInteger((String) value);
+        }
+
+        // Enum conversion
+        if (rawType.isEnum() && value instanceof String) {
+            return stringToEnum(rawType, (String) value);
+        }
+
+        // Collection handling (e.g., List<List<Map<String, Integer>>>)
+        if (Collection.class.isAssignableFrom(rawType)) {
+            if (value instanceof JSONArray) {
+                Type elementType = getElementType(targetType);
+                return fromJsonArray((JSONArray) value, rawType, elementType);
+            }
+        }
+        // Map handling (e.g., Map<Integer, List<String>>)
+        else if (Map.class.isAssignableFrom(rawType) && value instanceof JSONObject) {
+            Type[] mapTypes = getMapTypes(targetType);
+            Type keyType = mapTypes[0];
+            Type valueType = mapTypes[1];
+            return convertToMap((JSONObject) value, keyType, valueType, rawType);
+        }
+        // POJO handling (including custom classes like Tuple<Integer, String, Integer>)
+        else if (!rawType.isPrimitive() && !rawType.isEnum() && value instanceof JSONObject) {
+            // Recurse with the raw class for POJO deserialization
+            return ((JSONObject) value).fromJson(rawType);
+        }
+
+        // Fallback
+        return value.toString();
+    }
+
+    /**
+     * Converts a JSONObject to a Map with the specified generic key and value Types.
+     * Supports nested types via recursive convertValue.
+     */
+    private Map<?, ?> convertToMap(JSONObject jsonMap, Type keyType, Type valueType, Class<?> mapType) throws JSONException {
+        try {
+            @SuppressWarnings("unchecked")
+            Map<Object, Object> createdMap = new HashMap();
+
+            for (Object keyObj : jsonMap.keySet()) {
+                String keyStr = (String) keyObj;
+                Object mapValue = jsonMap.get(keyStr);
+                // Convert key (e.g., String to Integer for Map<Integer, ...>)
+                Object convertedKey = convertValue(keyStr, keyType);
+                // Convert value recursively (handles nesting)
+                Object convertedValue = convertValue(mapValue, valueType);
+                createdMap.put(convertedKey, convertedValue);
+            }
+            return createdMap;
+        } catch (Exception e) {
+            throw new JSONException("Failed to convert JSONObject to Map: " + mapType.getName(), e);
+        }
+    }
+
+    /**
+     * Converts a String to an Enum value.
+     */
+    private <E> E stringToEnum(Class<?> enumClass, String value) throws JSONException {
+        try {
+            @SuppressWarnings("unchecked")
+            Class<E> enumType = (Class<E>) enumClass;
+            Method valueOfMethod = enumType.getMethod("valueOf", String.class);
+            return (E) valueOfMethod.invoke(null, value);
+        } catch (Exception e) {
+            throw new JSONException("Failed to convert string to enum: " + value + " for " + enumClass.getName(), e);
+        }
+    }
+
+    /**
+     * Deserializes a JSONArray into a Collection, supporting nested generics.
+     * Uses recursive convertValue for elements.
+     */
+    @SuppressWarnings("unchecked")
+    private <T> Collection<T> fromJsonArray(JSONArray jsonArray, Class<?> collectionType, Type elementType) throws JSONException {
+        try {
+            Collection<T> collection = getCollection(collectionType);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Object jsonElement = jsonArray.get(i);
+                // Recursively convert each element using the full element Type (handles nesting)
+                Object convertedValue = convertValue(jsonElement, elementType);
+                collection.add((T) convertedValue);
+            }
+            return collection;
+        } catch (Exception e) {
+            throw new JSONException("Failed to convert JSONArray to Collection: " + collectionType.getName(), e);
+        }
+    }
+
+    /**
+    * Creates and returns a new instance of a supported {@link Collection} implementation
+    * based on the specified collection type.
+    * <p>
+    * This method currently supports the following collection types:
+    * <ul>
+    *   <li>{@code List.class}</li>
+    *   <li>{@code ArrayList.class}</li>
+    *   <li>{@code Set.class}</li>
+    *   <li>{@code HashSet.class}</li>
+    * </ul>
+    * If the provided type does not match any of the supported types, a {@link JSONException}
+    * is thrown.
+    *
+    * @param collectionType the {@link Class} object representing the desired collection type
+    * @return a new empty instance of the specified collection type
+    * @throws JSONException if the specified type is not a supported collection type
+    */
+    private Collection getCollection(Class<?> collectionType) throws JSONException {
+        if (collectionType == List.class || collectionType == ArrayList.class) {
+            return new ArrayList();
+        } else if (collectionType == Set.class || collectionType == HashSet.class) {
+            return new HashSet();
+        } else {
+            throw new JSONException("Unsupported Collection type: " + collectionType.getName());
+        }
     }
 }
