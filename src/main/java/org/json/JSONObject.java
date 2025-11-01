@@ -145,6 +145,18 @@ public class JSONObject {
     public static final Object NULL = new Null();
 
     /**
+     * Set of method names that should be excluded when identifying record-style accessors.
+     * These are common bean/Object method names that are not property accessors.
+     */
+    private static final Set<String> EXCLUDED_RECORD_METHOD_NAMES = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList(
+                    "get", "is", "set",
+                    "toString", "hashCode", "equals", "clone",
+                    "notify", "notifyAll", "wait"
+            ))
+    );
+
+    /**
      * Construct an empty JSONObject.
      */
     public JSONObject() {
@@ -1885,7 +1897,8 @@ public class JSONObject {
     }
 
     private static boolean isValidMethodName(String name) {
-        return !"getClass".equals(name) && !"getDeclaringClass".equals(name);
+        return !"getClass".equals(name) 
+                && !"getDeclaringClass".equals(name);
     }
 
     private static String getKeyNameFromMethod(Method method) {
@@ -1909,6 +1922,14 @@ public class JSONObject {
         } else if (name.startsWith("is") && name.length() > 2) {
             key = name.substring(2);
         } else {
+            // Check if this is a record-style accessor (no prefix)
+            // Record accessors are simple method names that match field names
+            // They must start with a lowercase letter and should be declared in the class itself
+            // (not inherited from Object, Enum, Number, or any java.* class)
+            // Also exclude common Object/bean method names
+            if (isRecordStyleAccessor(name, method)) {
+                return name;
+            }
             return null;
         }
         // if the first letter in the key is not uppercase, then skip.
@@ -1923,6 +1944,37 @@ public class JSONObject {
             key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
         }
         return key;
+    }
+
+    /**
+     * Checks if a method is a record-style accessor.
+     * Record accessors have lowercase names without get/is prefixes and are not inherited from standard Java classes.
+     * 
+     * @param methodName the name of the method
+     * @param method the method to check
+     * @return true if this is a record-style accessor, false otherwise
+     */
+    private static boolean isRecordStyleAccessor(String methodName, Method method) {
+        if (methodName.isEmpty() || !Character.isLowerCase(methodName.charAt(0))) {
+            return false;
+        }
+        
+        // Exclude common bean/Object method names
+        if (EXCLUDED_RECORD_METHOD_NAMES.contains(methodName)) {
+            return false;
+        }
+        
+        Class<?> declaringClass = method.getDeclaringClass();
+        if (declaringClass == null || declaringClass == Object.class) {
+            return false;
+        }
+        
+        if (Enum.class.isAssignableFrom(declaringClass) || Number.class.isAssignableFrom(declaringClass)) {
+            return false;
+        }
+        
+        String className = declaringClass.getName();
+        return !className.startsWith("java.") && !className.startsWith("javax.");
     }
 
     /**
