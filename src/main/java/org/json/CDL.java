@@ -27,7 +27,9 @@ public class CDL {
 
     /**
      * Constructs a new CDL object.
+     * @deprecated (Utility class cannot be instantiated)
      */
+    @Deprecated
     public CDL() {
     }
 

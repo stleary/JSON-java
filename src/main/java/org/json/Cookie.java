@@ -17,7 +17,9 @@ public class Cookie {
 
     /**
      * Constructs a new Cookie object.
+     * @deprecated (Utility class cannot be instantiated)
      */
+    @Deprecated()
     public Cookie() {
     }
 

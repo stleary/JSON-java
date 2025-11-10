@@ -13,7 +13,9 @@ public class CookieList {
 
     /**
      * Constructs a new CookieList object.
+     * @deprecated (Utility class cannot be instantiated)
      */
+    @Deprecated
     public CookieList() {
     }
  
