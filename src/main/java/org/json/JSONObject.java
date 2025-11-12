@@ -145,6 +145,18 @@ public class JSONObject {
     public static final Object NULL = new Null();
 
     /**
+     * Set of method names that should be excluded when identifying record-style accessors.
+     * These are common bean/Object method names that are not property accessors.
+     */
+    private static final Set<String> EXCLUDED_RECORD_METHOD_NAMES = Collections.unmodifiableSet(
+            new HashSet<String>(Arrays.asList(
+                    "get", "is", "set",
+                    "toString", "hashCode", "equals", "clone",
+                    "notify", "notifyAll", "wait"
+            ))
+    );
+
+    /**
      * Construct an empty JSONObject.
      */
     public JSONObject() {
@@ -1823,11 +1835,14 @@ public class JSONObject {
         Class<?> klass = bean.getClass();
 
         // If klass is a System class then set includeSuperClass to false.
+        
+        // Check if this is a Java record type
+        boolean isRecord = isRecordType(klass);
 
         Method[] methods = getMethods(klass);
         for (final Method method : methods) {
             if (isValidMethod(method)) {
-                final String key = getKeyNameFromMethod(method);
+                final String key = getKeyNameFromMethod(method, isRecord);
                 if (key != null && !key.isEmpty()) {
                     processMethod(bean, objectsRecord, jsonParserConfiguration, method, key);
                 }
@@ -1874,6 +1889,29 @@ public class JSONObject {
     }
 
     /**
+     * Checks if a class is a Java record type.
+     * This uses reflection to check for the isRecord() method which was introduced in Java 16.
+     * This approach works even when running on Java 6+ JVM.
+     * 
+     * @param klass the class to check
+     * @return true if the class is a record type, false otherwise
+     */
+    private static boolean isRecordType(Class<?> klass) {
+        try {
+            // Use reflection to check if Class has an isRecord() method (Java 16+)
+            // This allows the code to compile on Java 6 while still detecting records at runtime
+            Method isRecordMethod = Class.class.getMethod("isRecord");
+            return (Boolean) isRecordMethod.invoke(klass);
+        } catch (NoSuchMethodException e) {
+            // isRecord() method doesn't exist - we're on Java < 16
+            return false;
+        } catch (Exception e) {
+            // Any other reflection error - assume not a record
+            return false;
+        }
+    }
+
+    /**
      * This is a convenience method to simplify populate maps
      * @param klass the name of the object being checked
      * @return methods of klass
@@ -1885,10 +1923,11 @@ public class JSONObject {
     }
 
     private static boolean isValidMethodName(String name) {
-        return !"getClass".equals(name) && !"getDeclaringClass".equals(name);
+        return !"getClass".equals(name) 
+                && !"getDeclaringClass".equals(name);
     }
 
-    private static String getKeyNameFromMethod(Method method) {
+    private static String getKeyNameFromMethod(Method method, boolean isRecordType) {
         final int ignoreDepth = getAnnotationDepth(method, JSONPropertyIgnore.class);
         if (ignoreDepth > 0) {
             final int forcedNameDepth = getAnnotationDepth(method, JSONPropertyName.class);
@@ -1909,6 +1948,11 @@ public class JSONObject {
         } else if (name.startsWith("is") && name.length() > 2) {
             key = name.substring(2);
         } else {
+            // Only check for record-style accessors if this is actually a record type
+            // This maintains backward compatibility - classes with lowercase methods won't be affected
+            if (isRecordType && isRecordStyleAccessor(name, method)) {
+                return name;
+            }
             return null;
         }
         // if the first letter in the key is not uppercase, then skip.
@@ -1923,6 +1967,37 @@ public class JSONObject {
             key = key.substring(0, 1).toLowerCase(Locale.ROOT) + key.substring(1);
         }
         return key;
+    }
+
+    /**
+     * Checks if a method is a record-style accessor.
+     * Record accessors have lowercase names without get/is prefixes and are not inherited from standard Java classes.
+     * 
+     * @param methodName the name of the method
+     * @param method the method to check
+     * @return true if this is a record-style accessor, false otherwise
+     */
+    private static boolean isRecordStyleAccessor(String methodName, Method method) {
+        if (methodName.isEmpty() || !Character.isLowerCase(methodName.charAt(0))) {
+            return false;
+        }
+        
+        // Exclude common bean/Object method names
+        if (EXCLUDED_RECORD_METHOD_NAMES.contains(methodName)) {
+            return false;
+        }
+        
+        Class<?> declaringClass = method.getDeclaringClass();
+        if (declaringClass == null || declaringClass == Object.class) {
+            return false;
+        }
+        
+        if (Enum.class.isAssignableFrom(declaringClass) || Number.class.isAssignableFrom(declaringClass)) {
+            return false;
+        }
+        
+        String className = declaringClass.getName();
+        return !className.startsWith("java.") && !className.startsWith("javax.");
     }
 
     /**
