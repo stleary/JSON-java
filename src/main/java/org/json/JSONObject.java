@@ -2079,7 +2079,7 @@ public class JSONObject {
             } catch (final SecurityException ex) {
                 // ignore this exception
             } catch (final NoSuchMethodException ex) {
-                // ignore this excpetion
+                // ignore this exception
             }
         }
 
