@@ -3117,12 +3117,13 @@ public class JSONObjectTest {
         
         // test a more complex object
         writer = new StringWriter();
-        try {
-            new JSONObject()
+
+        JSONObject object = new JSONObject()
                 .put("somethingElse", "a value")
                 .put("someKey", new JSONArray()
-                        .put(new JSONObject().put("key1", new BrokenToString())))
-                .write(writer).toString();
+                        .put(new JSONObject().put("key1", new BrokenToString())));
+        try {
+            object.write(writer).toString();
             fail("Expected an exception, got a String value");
         } catch (JSONException e) {
             assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
@@ -3133,17 +3134,18 @@ public class JSONObjectTest {
                 writer.close();
             } catch (Exception e) {}
         }
-       
+
         // test a more slightly complex object
         writer = new StringWriter();
-        try {
-            new JSONObject()
+
+        object = new JSONObject()
                 .put("somethingElse", "a value")
                 .put("someKey", new JSONArray()
                         .put(new JSONObject().put("key1", new BrokenToString()))
                         .put(12345)
-                 )
-                .write(writer).toString();
+                 );
+        try {
+            object.write(writer).toString();
             fail("Expected an exception, got a String value");
         } catch (JSONException e) {
             assertEquals("Unable to write JSONObject value for key: someKey", e.getMessage());
