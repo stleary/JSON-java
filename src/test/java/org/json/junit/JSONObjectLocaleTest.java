@@ -36,25 +36,31 @@ public class JSONObjectLocaleTest {
 
         MyLocaleBean myLocaleBean = new MyLocaleBean();
 
-        /**
-         * This is just the control case which happens when the locale.ROOT
-         * lowercasing behavior is the same as the current locale.
-         */
-        Locale.setDefault(new Locale("en"));
-        JSONObject jsonen = new JSONObject(myLocaleBean);
-        assertEquals("expected size 2, found: " +jsonen.length(), 2, jsonen.length());
-        assertEquals("expected jsonen[i] == beanI", "beanI", jsonen.getString("i"));
-        assertEquals("expected jsonen[id] == beanId", "beanId", jsonen.getString("id"));
+        // save and restore the current default locale, to avoid any side effects on other executions in the same JVM
+        Locale defaultLocale = Locale.getDefault();
+        try {
+            /**
+             * This is just the control case which happens when the locale.ROOT
+             * lowercasing behavior is the same as the current locale.
+             */
+            Locale.setDefault(new Locale("en"));
+            JSONObject jsonen = new JSONObject(myLocaleBean);
+            assertEquals("expected size 2, found: " +jsonen.length(), 2, jsonen.length());
+            assertEquals("expected jsonen[i] == beanI", "beanI", jsonen.getString("i"));
+            assertEquals("expected jsonen[id] == beanId", "beanId", jsonen.getString("id"));
 
-        /**
-         * Without the JSON-Java change, these keys would be stored internally as
-         * starting with the letter, 'ı' (dotless i), since the lowercasing of
-         * the getI and getId keys would be specific to the Turkish locale.
-         */
-        Locale.setDefault(new Locale("tr"));
-        JSONObject jsontr = new JSONObject(myLocaleBean);
-        assertEquals("expected size 2, found: " +jsontr.length(), 2, jsontr.length());
-        assertEquals("expected jsontr[i] == beanI", "beanI", jsontr.getString("i"));
-        assertEquals("expected jsontr[id] == beanId", "beanId", jsontr.getString("id"));
+            /**
+             * Without the JSON-Java change, these keys would be stored internally as
+             * starting with the letter, 'ı' (dotless i), since the lowercasing of
+             * the getI and getId keys would be specific to the Turkish locale.
+             */
+            Locale.setDefault(new Locale("tr"));
+            JSONObject jsontr = new JSONObject(myLocaleBean);
+            assertEquals("expected size 2, found: " +jsontr.length(), 2, jsontr.length());
+            assertEquals("expected jsontr[i] == beanI", "beanI", jsontr.getString("i"));
+            assertEquals("expected jsontr[id] == beanId", "beanId", jsontr.getString("id"));
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 }
