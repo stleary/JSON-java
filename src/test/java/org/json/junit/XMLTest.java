@@ -1469,6 +1469,42 @@ public class XMLTest {
     }
 
     /**
+     * Tests that out-of-range hex entities throw JSONException rather than an uncaught runtime exception.
+     */
+    @Test(expected = JSONException.class)
+    public void testOutOfRangeHexEntityThrowsJSONException() {
+        String xmlStr = "<a>&#x110000;</a>";
+        XML.toJSONObject(xmlStr);
+    }
+
+    /**
+     * Tests that out-of-range decimal entities throw JSONException rather than an uncaught runtime exception.
+     */
+    @Test(expected = JSONException.class)
+    public void testOutOfRangeDecimalEntityThrowsJSONException() {
+        String xmlStr = "<a>&#1114112;</a>";
+        XML.toJSONObject(xmlStr);
+    }
+
+    /**
+     * Tests that surrogate code point entities throw JSONException.
+     */
+    @Test(expected = JSONException.class)
+    public void testSurrogateHexEntityThrowsJSONException() {
+        String xmlStr = "<a>&#xD800;</a>";
+        XML.toJSONObject(xmlStr);
+    }
+
+    /**
+     * Tests that out-of-range numeric entities in attribute values throw JSONException.
+     */
+    @Test(expected = JSONException.class)
+    public void testOutOfRangeHexEntityInAttributeThrowsJSONException() {
+        String xmlStr = "<a b=\"&#x110000;\"/>";
+        XML.toJSONObject(xmlStr);
+    }
+
+    /**
      * Tests that valid decimal numeric entity &#65; works correctly.
      * Should decode to character 'A'.
      */

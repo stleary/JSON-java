@@ -167,6 +167,9 @@ public class XMLTokener extends JSONTokener {
             int cp = (e.charAt(1) == 'x' || e.charAt(1) == 'X')
                 ? parseHexEntity(e)
                 : parseDecimalEntity(e);
+            if (XML.mustEscape(cp)) {
+                throw new JSONException("Invalid numeric character reference: &#" + e.substring(1) + ";");
+            }
             return new String(new int[] {cp}, 0, 1);
         }
         Character knownEntity = entity.get(e);

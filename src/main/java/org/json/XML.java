@@ -158,7 +158,7 @@ public class XML {
      * @param cp code point to test
      * @return true if the code point is not valid for an XML
      */
-    private static boolean mustEscape(int cp) {
+    static boolean mustEscape(int cp) {
         /* Valid range from https://www.w3.org/TR/REC-xml/#charsets
          *
          * #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
