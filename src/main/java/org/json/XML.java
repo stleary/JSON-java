@@ -63,41 +63,30 @@ public class XML {
      */
     public static final String TYPE_ATTR = "xsi:type";
 
-    /**
-     * Creates an iterator for navigating Code Points in a string instead of
-     * characters. Once Java7 support is dropped, this can be replaced with
-     * <code>
-     * string.codePoints()
-     * </code>
-     * which is available in Java8 and above.
-     *
-     * @see <a href=
-     *      "http://stackoverflow.com/a/21791059/6030888">http://stackoverflow.com/a/21791059/6030888</a>
-     */
-    private static Iterable<Integer> codePointIterator(final String string) {
+    private static Iterable<Integer> it(final String string) {
         return new Iterable<Integer>() {
             @Override
             public Iterator<Integer> iterator() {
                 return new Iterator<Integer>() {
-                    private int nextIndex = 0;
-                    private int length = string.length();
-
-                    @Override
-                    public boolean hasNext() {
-                        return this.nextIndex < this.length;
-                    }
+                    private int pos = 0;
 
                     @Override
                     public Integer next() {
-                        int result = string.codePointAt(this.nextIndex);
-                        this.nextIndex += Character.charCount(result);
-                        return result;
+                        int cp = string.codePointAt(pos);
+                        pos += Character.charCount(cp);
+                        return cp;
                     }
 
                     @Override
                     public void remove() {
                         throw new UnsupportedOperationException();
                     }
+
+                    @Override
+                    public boolean hasNext() {
+                        return pos < string.length();
+                    }
+
                 };
             }
         };
@@ -120,7 +109,7 @@ public class XML {
      */
     public static String escape(String string) {
         StringBuilder sb = new StringBuilder(string.length());
-        for (final int cp : codePointIterator(string)) {
+        for (final int cp : it(string)) {
             switch (cp) {
             case '&':
                 sb.append("&amp;");
