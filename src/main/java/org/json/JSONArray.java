@@ -184,7 +184,7 @@ public class JSONArray implements Iterable<Object> {
      *             If there is a syntax error.
      */
     public JSONArray(String source) throws JSONException {
-        this(source, new JSONParserConfiguration());
+        this(source, JSONParserConfiguration.getInstance());
     }
 
     /**
@@ -209,7 +209,7 @@ public class JSONArray implements Iterable<Object> {
      *            A Collection.
      */
     public JSONArray(Collection<?> collection) {
-      this(collection, 0, new JSONParserConfiguration());
+      this(collection, 0, JSONParserConfiguration.getInstance());
     }
 
     /**
@@ -1410,7 +1410,7 @@ public class JSONArray implements Iterable<Object> {
      *             If a key in the map is <code>null</code>
      */
     public JSONArray put(int index, Map<?, ?> value) throws JSONException {
-        this.put(index, new JSONObject(value, new JSONParserConfiguration()));
+        this.put(index, new JSONObject(value, JSONParserConfiguration.getInstance()));
         return this;
     }
 
@@ -1967,7 +1967,7 @@ public class JSONArray implements Iterable<Object> {
      *          Variable for tracking the count of nested object creations.
      */
     private void addAll(Object array, boolean wrap, int recursionDepth) {
-        addAll(array, wrap, recursionDepth, new JSONParserConfiguration());
+        addAll(array, wrap, recursionDepth, JSONParserConfiguration.getInstance());
     }
     /**
      * Add an array's elements to the JSONArray.

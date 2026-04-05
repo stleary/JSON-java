@@ -359,7 +359,7 @@ public class JSONObject {
      *            If a key in the map is <code>null</code>
      */
     public JSONObject(Map<?, ?> m) {
-      this(m, 0, new JSONParserConfiguration());
+      this(m, 0, JSONParserConfiguration.getInstance());
     }
 
     /**
@@ -460,7 +460,7 @@ public class JSONObject {
      */
     public JSONObject(Object bean) {
         this();
-        this.populateMap(bean, new JSONParserConfiguration());
+        this.populateMap(bean, JSONParserConfiguration.getInstance());
     }
 
     public JSONObject(Object bean, JSONParserConfiguration jsonParserConfiguration) {
@@ -470,7 +470,7 @@ public class JSONObject {
 
     private JSONObject(Object bean, Set<Object> objectsRecord) {
         this();
-        this.populateMap(bean, objectsRecord, new JSONParserConfiguration());
+        this.populateMap(bean, objectsRecord, JSONParserConfiguration.getInstance());
     }
 
     /**
@@ -513,7 +513,7 @@ public class JSONObject {
      *                duplicated key.
      */
     public JSONObject(String source) throws JSONException {
-        this(source, new JSONParserConfiguration());
+        this(source, JSONParserConfiguration.getInstance());
     }
 
     /**
@@ -2960,7 +2960,7 @@ public class JSONObject {
     }
 
     private static Object wrap(Object object, Set<Object> objectsRecord) {
-      return wrap(object, objectsRecord, 0, new JSONParserConfiguration());
+      return wrap(object, objectsRecord, 0, JSONParserConfiguration.getInstance());
     }
 
     private static Object wrap(Object object, Set<Object> objectsRecord, int recursionDepth, JSONParserConfiguration jsonParserConfiguration) {

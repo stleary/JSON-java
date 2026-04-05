@@ -41,7 +41,7 @@ public class JSONTokener {
      * @param reader the source.
      */
     public JSONTokener(Reader reader) {
-        this(reader, new JSONParserConfiguration());
+        this(reader, JSONParserConfiguration.getInstance());
     }
 
     /**
@@ -70,7 +70,7 @@ public class JSONTokener {
      * @param inputStream The source.
      */
     public JSONTokener(InputStream inputStream) {
-        this(inputStream, new JSONParserConfiguration());
+        this(inputStream, JSONParserConfiguration.getInstance());
     }
 
     /**

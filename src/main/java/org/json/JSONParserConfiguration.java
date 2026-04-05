@@ -4,6 +4,45 @@ package org.json;
  * Configuration object for the JSON parser. The configuration is immutable.
  */
 public class JSONParserConfiguration extends ParserConfiguration {
+
+    /**
+     *  system-wide default configuration.
+     */
+    private static JSONParserConfiguration globalConfig = null;
+
+    /**
+     * Sets the system-wide global JSONParserConfiguration.
+     * This can only be called once during the application's lifecycle.
+     *
+     * @param configuration The configuration to set globally.
+     * @throws IllegalStateException if the configuration is already set.
+     * @throws IllegalArgumentException if the provided config is null.
+     */
+    public static void setGlobalConfiguration(JSONParserConfiguration configuration){
+        if (configuration == null) {
+            throw new IllegalArgumentException("Global JSONParserConfiguration cannot be null.");
+        }
+        if(globalConfig == null){
+            globalConfig = configuration;
+        } else {
+            throw new IllegalStateException("Global JSONParserConfiguration has already been set. It cannot be modified.");
+        }
+    }
+
+    /**
+     * Retrieves the system-wide global JSONParserConfiguration.
+     * If one hasn't been explicitly set, it returns a fresh instance with standard defaults.
+     *
+     * @return The active global JSONParserConfiguration.
+     */
+    static JSONParserConfiguration getInstance() {
+        JSONParserConfiguration config = globalConfig;
+        if (config == null) {
+            return new JSONParserConfiguration();
+        }
+        return config;
+    }
+
     /**
      * Used to indicate whether to overwrite duplicate key or not.
      */
@@ -73,7 +112,7 @@ public class JSONParserConfiguration extends ParserConfiguration {
 
         return clone;
     }
-    
+
     /**
      * Controls the parser's behavior when meeting Java null values while converting maps.
      * If set to true, the parser will put a JSONObject.NULL into the resulting JSONObject.
