@@ -8,20 +8,155 @@ import org.json.JSONTokener;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.junit.Before;
+
+import static org.junit.Assert.*;
 
 public class JSONParserConfigurationTest {
     private static final String TEST_SOURCE = "{\"key\": \"value1\", \"key\": \"value2\"}";
+
+    @Before
+    public void resetGlobalConfigurationBeforeTest() {
+        resetGlobalConfiguration();
+    }
+
+    @After
+    public void resetGlobalConfigurationAfterTest() {
+        resetGlobalConfiguration();
+    }
+
+    @Test
+    public void globalConfigurationShouldRejectNull() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> JSONParserConfiguration.setGlobalConfiguration(null));
+
+        assertEquals("Global JSONParserConfiguration cannot be null.", exception.getMessage());
+    }
+
+    @Test
+    public void globalConfigurationShouldOnlyBeSetOnce() {
+        JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration());
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration().withStrictMode(true)));
+
+        assertEquals("Global JSONParserConfiguration has already been set. It cannot be modified.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void globalOverwriteDuplicateKeyShouldAffectDefaultJSONObjectStringConstructor() {
+        JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration().withOverwriteDuplicateKey(true));
+
+        JSONObject jsonObject = new JSONObject(TEST_SOURCE);
+
+        assertEquals("value2", jsonObject.getString("key"));
+    }
+
+    @Test
+    public void globalStrictModeShouldAffectDefaultJSONTokenerReaderConstructor() {
+        JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration().withStrictMode(true));
+
+        JSONException exception = assertThrows(JSONException.class,
+                () -> new JSONObject(new JSONTokener(new StringReader("{\"key\":\"value\"} invalid trailing text"))));
+
+        assertEquals("Strict mode error: Unparsed characters found at end of input text at 17 [character 18 line 1]",
+                exception.getMessage());
+    }
+
+    @Test
+    public void globalUseNativeNullsShouldAffectDefaultJSONObjectMapConstructor() {
+        JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration().withUseNativeNulls(true));
+        Map<String, Object> nullMap = Collections.singletonMap("nullKey", null);
+
+        JSONObject jsonObject = new JSONObject(nullMap);
+
+        assertTrue(jsonObject.has("nullKey"));
+        assertEquals(JSONObject.NULL, jsonObject.get("nullKey"));
+    }
+
+    @Test
+    public void globalUseNativeNullsShouldAffectDefaultJSONArrayArrayWrapping() {
+        JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration().withUseNativeNulls(true));
+        Map<String, Object> nullMap = Collections.singletonMap("nullKey", null);
+
+        JSONArray jsonArray = new JSONArray(new Object[] { nullMap });
+        JSONObject nestedObject = jsonArray.getJSONObject(0);
+
+        assertTrue(nestedObject.has("nullKey"));
+        assertEquals(JSONObject.NULL, nestedObject.get("nullKey"));
+    }
+
+    @Test
+    public void whenNoGlobalConfigurationSet_shouldUseDefaultConfiguration() {
+        // No global configuration set, should use defaults
+        // Default: overwriteDuplicateKey=false, so duplicate keys throw exception
+        JSONException exception = assertThrows(JSONException.class,
+                () -> new JSONObject(TEST_SOURCE));
+
+        assertTrue(exception.getMessage().contains("Duplicate key"));
+    }
+
+    @Test
+    public void globalStrictModeShouldAffectDefaultJSONArrayStringConstructor() {
+        JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration().withStrictMode(true));
+
+        JSONException exception = assertThrows(JSONException.class,
+                () -> new JSONArray("[\"value\"] invalid trailing text"));
+
+        assertEquals("Strict mode error: Unparsed characters found at end of input text at 11 [character 12 line 1]",
+                exception.getMessage());
+    }
+
+    @Test
+    public void globalUseNativeNullsShouldAffectDefaultJSONArrayCollectionConstructor() {
+        JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration().withUseNativeNulls(true));
+        Map<String, Object> nullMap = Collections.singletonMap("nullKey", null);
+        List<Map<String, Object>> collection = Collections.singletonList(nullMap);
+
+        JSONArray jsonArray = new JSONArray(collection);
+        JSONObject nestedObject = jsonArray.getJSONObject(0);
+
+        assertTrue(nestedObject.has("nullKey"));
+        assertEquals(JSONObject.NULL, nestedObject.get("nullKey"));
+    }
+
+    @Test
+    public void globalMaxNestingDepthShouldAffectDefaultJSONObjectMapConstructor() {
+        JSONParserConfiguration.setGlobalConfiguration(new JSONParserConfiguration().withMaxNestingDepth(1));
+        // Create a nested map that exceeds max depth 1 (depth 0 -> depth 1 -> depth 2 would exceed)
+        Map<String, Object> innerMostMap = Collections.singletonMap("innermost", "value");
+        Map<String, Object> innerMap = Collections.singletonMap("inner", innerMostMap);
+        Map<String, Object> outerMap = Collections.singletonMap("outer", innerMap);
+
+        JSONException exception = assertThrows(JSONException.class,
+                () -> new JSONObject(outerMap));
+
+        assertTrue(exception.getMessage().contains("depth"));
+    }
+
+
+    private void resetGlobalConfiguration() {
+        try {
+            Field field = JSONParserConfiguration.class.getDeclaredField("globalConfig");
+            field.setAccessible(true);
+            field.set(null, null);
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError("Unable to reset global JSONParserConfiguration for test isolation.", e);
+        }
+    }
 
     @Test(expected = JSONException.class)
     public void testThrowException() {
