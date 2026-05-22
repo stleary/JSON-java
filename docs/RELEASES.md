@@ -5,6 +5,8 @@ and artifactId "json". For example:
 [https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav](https://search.maven.org/search?q=g:org.json%20AND%20a:json&core=gav)
 
 ~~~
+20260522    Publish key data, recent commits for minor fixes
+
 20251224    Records, fromJson(), and recent commits
 
 20250517    Strict mode hardening and recent commits

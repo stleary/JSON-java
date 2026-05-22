@@ -11,7 +11,7 @@ JSON in Java [package org.json]
 [![CodeQL](https://github.com/stleary/JSON-java/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/stleary/JSON-java/actions/workflows/codeql-analysis.yml)
 [![javadoc](https://javadoc.io/badge2/org.json/json/javadoc.svg)](https://javadoc.io/doc/org.json/json)
 
-**[Click here if you just want the latest release jar file.](https://search.maven.org/remotecontent?filepath=org/json/json/20251224/json-20251224.jar)**
+**[Click here if you just want the latest release jar file.](https://search.maven.org/remotecontent?filepath=org/json/json/20260522/json-20260522.jar)**
 
 
 # Overview
