@@ -3333,6 +3333,7 @@ public class JSONObject {
      * no-argument constructor, and the field names in the class must match the keys
      * in the JSON string.
      *
+     * @param <T> the type of the object to return
      * @param jsonString json in string format
      * @param clazz the class of the object to be returned
      * @return an instance of Object T with fields populated from the JSON string
@@ -3474,7 +3475,12 @@ public class JSONObject {
 
     /**
      * Converts a String to an Enum value.
+     * The unchecked warning is suppressed when casting valueOf() to E
+     * @param enumClass enum class
+     * @param value value of enum
+     * @param <E> type of enum
      */
+    @SuppressWarnings("unchecked")
     private <E> E stringToEnum(Class<?> enumClass, String value) throws JSONException {
         try {
             @SuppressWarnings("unchecked")

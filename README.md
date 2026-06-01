@@ -41,6 +41,9 @@ This project is in the public domain. This means:
 We recognize this can create uncertainty for some corporate legal departments accustomed to standard licenses like MIT or Apache 2.0.
 If your organization requires a named license for compliance purposes, public domain is functionally equivalent to the Unlicense or CC0 1.0, both of which have been reviewed and accepted by organizations including the Open Source Initiative and Creative Commons. You may reference either when explaining this project's terms to your legal team.
 
+# Signing keys used in releases
+
+The signing keys can be found in [SECURITY.md](https://github.com/stleary/JSON-java/blob/master/docs/SECURITY.md)
 
 # If you would like to contribute to this project
 
