@@ -183,27 +183,40 @@ public class CDL {
                 sb.append(delimiter);
             }
             Object object = ja.opt(i);
-            if (object != null) {
-                String string = object.toString();
-                if (!string.isEmpty() && (string.indexOf(delimiter) >= 0 ||
-                        string.indexOf('\n') >= 0 || string.indexOf('\r') >= 0 ||
-                        string.indexOf(0) >= 0 || string.charAt(0) == '"')) {
-                    sb.append('"');
-                    int length = string.length();
-                    for (int j = 0; j < length; j += 1) {
-                        char c = string.charAt(j);
-                        if (c >= ' ' && c != '"') {
-                            sb.append(c);
-                        }
-                    }
-                    sb.append('"');
-                } else {
-                    sb.append(string);
-                }
-            }
+            appendRowValue(sb, object, delimiter);
         }
         sb.append('\n');
         return sb.toString();
+    }
+
+    private static void appendRowValue(StringBuilder sb, Object object, char delimiter) {
+        if (object == null) {
+            return;
+        }
+        String string = object.toString();
+        if (shouldQuoteValue(string, delimiter)) {
+            appendQuotedValue(sb, string);
+        } else {
+            sb.append(string);
+        }
+    }
+
+    private static boolean shouldQuoteValue(String string, char delimiter) {
+        return !string.isEmpty() && (string.indexOf(delimiter) >= 0 ||
+                string.indexOf('\n') >= 0 || string.indexOf('\r') >= 0 ||
+                string.indexOf(0) >= 0 || string.charAt(0) == '"');
+    }
+
+    private static void appendQuotedValue(StringBuilder sb, String string) {
+        sb.append('"');
+        int length = string.length();
+        for (int j = 0; j < length; j += 1) {
+            char c = string.charAt(j);
+            if (c >= ' ' && c != '"') {
+                sb.append(c);
+            }
+        }
+        sb.append('"');
     }
 
     /**
