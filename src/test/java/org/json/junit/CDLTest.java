@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.CDL;
+import org.json.JSONTokener;
 
 /**
  * Tests for CDL.java.
@@ -389,4 +390,122 @@ public class CDLTest {
     }
     
 
+
+@Test
+    public void rowToJSONArrayEmptyString() {
+        assertNull(CDL.rowToJSONArray(new JSONTokener("")));
+    }
+
+    @Test
+    public void rowToJSONArrayQuotedStringAtEOF() {
+        JSONArray result = CDL.rowToJSONArray(new JSONTokener("\"val\""));
+        assertNotNull(result);
+        assertEquals(1, result.length());
+        assertEquals("val", result.getString(0));
+    }
+
+    @Test(expected = JSONException.class)
+    public void rowToJSONArrayUnclosedQuoteAtEOF() {
+        CDL.rowToJSONArray(new JSONTokener("\"val"));
+    }
+
+    @Test
+    public void rowToJSONArrayUnquotedValue() {
+        JSONArray result = CDL.rowToJSONArray(new JSONTokener("a,b"));
+        assertNotNull(result);
+        assertEquals(2, result.length());
+        assertEquals("a", result.getString(0));
+        assertEquals("b", result.getString(1));
+    }
+
+    @Test
+    public void rowToJSONArrayReturnsNonNull() {
+        assertNotNull(CDL.rowToJSONArray(new JSONTokener("x")));
+    }
+
+    @Test
+    public void rowToJSONObjectReturnsNonNull() {
+        JSONArray names = new JSONArray("[\"name\"]");
+        JSONObject result = CDL.rowToJSONObject(names, new JSONTokener("value"));
+        assertNotNull(result);
+        assertEquals("value", result.getString("name"));
+    }
+
+    @Test
+    public void rowToStringReturnsNonEmpty() {
+        JSONArray ja = new JSONArray("[\"test\"]");
+        String result = CDL.rowToString(ja);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertTrue(result.endsWith("\n"));
+    }
+
+    @Test
+    public void rowToStringBoundaryConditions() {
+        JSONArray ja1 = new JSONArray("[\",a\"]");
+        String res1 = CDL.rowToString(ja1);
+        assertTrue("Value starting with delimiter should be quoted", res1.startsWith("\""));
+
+        JSONArray ja2 = new JSONArray("[\" a\"]");
+        String res2 = CDL.rowToString(ja2);
+        assertTrue("Space should be preserved", res2.contains(" a"));
+    }
+
+@Test
+    public void testGetValueEmptyInputReturnsNull() {
+        assertNull(CDL.rowToJSONArray(new JSONTokener("")));
+    }
+
+    @Test
+    public void testGetValueQuotedAtEOF() {
+        JSONArray result = CDL.rowToJSONArray(new JSONTokener("\"val\""));
+        assertNotNull(result);
+        assertEquals(1, result.length());
+        assertEquals("val", result.getString(0));
+    }
+
+    @Test
+    public void testGetValueQuotedFollowedByDelimiter() {
+        JSONArray result = CDL.rowToJSONArray(new JSONTokener("\"a\",\"b\""));
+        assertNotNull(result);
+        assertEquals(2, result.length());
+        assertEquals("a", result.getString(0));
+        assertEquals("b", result.getString(1));
+    }
+
+    @Test(expected = JSONException.class)
+    public void testGetValueUnclosedQuoteThrows() {
+        CDL.rowToJSONArray(new JSONTokener("\"val"));
+    }
+
+    @Test
+    public void testRowToStringSingleElement() {
+        assertEquals("a\n", CDL.rowToString(new JSONArray("[\"a\"]")));
+    }
+
+    @Test
+    public void testRowToStringEmptyElement() {
+        assertEquals("\n", CDL.rowToString(new JSONArray("[\"\"]")));
+    }
+
+    @Test
+    public void testRowToStringNonEmptyElement() {
+        assertEquals("test\n", CDL.rowToString(new JSONArray("[\"test\"]")));
+    }
+
+    @Test
+    public void testToJSONArrayFromTokenerNotReturnsNull() {
+        JSONArray result = CDL.toJSONArray(new JSONTokener("a,b\nc,d"));
+        assertNotNull(result);
+        assertEquals(1, result.length());
+    }
+
+    @Test
+    public void testToJSONArrayWithNamesNotReturnsNull() {
+        JSONArray names = new JSONArray("[\"col\"]");
+        JSONArray result = CDL.toJSONArray(names, new JSONTokener("val"));
+        assertNotNull(result);
+        assertEquals(1, result.length());
+        assertEquals("val", result.getJSONObject(0).getString("col"));
+    }
 }
