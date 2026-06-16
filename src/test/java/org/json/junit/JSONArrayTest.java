@@ -1557,9 +1557,9 @@ public class JSONArrayTest {
         JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
         if (jsonParserConfiguration.isStrictMode()) {
             try {
-                JSONArray jsonArray = new JSONArray(str);
+                new JSONArray(str);
                 fail("Expected to throw exception due to invalid string");
-            } catch (JSONException e) { }
+            } catch (JSONException e) { /* no action is needed here */ }
         } else {
             JSONArray jsonArray = new JSONArray(str);
             assertEquals("JSONArray in non-strictMode should contain a null entry",
