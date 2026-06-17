@@ -189,6 +189,14 @@ public class CDL {
         return sb.toString();
     }
 
+    /**
+     * Append a single row value, quoting it when required by the delimiter or
+     * content.
+     *
+     * @param sb the destination buffer
+     * @param object the value to append
+     * @param delimiter the delimiter used between row values
+     */
     private static void appendRowValue(StringBuilder sb, Object object, char delimiter) {
         if (object == null) {
             return;
@@ -201,17 +209,38 @@ public class CDL {
         }
     }
 
-    private static boolean shouldQuoteValue(String string, char delimiter) {
-        return !string.isEmpty() && (string.indexOf(delimiter) >= 0 ||
-                string.indexOf('\n') >= 0 || string.indexOf('\r') >= 0 ||
-                string.indexOf(0) >= 0 || string.charAt(0) == '"');
+    /**
+     * Determine whether a row value should be quoted.
+     *
+     * @param value the row value to evaluate
+     * @param delimiter the delimiter used between row values
+     * @return {@code true} if the value should be quoted
+     */
+    private static boolean shouldQuoteValue(String value, char delimiter) {
+        if (value.isEmpty()) {
+            return false;
+        }
+        boolean containsDelimiter = value.indexOf(delimiter) >= 0;
+        boolean containsNewline = value.indexOf('\n') >= 0;
+        boolean containsCarriageReturn = value.indexOf('\r') >= 0;
+        boolean containsNullCharacter = value.indexOf(0) >= 0;
+        boolean startsWithQuote = value.charAt(0) == '"';
+        return containsDelimiter || containsNewline || containsCarriageReturn ||
+                containsNullCharacter || startsWithQuote;
     }
 
-    private static void appendQuotedValue(StringBuilder sb, String string) {
+    /**
+     * Append a row value surrounded by quotes, omitting characters that should
+     * not appear inside the quoted value.
+     *
+     * @param sb the destination buffer
+     * @param value the value to append
+     */
+    private static void appendQuotedValue(StringBuilder sb, String value) {
         sb.append('"');
-        int length = string.length();
+        int length = value.length();
         for (int j = 0; j < length; j += 1) {
-            char c = string.charAt(j);
+            char c = value.charAt(j);
             if (c >= ' ' && c != '"') {
                 sb.append(c);
             }
