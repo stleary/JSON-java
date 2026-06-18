@@ -1548,4 +1548,22 @@ public class JSONArrayTest {
         nestedArray.add(buildNestedArray(maxDepth - 1));
         return nestedArray;
     }
+
+    @Test
+    public void TestLenientCommas() {
+        String str = "[1,,3]";
+
+        // Test should fail if default strictMode is true, pass with an extra null entry if false
+        JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+        if (jsonParserConfiguration.isStrictMode()) {
+            try {
+                new JSONArray(str);
+                fail("Expected to throw exception due to invalid string");
+            } catch (JSONException e) { /* no action is needed here */ }
+        } else {
+            JSONArray jsonArray = new JSONArray(str);
+            assertEquals("JSONArray in non-strictMode should contain a null entry",
+                    "[1,null,3]", jsonArray.toString());
+        }
+    }
 }
