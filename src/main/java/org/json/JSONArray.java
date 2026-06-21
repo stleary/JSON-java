@@ -131,9 +131,9 @@ public class JSONArray implements Iterable<Object> {
      * @param x                       A JSONTokener instance from which the JSONArray is constructed.
      * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
      * @param isInitial               Boolean indicating position of char
-     * @return
+     * @return                        true if a syntax error has occurred, otherwise false
      */
-    private static boolean checkForSyntaxError(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) {
+    private boolean checkForSyntaxError(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) {
         char nextChar;
         switch (x.nextClean()) {
         case 0:
@@ -153,11 +153,11 @@ public class JSONArray implements Iterable<Object> {
                 return true;
             }
             if (nextChar == ',') {
-                // consecutive commas are not allowed in strict mode
+                // Consecutive commas are not allowed in strict mode.
+                // Otherwise, the tokener is backed up, and a null object is inserted by the calling code.
                 if (jsonParserConfiguration.isStrictMode()) {
                     throw x.syntaxError("Strict mode error: Expected a valid array element");
                 }
-                return true;
             }
             x.back();
             break;
