@@ -650,7 +650,9 @@ public class XML {
         char initial = string.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
-                return stringToNumber(string);
+                if(string.length() <= 1000) {
+                	return stringToNumber(string);
+                }
             } catch (Exception ignore) {
             }
         }
