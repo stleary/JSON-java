@@ -2667,16 +2667,33 @@ public class JSONObject {
     /**
      * Try to convert a string into a number, boolean, or null. If the string
      * can't be converted, return the string.
+     * Warning! stringToValue(String) uses the default max number length. If you want to override it,
+     * use a suitable initialized JSONParserConfiguration and the method: stringToValue(String, JSONParserConfiguration).
      *
-     * @param string
-     *            A String. can not be null.
+     * @param str A String. can not be null.
      * @return A simple JSON value.
      * @throws NullPointerException
      *             Thrown if the string is null.
      */
     // Changes to this method must be copied to the corresponding method in
     // the XML class to keep full support for Android
-    public static Object stringToValue(String string) {
+    public static Object stringToValue(String str) {
+        return stringToValue(str, new JSONParserConfiguration());
+    }
+
+    /**
+     * Try to convert a string into a number, boolean, or null. If the string
+     * can't be converted, return the string.
+     *
+     * @param string A String. can not be null.
+     * @param jsonParserConfiguration the parser config
+     * @return A simple JSON value. If the string represents a number that is too large,
+     * a string will be returned.
+     * @throws NullPointerException Thrown if the string is null.
+     */
+    // Changes to this method must be copied to the corresponding method in
+    // the XML class to keep full support for Android
+    public static Object stringToValue(String string, JSONParserConfiguration jsonParserConfiguration) {
         if ("".equals(string)) {
             return string;
         }
@@ -2700,7 +2717,14 @@ public class JSONObject {
         char initial = string.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
-                if (string.length() <= 1000) {
+                if (jsonParserConfiguration == null) {
+                    jsonParserConfiguration = new JSONParserConfiguration();
+                }
+                // user declines max number checking
+                if (jsonParserConfiguration.getMaxNumberLength() == JSONParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH) {
+                    return stringToNumber(string);
+                }
+                if (string.length() <= jsonParserConfiguration.getMaxNumberLength()) {
                 	return stringToNumber(string);
                 }
             } catch (Exception ignore) {
