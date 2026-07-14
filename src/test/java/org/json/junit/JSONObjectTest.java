@@ -1385,6 +1385,7 @@ public class JSONObjectTest {
 			jo.getBigInteger("x");
 			fail("getBigInteger should throw for huge exponent");
 		} catch (JSONException expected) {
+			// expected: integer part exceeds DEFAULT_MAX_NUMBER_LENGTH digits
 		}
 
 		// String path: value put() as a String, exercised via objectToBigInteger's
