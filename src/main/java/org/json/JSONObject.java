@@ -1399,7 +1399,15 @@ public class JSONObject {
             return (BigInteger) val;
         }
         if (val instanceof BigDecimal){
-            return ((BigDecimal) val).toBigInteger();
+            BigDecimal bd = (BigDecimal) val;
+            // Same ceiling as the parse-time maxNumberLength guard: refuse to
+            // materialise an integer whose decimal representation would exceed
+            // DEFAULT_MAX_NUMBER_LENGTH digits. Prevents DoS via short exponent
+            // literals like 1e100000000 (CVE-2026-59171, see issue #1063).
+            if ((long) bd.precision() - bd.scale() > ParserConfiguration.DEFAULT_MAX_NUMBER_LENGTH) {
+                return defaultValue;
+            }
+            return bd.toBigInteger();
         }
         if (val instanceof Double || val instanceof Float){
             if (!numberIsFinite((Number)val)) {
@@ -1422,7 +1430,11 @@ public class JSONObject {
              */
             final String valStr = val.toString();
             if(isDecimalNotation(valStr)) {
-                return new BigDecimal(valStr).toBigInteger();
+                BigDecimal bd = new BigDecimal(valStr);
+                if ((long) bd.precision() - bd.scale() > ParserConfiguration.DEFAULT_MAX_NUMBER_LENGTH) {
+                    return defaultValue;
+                }
+                return bd.toBigInteger();
             }
             return new BigInteger(valStr);
         } catch (Exception e) {

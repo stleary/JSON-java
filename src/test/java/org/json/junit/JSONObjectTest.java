@@ -1368,6 +1368,43 @@ public class JSONObjectTest {
 	}
 
 	/**
+	 * Verifies that getBigInteger / optBigInteger do not attempt to materialise a
+	 * BigInteger whose decimal representation would exceed
+	 * ParserConfiguration.DEFAULT_MAX_NUMBER_LENGTH digits. A short exponent-notation
+	 * literal such as 1e100000000 is stored compactly as a BigDecimal at parse time
+	 * but would otherwise expand to ~100 000 000 digits in BigDecimal.toBigInteger(),
+	 * stalling the thread / OOM (CVE-2026-59171, issue #1063).
+	 */
+	@Test(timeout = 5000)
+	public void getBigIntegerHugeExponentReturnsDefault() {
+		// BigDecimal path: value arrives via the parser as a BigDecimal
+		JSONObject jo = new JSONObject("{\"x\":1e100000000}");
+		assertTrue("huge-exponent literal parses to BigDecimal", jo.get("x") instanceof BigDecimal);
+		assertNull("optBigInteger returns default for huge exponent", jo.optBigInteger("x", null));
+		try {
+			jo.getBigInteger("x");
+			fail("getBigInteger should throw for huge exponent");
+		} catch (JSONException expected) {
+		}
+
+		// String path: value put() as a String, exercised via objectToBigInteger's
+		// isDecimalNotation branch
+		JSONObject jo2 = new JSONObject();
+		jo2.put("x", "1e100000000");
+		assertNull("optBigInteger returns default for huge-exponent string", jo2.optBigInteger("x", null));
+
+		// JSONArray accessors delegate to the same helper
+		JSONArray ja = new JSONArray("[1e100000000]");
+		assertTrue("optBigInteger returns default for huge exponent (array)",
+				BigInteger.ONE.equals(ja.optBigInteger(0, BigInteger.ONE)));
+
+		// Boundary: a value at the limit still converts correctly
+		JSONObject jo3 = new JSONObject("{\"x\":1e999}");
+		assertEquals("1e999 still converts", 0,
+				jo3.getBigInteger("x").compareTo(BigInteger.TEN.pow(999)));
+	}
+
+	/**
 	 * The purpose for the static method getNames() methods are not clear. This
 	 * method is not called from within JSON-Java. Most likely uses are to prep
 	 * names arrays for: JSONObject(JSONObject jo, String[] names) JSONObject(Object
