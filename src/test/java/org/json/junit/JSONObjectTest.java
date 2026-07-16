@@ -1406,6 +1406,58 @@ public class JSONObjectTest {
 	}
 
 	/**
+	 * Verifies that the JSONParserConfiguration.maxNumberLength setting is honoured
+	 * by the getBigInteger / optBigInteger overloads on JSONObject and JSONArray.
+	 */
+	@Test(timeout = 5000)
+	public void getBigIntegerHonorsMaxNumberLengthConfig() {
+		JSONObject jo = new JSONObject("{\"a\":1e1500,\"b\":1e2500}");
+
+		// Default config: DEFAULT_MAX_NUMBER_LENGTH == 1000, both rejected
+		assertNull("1e1500 rejected under default", jo.optBigInteger("a", null));
+		assertNull("1e2500 rejected under default", jo.optBigInteger("b", null));
+
+		// Custom raised limit
+		JSONParserConfiguration cfg2000 = new JSONParserConfiguration().withMaxNumberLength(2000);
+		assertEquals("1e1500 accepted under maxNumberLength=2000", 0,
+				jo.getBigInteger("a", cfg2000).compareTo(BigInteger.TEN.pow(1500)));
+		assertNull("1e2500 rejected under maxNumberLength=2000",
+				jo.optBigInteger("b", null, cfg2000));
+		try {
+			jo.getBigInteger("b", cfg2000);
+			fail("getBigInteger should throw for 1e2500 under maxNumberLength=2000");
+		} catch (JSONException expected) {
+			// expected: integer part exceeds configured maxNumberLength
+		}
+
+		// Custom lowered limit
+		JSONParserConfiguration cfg5 = new JSONParserConfiguration().withMaxNumberLength(5);
+		assertNull("1e1500 rejected under maxNumberLength=5",
+				jo.optBigInteger("a", null, cfg5));
+		JSONObject small = new JSONObject("{\"x\":1234}");
+		assertEquals("small value accepted under maxNumberLength=5",
+				BigInteger.valueOf(1234), small.getBigInteger("x", cfg5));
+
+		// Disabled: -1 turns the guard off. Use a moderate exponent so the test
+		// completes in a few ms while still exceeding the default limit.
+		JSONParserConfiguration cfgOff = new JSONParserConfiguration()
+				.withMaxNumberLength(ParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH);
+		assertEquals("1e2500 accepted when maxNumberLength is disabled", 0,
+				jo.getBigInteger("b", cfgOff).compareTo(BigInteger.TEN.pow(2500)));
+
+		// null config falls back to default
+		assertNull("null config behaves like default", jo.optBigInteger("a", null, null));
+
+		// JSONArray overloads follow the same rules
+		JSONArray ja = new JSONArray("[1e1500]");
+		assertNull("array: 1e1500 rejected under default", ja.optBigInteger(0, null));
+		assertEquals("array: 1e1500 accepted under maxNumberLength=2000", 0,
+				ja.getBigInteger(0, cfg2000).compareTo(BigInteger.TEN.pow(1500)));
+		assertEquals("array: 1e1500 accepted when disabled", 0,
+				ja.optBigInteger(0, null, cfgOff).compareTo(BigInteger.TEN.pow(1500)));
+	}
+
+	/**
 	 * The purpose for the static method getNames() methods are not clear. This
 	 * method is not called from within JSON-Java. Most likely uses are to prep
 	 * names arrays for: JSONObject(JSONObject jo, String[] names) JSONObject(Object
