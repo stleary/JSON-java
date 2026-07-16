@@ -667,7 +667,7 @@ public class XML {
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
                 // user declines max number checking
-                if (xmlParserConfiguration.getMaxNumberLength() == JSONParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH) {
+                if (xmlParserConfiguration.getMaxNumberLength() == ParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH) {
                     return stringToNumber(string);
                 }
                 if(string.length() <= xmlParserConfiguration.getMaxNumberLength()) {

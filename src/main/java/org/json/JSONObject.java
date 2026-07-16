@@ -1484,6 +1484,18 @@ public class JSONObject {
                 || val instanceof Short || val instanceof Byte){
             return BigInteger.valueOf(((Number) val).longValue());
         }
+        return attemptConversionToBigInteger(val, defaultValue, maxNumberLength);
+    }
+
+    /**
+     * Convenience method to attempt conversion of value to BigInteger.
+     * Added to reduce complexity of objectToBigInteger()
+     * @param val the value to be converted
+     * @param defaultValue the default value to use if conversion is not attempted or fails
+     * @param maxNumberLength the max length allowed for BigIntegers
+     * @return the converted value, or the defaultValue
+     */
+    private static BigInteger attemptConversionToBigInteger(Object val, BigInteger defaultValue, int maxNumberLength) {
         // don't check if it's a string in case of unchecked Number subclasses
         try {
             /**
@@ -2799,7 +2811,7 @@ public class JSONObject {
                     jsonParserConfiguration = new JSONParserConfiguration();
                 }
                 // user declines max number checking
-                if (jsonParserConfiguration.getMaxNumberLength() == JSONParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH) {
+                if (jsonParserConfiguration.getMaxNumberLength() == ParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH) {
                     return stringToNumber(string);
                 }
                 if (string.length() <= jsonParserConfiguration.getMaxNumberLength()) {

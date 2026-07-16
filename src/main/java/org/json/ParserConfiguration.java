@@ -58,8 +58,9 @@ public class ParserConfiguration {
      *
      * @param keepStrings     A boolean indicating whether to preserve strings during parsing.
      * @param maxNestingDepth An integer representing the maximum allowed nesting depth.
-     * @deprecated
+     * @deprecated Use the with*() methods instead
      */
+    @Deprecated
     protected ParserConfiguration(final boolean keepStrings, final int maxNestingDepth) {
         this.keepStrings = keepStrings;
         this.maxNestingDepth = maxNestingDepth;
