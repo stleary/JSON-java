@@ -760,8 +760,29 @@ public class JSONObject {
      *             be converted to BigInteger.
      */
     public BigInteger getBigInteger(String key) throws JSONException {
+        return this.getBigInteger(key, new JSONParserConfiguration());
+    }
+
+    /**
+     * Get the BigInteger value associated with a key.
+     *
+     * @param key
+     *            A key string.
+     * @param jsonParserConfiguration
+     *            A configuration whose {@code maxNumberLength} bounds the number of
+     *            decimal digits in the returned integer. Values exceeding this length
+     *            are treated as unconvertible. Pass a configuration with
+     *            {@link ParserConfiguration#UNDEFINED_MAXIMUM_NUMBER_LENGTH} to disable
+     *            this check.
+     * @return The numeric value.
+     * @throws JSONException
+     *             if the key is not found or if the value cannot
+     *             be converted to BigInteger.
+     */
+    public BigInteger getBigInteger(String key, JSONParserConfiguration jsonParserConfiguration)
+            throws JSONException {
         Object object = this.get(key);
-        BigInteger ret = objectToBigInteger(object, null);
+        BigInteger ret = objectToBigInteger(object, null, jsonParserConfiguration);
         if (ret != null) {
             return ret;
         }
@@ -1381,8 +1402,31 @@ public class JSONObject {
      * @return An object which is the value.
      */
     public BigInteger optBigInteger(String key, BigInteger defaultValue) {
+        return this.optBigInteger(key, defaultValue, new JSONParserConfiguration());
+    }
+
+    /**
+     * Get an optional BigInteger associated with a key, or the defaultValue if
+     * there is no such key or if its value is not a number. If the value is a
+     * string, an attempt will be made to evaluate it as a number.
+     *
+     * @param key
+     *            A key string.
+     * @param defaultValue
+     *            The default.
+     * @param jsonParserConfiguration
+     *            A configuration whose {@code maxNumberLength} bounds the number of
+     *            decimal digits in the returned integer. Values exceeding this length
+     *            are treated as unconvertible and {@code defaultValue} is returned.
+     *            Pass a configuration with
+     *            {@link ParserConfiguration#UNDEFINED_MAXIMUM_NUMBER_LENGTH} to disable
+     *            this check.
+     * @return An object which is the value.
+     */
+    public BigInteger optBigInteger(String key, BigInteger defaultValue,
+            JSONParserConfiguration jsonParserConfiguration) {
         Object val = this.opt(key);
-        return objectToBigInteger(val, defaultValue);
+        return objectToBigInteger(val, defaultValue, jsonParserConfiguration);
     }
 
     /**
@@ -1392,14 +1436,43 @@ public class JSONObject {
      *          to convert.
      */
     static BigInteger objectToBigInteger(Object val, BigInteger defaultValue) {
+        return objectToBigInteger(val, defaultValue, new JSONParserConfiguration());
+    }
+
+    /**
+     * @param val value to convert
+     * @param defaultValue default value to return is the conversion doesn't work or is null.
+     * @param jsonParserConfiguration parser configuration whose {@code maxNumberLength}
+     *            bounds the number of decimal digits in the resulting integer. Values whose
+     *            integer part would exceed this length are treated as unconvertible and
+     *            {@code defaultValue} is returned. Pass a configuration with
+     *            {@link ParserConfiguration#UNDEFINED_MAXIMUM_NUMBER_LENGTH} to disable this check.
+     * @return BigInteger conversion of the original value, or the defaultValue if unable
+     *          to convert.
+     */
+    static BigInteger objectToBigInteger(Object val, BigInteger defaultValue,
+            JSONParserConfiguration jsonParserConfiguration) {
         if (NULL.equals(val)) {
             return defaultValue;
         }
+        if (jsonParserConfiguration == null) {
+            jsonParserConfiguration = new JSONParserConfiguration();
+        }
+        final int maxNumberLength = jsonParserConfiguration.getMaxNumberLength();
         if (val instanceof BigInteger){
             return (BigInteger) val;
         }
         if (val instanceof BigDecimal){
-            return ((BigDecimal) val).toBigInteger();
+            BigDecimal bd = (BigDecimal) val;
+            // Same ceiling as the parse-time maxNumberLength guard: refuse to
+            // materialise an integer whose decimal representation would exceed
+            // maxNumberLength digits. Prevents DoS via short exponent literals
+            // like 1e100000000 (CVE-2026-59171, see issue #1063).
+            if (maxNumberLength != ParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH
+                    && (long) bd.precision() - bd.scale() > maxNumberLength) {
+                return defaultValue;
+            }
+            return bd.toBigInteger();
         }
         if (val instanceof Double || val instanceof Float){
             if (!numberIsFinite((Number)val)) {
@@ -1411,6 +1484,18 @@ public class JSONObject {
                 || val instanceof Short || val instanceof Byte){
             return BigInteger.valueOf(((Number) val).longValue());
         }
+        return attemptConversionToBigInteger(val, defaultValue, maxNumberLength);
+    }
+
+    /**
+     * Convenience method to attempt conversion of value to BigInteger.
+     * Added to reduce complexity of objectToBigInteger()
+     * @param val the value to be converted
+     * @param defaultValue the default value to use if conversion is not attempted or fails
+     * @param maxNumberLength the max length allowed for BigIntegers
+     * @return the converted value, or the defaultValue
+     */
+    private static BigInteger attemptConversionToBigInteger(Object val, BigInteger defaultValue, int maxNumberLength) {
         // don't check if it's a string in case of unchecked Number subclasses
         try {
             /**
@@ -1422,7 +1507,12 @@ public class JSONObject {
              */
             final String valStr = val.toString();
             if(isDecimalNotation(valStr)) {
-                return new BigDecimal(valStr).toBigInteger();
+                BigDecimal bd = new BigDecimal(valStr);
+                if (maxNumberLength != ParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH
+                        && (long) bd.precision() - bd.scale() > maxNumberLength) {
+                    return defaultValue;
+                }
+                return bd.toBigInteger();
             }
             return new BigInteger(valStr);
         } catch (Exception e) {
@@ -2667,16 +2757,33 @@ public class JSONObject {
     /**
      * Try to convert a string into a number, boolean, or null. If the string
      * can't be converted, return the string.
+     * Warning! stringToValue(String) uses the default max number length. If you want to override it,
+     * use a suitable initialized JSONParserConfiguration and the method: stringToValue(String, JSONParserConfiguration).
      *
-     * @param string
-     *            A String. can not be null.
+     * @param str A String. can not be null.
      * @return A simple JSON value.
      * @throws NullPointerException
      *             Thrown if the string is null.
      */
     // Changes to this method must be copied to the corresponding method in
     // the XML class to keep full support for Android
-    public static Object stringToValue(String string) {
+    public static Object stringToValue(String str) {
+        return stringToValue(str, new JSONParserConfiguration());
+    }
+
+    /**
+     * Try to convert a string into a number, boolean, or null. If the string
+     * can't be converted, return the string.
+     *
+     * @param string A String. can not be null.
+     * @param jsonParserConfiguration the parser config
+     * @return A simple JSON value. If the string represents a number that is too large,
+     * a string will be returned.
+     * @throws NullPointerException Thrown if the string is null.
+     */
+    // Changes to this method must be copied to the corresponding method in
+    // the XML class to keep full support for Android
+    public static Object stringToValue(String string, JSONParserConfiguration jsonParserConfiguration) {
         if ("".equals(string)) {
             return string;
         }
@@ -2700,7 +2807,14 @@ public class JSONObject {
         char initial = string.charAt(0);
         if ((initial >= '0' && initial <= '9') || initial == '-') {
             try {
-                if (string.length() <= 1000) {
+                if (jsonParserConfiguration == null) {
+                    jsonParserConfiguration = new JSONParserConfiguration();
+                }
+                // user declines max number checking
+                if (jsonParserConfiguration.getMaxNumberLength() == ParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH) {
+                    return stringToNumber(string);
+                }
+                if (string.length() <= jsonParserConfiguration.getMaxNumberLength()) {
                 	return stringToNumber(string);
                 }
             } catch (Exception ignore) {

@@ -513,7 +513,7 @@ public class JSONTokener {
                 jsonParserConfiguration.isStrictMode() && string.endsWith(".")) {
             throw this.syntaxError(String.format("Strict mode error: Value '%s' ends with dot", string));
         }
-        Object obj = JSONObject.stringToValue(string);
+        Object obj = JSONObject.stringToValue(string, jsonParserConfiguration);
         // if obj is a boolean, look at string
         if (jsonParserConfiguration != null &&
                 jsonParserConfiguration.isStrictMode()) {

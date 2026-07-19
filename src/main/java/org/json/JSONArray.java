@@ -483,8 +483,29 @@ public class JSONArray implements Iterable<Object> {
      *             to a BigInteger.
      */
     public BigInteger getBigInteger (int index) throws JSONException {
+        return this.getBigInteger(index, new JSONParserConfiguration());
+    }
+
+    /**
+     * Get the BigInteger value associated with an index.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param jsonParserConfiguration
+     *            A configuration whose {@code maxNumberLength} bounds the number of
+     *            decimal digits in the returned integer. Values exceeding this length
+     *            are treated as unconvertible. Pass a configuration with
+     *            {@link ParserConfiguration#UNDEFINED_MAXIMUM_NUMBER_LENGTH} to disable
+     *            this check.
+     * @return The value.
+     * @throws JSONException
+     *             If the key is not found or if the value cannot be converted
+     *             to a BigInteger.
+     */
+    public BigInteger getBigInteger (int index, JSONParserConfiguration jsonParserConfiguration)
+            throws JSONException {
         Object object = this.get(index);
-        BigInteger val = JSONObject.objectToBigInteger(object, null);
+        BigInteger val = JSONObject.objectToBigInteger(object, null, jsonParserConfiguration);
         if(val == null) {
             throw wrongValueFormatException(index, "BigInteger", object, null);
         }
@@ -960,8 +981,8 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the optional BigInteger value associated with an index. The 
-     * defaultValue is returned if there is no value for the index, or if the 
+     * Get the optional BigInteger value associated with an index. The
+     * defaultValue is returned if there is no value for the index, or if the
      * value is not a number and cannot be converted to a number.
      *
      * @param index
@@ -971,8 +992,31 @@ public class JSONArray implements Iterable<Object> {
      * @return The value.
      */
     public BigInteger optBigInteger(int index, BigInteger defaultValue) {
+        return this.optBigInteger(index, defaultValue, new JSONParserConfiguration());
+    }
+
+    /**
+     * Get the optional BigInteger value associated with an index. The
+     * defaultValue is returned if there is no value for the index, or if the
+     * value is not a number and cannot be converted to a number.
+     *
+     * @param index
+     *            The index must be between 0 and length() - 1.
+     * @param defaultValue
+     *            The default value.
+     * @param jsonParserConfiguration
+     *            A configuration whose {@code maxNumberLength} bounds the number of
+     *            decimal digits in the returned integer. Values exceeding this length
+     *            are treated as unconvertible and {@code defaultValue} is returned.
+     *            Pass a configuration with
+     *            {@link ParserConfiguration#UNDEFINED_MAXIMUM_NUMBER_LENGTH} to disable
+     *            this check.
+     * @return The value.
+     */
+    public BigInteger optBigInteger(int index, BigInteger defaultValue,
+            JSONParserConfiguration jsonParserConfiguration) {
         Object val = this.opt(index);
-        return JSONObject.objectToBigInteger(val, defaultValue);
+        return JSONObject.objectToBigInteger(val, defaultValue, jsonParserConfiguration);
     }
 
     /**

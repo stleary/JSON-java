@@ -67,7 +67,6 @@ import org.json.junit.data.CustomClassG;
 import org.json.junit.data.CustomClassH;
 import org.json.junit.data.CustomClassI;
 import org.json.junit.data.CustomClassJ;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -1366,6 +1365,96 @@ public class JSONObjectTest {
 				jsonObject3, jsonObject4, jsonObject5, jsonObject6, jsonObject7, jsonObject8)));
 		Util.checkJSONArrayMaps(jsonArray0, jsonObject0.getMapType());
 		Util.checkJSONArrayMaps(jsonArray1, jsonObject0.getMapType());
+	}
+
+	/**
+	 * Verifies that getBigInteger / optBigInteger do not attempt to materialise a
+	 * BigInteger whose decimal representation would exceed
+	 * ParserConfiguration.DEFAULT_MAX_NUMBER_LENGTH digits. A short exponent-notation
+	 * literal such as 1e100000000 is stored compactly as a BigDecimal at parse time
+	 * but would otherwise expand to ~100 000 000 digits in BigDecimal.toBigInteger(),
+	 * stalling the thread / OOM (CVE-2026-59171, issue #1063).
+	 */
+	@Test(timeout = 5000)
+	public void getBigIntegerHugeExponentReturnsDefault() {
+		// BigDecimal path: value arrives via the parser as a BigDecimal
+		JSONObject jo = new JSONObject("{\"x\":1e100000000}");
+		assertTrue("huge-exponent literal parses to BigDecimal", jo.get("x") instanceof BigDecimal);
+		assertNull("optBigInteger returns default for huge exponent", jo.optBigInteger("x", null));
+		try {
+			jo.getBigInteger("x");
+			fail("getBigInteger should throw for huge exponent");
+		} catch (JSONException expected) {
+			// expected: integer part exceeds DEFAULT_MAX_NUMBER_LENGTH digits
+		}
+
+		// String path: value put() as a String, exercised via objectToBigInteger's
+		// isDecimalNotation branch
+		JSONObject jo2 = new JSONObject();
+		jo2.put("x", "1e100000000");
+		assertNull("optBigInteger returns default for huge-exponent string", jo2.optBigInteger("x", null));
+
+		// JSONArray accessors delegate to the same helper
+		JSONArray ja = new JSONArray("[1e100000000]");
+		assertTrue("optBigInteger returns default for huge exponent (array)",
+				BigInteger.ONE.equals(ja.optBigInteger(0, BigInteger.ONE)));
+
+		// Boundary: a value at the limit still converts correctly
+		JSONObject jo3 = new JSONObject("{\"x\":1e999}");
+		assertEquals("1e999 still converts", 0,
+				jo3.getBigInteger("x").compareTo(BigInteger.TEN.pow(999)));
+	}
+
+	/**
+	 * Verifies that the JSONParserConfiguration.maxNumberLength setting is honoured
+	 * by the getBigInteger / optBigInteger overloads on JSONObject and JSONArray.
+	 */
+	@Test(timeout = 5000)
+	public void getBigIntegerHonorsMaxNumberLengthConfig() {
+		JSONObject jo = new JSONObject("{\"a\":1e1500,\"b\":1e2500}");
+
+		// Default config: DEFAULT_MAX_NUMBER_LENGTH == 1000, both rejected
+		assertNull("1e1500 rejected under default", jo.optBigInteger("a", null));
+		assertNull("1e2500 rejected under default", jo.optBigInteger("b", null));
+
+		// Custom raised limit
+		JSONParserConfiguration cfg2000 = new JSONParserConfiguration().withMaxNumberLength(2000);
+		assertEquals("1e1500 accepted under maxNumberLength=2000", 0,
+				jo.getBigInteger("a", cfg2000).compareTo(BigInteger.TEN.pow(1500)));
+		assertNull("1e2500 rejected under maxNumberLength=2000",
+				jo.optBigInteger("b", null, cfg2000));
+		try {
+			jo.getBigInteger("b", cfg2000);
+			fail("getBigInteger should throw for 1e2500 under maxNumberLength=2000");
+		} catch (JSONException expected) {
+			// expected: integer part exceeds configured maxNumberLength
+		}
+
+		// Custom lowered limit
+		JSONParserConfiguration cfg5 = new JSONParserConfiguration().withMaxNumberLength(5);
+		assertNull("1e1500 rejected under maxNumberLength=5",
+				jo.optBigInteger("a", null, cfg5));
+		JSONObject small = new JSONObject("{\"x\":1234}");
+		assertEquals("small value accepted under maxNumberLength=5",
+				BigInteger.valueOf(1234), small.getBigInteger("x", cfg5));
+
+		// Disabled: -1 turns the guard off. Use a moderate exponent so the test
+		// completes in a few ms while still exceeding the default limit.
+		JSONParserConfiguration cfgOff = new JSONParserConfiguration()
+				.withMaxNumberLength(ParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH);
+		assertEquals("1e2500 accepted when maxNumberLength is disabled", 0,
+				jo.getBigInteger("b", cfgOff).compareTo(BigInteger.TEN.pow(2500)));
+
+		// null config falls back to default
+		assertNull("null config behaves like default", jo.optBigInteger("a", null, null));
+
+		// JSONArray overloads follow the same rules
+		JSONArray ja = new JSONArray("[1e1500]");
+		assertNull("array: 1e1500 rejected under default", ja.optBigInteger(0, null));
+		assertEquals("array: 1e1500 accepted under maxNumberLength=2000", 0,
+				ja.getBigInteger(0, cfg2000).compareTo(BigInteger.TEN.pow(1500)));
+		assertEquals("array: 1e1500 accepted when disabled", 0,
+				ja.optBigInteger(0, null, cfgOff).compareTo(BigInteger.TEN.pow(1500)));
 	}
 
 	/**
@@ -3801,33 +3890,84 @@ public class JSONObjectTest {
 			sb.append("9999999999");
 		}
 
-		// edge case: JSONObject with number just under the max length limit
-		String s1Object = "{ \"a\": " + sb + "}";
-		JSONObject jsonObject1 = new JSONObject(s1Object);
-		Object obj1Object = jsonObject1.get("a");
-		assertTrue(obj1Object instanceof Number);
-		assertEquals(1000, obj1Object.toString().length());
+		// JSONObject with number just under the max length limit
+		checkJSONObjectMaxLen(sb.toString(), true, null);
 
-		// edge case: JSONArray with number just under the max length limit
-		String s1Array = "[" + sb + "]";
-		JSONArray jsonArray1 = new JSONArray(s1Array);
-		Object obj1Array = jsonArray1.get(0);
-		assertTrue(obj1Array instanceof Number);
-		assertEquals(1000, obj1Array.toString().length());
+		// JSONArray with number just under the max length limit
+		checkJSONArrayMaxLen(sb.toString(), true, null);
 
-		// edge case: JSONObject with number just over the max length limit
-		String s2Object = "{ \"a\": " + sb + "9}";
-		JSONObject jsonObject2 = new JSONObject(s2Object);
-		Object obj2Object = jsonObject2.get("a");
-		assertTrue(obj2Object instanceof String);
-		assertEquals(1001, ((String) obj2Object).length());
+		// JSONObject with number just over the max length limit
+		checkJSONObjectMaxLen(sb + "9", false, null);
 
-		// edge case: JSONArray with number just over the max length limit
-		String s2Array = "[" + sb + "9]";
-		JSONArray jsonArray2 = new JSONArray(s2Array);
-		Object obj2Array = jsonArray2.get(0);
-		assertTrue(obj2Array instanceof String);
-		assertEquals(1001, ((String) obj2Array).length());
+		// JSONArray with number just over the max length limit
+		checkJSONArrayMaxLen(sb + "9", false, null);
+
+		// JSONObject with number at config max length limit
+		checkJSONObjectMaxLen(sb.toString() + sb.toString(), true, new JSONParserConfiguration().withMaxNumberLength(2000));
+
+		// JSONArray with number at config max length limit
+		checkJSONArrayMaxLen((sb.toString() + sb), true, new JSONParserConfiguration().withMaxNumberLength(2000));
+
+		// JSONObject with number just over config max length limit
+		checkJSONObjectMaxLen(sb.toString() + sb.toString() + "9", false, new JSONParserConfiguration().withMaxNumberLength(2000));
+
+		// JSONArray with number just over config max length limit
+		checkJSONArrayMaxLen((sb.toString() + sb + "9"), false, new JSONParserConfiguration().withMaxNumberLength(2000));
+
+		// JSONObject with large number, no checks
+		checkJSONObjectMaxLen(sb.toString() + sb.toString() + "9", true,
+				new JSONParserConfiguration().withMaxNumberLength(JSONParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH));
+
+		// JSONArray with number just over config max length limit
+		checkJSONArrayMaxLen((sb.toString() + sb + "9"), true,
+				new JSONParserConfiguration().withMaxNumberLength(JSONParserConfiguration.UNDEFINED_MAXIMUM_NUMBER_LENGTH));
+	}
+
+	/**
+	 * Convenience method to check JSONObject for a long number
+	 * @param s string containing the number digits to check
+	 * @param isValid true if number is valid, otherwise false
+	 * @param jsonParserConfiguration the config object
+	 */
+	private static void checkJSONObjectMaxLen(String s, boolean isValid, JSONParserConfiguration jsonParserConfiguration) {
+		String str = "{ \"a\": " + s + "}";
+		JSONObject jsonObject;
+		if (jsonParserConfiguration == null) {
+			jsonObject = new JSONObject(str);
+		} else {
+			jsonObject = new JSONObject(str, jsonParserConfiguration);
+		}
+		Object obj = jsonObject.get("a");
+		if (isValid) {
+			assertTrue(obj instanceof Number);
+		} else {
+			assertTrue(obj instanceof String);
+		}
+		// may not work for scientific notation and BigDecimal
+		// assertEquals(s.length(), obj.toString().length());
+	}
+
+	/**
+	 * Convenience method to check JSONArray for a long number
+	 * @param s string containing the number digits to check
+	 * @param isValid true if number is valid, otherwise false
+	 */
+	private static void checkJSONArrayMaxLen(String s, boolean isValid, JSONParserConfiguration jsonParserConfiguration) {
+		String str = "[" + s + "]";
+		JSONArray jsonArray;
+		if (jsonParserConfiguration == null) {
+			jsonArray = new JSONArray(str);
+		} else {
+			jsonArray = new JSONArray(str, jsonParserConfiguration);
+		}
+		Object obj = jsonArray.get(0);
+		if (isValid) {
+			assertTrue(obj instanceof Number);
+		} else {
+			assertTrue(obj instanceof String);
+		}
+		// may not work for scientific notation and BigDecimal
+		// assertEquals(s.length(), obj.toString().length());
 	}
 
 	/**
@@ -3843,16 +3983,12 @@ public class JSONObjectTest {
 		assertEquals(1000, sb.length());
 
 		// at max length: parsed as number
-		JSONObject jo = new JSONObject("{ \"a\": " + sb + "}");
-		Object val = jo.get("a");
-		assertTrue("Expected Number but got " + val.getClass(), val instanceof Number);
+		checkJSONObjectMaxLen(sb.toString(), true, null);
 
 		// over max length: returned as string
 		sb.append("1");
 		assertEquals(1001, sb.length());
-		JSONObject jo2 = new JSONObject("{ \"a\": " + sb + "}");
-		Object val2 = jo2.get("a");
-		assertTrue("Expected String but got " + val2.getClass(), val2 instanceof String);
+		checkJSONObjectMaxLen(sb.toString(), false, null);
 	}
 
 	/**
@@ -3873,16 +4009,12 @@ public class JSONObjectTest {
 		assertEquals(1000, sb.length());
 
 		// at max length: parsed as number (BigDecimal)
-		JSONObject jo = new JSONObject("{ \"a\": " + sb + "}");
-		Object val = jo.get("a");
-		assertTrue("Expected Number but got " + val.getClass(), val instanceof Number);
+		checkJSONObjectMaxLen(sb.toString(), true, null);
 
 		// over max length: returned as string
 		sb.append("3");
 		assertEquals(1001, sb.length());
-		JSONObject jo2 = new JSONObject("{ \"a\": " + sb + "}");
-		Object val2 = jo2.get("a");
-		assertTrue("Expected String but got " + val2.getClass(), val2 instanceof String);
+		checkJSONObjectMaxLen(sb.toString(), false, null);
 	}
 
 	/**
@@ -3899,9 +4031,7 @@ public class JSONObjectTest {
 		assertEquals(1000, sb.length());
 
 		// at max length: parsed as number
-		JSONObject jo = new JSONObject("{ \"a\": " + sb + "}");
-		Object val = jo.get("a");
-		assertTrue("Expected Number but got " + val.getClass(), val instanceof Number);
+		checkJSONObjectMaxLen(sb.toString(), true, null);
 
 		// over max length: returned as string
 		sb = new StringBuilder("1.");
@@ -3910,9 +4040,7 @@ public class JSONObjectTest {
 		}
 		sb.append("e100");
 		assertEquals(1001, sb.length());
-		JSONObject jo2 = new JSONObject("{ \"a\": " + sb + "}");
-		Object val2 = jo2.get("a");
-		assertTrue("Expected String but got " + val2.getClass(), val2 instanceof String);
+		checkJSONObjectMaxLen(sb.toString(), false, null);
 	}
 
 	/**

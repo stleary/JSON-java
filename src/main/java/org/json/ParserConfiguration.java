@@ -14,9 +14,19 @@ public class ParserConfiguration {
     public static final int UNDEFINED_MAXIMUM_NESTING_DEPTH = -1;
 
     /**
+     * Used to indicate there's no defined limit to the maximum number length
+     */
+    public static final int UNDEFINED_MAXIMUM_NUMBER_LENGTH = -1;
+
+    /**
      * The default maximum nesting depth when parsing a document.
      */
     public static final int DEFAULT_MAXIMUM_NESTING_DEPTH = 512;
+
+    /**
+     * The default  max number length
+     */
+    public static final int DEFAULT_MAX_NUMBER_LENGTH = 1000;
 
     /**
      * Specifies if values should be kept as strings (<code>true</code>), or if
@@ -30,22 +40,31 @@ public class ParserConfiguration {
     protected int maxNestingDepth;
 
     /**
+     * The max number of chars for any number. Exceeding this limit will cause the value to be converted to a string
+     */
+    protected int maxNumberLength;
+
+    /**
      * Constructs a new ParserConfiguration with default settings.
      */
     public ParserConfiguration() {
         this.keepStrings = false;
         this.maxNestingDepth = DEFAULT_MAXIMUM_NESTING_DEPTH;
+        this.maxNumberLength = DEFAULT_MAX_NUMBER_LENGTH;
     }
 
     /**
-     * Constructs a new ParserConfiguration with the specified settings.
+     * Constructs a new ParserConfiguration with the specified settings. Use the with* methods instead of calling this ctor.
      *
      * @param keepStrings     A boolean indicating whether to preserve strings during parsing.
      * @param maxNestingDepth An integer representing the maximum allowed nesting depth.
+     * @deprecated Use the with*() methods instead
      */
+    @Deprecated
     protected ParserConfiguration(final boolean keepStrings, final int maxNestingDepth) {
         this.keepStrings = keepStrings;
         this.maxNestingDepth = maxNestingDepth;
+        this.maxNumberLength = DEFAULT_MAX_NUMBER_LENGTH;
     }
 
     /**
@@ -58,10 +77,11 @@ public class ParserConfiguration {
         // item, a new map instance should be created and if possible each value in the
         // map should be cloned as well. If the values of the map are known to also
         // be immutable, then a shallow clone of the map is acceptable.
-        return new ParserConfiguration(
-                this.keepStrings,
-                this.maxNestingDepth
-        );
+        ParserConfiguration parserConfiguration = new ParserConfiguration();
+        parserConfiguration.keepStrings = this.keepStrings;
+        parserConfiguration.maxNestingDepth = this.maxNestingDepth;
+        parserConfiguration.maxNumberLength = this.maxNumberLength;
+        return parserConfiguration;
     }
 
     /**
@@ -123,4 +143,37 @@ public class ParserConfiguration {
 
         return newConfig;
     }
+
+
+    /**
+     * The maximum number length that the parser will allow
+     *
+     * @return the maximum number lengtj set for this configuration
+     */
+    public int getMaxNumberLength() {
+        return maxNumberLength;
+    }
+
+    /**
+     * Defines the maximum number length that the parser will allow
+     * Using any negative value as a parameter is equivalent to setting no limit to the length
+     * which means any size number is allowed
+     *
+     * @param maxNumberLength the maximum number length allowed
+     * @param <T>             the type of the configuration object
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends ParserConfiguration> T withMaxNumberLength(int maxNumberLength) {
+        T newConfig = (T) this.clone();
+
+        if (maxNumberLength > UNDEFINED_MAXIMUM_NUMBER_LENGTH) {
+            newConfig.maxNumberLength = maxNumberLength;
+        } else {
+            newConfig.maxNumberLength = UNDEFINED_MAXIMUM_NUMBER_LENGTH;
+        }
+
+        return newConfig;
+    }
+
 }
