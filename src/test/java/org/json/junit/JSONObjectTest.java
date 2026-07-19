@@ -3885,6 +3885,7 @@ public class JSONObjectTest {
 
 	@Test
 	public void testMaxNumberLength() {
+		JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 100; ++i) {
 			sb.append("9999999999");
@@ -3896,11 +3897,14 @@ public class JSONObjectTest {
 		// JSONArray with number just under the max length limit
 		checkJSONArrayMaxLen(sb.toString(), true, null);
 
-		// JSONObject with number just over the max length limit
-		checkJSONObjectMaxLen(sb + "9", false, null);
+		// numbers without quotes are not allowed in strict mode
+		if (!jsonParserConfiguration.isStrictMode()) {
+			// JSONObject with number just over the max length limit
+			checkJSONObjectMaxLen(sb + "9", false, null);
 
-		// JSONArray with number just over the max length limit
-		checkJSONArrayMaxLen(sb + "9", false, null);
+			// JSONArray with number just over the max length limit
+			checkJSONArrayMaxLen(sb + "9", false, null);
+		}
 
 		// JSONObject with number at config max length limit
 		checkJSONObjectMaxLen(sb.toString() + sb.toString(), true, new JSONParserConfiguration().withMaxNumberLength(2000));
@@ -3908,11 +3912,14 @@ public class JSONObjectTest {
 		// JSONArray with number at config max length limit
 		checkJSONArrayMaxLen((sb.toString() + sb), true, new JSONParserConfiguration().withMaxNumberLength(2000));
 
-		// JSONObject with number just over config max length limit
-		checkJSONObjectMaxLen(sb.toString() + sb.toString() + "9", false, new JSONParserConfiguration().withMaxNumberLength(2000));
+		// numbers without quotes are not allowed in strict mode
+		if (!jsonParserConfiguration.isStrictMode()) {
+			// JSONObject with number just over config max length limit
+			checkJSONObjectMaxLen(sb.toString() + sb.toString() + "9", false, new JSONParserConfiguration().withMaxNumberLength(2000));
 
-		// JSONArray with number just over config max length limit
-		checkJSONArrayMaxLen((sb.toString() + sb + "9"), false, new JSONParserConfiguration().withMaxNumberLength(2000));
+			// JSONArray with number just over config max length limit
+			checkJSONArrayMaxLen((sb.toString() + sb + "9"), false, new JSONParserConfiguration().withMaxNumberLength(2000));
+		}
 
 		// JSONObject with large number, no checks
 		checkJSONObjectMaxLen(sb.toString() + sb.toString() + "9", true,
@@ -3975,6 +3982,8 @@ public class JSONObjectTest {
 	 */
 	@Test
 	public void testMaxNumberLengthNegativeInteger() {
+		JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+
 		// Build a negative number string of exactly 1000 chars: "-" + 999 digits
 		StringBuilder sb = new StringBuilder("-");
 		for (int i = 0; i < 999; ++i) {
@@ -3985,10 +3994,13 @@ public class JSONObjectTest {
 		// at max length: parsed as number
 		checkJSONObjectMaxLen(sb.toString(), true, null);
 
-		// over max length: returned as string
-		sb.append("1");
-		assertEquals(1001, sb.length());
-		checkJSONObjectMaxLen(sb.toString(), false, null);
+		// numbers without quotes are not allowed in strict mode
+		if (!jsonParserConfiguration.isStrictMode()) {
+			// over max length: returned as string
+			sb.append("1");
+			assertEquals(1001, sb.length());
+			checkJSONObjectMaxLen(sb.toString(), false, null);
+		}
 	}
 
 	/**
@@ -3996,6 +4008,8 @@ public class JSONObjectTest {
 	 */
 	@Test
 	public void testMaxNumberLengthDecimal() {
+		JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+
 		// Build a decimal number string of exactly 1000 chars: 499 digits + "." + 500
 		// digits
 		StringBuilder sb = new StringBuilder();
@@ -4011,10 +4025,13 @@ public class JSONObjectTest {
 		// at max length: parsed as number (BigDecimal)
 		checkJSONObjectMaxLen(sb.toString(), true, null);
 
-		// over max length: returned as string
-		sb.append("3");
-		assertEquals(1001, sb.length());
-		checkJSONObjectMaxLen(sb.toString(), false, null);
+		// numbers without quotes are not allowed in strict mode
+		if (!jsonParserConfiguration.isStrictMode()) {
+			// over max length: returned as string
+			sb.append("3");
+			assertEquals(1001, sb.length());
+			checkJSONObjectMaxLen(sb.toString(), false, null);
+		}
 	}
 
 	/**
@@ -4022,6 +4039,8 @@ public class JSONObjectTest {
 	 */
 	@Test
 	public void testMaxNumberLengthScientificNotation() {
+		JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+
 		// Build a scientific notation string of exactly 1000 chars
 		StringBuilder sb = new StringBuilder("1.");
 		for (int i = 0; i < 994; ++i) {
@@ -4038,9 +4057,13 @@ public class JSONObjectTest {
 		for (int i = 0; i < 995; ++i) {
 			sb.append("0");
 		}
-		sb.append("e100");
-		assertEquals(1001, sb.length());
-		checkJSONObjectMaxLen(sb.toString(), false, null);
+
+		// numbers without quotes are not allowed in strict mode
+		if (!jsonParserConfiguration.isStrictMode()) {
+			sb.append("e100");
+			assertEquals(1001, sb.length());
+			checkJSONObjectMaxLen(sb.toString(), false, null);
+		}
 	}
 
 	/**
@@ -4297,17 +4320,21 @@ public class JSONObjectTest {
 	 */
 	@Test
 	public void testStringToNumberInvalidFormats() {
-		// Leading zero followed by digit → treated as string (not octal)
-		JSONObject jo = new JSONObject("{\"a\": 01}");
-		// JSONTokener with strict mode would reject, but default mode stores as string
-		// since stringToNumber throws NumberFormatException for "01"
-		Object val = jo.get("a");
-		assertTrue("01 should be stored as string, got " + val.getClass(), val instanceof String);
+		// this test should only run in non-strict mode, otherwise it will throw an exception
+		JSONParserConfiguration jsonParserConfiguration = new JSONParserConfiguration();
+		if (!jsonParserConfiguration.isStrictMode()) {
+			// Leading zero followed by digit → treated as string (not octal)
+			JSONObject jo = new JSONObject("{\"a\": 01}");
+			// JSONTokener with strict mode would reject, but default mode stores as string
+			// since stringToNumber throws NumberFormatException for "01"
+			Object val = jo.get("a");
+			assertTrue("01 should be stored as string, got " + val.getClass(), val instanceof String);
 
-		// Negative with leading zero → "-01"
-		jo = new JSONObject("{\"a\": -01}");
-		val = jo.get("a");
-		assertTrue("-01 should be stored as string, got " + val.getClass(), val instanceof String);
+			// Negative with leading zero → "-01"
+			jo = new JSONObject("{\"a\": -01}");
+			val = jo.get("a");
+			assertTrue("-01 should be stored as string, got " + val.getClass(), val instanceof String);
+		}
 	}
 
 }
