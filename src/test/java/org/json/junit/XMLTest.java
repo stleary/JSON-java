@@ -1537,6 +1537,43 @@ public class XMLTest {
         assertEquals("A", jsonObject.getString("a"));
     }
 
+    /**
+     * Tests that valid XML numeric character references for whitespace
+     * control characters (TAB, LF, CR) are correctly unescaped. These
+     * codepoints are explicitly allowed by the XML 1.0 spec
+     * (https://www.w3.org/TR/REC-xml/#charsets) but were previously rejected
+     * as invalid. See issue #1059.
+     */
+    @Test
+    public void testValidWhitespaceNumericEntityUnescape() {
+        // decimal references for the three allowed control characters
+        assertEquals("\t", XML.unescape("&#9;"));
+        assertEquals("\n", XML.unescape("&#10;"));
+        assertEquals("\r", XML.unescape("&#13;"));
+        // hex references for the same codepoints
+        assertEquals("\t", XML.unescape("&#x9;"));
+        assertEquals("\n", XML.unescape("&#xA;"));
+        assertEquals("\r", XML.unescape("&#xD;"));
+    }
+
+    /**
+     * Tests that {@code XML.toJSONObject} accepts numeric character references
+     * for the XML-allowed control characters (TAB, LF, CR) without throwing.
+     * Regression test for #1059, where {@code XML.toJSONObject("<a>&#10;</a>")}
+     * threw JSONException in versions after 20251224.
+     */
+    @Test
+    public void testValidWhitespaceNumericEntityToJSONObject() {
+        // LF reference should round-trip through toJSONObject without throwing
+        JSONObject jsonObject = XML.toJSONObject("<a>&#10;</a>");
+        // the value is the LF character (possibly trimmed by the JSON path,
+        // but the call must not throw)
+        assertTrue(jsonObject.has("a"));
+        // TAB and CR references also accepted
+        XML.toJSONObject("<a>&#9;</a>");
+        XML.toJSONObject("<a>&#13;</a>");
+    }
+
 }
 
 

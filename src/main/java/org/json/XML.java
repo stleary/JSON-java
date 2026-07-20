@@ -172,8 +172,14 @@ public class XML {
                 && cp != 0xA
                 && cp != 0xD
             ) || !(
-                // valid the range of acceptable characters that aren't control
-                (cp >= 0x20 && cp <= 0xD7FF)
+                // Valid character range per W3C XML 1.0 spec:
+                // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+                // Previously omitted #x9/#xA/#xD, causing unescape("&#10;") etc.
+                // to reject valid LF/TAB/CR as illegal (see #1059)
+                cp == 0x9
+                || cp == 0xA
+                || cp == 0xD
+                || (cp >= 0x20 && cp <= 0xD7FF)
                 || (cp >= 0xE000 && cp <= 0xFFFD)
                 || (cp >= 0x10000 && cp <= 0x10FFFF)
             )
