@@ -233,6 +233,75 @@ public class XML {
     }
 
     /**
+     * Throw an exception if the string is not a valid XML 1.0 {@code Name}
+     * (element name). Used by {@link #toString(Object)} to reject JSON keys that
+     * would otherwise be emitted verbatim between {@code <} and {@code >} and
+     * could break out of the tag context (element injection, CWE-91;
+     * see issue #1071 and #294).
+     *
+     * @param string the candidate element name
+     * @throws JSONException if {@code string} is null, empty, or contains a
+     *             character outside the XML 1.0 Name production
+     */
+    static void mustBeXmlName(String string) throws JSONException {
+        if (string == null || string.isEmpty()) {
+            throw new JSONException("'" + string
+                    + "' is not a valid XML element name.");
+        }
+        int cp = string.codePointAt(0);
+        if (!isXmlNameStart(cp)) {
+            throw new JSONException("'" + string
+                    + "' is not a valid XML element name.");
+        }
+        for (int i = Character.charCount(cp); i < string.length(); i += Character.charCount(cp)) {
+            cp = string.codePointAt(i);
+            if (!isXmlNameChar(cp)) {
+                throw new JSONException("'" + string
+                        + "' is not a valid XML element name.");
+            }
+        }
+    }
+
+    /**
+     * XML 1.0 (5th ed.) {@code NameStartChar} production.
+     *
+     * @param cp a Unicode code point
+     * @return true if {@code cp} may start an XML Name
+     */
+    private static boolean isXmlNameStart(int cp) {
+        return cp == ':' || cp == '_'
+                || (cp >= 'A' && cp <= 'Z')
+                || (cp >= 'a' && cp <= 'z')
+                || (cp >= 0xC0   && cp <= 0xD6)
+                || (cp >= 0xD8   && cp <= 0xF6)
+                || (cp >= 0xF8   && cp <= 0x2FF)
+                || (cp >= 0x370  && cp <= 0x37D)
+                || (cp >= 0x37F  && cp <= 0x1FFF)
+                || (cp >= 0x200C && cp <= 0x200D)
+                || (cp >= 0x2070 && cp <= 0x218F)
+                || (cp >= 0x2C00 && cp <= 0x2FEF)
+                || (cp >= 0x3001 && cp <= 0xD7FF)
+                || (cp >= 0xF900 && cp <= 0xFDCF)
+                || (cp >= 0xFDF0 && cp <= 0xFFFD)
+                || (cp >= 0x10000 && cp <= 0xEFFFF);
+    }
+
+    /**
+     * XML 1.0 (5th ed.) {@code NameChar} production.
+     *
+     * @param cp a Unicode code point
+     * @return true if {@code cp} may appear after the first character of an XML Name
+     */
+    private static boolean isXmlNameChar(int cp) {
+        return isXmlNameStart(cp)
+                || cp == '-' || cp == '.'
+                || (cp >= '0' && cp <= '9')
+                || cp == 0xB7
+                || (cp >= 0x0300 && cp <= 0x036F)
+                || (cp >= 0x203F && cp <= 0x2040);
+    }
+
+    /**
      * Scan the content following the named tag, attaching it to the context.
      *
      * @param x
@@ -968,6 +1037,10 @@ public class XML {
         JSONObject jo;
         String string;
 
+        if (tagName != null) {
+            mustBeXmlName(tagName);
+        }
+
         if (object instanceof JSONObject) {
 
             // Emit <tagName>
@@ -986,6 +1059,9 @@ public class XML {
             // don't use the new entrySet accessor to maintain Android Support
             jo = (JSONObject) object;
             for (final String key : jo.keySet()) {
+                if (!key.equals(config.getcDataTagName())) {
+                    mustBeXmlName(key);
+                }
                 Object value = jo.opt(key);
                 if (value == null) {
                     value = "";

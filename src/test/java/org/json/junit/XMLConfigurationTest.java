@@ -506,32 +506,31 @@ public class XMLConfigurationTest {
 
 
     /**
-     * Possible bug: 
-     * Illegal node-names must be converted to legal XML-node-names.
-     * The given example shows 2 nodes which are valid for JSON, but not for XML.
-     * Therefore illegal arguments should be converted to e.g. an underscore (_).
+     * JSON keys that are not valid XML 1.0 Names are rejected by
+     * XML.toString rather than being emitted as (malformed) tag names.
+     * See issues #166, #294, #308 and #1071.
      */
     @Test
     public void shouldHandleIllegalJSONNodeNames()
     {
-        JSONObject inputJSON = new JSONObject();
-        inputJSON.append("123IllegalNode", "someValue1");
-        inputJSON.append("Illegal@node", "someValue2");
-
-        String result = XML.toString(inputJSON, null,
-                XMLParserConfiguration.KEEP_STRINGS);
-
-        /*
-         * This is invalid XML. Names should not begin with digits or contain
-         * certain values, including '@'. One possible solution is to replace
-         * illegal chars with '_', in which case the expected output would be:
-         * <___IllegalNode>someValue1</___IllegalNode><Illegal_node>someValue2</Illegal_node>
-         */
-        String expected = "<123IllegalNode>someValue1</123IllegalNode><Illegal@node>someValue2</Illegal@node>";
-
-        assertEquals("Length", expected.length(), result.length());
-        assertTrue("123IllegalNode", result.contains("<123IllegalNode>someValue1</123IllegalNode>"));
-        assertTrue("Illegal@node", result.contains("<Illegal@node>someValue2</Illegal@node>"));
+        // Name may not start with a digit
+        try {
+            XML.toString(new JSONObject().append("123IllegalNode", "someValue1"),
+                    null, XMLParserConfiguration.KEEP_STRINGS);
+            fail("expected JSONException for digit-leading element name");
+        } catch (JSONException expected) {
+            assertTrue("message names the offending key",
+                    expected.getMessage().contains("123IllegalNode"));
+        }
+        // Name may not contain '@'
+        try {
+            XML.toString(new JSONObject().append("Illegal@node", "someValue2"),
+                    null, XMLParserConfiguration.KEEP_STRINGS);
+            fail("expected JSONException for '@' in element name");
+        } catch (JSONException expected) {
+            assertTrue("message names the offending key",
+                    expected.getMessage().contains("Illegal@node"));
+        }
     }
 
     /**
