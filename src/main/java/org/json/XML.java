@@ -262,6 +262,10 @@ public class XML {
         }
     }
 
+    private static boolean inRange(int cp, int lo, int hi) {
+        return cp >= lo && cp <= hi;
+    }
+
     /**
      * XML 1.0 (5th ed.) {@code NameStartChar} production.
      *
@@ -269,21 +273,22 @@ public class XML {
      * @return true if {@code cp} may start an XML Name
      */
     private static boolean isXmlNameStart(int cp) {
-        return cp == ':' || cp == '_'
-                || (cp >= 'A' && cp <= 'Z')
-                || (cp >= 'a' && cp <= 'z')
-                || (cp >= 0xC0   && cp <= 0xD6)
-                || (cp >= 0xD8   && cp <= 0xF6)
-                || (cp >= 0xF8   && cp <= 0x2FF)
-                || (cp >= 0x370  && cp <= 0x37D)
-                || (cp >= 0x37F  && cp <= 0x1FFF)
-                || (cp >= 0x200C && cp <= 0x200D)
-                || (cp >= 0x2070 && cp <= 0x218F)
-                || (cp >= 0x2C00 && cp <= 0x2FEF)
-                || (cp >= 0x3001 && cp <= 0xD7FF)
-                || (cp >= 0xF900 && cp <= 0xFDCF)
-                || (cp >= 0xFDF0 && cp <= 0xFFFD)
-                || (cp >= 0x10000 && cp <= 0xEFFFF);
+        return cp == ':'
+                || cp == '_'
+                || inRange(cp, 'A', 'Z')
+                || inRange(cp, 'a', 'z')
+                || inRange(cp, 0xC0,    0xD6)
+                || inRange(cp, 0xD8,    0xF6)
+                || inRange(cp, 0xF8,    0x2FF)
+                || inRange(cp, 0x370,   0x37D)
+                || inRange(cp, 0x37F,   0x1FFF)
+                || inRange(cp, 0x200C,  0x200D)
+                || inRange(cp, 0x2070,  0x218F)
+                || inRange(cp, 0x2C00,  0x2FEF)
+                || inRange(cp, 0x3001,  0xD7FF)
+                || inRange(cp, 0xF900,  0xFDCF)
+                || inRange(cp, 0xFDF0,  0xFFFD)
+                || inRange(cp, 0x10000, 0xEFFFF);
     }
 
     /**
@@ -294,11 +299,12 @@ public class XML {
      */
     private static boolean isXmlNameChar(int cp) {
         return isXmlNameStart(cp)
-                || cp == '-' || cp == '.'
-                || (cp >= '0' && cp <= '9')
+                || cp == '-'
+                || cp == '.'
                 || cp == 0xB7
-                || (cp >= 0x0300 && cp <= 0x036F)
-                || (cp >= 0x203F && cp <= 0x2040);
+                || inRange(cp, '0', '9')
+                || inRange(cp, 0x0300, 0x036F)
+                || inRange(cp, 0x203F, 0x2040);
     }
 
     /**
