@@ -1751,20 +1751,25 @@ public class JSONArray implements Iterable<Object> {
      * Make a JSON text of this JSONArray. For compactness, no unnecessary
      * whitespace is added. If it is not possible to produce a syntactically
      * correct JSON text then null will be returned instead. This could occur if
-     * the array contains an invalid number.
+     * the array contains an invalid number. Cyclic references throw
+     * {@link JSONException}; other serialization failures still return null.
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      * </b>
      *
      * @return a printable, displayable, transmittable representation of the
      *         array.
+     * @throws JSONException if a cyclic reference is detected during serialization
      */
     @Override
     public String toString() {
         try {
             return this.toString(0);
         } catch (JSONException e) {
-            throw e;
+            if (JSONObject.isCyclicReferenceException(e)) {
+                throw e;
+            }
+            return null;
         } catch (Exception e) {
             return null;
         }
@@ -1857,7 +1862,7 @@ public class JSONArray implements Iterable<Object> {
     Writer write(Writer writer, int indentFactor, int indent, Set<Object> serializationStack)
             throws JSONException {
         if (!serializationStack.add(this)) {
-            throw new JSONException(JSONObject.CYCLIC_REFERENCE_MESSAGE);
+            throw JSONObject.cyclicReferenceDuringSerializationException();
         }
         try {
             boolean needsComma = false;
@@ -1911,7 +1916,7 @@ public class JSONArray implements Iterable<Object> {
             JSONObject.writeValue(writer, this.myArrayList.get(i),
                     indentFactor, indent, serializationStack);
         } catch (JSONException e) {
-            if (JSONObject.CYCLIC_REFERENCE_MESSAGE.equals(e.getMessage())) {
+            if (JSONObject.isCyclicReferenceException(e)) {
                 throw e;
             }
             throw new JSONException("Unable to write JSONArray value at index: " + i, e);

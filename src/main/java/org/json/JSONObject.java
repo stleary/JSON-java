@@ -2953,7 +2953,8 @@ public class JSONObject {
     /**
      * Make a JSON text of this JSONObject. For compactness, no whitespace is
      * added. If this would not result in a syntactically correct JSON text,
-     * then null will be returned instead.
+     * then null will be returned instead. Cyclic references throw
+     * {@link JSONException}; other serialization failures still return null.
      * <p><b>
      * Warning: This method assumes that the data structure is acyclical.
      * </b>
@@ -2962,13 +2963,17 @@ public class JSONObject {
      *         of the object, beginning with <code>{</code>&nbsp;<small>(left
      *         brace)</small> and ending with <code>}</code>&nbsp;<small>(right
      *         brace)</small>.
+     * @throws JSONException if a cyclic reference is detected during serialization
      */
     @Override
     public String toString() {
         try {
             return this.toString(0);
         } catch (JSONException e) {
-            throw e;
+            if (isCyclicReferenceException(e)) {
+                throw e;
+            }
+            return null;
         } catch (Exception e) {
             return null;
         }
@@ -3149,8 +3154,26 @@ public class JSONObject {
     static final String CYCLIC_REFERENCE_MESSAGE =
             "Cyclic reference detected during serialization";
 
-    private static JSONException cyclicReferenceDuringSerializationException() {
-        return new JSONException(CYCLIC_REFERENCE_MESSAGE);
+    static final class CyclicReferenceException extends JSONException {
+        private static final long serialVersionUID = 1L;
+
+        CyclicReferenceException() {
+            super(CYCLIC_REFERENCE_MESSAGE);
+        }
+    }
+
+    static JSONException cyclicReferenceDuringSerializationException() {
+        return new CyclicReferenceException();
+    }
+
+    static boolean isCyclicReferenceException(Throwable throwable) {
+        while (throwable != null) {
+            if (throwable instanceof CyclicReferenceException) {
+                return true;
+            }
+            throwable = throwable.getCause();
+        }
+        return false;
     }
 
     @SuppressWarnings("resource")
@@ -3363,7 +3386,7 @@ public class JSONObject {
         try{
             writeValue(writer, entry.getValue(), indentFactor, indent, serializationStack);
         } catch (JSONException e) {
-            if (CYCLIC_REFERENCE_MESSAGE.equals(e.getMessage())) {
+            if (isCyclicReferenceException(e)) {
                 throw e;
             }
             throw new JSONException("Unable to write JSONObject value for key: " + key, e);

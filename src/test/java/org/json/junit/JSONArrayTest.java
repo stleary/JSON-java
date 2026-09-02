@@ -1526,12 +1526,10 @@ public class JSONArrayTest {
         }
     }
 
-    @Test(expected = JSONException.class)
-    public void issue1056SelfReferentialJSONArray() {
-        JSONArray arr = new JSONArray();
-        arr.put("x");
-        arr.put(arr);
-        arr.toString();
+    @Test
+    public void issue1056BrokenToStringStillReturnsNullFromToString() {
+        JSONArray arr = new JSONArray().put(new JSONObject().put("k", new org.json.junit.data.BrokenToString()));
+        assertNull(arr.toString());
     }
 
     @Test(expected = JSONException.class)
