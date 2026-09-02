@@ -2967,6 +2967,8 @@ public class JSONObject {
     public String toString() {
         try {
             return this.toString(0);
+        } catch (JSONException e) {
+            throw e;
         } catch (Exception e) {
             return null;
         }
@@ -3140,9 +3142,27 @@ public class JSONObject {
         return this.write(writer, 0, 0);
     }
 
+    static Set<Object> newSerializationStack() {
+        return Collections.newSetFromMap(new IdentityHashMap<Object, Boolean>());
+    }
+
+    static final String CYCLIC_REFERENCE_MESSAGE =
+            "Cyclic reference detected during serialization";
+
+    private static JSONException cyclicReferenceDuringSerializationException() {
+        return new JSONException(CYCLIC_REFERENCE_MESSAGE);
+    }
+
     @SuppressWarnings("resource")
     static final Writer writeValue(Writer writer, Object value,
             int indentFactor, int indent) throws JSONException, IOException {
+        return writeValue(writer, value, indentFactor, indent, newSerializationStack());
+    }
+
+    @SuppressWarnings("resource")
+    static final Writer writeValue(Writer writer, Object value,
+            int indentFactor, int indent, Set<Object> serializationStack)
+            throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.write("null");
         } else if (value instanceof JSONString) {
@@ -3160,17 +3180,17 @@ public class JSONObject {
         } else if (value instanceof Enum<?>) {
             writer.write(quote(((Enum<?>)value).name()));
         } else if (value instanceof JSONObject) {
-            ((JSONObject) value).write(writer, indentFactor, indent);
+            ((JSONObject) value).write(writer, indentFactor, indent, serializationStack);
         } else if (value instanceof JSONArray) {
-            ((JSONArray) value).write(writer, indentFactor, indent);
+            ((JSONArray) value).write(writer, indentFactor, indent, serializationStack);
         } else if (value instanceof Map) {
             Map<?, ?> map = (Map<?, ?>) value;
-            new JSONObject(map).write(writer, indentFactor, indent);
+            new JSONObject(map).write(writer, indentFactor, indent, serializationStack);
         } else if (value instanceof Collection) {
             Collection<?> coll = (Collection<?>) value;
-            new JSONArray(coll).write(writer, indentFactor, indent);
+            new JSONArray(coll).write(writer, indentFactor, indent, serializationStack);
         } else if (value.getClass().isArray()) {
-            new JSONArray(value).write(writer, indentFactor, indent);
+            new JSONArray(value).write(writer, indentFactor, indent, serializationStack);
         } else {
             quote(value.toString(), writer);
         }
@@ -3248,6 +3268,14 @@ public class JSONObject {
     @SuppressWarnings("resource")
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
+        return write(writer, indentFactor, indent, newSerializationStack());
+    }
+
+    Writer write(Writer writer, int indentFactor, int indent, Set<Object> serializationStack)
+            throws JSONException {
+        if (!serializationStack.add(this)) {
+            throw cyclicReferenceDuringSerializationException();
+        }
         try {
             boolean needsComma = false;
             final int length = this.length();
@@ -3262,14 +3290,16 @@ public class JSONObject {
                     writer.write(' ');
                 }
                 // might throw an exception
-                attemptWriteValue(writer, indentFactor, indent, entry, key);
+                attemptWriteValue(writer, indentFactor, indent, entry, key, serializationStack);
             } else if (length != 0) {
-                writeContent(writer, indentFactor, indent, needsComma);
+                writeContent(writer, indentFactor, indent, needsComma, serializationStack);
             }
             writer.write('}');
             return writer;
         } catch (IOException exception) {
             throw new JSONException(exception);
+        } finally {
+            serializationStack.remove(this);
         }
     }
 
@@ -3286,7 +3316,8 @@ public class JSONObject {
      * @throws IOException
      *            If something goes wrong
      */
-    private void writeContent(Writer writer, int indentFactor, int indent, boolean needsComma) throws IOException {
+    private void writeContent(Writer writer, int indentFactor, int indent, boolean needsComma,
+            Set<Object> serializationStack) throws IOException {
         final int newIndent = indent + indentFactor;
         for (final Entry<String,?> entry : this.entrySet()) {
             if (needsComma) {
@@ -3302,7 +3333,7 @@ public class JSONObject {
             if (indentFactor > 0) {
                 writer.write(' ');
             }
-            attemptWriteValue(writer, indentFactor, newIndent, entry, key);
+            attemptWriteValue(writer, indentFactor, newIndent, entry, key, serializationStack);
             needsComma = true;
         }
         if (indentFactor > 0) {
@@ -3327,9 +3358,15 @@ public class JSONObject {
      * occurs
 
      */
-    private static void attemptWriteValue(Writer writer, int indentFactor, int indent, Entry<String, ?> entry, String key) {
+    private static void attemptWriteValue(Writer writer, int indentFactor, int indent, Entry<String, ?> entry,
+            String key, Set<Object> serializationStack) {
         try{
-            writeValue(writer, entry.getValue(), indentFactor, indent);
+            writeValue(writer, entry.getValue(), indentFactor, indent, serializationStack);
+        } catch (JSONException e) {
+            if (CYCLIC_REFERENCE_MESSAGE.equals(e.getMessage())) {
+                throw e;
+            }
+            throw new JSONException("Unable to write JSONObject value for key: " + key, e);
         } catch (Exception e) {
             throw new JSONException("Unable to write JSONObject value for key: " + key, e);
         }

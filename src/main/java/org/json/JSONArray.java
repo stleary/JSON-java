@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -1762,6 +1763,8 @@ public class JSONArray implements Iterable<Object> {
     public String toString() {
         try {
             return this.toString(0);
+        } catch (JSONException e) {
+            throw e;
         } catch (Exception e) {
             return null;
         }
@@ -1848,13 +1851,21 @@ public class JSONArray implements Iterable<Object> {
     @SuppressWarnings("resource")
     public Writer write(Writer writer, int indentFactor, int indent)
             throws JSONException {
+        return write(writer, indentFactor, indent, JSONObject.newSerializationStack());
+    }
+
+    Writer write(Writer writer, int indentFactor, int indent, Set<Object> serializationStack)
+            throws JSONException {
+        if (!serializationStack.add(this)) {
+            throw new JSONException(JSONObject.CYCLIC_REFERENCE_MESSAGE);
+        }
         try {
             boolean needsComma = false;
             int length = this.length();
             writer.write('[');
 
             if (length == 1) {
-                writeArrayAttempt(writer, indentFactor, indent, 0);
+                writeArrayAttempt(writer, indentFactor, indent, 0, serializationStack);
             } else if (length != 0) {
                 final int newIndent = indent + indentFactor;
 
@@ -1866,7 +1877,7 @@ public class JSONArray implements Iterable<Object> {
                         writer.write('\n');
                     }
                     JSONObject.indent(writer, newIndent);
-                    writeArrayAttempt(writer, indentFactor, newIndent, i);
+                    writeArrayAttempt(writer, indentFactor, newIndent, i, serializationStack);
                     needsComma = true;
                 }
                 if (indentFactor > 0) {
@@ -1878,6 +1889,8 @@ public class JSONArray implements Iterable<Object> {
             return writer;
         } catch (IOException e) {
             throw new JSONException(e);
+        } finally {
+            serializationStack.remove(this);
         }
     }
 
@@ -1892,10 +1905,16 @@ public class JSONArray implements Iterable<Object> {
      * @param i
      *            Index in array to be added
      */
-    private void writeArrayAttempt(Writer writer, int indentFactor, int indent, int i) {
+    private void writeArrayAttempt(Writer writer, int indentFactor, int indent, int i,
+            Set<Object> serializationStack) {
         try {
             JSONObject.writeValue(writer, this.myArrayList.get(i),
-                    indentFactor, indent);
+                    indentFactor, indent, serializationStack);
+        } catch (JSONException e) {
+            if (JSONObject.CYCLIC_REFERENCE_MESSAGE.equals(e.getMessage())) {
+                throw e;
+            }
+            throw new JSONException("Unable to write JSONArray value at index: " + i, e);
         } catch (Exception e) {
             throw new JSONException("Unable to write JSONArray value at index: " + i, e);
         }

@@ -1527,6 +1527,14 @@ public class JSONArrayTest {
     }
 
     @Test(expected = JSONException.class)
+    public void issue1056SelfReferentialJSONArray() {
+        JSONArray arr = new JSONArray();
+        arr.put("x");
+        arr.put(arr);
+        arr.toString();
+    }
+
+    @Test(expected = JSONException.class)
     public void testRecursiveDepthArrayFor1001Levels() {
         ArrayList<Object> array = buildNestedArray(1001);
         new JSONArray(array);

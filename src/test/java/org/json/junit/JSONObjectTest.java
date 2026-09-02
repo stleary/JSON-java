@@ -3518,6 +3518,42 @@ public class JSONObjectTest {
 	}
 
 	@Test(expected = JSONException.class)
+	public void issue1056SelfReferentialJSONObject() {
+		JSONObject jo = new JSONObject();
+		jo.put("key", "value");
+		jo.put("self", jo);
+		jo.toString();
+	}
+
+	@Test(expected = JSONException.class)
+	public void issue1056MutualJSONObjectCycle() {
+		JSONObject a = new JSONObject();
+		JSONObject b = new JSONObject();
+		a.put("b", b);
+		b.put("a", a);
+		a.toString();
+	}
+
+	@Test
+	public void issue1056DiamondSharedChildStillSerializes() {
+		JSONObject parent = new JSONObject();
+		JSONObject child = new JSONObject().put("x", 1);
+		parent.put("a", child);
+		parent.put("b", child);
+		String json = parent.toString();
+		assertTrue(json.contains("\"a\":"));
+		assertTrue(json.contains("\"b\":"));
+		assertTrue(json.contains("\"x\":1"));
+	}
+
+	@Test(expected = JSONException.class)
+	public void issue1056ValueToStringOnCyclicJSONObject() {
+		JSONObject jo = new JSONObject();
+		jo.put("self", jo);
+		JSONObject.valueToString(jo);
+	}
+
+	@Test(expected = JSONException.class)
 	public void testCircularReferenceMultipleLevel() {
 		HashMap<String, Object> inside = new HashMap<>();
 		HashMap<String, Object> jsonObject = new HashMap<>();
