@@ -4337,4 +4337,22 @@ public class JSONObjectTest {
 		}
 	}
 
+	@Test
+	public void strictModeShouldCheckTrailingCharactersAfterNextAndBack() {
+		JSONParserConfiguration strict =
+				new JSONParserConfiguration().withStrictMode();
+
+		JSONTokener tok = new JSONTokener("{}xxx");
+
+		tok.next();
+		tok.back();
+
+		JSONException exception = assertThrows(
+				JSONException.class,
+				() -> new JSONObject(tok, strict));
+
+		assertTrue(exception.getMessage().contains(
+				"Unparsed characters found at end of input text"));
+	}
+
 }

@@ -1566,4 +1566,22 @@ public class JSONArrayTest {
                     "[1,null,3]", jsonArray.toString());
         }
     }
+
+    @Test
+    public void strictModeShouldCheckTrailingCharactersAfterNextAndBack() {
+        JSONParserConfiguration strict =
+                new JSONParserConfiguration().withStrictMode();
+
+        JSONTokener tok = new JSONTokener("[]xxx");
+
+        tok.next();
+        tok.back();
+
+        JSONException exception = assertThrows(
+                JSONException.class,
+                () -> new JSONArray(tok, strict));
+
+        assertTrue(exception.getMessage().contains(
+                "Unparsed characters found at end of input text"));
+    }
 }

@@ -94,9 +94,21 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException If a syntax error occurs during the construction of the JSONArray.
      */
     public JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
+        this(x, jsonParserConfiguration, x.isAtStart());
+    }
+
+    /**
+     * Constructs a JSONArray from a JSONTokener and a JSONParserConfiguration, for internal use. <br>
+     * Never call this instead of using withStrictMode(boolean).
+     *
+     * @param x                       A JSONTokener instance from which the JSONArray is constructed.
+     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
+     * @param eofRequired             A boolean that determines whether this array is the root.
+     * @throws JSONException If a syntax error occurs during the construction of the JSONArray.
+     */
+    JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean eofRequired) throws JSONException {
         this();
 
-        boolean isInitial = x.getPrevious() == 0;
         if (x.nextClean() != '[') {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
@@ -118,10 +130,10 @@ public class JSONArray implements Iterable<Object> {
                     x.back();
                     this.myArrayList.add(x.nextValue());
                 }
-                if (checkForSyntaxError(x, jsonParserConfiguration, isInitial)) return;
+                if (checkForSyntaxError(x, jsonParserConfiguration, eofRequired)) return;
             }
         } else {
-            if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
+            if (eofRequired && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
                 throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
             }
         }

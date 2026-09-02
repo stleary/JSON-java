@@ -121,6 +121,15 @@ public class JSONTokener {
     }
 
     /**
+     * Returns whether the tokener is currently positioned at the beginning,
+     *
+     * @return true if the current input position is the beginning
+     */
+    public boolean isAtStart() {
+        return this.index == 0;
+    }
+
+    /**
      * Back up one character. This provides a sort of lookahead capability,
      * so that you can test for a digit or letter before attempting to parse
      * the next number or identifier.
@@ -458,14 +467,14 @@ public class JSONTokener {
         case '{':
             this.back();
             try {
-                return new JSONObject(this, jsonParserConfiguration);
+                return new JSONObject(this, jsonParserConfiguration, false);
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
         case '[':
             this.back();
             try {
-                return new JSONArray(this, jsonParserConfiguration);
+                return new JSONArray(this, jsonParserConfiguration, false);
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }

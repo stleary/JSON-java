@@ -214,14 +214,31 @@ public class JSONObject {
      *             duplicated key.
      */
     public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
+        this(x, jsonParserConfiguration, x.isAtStart());
+    }
+
+    /**
+     * Construct a JSONObject from a JSONTokener with custom json parse configurations, for internal use. <br>
+     * Never call this instead of using withStrictMode(boolean).
+     *
+     * @param x
+     *            A JSONTokener object containing the source string.
+     * @param jsonParserConfiguration
+     *            Variable to pass parser custom configuration for json parsing.
+     * @param eofRequired
+     *            A boolean that determines whether this object is the root.
+     * @throws JSONException
+     *             If there is a syntax error in the source string or a
+     *             duplicated key.
+     */
+    JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean eofRequired) throws JSONException {
         this();
-        boolean isInitial = x.getPrevious() == 0;
 
         if (x.nextClean() != '{') {
             throw x.syntaxError("A JSONObject text must begin with '{'");
         }
         for (;;) {
-            if (parseJSONObject(x, jsonParserConfiguration, isInitial)) {
+            if (parseJSONObject(x, jsonParserConfiguration, eofRequired)) {
                 return;
             }
         }
