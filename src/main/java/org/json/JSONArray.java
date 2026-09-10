@@ -94,7 +94,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException If a syntax error occurs during the construction of the JSONArray.
      */
     public JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
-        this(x, jsonParserConfiguration, x.isAtStart());
+        this(x, jsonParserConfiguration, true);
     }
 
     /**

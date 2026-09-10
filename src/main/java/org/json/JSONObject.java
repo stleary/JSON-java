@@ -214,7 +214,7 @@ public class JSONObject {
      *            duplicated key.
      */
     public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
-        this(x, jsonParserConfiguration, x.isAtStart());
+        this(x, jsonParserConfiguration, true);
     }
 
     /**

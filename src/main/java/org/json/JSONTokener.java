@@ -31,8 +31,6 @@ public class JSONTokener {
     private boolean usePrevious;
     /** the number of characters read in the previous line. */
     private long characterPreviousLine;
-    /** number of non-whitespace characters read from the source. */
-    private long contentCharCount;
 
     // access to this object is required for strict mode checking
     private JSONParserConfiguration jsonParserConfiguration;
@@ -62,7 +60,6 @@ public class JSONTokener {
         this.usePrevious = false;
         this.previous = 0;
         this.index = 0;
-        this.contentCharCount = 0;
         this.character = 1;
         this.characterPreviousLine = 0;
         this.line = 1;
@@ -124,17 +121,6 @@ public class JSONTokener {
     }
 
     /**
-     * Returns whether the tokener is positioned at the beginning,
-     * i.e. only whitespace characters (or no characters at all) have been read so far.
-     * Consuming and backing up over the first characters does not change the result.
-     *
-     * @return true if no non-whitespace character has been read
-     */
-    protected boolean isAtStart() {
-        return this.contentCharCount == 0;
-    }
-
-    /**
      * Back up one character. This provides a sort of lookahead capability,
      * so that you can test for a digit or letter before attempting to parse
      * the next number or identifier.
@@ -144,9 +130,6 @@ public class JSONTokener {
     public void back() throws JSONException {
         if (this.usePrevious || this.index <= 0) {
             throw new JSONException("Stepping back two steps is not supported");
-        }
-        if (this.previous > ' ') {
-            this.contentCharCount--;
         }
         this.decrementIndexes();
         this.usePrevious = true;
@@ -248,9 +231,6 @@ public class JSONTokener {
             return 0;
         }
         this.incrementIndexes(c);
-        if (c > ' ') {
-            this.contentCharCount++;
-        }
         this.previous = (char) c;
         return this.previous;
     }
@@ -569,7 +549,6 @@ public class JSONTokener {
             long startIndex = this.index;
             long startCharacter = this.character;
             long startLine = this.line;
-            long startContentCharCount = this.contentCharCount;
             this.reader.mark(1000000);
             do {
                 c = this.next();
@@ -581,7 +560,6 @@ public class JSONTokener {
                     this.index = startIndex;
                     this.character = startCharacter;
                     this.line = startLine;
-                    this.contentCharCount = startContentCharCount;
                     return 0;
                 }
             } while (c != to);
