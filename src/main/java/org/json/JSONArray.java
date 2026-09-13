@@ -80,7 +80,7 @@ public class JSONArray implements Iterable<Object> {
      * @param x
      *            A JSONTokener
      * @throws JSONException
-     *             If there is a syntax error.
+     *            If there is a syntax error.
      */
     public JSONArray(JSONTokener x) throws JSONException {
         this(x, x.getJsonParserConfiguration());
@@ -94,9 +94,21 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException If a syntax error occurs during the construction of the JSONArray.
      */
     public JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
+        this(x, jsonParserConfiguration, true);
+    }
+
+    /**
+     * Constructs a JSONArray from a JSONTokener and a JSONParserConfiguration, for internal use. <br>
+     * Never call this instead of using withStrictMode(boolean).
+     *
+     * @param x                       A JSONTokener instance from which the JSONArray is constructed.
+     * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
+     * @param isInitial               A boolean that determines whether this array is the root.
+     * @throws JSONException If a syntax error occurs during the construction of the JSONArray.
+     */
+    JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) throws JSONException {
         this();
 
-        boolean isInitial = x.getPrevious() == 0;
         if (x.nextClean() != '[') {
             throw x.syntaxError("A JSONArray text must start with '['");
         }

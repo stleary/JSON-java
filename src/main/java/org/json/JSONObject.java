@@ -195,8 +195,8 @@ public class JSONObject {
      * @param x
      *            A JSONTokener object containing the source string.
      * @throws JSONException
-     *             If there is a syntax error in the source string or a
-     *             duplicated key.
+     *            If there is a syntax error in the source string or a
+     *            duplicated key.
      */
     public JSONObject(JSONTokener x) throws JSONException {
         this(x, x.getJsonParserConfiguration());
@@ -210,12 +210,29 @@ public class JSONObject {
      * @param jsonParserConfiguration
      *            Variable to pass parser custom configuration for json parsing.
      * @throws JSONException
-     *             If there is a syntax error in the source string or a
-     *             duplicated key.
+     *            If there is a syntax error in the source string or a
+     *            duplicated key.
      */
     public JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration) throws JSONException {
+        this(x, jsonParserConfiguration, true);
+    }
+
+    /**
+     * Construct a JSONObject from a JSONTokener with custom json parse configurations, for internal use. <br>
+     * Never call this instead of using withStrictMode(boolean).
+     *
+     * @param x
+     *            A JSONTokener object containing the source string.
+     * @param jsonParserConfiguration
+     *            Variable to pass parser custom configuration for json parsing.
+     * @param isInitial
+     *            A boolean that determines whether this object is the root.
+     * @throws JSONException
+     *            If there is a syntax error in the source string or a
+     *            duplicated key.
+     */
+    JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) throws JSONException {
         this();
-        boolean isInitial = x.getPrevious() == 0;
 
         if (x.nextClean() != '{') {
             throw x.syntaxError("A JSONObject text must begin with '{'");

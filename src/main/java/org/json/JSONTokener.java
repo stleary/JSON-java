@@ -458,14 +458,14 @@ public class JSONTokener {
         case '{':
             this.back();
             try {
-                return new JSONObject(this, jsonParserConfiguration);
+                return new JSONObject(this, jsonParserConfiguration, false);
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
         case '[':
             this.back();
             try {
-                return new JSONArray(this, jsonParserConfiguration);
+                return new JSONArray(this, jsonParserConfiguration, false);
             } catch (StackOverflowError e) {
                 throw new JSONException("JSON Array or Object depth too large to process.", e);
             }
