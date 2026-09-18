@@ -88,6 +88,8 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Constructs a JSONArray from a JSONTokener and a JSONParserConfiguration.
+     * The supplied configuration replaces the tokener's configuration and applies
+     * to all values, including nested objects and arrays.
      *
      * @param x                       A JSONTokener instance from which the JSONArray is constructed.
      * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
@@ -108,6 +110,7 @@ public class JSONArray implements Iterable<Object> {
      */
     JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) throws JSONException {
         this();
+        x.setJsonParserConfiguration(jsonParserConfiguration);
 
         if (x.nextClean() != '[') {
             throw x.syntaxError("A JSONArray text must start with '['");

@@ -204,6 +204,8 @@ public class JSONObject {
 
     /**
      * Construct a JSONObject from a JSONTokener with custom json parse configurations.
+     * The supplied configuration replaces the tokener's configuration and applies
+     * to all values, including nested objects and arrays.
      *
      * @param x
      *            A JSONTokener object containing the source string.
@@ -233,6 +235,7 @@ public class JSONObject {
      */
     JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) throws JSONException {
         this();
+        x.setJsonParserConfiguration(jsonParserConfiguration);
 
         if (x.nextClean() != '{') {
             throw x.syntaxError("A JSONObject text must begin with '{'");
