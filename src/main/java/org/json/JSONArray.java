@@ -88,8 +88,9 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Constructs a JSONArray from a JSONTokener and a JSONParserConfiguration.
-     * The supplied configuration replaces the tokener's configuration and applies
-     * to all values, including nested objects and arrays.
+     * The supplied configuration applies to all values during construction,
+     * including nested objects and arrays. The tokener's original configuration
+     * is restored afterward, even if parsing fails.
      *
      * @param x                       A JSONTokener instance from which the JSONArray is constructed.
      * @param jsonParserConfiguration A JSONParserConfiguration instance that controls the behavior of the parser.
@@ -110,35 +111,39 @@ public class JSONArray implements Iterable<Object> {
      */
     JSONArray(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) throws JSONException {
         this();
-        x.setJsonParserConfiguration(jsonParserConfiguration);
+        JSONParserConfiguration originalConfiguration = x.getJsonParserConfiguration();
+        x.setJsonParserConfigurationInternal(jsonParserConfiguration);
+        try {
+            if (x.nextClean() != '[') {
+                throw x.syntaxError("A JSONArray text must start with '['");
+            }
 
-        if (x.nextClean() != '[') {
-            throw x.syntaxError("A JSONArray text must start with '['");
-        }
-
-        char nextChar = x.nextClean();
-        if (nextChar == 0) {
-            // array is unclosed. No ']' found, instead EOF
-            throw x.syntaxError("Expected a ',' or ']'");
-        } else if (nextChar==',' && jsonParserConfiguration.isStrictMode()) {
-        	 throw x.syntaxError("Array content starts with a ','");
-        }
-        if (nextChar != ']') {
-            x.back();
-            for (;;) {
-                if (x.nextClean() == ',') {
-                    x.back();
-                    this.myArrayList.add(JSONObject.NULL);
-                } else {
-                    x.back();
-                    this.myArrayList.add(x.nextValue());
+            char nextChar = x.nextClean();
+            if (nextChar == 0) {
+                // array is unclosed. No ']' found, instead EOF
+                throw x.syntaxError("Expected a ',' or ']'");
+            } else if (nextChar==',' && jsonParserConfiguration.isStrictMode()) {
+                throw x.syntaxError("Array content starts with a ','");
+            }
+            if (nextChar != ']') {
+                x.back();
+                for (;;) {
+                    if (x.nextClean() == ',') {
+                        x.back();
+                        this.myArrayList.add(JSONObject.NULL);
+                    } else {
+                        x.back();
+                        this.myArrayList.add(x.nextValue());
+                    }
+                    if (checkForSyntaxError(x, jsonParserConfiguration, isInitial)) return;
                 }
-                if (checkForSyntaxError(x, jsonParserConfiguration, isInitial)) return;
+            } else {
+                if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
+                    throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
+                }
             }
-        } else {
-            if (isInitial && jsonParserConfiguration.isStrictMode() && x.nextClean() != 0) {
-                throw x.syntaxError("Strict mode error: Unparsed characters found at end of input text");
-            }
+        } finally {
+            x.setJsonParserConfigurationInternal(originalConfiguration);
         }
     }
 

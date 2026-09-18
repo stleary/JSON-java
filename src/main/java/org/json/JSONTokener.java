@@ -117,6 +117,10 @@ public class JSONTokener {
      */
     @Deprecated
     public void setJsonParserConfiguration(JSONParserConfiguration jsonParserConfiguration) {
+        setJsonParserConfigurationInternal(jsonParserConfiguration);
+    }
+
+    void setJsonParserConfigurationInternal(JSONParserConfiguration jsonParserConfiguration) {
         this.jsonParserConfiguration = jsonParserConfiguration;
     }
 
