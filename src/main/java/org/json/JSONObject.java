@@ -204,6 +204,9 @@ public class JSONObject {
 
     /**
      * Construct a JSONObject from a JSONTokener with custom json parse configurations.
+     * The supplied configuration applies to all values during construction,
+     * including nested objects and arrays. The tokener's original configuration
+     * is restored afterward, even if parsing fails.
      *
      * @param x
      *            A JSONTokener object containing the source string.
@@ -233,14 +236,19 @@ public class JSONObject {
      */
     JSONObject(JSONTokener x, JSONParserConfiguration jsonParserConfiguration, boolean isInitial) throws JSONException {
         this();
-
-        if (x.nextClean() != '{') {
-            throw x.syntaxError("A JSONObject text must begin with '{'");
-        }
-        for (;;) {
-            if (parseJSONObject(x, jsonParserConfiguration, isInitial)) {
-                return;
+        JSONParserConfiguration originalConfiguration = x.getJsonParserConfiguration();
+        x.setJsonParserConfigurationInternal(jsonParserConfiguration);
+        try {
+            if (x.nextClean() != '{') {
+                throw x.syntaxError("A JSONObject text must begin with '{'");
             }
+            for (;;) {
+                if (parseJSONObject(x, jsonParserConfiguration, isInitial)) {
+                    return;
+                }
+            }
+        } finally {
+            x.setJsonParserConfigurationInternal(originalConfiguration);
         }
     }
 

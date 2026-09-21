@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -34,6 +35,92 @@ public class JSONParserConfigurationTest {
                 new JSONParserConfiguration().withOverwriteDuplicateKey(true));
 
         assertEquals("duplicate key should be overwritten", "value2", jsonObject.getString("key"));
+    }
+
+    @Test
+    public void objectConstructorAppliesExplicitStrictModeToValues() {
+        JSONParserConfiguration configuration = new JSONParserConfiguration().withStrictMode();
+        JSONParserConfiguration lenient = new JSONParserConfiguration().withStrictMode(false);
+        for (String source : Arrays.asList(
+                "[]",
+                "{",
+                "{} trailing",
+                "{\"value\":'text'}",
+                "{\"value\":[1,]}",
+                "{\"value\":{\"nested\":1,}}")) {
+            JSONTokener tokener = new JSONTokener(source, lenient);
+            assertThrows(JSONException.class, () -> new JSONObject(tokener, configuration));
+            assertSame(lenient, tokener.getJsonParserConfiguration());
+        }
+    }
+
+    @Test
+    public void arrayConstructorAppliesExplicitStrictModeToValues() {
+        JSONParserConfiguration configuration = new JSONParserConfiguration().withStrictMode();
+        JSONParserConfiguration lenient = new JSONParserConfiguration().withStrictMode(false);
+        for (String source : Arrays.asList(
+                "{}",
+                "[",
+                "[] trailing",
+                "['text']",
+                "[[1,]]",
+                "[{\"nested\":1,}]")) {
+            JSONTokener tokener = new JSONTokener(source, lenient);
+            assertThrows(JSONException.class, () -> new JSONArray(tokener, configuration));
+            assertSame(lenient, tokener.getJsonParserConfiguration());
+        }
+    }
+
+    @Test
+    public void explicitConfigurationOverridesTokenerStrictMode() {
+        JSONParserConfiguration strict = new JSONParserConfiguration().withStrictMode();
+        JSONParserConfiguration lenient = new JSONParserConfiguration().withStrictMode(false);
+        JSONTokener objectTokener = new JSONTokener("{\"value\":[{'nested':'text',}], 'other':'text'} 'next'", strict);
+        JSONTokener arrayTokener = new JSONTokener("[{\"value\":['text',]},'text'] 'next'", strict);
+
+        JSONObject object = new JSONObject(objectTokener, lenient);
+        JSONArray array = new JSONArray(arrayTokener, lenient);
+
+        assertEquals("text", object.getJSONArray("value").getJSONObject(0).getString("nested"));
+        assertEquals("text", array.getJSONObject(0).getJSONArray("value").getString(0));
+        assertEquals("text", object.getString("other"));
+        assertEquals("text", array.getString(1));
+        assertSame(strict, objectTokener.getJsonParserConfiguration());
+        assertSame(strict, arrayTokener.getJsonParserConfiguration());
+        assertThrows(JSONException.class, () -> objectTokener.nextValue());
+        assertThrows(JSONException.class, () -> arrayTokener.nextValue());
+    }
+
+    @Test
+    public void objectConstructorRestoresTokenerConfiguration() {
+        JSONParserConfiguration original = new JSONParserConfiguration().withStrictMode(false);
+        JSONParserConfiguration strict = new JSONParserConfiguration().withStrictMode();
+        for (String source : Arrays.asList("{}", "{\"value\":[{\"nested\":\"text\"}],\"other\":true}")) {
+            JSONTokener tokener = new JSONTokener(source, original);
+            new JSONObject(tokener, strict);
+            assertSame(original, tokener.getJsonParserConfiguration());
+        }
+    }
+
+    @Test
+    public void arrayConstructorRestoresTokenerConfiguration() {
+        JSONParserConfiguration original = new JSONParserConfiguration().withStrictMode(false);
+        JSONParserConfiguration strict = new JSONParserConfiguration().withStrictMode();
+        for (String source : Arrays.asList("[]", "[{\"value\":[\"text\"]},true]")) {
+            JSONTokener tokener = new JSONTokener(source, original);
+            new JSONArray(tokener, strict);
+            assertSame(original, tokener.getJsonParserConfiguration());
+        }
+    }
+
+    @Test
+    public void explicitConfigurationAppliesToNestedDuplicateKeys() {
+        JSONParserConfiguration configuration = new JSONParserConfiguration().withOverwriteDuplicateKey(true);
+        JSONObject object = new JSONObject(new JSONTokener("{\"value\":[{\"key\":1,\"key\":2}]}"), configuration);
+        JSONArray array = new JSONArray(new JSONTokener("[{\"value\":{\"key\":1,\"key\":2}}]"), configuration);
+
+        assertEquals(2, object.getJSONArray("value").getJSONObject(0).getInt("key"));
+        assertEquals(2, array.getJSONObject(0).getJSONObject("value").getInt("key"));
     }
 
     @Test
