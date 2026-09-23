@@ -1526,6 +1526,12 @@ public class JSONArrayTest {
         }
     }
 
+    @Test
+    public void issue1056BrokenToStringStillReturnsNullFromToString() {
+        JSONArray arr = new JSONArray().put(new JSONObject().put("k", new org.json.junit.data.BrokenToString()));
+        assertNull(arr.toString());
+    }
+
     @Test(expected = JSONException.class)
     public void testRecursiveDepthArrayFor1001Levels() {
         ArrayList<Object> array = buildNestedArray(1001);
