@@ -203,7 +203,7 @@ public class JSONPointer {
         Object current = document;
         for (String token : this.refTokens) {
             if (current instanceof JSONObject) {
-                current = ((JSONObject) current).opt(unescape(token));
+                current = ((JSONObject) current).opt(token);
             } else if (current instanceof JSONArray) {
                 current = readByIndexToken(current, token);
             } else {

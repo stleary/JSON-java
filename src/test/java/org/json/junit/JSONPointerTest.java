@@ -98,6 +98,32 @@ public class JSONPointerTest {
         assertEquals(8, query("/m~0n"));
     }
 
+    @Test
+    public void escapeSequencesInObjectKeys() {
+        JSONObject object = new JSONObject().put("~1", "tilde one").put("/", "slash")
+                .put("~0", "tilde zero").put("~", "tilde");
+        assertEquals("tilde one", object.query("/~01"));
+        assertEquals("tilde zero", object.query("/~00"));
+        assertEquals("tilde one", object.query("#/~01"));
+        assertEquals("tilde zero", object.query("#/~00"));
+    }
+
+    @Test
+    public void builderPreservesLiteralTokens() {
+        JSONObject object = new JSONObject().put("~1", "tilde one").put("/", "slash")
+                .put("~0", "tilde zero").put("~", "tilde");
+        assertEquals("tilde one", JSONPointer.builder().append("~1").build().queryFrom(object));
+        assertEquals("tilde zero", JSONPointer.builder().append("~0").build().queryFrom(object));
+    }
+
+    @Test
+    public void tokenListPreservesLiteralTokens() {
+        JSONObject object = new JSONObject().put("~1", "tilde one").put("/", "slash")
+                .put("~0", "tilde zero").put("~", "tilde");
+        assertEquals("tilde one", new JSONPointer(java.util.Arrays.asList("~1")).queryFrom(object));
+        assertEquals("tilde zero", new JSONPointer(java.util.Arrays.asList("~0")).queryFrom(object));
+    }
+
     /**
      * We pass backslashes as-is
      * 
