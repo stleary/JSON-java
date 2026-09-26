@@ -276,7 +276,7 @@ public class JSONPointer {
         try {
             StringBuilder rval = new StringBuilder("#");
             for (String token : this.refTokens) {
-                rval.append('/').append(URLEncoder.encode(token, ENCODING));
+                rval.append('/').append(URLEncoder.encode(escape(token), ENCODING));
             }
             return rval.toString();
         } catch (UnsupportedEncodingException e) {

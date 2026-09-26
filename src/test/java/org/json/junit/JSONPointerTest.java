@@ -219,9 +219,29 @@ public class JSONPointerTest {
         assertEquals("#/c%25d", new JSONPointer("/c%d").toURIFragment());
         assertEquals("#/e%5Ef", new JSONPointer("/e^f").toURIFragment());
         assertEquals("#/g%7Ch", new JSONPointer("/g|h").toURIFragment());
-        assertEquals("#/m%7En", new JSONPointer("/m~n").toURIFragment());
+        assertEquals("#/m%7E0n", new JSONPointer("/m~n").toURIFragment());
     }
-    
+
+    @Test
+    public void toURIFragmentEscaping() {
+        JSONPointer pointer = JSONPointer.builder()
+                .append("obj")
+                .append("other~key").append("another/key")
+                .append(0)
+                .build();
+        assertEquals("#/obj/other%7E0key/another%7E1key/0", pointer.toURIFragment());
+        assertEquals("val", new JSONPointer(pointer.toURIFragment()).queryFrom(document));
+    }
+
+    @Test
+    public void toURIFragmentRoundTrip() {
+        JSONObject object = new JSONObject().put("~1", "tilde one").put("/", "slash");
+        JSONPointer tildeOne = JSONPointer.builder().append("~1").build();
+        JSONPointer slash = JSONPointer.builder().append("/").build();
+        assertEquals("tilde one", object.query(tildeOne.toURIFragment()));
+        assertEquals("slash", object.query(slash.toURIFragment()));
+    }
+
     @Test
     public void tokenListIsCopiedInConstructor() {
         JSONPointer.Builder b = JSONPointer.builder().append("key1");
