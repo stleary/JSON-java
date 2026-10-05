@@ -17,6 +17,33 @@ import org.junit.Test;
  */
 public class PropertyTest {
 
+    @Test
+    public void shouldIncludeInheritedPropertiesWithoutLocalEntries() {
+        Properties defaults = new Properties();
+        defaults.setProperty("timeout", "30");
+        Properties properties = new Properties(new Properties(defaults));
+
+        JSONObject jsonObject = Property.toJSONObject(properties);
+
+        assertEquals(1, jsonObject.length());
+        assertEquals("30", jsonObject.getString("timeout"));
+    }
+
+    @Test
+    public void shouldPreferLocalPropertiesOverDefaults() {
+        Properties defaults = new Properties();
+        defaults.setProperty("timeout", "30");
+        defaults.setProperty("host", "localhost");
+        Properties properties = new Properties(defaults);
+        properties.setProperty("timeout", "60");
+
+        JSONObject jsonObject = Property.toJSONObject(properties);
+
+        assertEquals(2, jsonObject.length());
+        assertEquals("60", jsonObject.getString("timeout"));
+        assertEquals("localhost", jsonObject.getString("host"));
+    }
+
     /**
      * JSONObject from null properties object should
      * result in an empty JSONObject.
