@@ -1052,4 +1052,61 @@ public class JSONMLTest {
         }
     }
 
+    /**
+     * Tests that the childNodes attribute is reserved in object-form parsing.
+     */
+    @Test
+    public void testToJSONObjectRejectsReservedChildNodesAttribute() {
+        String xmlStr = "<p childNodes=\"metadata\">text</p>";
+        for (boolean keepStrings : new boolean[] {false, true}) {
+            JSONException exception = assertThrows(JSONException.class,
+                () -> JSONML.toJSONObject(xmlStr, keepStrings));
+            assertTrue(exception.getMessage().startsWith("Reserved attribute."));
+        }
+    }
+
+    /**
+     * Tests that the ordinary childNode attribute is preserved in object-form parsing.
+     */
+    @Test
+    public void testToJSONObjectPreservesChildNodeAttribute() {
+        String xmlStr = "<p childNode=\"metadata\">text</p>";
+        for (boolean keepStrings : new boolean[] {false, true}) {
+            JSONObject jsonObject = JSONML.toJSONObject(xmlStr, keepStrings);
+            assertEquals("p", jsonObject.getString("tagName"));
+            assertEquals("metadata", jsonObject.getString("childNode"));
+            assertEquals("text", jsonObject.getJSONArray("childNodes").getString(0));
+        }
+    }
+
+    /**
+     * Tests that the tagName attribute remains reserved in object-form parsing.
+     */
+    @Test
+    public void testToJSONObjectRejectsReservedTagNameAttribute() {
+        String xmlStr = "<p tagName=\"metadata\">text</p>";
+        for (boolean keepStrings : new boolean[] {false, true}) {
+            JSONException exception = assertThrows(JSONException.class,
+                () -> JSONML.toJSONObject(xmlStr, keepStrings));
+            assertTrue(exception.getMessage().startsWith("Reserved attribute."));
+        }
+    }
+
+    /**
+     * Tests that childNode and childNodes attributes are preserved in array-form parsing.
+     */
+    @Test
+    public void testToJSONArrayPreservesChildNodeAttributes() {
+        String xmlStr = "<p childNode=\"singular\" childNodes=\"plural\">text</p>";
+        for (boolean keepStrings : new boolean[] {false, true}) {
+            JSONArray jsonArray = JSONML.toJSONArray(xmlStr, keepStrings);
+            assertEquals(3, jsonArray.length());
+            assertEquals("p", jsonArray.getString(0));
+            JSONObject attributes = jsonArray.getJSONObject(1);
+            assertEquals("singular", attributes.getString("childNode"));
+            assertEquals("plural", attributes.getString("childNodes"));
+            assertEquals("text", jsonArray.getString(2));
+        }
+    }
+
 }

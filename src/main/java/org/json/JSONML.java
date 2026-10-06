@@ -14,6 +14,8 @@ Public Domain.
  */
 public class JSONML {
 
+    private static final String CHILD_NODES = "childNodes";
+
     /**
      * Constructs a new JSONML object.
      * @deprecated (Utility class cannot be instantiated)
@@ -205,7 +207,7 @@ public class JSONML {
 // attribute = value
 
                         attribute = (String)token;
-                        if (!arrayForm && ("tagName".equals(attribute) || "childNode".equals(attribute))) {
+                        if (!arrayForm && ("tagName".equals(attribute) || CHILD_NODES.equals(attribute))) {
                             throw x.syntaxError("Reserved attribute.");
                         }
                         token = x.nextToken();
@@ -256,7 +258,7 @@ public class JSONML {
                             }
                             tagName = null;
                             if (!arrayForm && newja.length() > 0) {
-                                newjo.put("childNodes", newja);
+                                newjo.put(CHILD_NODES, newja);
                             }
                             if (ja == null) {
                                 if (arrayForm) {
@@ -648,7 +650,7 @@ public class JSONML {
 
         // Don't use the new entrySet API to maintain Android support
         for (final String key : jo.keySet()) {
-            if (!"tagName".equals(key) && !"childNodes".equals(key)) {
+            if (!"tagName".equals(key) && !CHILD_NODES.equals(key)) {
                 XML.noSpace(key);
                 value = jo.opt(key);
                 if (value != null) {
@@ -664,7 +666,7 @@ public class JSONML {
 
 //Emit content in body
 
-        ja = jo.optJSONArray("childNodes");
+        ja = jo.optJSONArray(CHILD_NODES);
         if (ja == null) {
             sb.append('/');
             sb.append('>');
