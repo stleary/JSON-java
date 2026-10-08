@@ -276,7 +276,7 @@ public class JSONML {
                     if (token instanceof String) {
                         String strToken = (String) token;
                         if (config.isKeepStrings()) {
-                            value = XML.unescape(strToken);
+                            value = strToken;
                         } else {
                             value = XML.stringToValue(strToken);
                         }

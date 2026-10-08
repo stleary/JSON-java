@@ -725,6 +725,98 @@ public class JSONMLTest {
     }
 
     /**
+     * Entity-looking text is decoded once, including when strings are kept.
+     */
+    @Test
+    public void shouldDecodeEntitiesOnceWhenKeepingStringsInJSONArray() {
+        final String[][] cases = {
+            {"&amp;lt;", "&lt;"},
+            {"&amp;amp;", "&amp;"},
+            {"&amp;#65;", "&#65;"},
+            {"&#38;lt;", "&lt;"},
+            {"&lt;&gt;&amp;&quot;&apos;&#65;&#x42;", "<>&\"'AB"}
+        };
+        for (String[] testCase : cases) {
+            final String xml = "<p title=\"" + testCase[0] + "\">" + testCase[0] + "</p>";
+            final JSONArray json = JSONML.toJSONArray(xml, true);
+            assertEquals(xml, testCase[1], json.getJSONObject(1).get("title"));
+            assertEquals(xml, testCase[1], json.get(2));
+            assertEquals(xml, testCase[1], JSONML.toJSONArray(xml, false).get(2));
+            assertTrue(xml, json.similar(JSONML.toJSONArray(new XMLTokener(JSONML.toString(json)),
+                    JSONMLParserConfiguration.KEEP_STRINGS)));
+        }
+    }
+
+    /**
+     * Object form preserves the same decoded attribute and text values.
+     */
+    @Test
+    public void shouldDecodeEntitiesOnceWhenKeepingStringsInJSONObject() {
+        final String xml = "<p title=\"&amp;lt;\">&amp;lt;</p>";
+        final JSONObject json = JSONML.toJSONObject(xml,
+                JSONMLParserConfiguration.ORIGINAL.withKeepStrings(true));
+        assertEquals("&lt;", json.get("title"));
+        assertEquals("&lt;", json.getJSONArray("childNodes").get(0));
+        assertEquals("&lt;", JSONML.toJSONObject(xml).getJSONArray("childNodes").get(0));
+        assertTrue(json.similar(JSONML.toJSONObject(new XMLTokener(JSONML.toString(json)), true)));
+    }
+
+    /**
+     * Keeping strings disables type conversion without disabling entity decoding.
+     */
+    @Test
+    public void shouldPreserveValueTypesWhenKeepingStrings() {
+        final String[] values = {"42", "true", "false", "null"};
+        final String[] content = {"&#52;&#50;", "&#116;rue", "false", "null"};
+        final Object[] typedValues = {Integer.valueOf(42), Boolean.TRUE, Boolean.FALSE, JSONObject.NULL};
+        for (int i = 0; i < values.length; i++) {
+            final String xml = "<p value=\"" + values[i] + "\">" + content[i] + "</p>";
+            final JSONArray array = JSONML.toJSONArray(new XMLTokener(xml), true);
+            final JSONObject object = JSONML.toJSONObject(xml, true);
+            assertEquals(values[i], array.getJSONObject(1).get("value"));
+            assertEquals(values[i], array.get(2));
+            assertEquals(values[i], object.get("value"));
+            assertEquals(values[i], object.getJSONArray("childNodes").get(0));
+            final JSONArray typedArray = JSONML.toJSONArray(xml);
+            final JSONObject typedObject = JSONML.toJSONObject(xml);
+            assertEquals(typedValues[i], typedArray.getJSONObject(1).get("value"));
+            assertEquals(typedValues[i], typedArray.get(2));
+            assertEquals(typedValues[i], typedObject.get("value"));
+            assertEquals(typedValues[i], typedObject.getJSONArray("childNodes").get(0));
+        }
+    }
+
+    /**
+     * CDATA entity syntax remains literal content.
+     */
+    @Test
+    public void shouldPreserveCdataWhenKeepingStrings() {
+        final String content = "&lt; &#65; &amp; 42 true null";
+        final String xml = "<p><![CDATA[" + content + "]]></p>";
+        assertEquals(content, JSONML.toJSONArray(xml, true).get(1));
+        assertEquals(content, JSONML.toJSONObject(xml, true).getJSONArray("childNodes").get(0));
+    }
+
+    /**
+     * Escaped invalid character references are text, while raw references remain invalid.
+     */
+    @Test
+    public void shouldPreserveEscapedInvalidCharacterReferences() {
+        final String[] references = {"#0", "#x110000"};
+        for (String reference : references) {
+            final String expected = "&" + reference + ";";
+            final String xml = "<p>&amp;" + reference + ";</p>";
+            assertEquals(expected, JSONML.toJSONArray(xml, true).get(1));
+            assertEquals(expected, JSONML.toJSONObject(xml, true).getJSONArray("childNodes").get(0));
+            assertEquals(expected, JSONML.toJSONArray(xml).get(1));
+            assertEquals(expected, JSONML.toJSONObject(xml).getJSONArray("childNodes").get(0));
+            final String invalidXml = "<p>" + expected + "</p>";
+            assertThrows(JSONException.class, () -> JSONML.toJSONArray(invalidXml, true));
+            assertThrows(JSONException.class, () -> JSONML.toJSONObject(invalidXml, true));
+        }
+    }
+
+    /**
      * JSON string cannot be reverted to original xml when type guessing is used.
      * When we force all the values as string, the original text comes back.
      */
