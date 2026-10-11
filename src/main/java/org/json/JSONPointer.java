@@ -135,7 +135,8 @@ public class JSONPointer {
         if (pointer.startsWith("#/")) {
             refs = pointer.substring(2);
             try {
-                refs = URLDecoder.decode(refs, ENCODING);
+                // URI fragments preserve plus signs rather than treating them as form-encoded spaces.
+                refs = URLDecoder.decode(refs.replace("+", "%2B"), ENCODING);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
@@ -276,7 +277,7 @@ public class JSONPointer {
         try {
             StringBuilder rval = new StringBuilder("#");
             for (String token : this.refTokens) {
-                rval.append('/').append(URLEncoder.encode(escape(token), ENCODING));
+                rval.append('/').append(URLEncoder.encode(escape(token), ENCODING).replace("+", "%20"));
             }
             return rval.toString();
         } catch (UnsupportedEncodingException e) {

@@ -167,6 +167,41 @@ public class JSONPointerTest {
         assertEquals(8, query("#/m~0n"));
     }
 
+    @Test
+    public void uriFragmentPreservesLiteralPlus() {
+        JSONObject object = new JSONObject().put("a+b", "plus").put("a b", "space")
+                .put("a%2Bb", "percent");
+        assertEquals("plus", object.query("#/a+b"));
+        assertEquals("plus", object.query("#/a%2Bb"));
+        assertEquals("space", object.query("#/a%20b"));
+        assertEquals("percent", object.query("#/a%252Bb"));
+        assertEquals("plus", object.query("/a+b"));
+    }
+
+    @Test
+    public void uriFragmentEncodesSpaces() {
+        JSONObject object = new JSONObject().put("a+b", "plus").put("a b", "space");
+        JSONPointer plus = JSONPointer.builder().append("a+b").build();
+        JSONPointer space = JSONPointer.builder().append("a b").build();
+        assertEquals("#/a%2Bb", plus.toURIFragment());
+        assertEquals("#/a%20b", space.toURIFragment());
+        assertEquals("#/%20", new JSONPointer("/ ").toURIFragment());
+        assertEquals("plus", object.query(plus.toURIFragment()));
+        assertEquals("space", object.query(space.toURIFragment()));
+    }
+
+    @Test
+    public void uriFragmentPreservesUtf8AndPointerEscapes() {
+        String key = "\u4e2d +/~1";
+        JSONObject object = new JSONObject().put(key, "expected")
+                .put("\u4e2d  /~1", "wrong space");
+        assertEquals("expected", object.query("#/%E4%B8%AD%20+~1~01"));
+        assertEquals("expected", object.query("#/%E4%B8%AD%20%2B%7E1%7E01"));
+        JSONPointer pointer = JSONPointer.builder().append(key).build();
+        assertEquals("#/%E4%B8%AD%20%2B%7E1%7E01", pointer.toURIFragment());
+        assertEquals("expected", object.query(pointer.toURIFragment()));
+    }
+
     @SuppressWarnings("unused")
     @Test(expected = IllegalArgumentException.class)
     public void syntaxError() {
