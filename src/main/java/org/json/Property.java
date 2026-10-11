@@ -30,7 +30,7 @@ public class Property {
         // can't use the new constructor for Android support
         // JSONObject jo = new JSONObject(properties == null ? 0 : properties.size());
         JSONObject jo = new JSONObject();
-        if (properties != null && !properties.isEmpty()) {
+        if (properties != null) {
             Enumeration<?> enumProperties = properties.propertyNames();
             while(enumProperties.hasMoreElements()) {
                 String name = (String)enumProperties.nextElement();
