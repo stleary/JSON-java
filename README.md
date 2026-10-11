@@ -51,6 +51,24 @@ For more information on contributions, please see [CONTRIBUTING.md](https://gith
 
 Bug fixes, code improvements, and unit test coverage changes are welcome! Because this project is currently in the maintenance phase, the kinds of changes that can be accepted are limited. For more information, please read the [FAQ](https://github.com/stleary/JSON-java/wiki/FAQ).
 
+The project has recently received a number of pull requests that each make a small change to existing behavior. Most come from reading the code or a specification, many apparently with the help of AI tools, and not from a problem that someone met in use. Each change is small, but together they put backward compatibility at risk. For that reason, the requirements below now apply.
+
+# Requirements for code changes
+
+These requirements apply to every pull request that changes code under src/main:
+
+**1. File an issue first.** The issue must come from someone who hit the problem in real use. It should describe what you were doing, the input, the result you got, and the result you expected. A difference from a specification that was found by reading the code is not enough on its own.
+
+**2. State which inputs change, and how.** The pull request description must link the issue and list the inputs that behave differently, with the result before and after the change. If no existing behavior changes, say so.
+
+Pull requests that do not meet these requirements may be closed without review.
+
+Pull requests that only change unit tests or documentation do not need an issue. Security vulnerabilities are handled separately; please report them as described in SECURITY.md.
+
+**JSONPointer is frozen**
+
+Several fixes that bring JSONPointer in line with RFC 6901 ship in the release that follows 20260814. Once that release is published, JSONPointer is frozen. It will be reopened only for bugs that users report, under the requirements above. Its behavior is pinned by JSONPointerConformanceTest (**TBD**).
+
 # Build Instructions
 
 The org.json package can be built from the command line, Maven, and Gradle. The unit tests can be executed from Maven, Gradle, or individually in an IDE e.g. Eclipse.
