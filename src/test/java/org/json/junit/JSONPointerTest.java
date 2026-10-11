@@ -124,6 +124,24 @@ public class JSONPointerTest {
         assertEquals("tilde zero", new JSONPointer(java.util.Arrays.asList("~0")).queryFrom(object));
     }
 
+    @Test
+    public void escapedTildeTokensSelectLiteralKeys() {
+        JSONObject object = new JSONObject().put("~1", "literal ~1").put("/", "slash")
+                .put("~0", "literal ~0").put("~", "tilde")
+                .put("a~1b", "literal a~1b").put("a/b", "a slash b")
+                .put("a~0b", "literal a~0b").put("a~b", "a tilde b");
+
+        assertEquals("literal ~1", object.query("/~01"));
+        assertEquals("literal ~1", object.query("#/~01"));
+        assertEquals("literal ~0", object.query("/~00"));
+        assertEquals("literal ~0", object.query("#/~00"));
+        assertEquals("literal a~1b", object.query("/a~01b"));
+        assertEquals("literal a~0b", object.query("/a~00b"));
+        assertEquals("literal ~1", JSONPointer.builder().append("~1").build().queryFrom(object));
+        assertEquals("literal ~0", JSONPointer.builder().append("~0").build().queryFrom(object));
+        assertEquals("literal ~1", new JSONPointer(java.util.Arrays.asList("~1")).queryFrom(object));
+    }
+
     /**
      * We pass backslashes as-is
      * 
