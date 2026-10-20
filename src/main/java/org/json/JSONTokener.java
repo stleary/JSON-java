@@ -2,6 +2,8 @@ package org.json;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
 Public Domain.
@@ -34,6 +36,9 @@ public class JSONTokener {
 
     // access to this object is required for strict mode checking
     private JSONParserConfiguration jsonParserConfiguration;
+
+    /** object keys already read, so repeated keys can share one String instance. */
+    private Map<String, String> sharedKeys;
 
     /**
      * Construct a JSONTokener from a Reader. The caller must close the Reader.
@@ -122,6 +127,31 @@ public class JSONTokener {
 
     void setJsonParserConfigurationInternal(JSONParserConfiguration jsonParserConfiguration) {
         this.jsonParserConfiguration = jsonParserConfiguration;
+    }
+
+    /**
+     * Returns an earlier String instance equal to the key if this tokener has read one, otherwise the key itself.
+     *
+     * @param key an object key that was just read
+     * @param maxSharedKeys the maximum number of distinct keys to remember; 0 disables sharing and a negative
+     *        value means no limit
+     * @return a String equal to <code>key</code>
+     */
+    String shareKey(String key, int maxSharedKeys) {
+        if (maxSharedKeys == 0) {
+            return key;
+        }
+        if (this.sharedKeys == null) {
+            this.sharedKeys = new HashMap<String, String>();
+        }
+        String shared = this.sharedKeys.get(key);
+        if (shared != null) {
+            return shared;
+        }
+        if (maxSharedKeys < 0 || this.sharedKeys.size() < maxSharedKeys) {
+            this.sharedKeys.put(key, key);
+        }
+        return key;
     }
 
     /**

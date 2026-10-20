@@ -5,6 +5,16 @@ package org.json;
  */
 public class JSONParserConfiguration extends ParserConfiguration {
     /**
+     * The default maximum number of distinct object keys shared within one parse.
+     */
+    public static final int DEFAULT_MAXIMUM_SHARED_KEYS = 1000;
+
+    /**
+     * Used to indicate that there is no limit on the number of distinct object keys shared within one parse.
+     */
+    public static final int UNLIMITED_SHARED_KEYS = -1;
+
+    /**
      * Used to indicate whether to overwrite duplicate key or not.
      */
     private boolean overwriteDuplicateKey;
@@ -15,11 +25,17 @@ public class JSONParserConfiguration extends ParserConfiguration {
     private boolean useNativeNulls;
 
     /**
+     * The maximum number of distinct object keys shared within one parse.
+     */
+    private int maxSharedKeys;
+
+    /**
      * Configuration with the default values.
      */
     public JSONParserConfiguration() {
         super();
         this.overwriteDuplicateKey = false;
+        this.maxSharedKeys = DEFAULT_MAXIMUM_SHARED_KEYS;
         // DO NOT DELETE THE FOLLOWING LINE -- it is used for strictMode testing
         // this.strictMode = true;
     }
@@ -38,6 +54,7 @@ public class JSONParserConfiguration extends ParserConfiguration {
         clone.maxNestingDepth = maxNestingDepth;
         clone.keepStrings = keepStrings;
         clone.useNativeNulls = useNativeNulls;
+        clone.maxSharedKeys = maxSharedKeys;
         return clone;
     }
 
@@ -85,6 +102,24 @@ public class JSONParserConfiguration extends ParserConfiguration {
     public JSONParserConfiguration withUseNativeNulls(final boolean useNativeNulls) {
         JSONParserConfiguration clone = this.clone();
         clone.useNativeNulls = useNativeNulls;
+
+        return clone;
+    }
+
+    /**
+     * Defines how many distinct object keys the parser shares within one parse. When a key repeats, for example
+     * in each element of an array of objects, the parser reuses the first String instance read for that key
+     * instead of keeping a separate copy in every object. Only the first <code>maxSharedKeys</code> distinct keys
+     * are shared, so input that begins with many unique keys may need a higher limit. The default is 1000.
+     * Parsed values are the same with any setting.
+     *
+     * @param maxSharedKeys the maximum number of distinct keys to share; 0 disables sharing, and
+     *        {@link #UNLIMITED_SHARED_KEYS} (or any negative value) removes the limit
+     * @return The existing configuration will not be modified. A new configuration is returned.
+     */
+    public JSONParserConfiguration withMaxSharedKeys(final int maxSharedKeys) {
+        JSONParserConfiguration clone = this.clone();
+        clone.maxSharedKeys = Math.max(maxSharedKeys, UNLIMITED_SHARED_KEYS);
 
         return clone;
     }
@@ -139,6 +174,16 @@ public class JSONParserConfiguration extends ParserConfiguration {
         return this.useNativeNulls;
     }
     
+
+    /**
+     * The maximum number of distinct object keys shared within one parse. 0 means keys are not shared,
+     * and {@link #UNLIMITED_SHARED_KEYS} means there is no limit.
+     *
+     * @return The <code>maxSharedKeys</code> configuration value.
+     */
+    public int getMaxSharedKeys() {
+        return this.maxSharedKeys;
+    }
 
     /**
      * The parser throws an Exception when strict mode is true and tries to parse invalid JSON characters.
