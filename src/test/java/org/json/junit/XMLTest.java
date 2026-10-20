@@ -7,6 +7,7 @@ Public Domain.
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1608,6 +1609,76 @@ public class XMLTest {
         // TAB and CR references also accepted
         XML.toJSONObject("<a>&#9;</a>");
         XML.toJSONObject("<a>&#13;</a>");
+    }
+
+    /**
+     * Tests that numeric character references to C1 control characters are
+     * still rejected. #x7F-#x9F is inside the XML 1.0 {@code Char} range, but
+     * this library has always refused those references while parsing
+     * ({@code &#133;} is NEL, #x85), and fixing the serialization of TAB/LF/CR
+     * must not change what the parser accepts.
+     */
+    @Test
+    public void testRejectsC1ControlCharacterReference() {
+        assertThrows(JSONException.class,
+                () -> XML.toJSONObject("<name>Joe &#133; Tester</name>"));
+        // the neighbouring boundary codepoints behave the same way
+        assertThrows(JSONException.class,
+                () -> XML.toJSONObject("<name>Joe &#127; Tester</name>"));
+        assertThrows(JSONException.class,
+                () -> XML.toJSONObject("<name>Joe &#159; Tester</name>"));
+        // ... while the characters the parser does accept still work
+        XML.toJSONObject("<name>Joe &#32; Tester</name>");
+    }
+
+    /**
+     * Tests that serializing a string value containing literal TAB, LF and CR
+     * characters writes numeric character references (&amp;#9;, &amp;#10;,
+     * &amp;#13;) instead of the literal characters. Literal occurrences of
+     * these characters are subject to whitespace normalization by conforming
+     * XML parsers, so the original value would be lost when the generated XML
+     * is read back. Regression test for #1092, where #1070 stopped
+     * XML.toString() and JSONML.toString() from escaping these characters.
+     */
+    @Test
+    public void testEscapesLiteralWhitespaceControlCharsOnSerialization() {
+        // LF in a text node must survive as a numeric character reference
+        JSONObject jo = new JSONObject().put("value", "Lettuce\nTomato");
+        String xmlOutput = XML.toString(jo);
+        assertTrue("XML should escape literal LF to preserve it, got: " + xmlOutput,
+                xmlOutput.contains("&#xa;"));
+
+        // TAB and CR likewise
+        JSONObject tabJo = new JSONObject().put("value", "a\tb\rc");
+        String tabXml = XML.toString(tabJo);
+        assertTrue("XML should escape literal TAB, got: " + tabXml, tabXml.contains("&#x9;"));
+        assertTrue("XML should escape literal CR, got: " + tabXml, tabXml.contains("&#xd;"));
+    }
+
+    /**
+     * Tests that the generated XML round-trips: the numeric character
+     * references produced for TAB/LF/CR are read back by
+     * {@code XML.toJSONObject} as the original characters.
+     */
+    @Test
+    public void testWhitespaceControlCharsRoundTripThroughXml() {
+        String original = "Lettuce\nTomato\tMustard";
+        JSONObject jo = new JSONObject().put("value", original);
+        String xmlOutput = XML.toString(jo);
+        JSONObject reparsed = XML.toJSONObject(xmlOutput);
+        assertEquals("LF/TAB must survive the XML round trip",
+                original, reparsed.getString("value"));
+    }
+
+    /**
+     * Same escaping requirement for {@code JSONML.toString}.
+     */
+    @Test
+    public void testJSONMLToStringEscapesLiteralNewlines() {
+        JSONObject jo = new JSONObject("{\"tagName\":\"MyTag\", \"value\":\"Lettuce\\nTomato\"}");
+        String xmlOutput = JSONML.toString(jo);
+        assertTrue("JSONML should escape literal LF to preserve it, got: " + xmlOutput,
+                xmlOutput.contains("&#xa;"));
     }
 
 }
