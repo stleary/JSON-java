@@ -276,7 +276,7 @@ public class JSONObject {
                 return true;
             default:
                 obj = jsonTokener.nextSimpleValue(c);
-                key = obj.toString();
+                key = jsonTokener.shareKey(obj.toString(), jsonParserConfiguration.getMaxSharedKeys());
         }
 
         checkKeyForStrictMode(jsonTokener, jsonParserConfiguration, obj);

@@ -16,9 +16,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 public class JSONParserConfigurationTest {
@@ -706,6 +708,142 @@ public class JSONParserConfigurationTest {
                 "{a:[{\"number\":\"7990154836330\",\"color\":'c'},{\"number\":8784148854580,\"color\":RosyBrown},{\"number\":\"5875770107113\",\"color\":\"DarkSeaGreen\"}]}",
                 "{a:{test: \"implied\"}}"
         );
+    }
+
+    private static final String SHARED_KEYS_SOURCE = "{\"rows\": ["
+            + "{\"name\": \"a\", \"count\": 1, \"big\": 12345678901, \"ratio\": 1.5, \"flag\": true, \"missing\": null,"
+            + " \"nested\": {\"name\": \"inner\", \"list\": [1, \"name\", null]}},"
+            + "{\"name\": \"name\", \"count\": 2, \"nested\": {\"name\": \"inner2\", \"list\": []}},"
+            + "{\"name\": \"third\", \"count\": -3}"
+            + "]}";
+
+    @Test
+    public void testMaxSharedKeysConfig() {
+        JSONParserConfiguration config = new JSONParserConfiguration();
+        assertEquals(JSONParserConfiguration.DEFAULT_MAXIMUM_SHARED_KEYS, config.getMaxSharedKeys());
+        assertEquals(1000, config.getMaxSharedKeys());
+        assertEquals(0, config.withMaxSharedKeys(0).getMaxSharedKeys());
+        assertEquals(JSONParserConfiguration.UNLIMITED_SHARED_KEYS, config.withMaxSharedKeys(-1).getMaxSharedKeys());
+        assertEquals(JSONParserConfiguration.UNLIMITED_SHARED_KEYS, config.withMaxSharedKeys(-5).getMaxSharedKeys());
+
+        JSONParserConfiguration chained = config.withMaxSharedKeys(7).withOverwriteDuplicateKey(true).withStrictMode(false);
+        assertEquals(7, chained.getMaxSharedKeys());
+        assertTrue(chained.isOverwriteDuplicateKey());
+        assertEquals(1000, config.getMaxSharedKeys());
+    }
+
+    @Test
+    public void testSharedKeysByDefault() {
+        JSONArray rows = new JSONObject(SHARED_KEYS_SOURCE).getJSONArray("rows");
+        String nameKey = key(rows.getJSONObject(0), "name");
+        for (int i = 1; i < rows.length(); i++) {
+            assertSame(nameKey, key(rows.getJSONObject(i), "name"));
+        }
+        assertSame(nameKey, key(rows.getJSONObject(0).getJSONObject("nested"), "name"));
+        assertSame(key(rows.getJSONObject(0), "count"), key(rows.getJSONObject(2), "count"));
+        assertSame(key(rows.getJSONObject(0).getJSONObject("nested"), "list"),
+                key(rows.getJSONObject(1).getJSONObject("nested"), "list"));
+
+        // string values equal to a key are not shared
+        assertNotSame(nameKey, rows.getJSONObject(1).get("name"));
+        assertNotSame(nameKey, rows.getJSONObject(0).getJSONObject("nested").getJSONArray("list").get(1));
+    }
+
+    @Test
+    public void testSharedKeysDisabled() {
+        JSONArray rows = new JSONObject(SHARED_KEYS_SOURCE, new JSONParserConfiguration().withMaxSharedKeys(0))
+                .getJSONArray("rows");
+        assertNotSame(key(rows.getJSONObject(0), "name"), key(rows.getJSONObject(1), "name"));
+        assertNotSame(key(rows.getJSONObject(0), "count"), key(rows.getJSONObject(1), "count"));
+    }
+
+    @Test
+    public void testSharedKeysLimit() {
+        JSONArray rows = new JSONArray("[{\"a\": 1, \"b\": 2, \"c\": 3}, {\"a\": 4, \"b\": 5, \"c\": 6}]",
+                new JSONParserConfiguration().withMaxSharedKeys(2));
+        assertSame(key(rows.getJSONObject(0), "a"), key(rows.getJSONObject(1), "a"));
+        assertSame(key(rows.getJSONObject(0), "b"), key(rows.getJSONObject(1), "b"));
+        assertNotSame(key(rows.getJSONObject(0), "c"), key(rows.getJSONObject(1), "c"));
+    }
+
+    @Test
+    public void testSharedKeysUnlimited() {
+        int keyCount = JSONParserConfiguration.DEFAULT_MAXIMUM_SHARED_KEYS + 500;
+        StringBuilder row = new StringBuilder("{");
+        for (int i = 0; i < keyCount; i++) {
+            row.append(i == 0 ? "" : ",").append("\"k").append(i).append("\":").append(i);
+        }
+        row.append('}');
+        String source = "[" + row + "," + row + "]";
+
+        JSONArray unlimited = new JSONArray(source,
+                new JSONParserConfiguration().withMaxSharedKeys(JSONParserConfiguration.UNLIMITED_SHARED_KEYS));
+        for (int i = 0; i < keyCount; i++) {
+            assertSame(key(unlimited.getJSONObject(0), "k" + i), key(unlimited.getJSONObject(1), "k" + i));
+        }
+
+        JSONArray limited = new JSONArray(source);
+        String lastKey = "k" + (keyCount - 1);
+        assertSame(key(limited.getJSONObject(0), "k0"), key(limited.getJSONObject(1), "k0"));
+        assertNotSame(key(limited.getJSONObject(0), lastKey), key(limited.getJSONObject(1), lastKey));
+        assertTrue(unlimited.similar(limited));
+    }
+
+    @Test
+    public void testSharedKeysNotSharedAcrossParses() {
+        JSONObject first = new JSONObject("{\"name\": 1}");
+        JSONObject second = new JSONObject("{\"name\": 2}");
+        assertNotSame(key(first, "name"), key(second, "name"));
+    }
+
+    @Test
+    public void testSharedKeysParseUnchanged() {
+        JSONObject unshared = new JSONObject(SHARED_KEYS_SOURCE, new JSONParserConfiguration().withMaxSharedKeys(0));
+        JSONObject shared = new JSONObject(SHARED_KEYS_SOURCE);
+        JSONObject unlimited = new JSONObject(SHARED_KEYS_SOURCE,
+                new JSONParserConfiguration().withMaxSharedKeys(JSONParserConfiguration.UNLIMITED_SHARED_KEYS));
+        assertTrue(unshared.similar(shared));
+        assertTrue(unshared.similar(unlimited));
+        assertEquals(unshared.toString(), shared.toString());
+        assertEquals(unshared.toString(), unlimited.toString());
+
+        JSONObject row = shared.getJSONArray("rows").getJSONObject(0);
+        assertEquals(Integer.class, row.get("count").getClass());
+        assertEquals(Long.class, row.get("big").getClass());
+        assertEquals(java.math.BigDecimal.class, row.get("ratio").getClass());
+        assertEquals(Boolean.TRUE, row.get("flag"));
+        assertSame(JSONObject.NULL, row.get("missing"));
+        assertSame(JSONObject.NULL, row.getJSONObject("nested").getJSONArray("list").get(2));
+        assertEquals("third", shared.getJSONArray("rows").getJSONObject(2).get("name"));
+    }
+
+    @Test
+    public void testSharedKeysLenientSyntax() {
+        JSONArray rows = new JSONArray("[{\"name\": 1, \"count\": 2}, {'name': 'single', count: 3}]",
+                new JSONParserConfiguration().withStrictMode(false));
+        assertSame(key(rows.getJSONObject(0), "name"), key(rows.getJSONObject(1), "name"));
+        assertSame(key(rows.getJSONObject(0), "count"), key(rows.getJSONObject(1), "count"));
+        assertEquals("single", rows.getJSONObject(1).get("name"));
+    }
+
+    @Test
+    public void testSharedKeysStrictMode() {
+        JSONArray rows = new JSONArray("[{\"a\": 1}, {\"a\": 2}]", new JSONParserConfiguration().withStrictMode());
+        assertSame(key(rows.getJSONObject(0), "a"), key(rows.getJSONObject(1), "a"));
+        assertFalse(rows.getJSONObject(0).similar(rows.getJSONObject(1)));
+    }
+
+    /**
+     * Returns the key instance a JSONObject holds, rather than the caller's equal String.
+     */
+    private static String key(JSONObject jsonObject, String name) {
+        for (String key : jsonObject.keySet()) {
+            if (key.equals(name)) {
+                return key;
+            }
+        }
+        fail("missing key " + name);
+        return null;
     }
 
 }
