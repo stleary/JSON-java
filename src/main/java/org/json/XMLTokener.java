@@ -167,7 +167,11 @@ public class XMLTokener extends JSONTokener {
             int cp = (e.charAt(1) == 'x' || e.charAt(1) == 'X')
                 ? parseHexEntity(e)
                 : parseDecimalEntity(e);
-            if (XML.mustEscape(cp)) {
+            // Validate with isValidXmlCharacter, not with XML.mustEscape:
+            // mustEscape also escapes TAB/LF/CR for the serialization path
+            // (#1092), while the numeric references &#9;, &#10; and &#13; are
+            // valid XML and must keep being accepted here (see #1059).
+            if (!XML.isValidXmlCharacter(cp)) {
                 throw new JSONException("Invalid numeric character reference: &#" + e.substring(1) + ";");
             }
             return new String(new int[] {cp}, 0, 1);
