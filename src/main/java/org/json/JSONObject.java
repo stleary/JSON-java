@@ -3472,12 +3472,15 @@ public class JSONObject {
      * of the given class. It supports basic data types including int, double, float,
      * long, and boolean (as well as their boxed counterparts). The class must have a
      * no-argument constructor, and the field names in the class must match the keys
-     * in the JSON string.
+     * in the JSON string. Static fields are ignored; see {@link #fromJson(Class)} for
+     * how the remaining fields are bound.
      *
      * @param <T> the type of the object to return
      * @param jsonString json in string format
      * @param clazz the class of the object to be returned
      * @return an instance of Object T with fields populated from the JSON string
+     * @throws JSONException if jsonString is not valid JSON, or if it cannot be bound to clazz
+     *         as described in {@link #fromJson(Class)}
      */
     public static <T> T fromJson(String jsonString, Class<T> clazz) {
         JSONObject jsonObject = new JSONObject(jsonString);
@@ -3493,15 +3496,20 @@ public class JSONObject {
      * The target class must have a no-argument constructor, and its field names must match
      * the keys in the JSON string. Static fields are ignored.
      *
-     * <p><strong>Note:</strong> Only classes that are explicitly supported and registered within
-     * the {@code JSONObject} context can be deserialized. If the provided class is not among those,
-     * this method will not be able to deserialize it. This ensures that only a limited and
-     * controlled set of types can be instantiated from JSON for safety and predictability.
+     * <p><strong>Note:</strong> binding is driven by the keys present in the JSON, not by
+     * how the fields are declared. Every non-static field declared by the class is written
+     * when its name matches a key, including {@code private} and {@code transient} fields,
+     * and field access is widened with
+     * {@link java.lang.reflect.Field#setAccessible(boolean)}. {@link JSONPropertyIgnore}
+     * only suppresses the bean to JSONObject direction, so it does not keep a field from
+     * being populated here. JSON coming from an untrusted source should therefore be
+     * validated, or reduced to the expected keys, before it is handed to this method.
      *
      * @param clazz the class of the object to be returned
      * @param <T> the type of the object
      * @return an instance of type {@code T} with fields populated from the JSON string
-     * @throws IllegalArgumentException if the class is not supported for deserialization
+     * @throws JSONException if the class has no accessible no-argument constructor, or if a
+     *         field cannot be instantiated or set
      */
     @SuppressWarnings("unchecked")
     public <T> T fromJson(Class<T> clazz) {

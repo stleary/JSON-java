@@ -67,6 +67,7 @@ import org.json.junit.data.CustomClassG;
 import org.json.junit.data.CustomClassH;
 import org.json.junit.data.CustomClassI;
 import org.json.junit.data.CustomClassJ;
+import org.json.junit.data.FromJsonKeyBindingExample;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -3881,6 +3882,31 @@ public class JSONObjectTest {
 		} finally {
 			CustomClassJ.classState = initialClassState;
 		}
+	}
+
+	/**
+	 * Pins down the field binding done by {@code fromJson(Class)}: every non-static
+	 * declared field whose name matches a JSON key is written, no matter how the
+	 * field is declared. Private fields, transient fields and fields hidden behind
+	 * a {@code @JSONPropertyIgnore} getter are all populated, because that
+	 * annotation only affects the bean to JSONObject direction. See issue #1076.
+	 */
+	@Test
+	public void jsonObjectParseFromJson_10() {
+		JSONObject object = new JSONObject()
+				.put("displayName", "bob")
+				.put("privateBoolean", true)
+				.put("privateString", "private-value")
+				.put("transientString", "transient-value")
+				.put("ignoredGetterBoolean", true);
+
+		FromJsonKeyBindingExample bound = object.fromJson(FromJsonKeyBindingExample.class);
+
+		assertEquals("private field should be populated", true, bound.isPrivateBoolean());
+		assertEquals("private field should be populated", "private-value", bound.getPrivateString());
+		assertEquals("transient field should be populated", "transient-value", bound.getTransientString());
+		assertEquals("field behind a @JSONPropertyIgnore getter should be populated", true,
+				bound.isIgnoredGetterBoolean());
 	}
 
 	@Test
