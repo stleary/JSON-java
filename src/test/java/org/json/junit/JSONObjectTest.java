@@ -285,6 +285,27 @@ public class JSONObjectTest {
 		Util.checkJSONObjectsMaps(new ArrayList<JSONObject>(Arrays.asList(jsonObject, jsonObjectByName)));
 	}
 
+	@Test
+	public void jsonObjectByNullNames() {
+		JSONObject source = new JSONObject().put("value", 1);
+		JSONObject subset = new JSONObject(source, (String[]) null);
+		assertTrue("null names should select no keys", subset.isEmpty());
+		assertEquals("source should be unchanged", 1, source.getInt("value"));
+	}
+
+	@Test
+	public void jsonObjectByObjectAndNullNames() {
+		JSONObject subset = new JSONObject(new MyPublicClass(), (String[]) null);
+		assertTrue("null names should select no fields", subset.isEmpty());
+	}
+
+	@Test
+	public void jsonObjectByNamesFromEmptyObject() {
+		JSONObject source = new JSONObject();
+		JSONObject subset = new JSONObject(source, JSONObject.getNames(source));
+		assertTrue("names from an empty object should select no keys", subset.isEmpty());
+	}
+
 	/**
 	 * JSONObjects can be built from a Map<String, Object>. In this test the map is
 	 * null. the JSONObject(JsonTokener) ctor is not tested directly since it

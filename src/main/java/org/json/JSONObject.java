@@ -177,10 +177,14 @@ public class JSONObject {
      * @param jo
      *            A JSONObject.
      * @param names
-     *            An array of strings.
+     *            An array of strings. A null array selects no keys and creates
+     *            an empty JSONObject.
      */
     public JSONObject(JSONObject jo, String ... names) {
-        this(names.length);
+        this(names == null ? 0 : names.length);
+        if (names == null) {
+            return;
+        }
         for (int i = 0; i < names.length; i += 1) {
             try {
                 this.putOnce(names[i], jo.opt(names[i]));
@@ -510,10 +514,14 @@ public class JSONObject {
      *            JSONObject.
      * @param names
      *            An array of strings, the names of the fields to be obtained
-     *            from the object.
+     *            from the object. A null array selects no fields and creates
+     *            an empty JSONObject.
      */
     public JSONObject(Object object, String ... names) {
-        this(names.length);
+        this(names == null ? 0 : names.length);
+        if (names == null) {
+            return;
+        }
         Class<?> c = object.getClass();
         for (int i = 0; i < names.length; i += 1) {
             String name = names[i];
