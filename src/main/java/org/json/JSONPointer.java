@@ -224,18 +224,46 @@ public class JSONPointer {
      * @throws JSONPointerException is thrown if the index is out of bounds
      */
     private static Object readByIndexToken(Object current, String indexToken) throws JSONPointerException {
+        int index = toArrayIndex(indexToken);
+        JSONArray currentArr = (JSONArray) current;
+        if (index >= currentArr.length()) {
+            throw new JSONPointerException(format("index %s is out of bounds - the array has %d elements", indexToken,
+                    Integer.valueOf(currentArr.length())));
+        }
         try {
-            int index = Integer.parseInt(indexToken);
-            JSONArray currentArr = (JSONArray) current;
-            if (index >= currentArr.length()) {
-                throw new JSONPointerException(format("index %s is out of bounds - the array has %d elements", indexToken,
-                        Integer.valueOf(currentArr.length())));
+			return currentArr.get(index);
+		} catch (JSONException e) {
+			throw new JSONPointerException("Error reading value at index position " + index, e);
+		}
+    }
+
+    /**
+     * Converts an array index token to its ordinal position. RFC 6901 section 4 restricts an array
+     * index to {@code "0"} or to a digit string which does not start with a zero:
+     * {@code array-index = %x30 / ( %x31-39 *(%x30-39) )}. Number spellings which Java accepts but
+     * the grammar does not, such as {@code "01"}, {@code "+1"} or {@code "-0"}, are rejected so that
+     * they cannot be read as a different element than the one that was asked for.
+     *
+     * @param indexToken the array index in string form
+     * @return the ordinal position the token denotes
+     * @throws JSONPointerException if the token is not a valid array index
+     * @see <a href="https://tools.ietf.org/html/rfc6901#section-4">rfc6901 section 4</a>
+     */
+    private static int toArrayIndex(String indexToken) throws JSONPointerException {
+        char first = indexToken.charAt(0);
+        if (first != '0' && (first < '1' || first > '9')) {
+            throw new JSONPointerException(format("%s is not an array index", indexToken));
+        }
+        if (first == '0' && indexToken.length() > 1) {
+            throw new JSONPointerException(format("%s is not an array index", indexToken));
+        }
+        for (int i = 1; i < indexToken.length(); i++) {
+            if (indexToken.charAt(i) < '0' || indexToken.charAt(i) > '9') {
+                throw new JSONPointerException(format("%s is not an array index", indexToken));
             }
-            try {
-				return currentArr.get(index);
-			} catch (JSONException e) {
-				throw new JSONPointerException("Error reading value at index position " + index, e);
-			}
+        }
+        try {
+            return Integer.parseInt(indexToken);
         } catch (NumberFormatException e) {
             throw new JSONPointerException(format("%s is not an array index", indexToken), e);
         }

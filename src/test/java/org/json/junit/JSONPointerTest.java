@@ -307,6 +307,32 @@ public class JSONPointerTest {
     }
 
     /**
+     * RFC 6901 section 4 restricts an array index to "0", or to a digit string that does not
+     * start with a zero: {@code array-index = %x30 / ( %x31-39 *(%x30-39) )}. Tokens such as
+     * {@code "01"} and {@code "+1"} are therefore not array indexes, and navigating into an
+     * array with them must fail instead of silently resolving to a different element.
+     *
+     * @see <a href="https://tools.ietf.org/html/rfc6901#section-4">rfc6901 section 4</a>
+     */
+    @Test
+    public void arrayIndexTokenMustMatchRfc6901Grammar() {
+        JSONArray array = new JSONArray("[10,20,30,40,50,60]");
+        assertEquals(10, array.query("/0"));
+        assertEquals(20, array.query("/1"));
+        for (String token : new String[] { "01", "00", "+1", "-0", "1.0", "(1)", "0000000000000000001" }) {
+            try {
+                Object value = array.query("/" + token);
+                fail("Expected JSONPointerException for array index token '" + token + "', got " + value);
+            } catch (JSONPointerException e) {
+                assertTrue("Expected index message for token '" + token + "', got: " + e.getMessage(),
+                        e.getMessage().contains("is not an array index"));
+            }
+        }
+        // the same rule applies to JSONArray.optQuery, which reports a failed query as null
+        assertTrue("Expected null", array.optQuery("/01") == null);
+    }
+
+    /**
      * Coverage for JSONObject query(String)
      */
     @Test
