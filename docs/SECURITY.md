@@ -14,7 +14,7 @@ All releases of `org.json:json` published to Maven Central are signed with PGP. 
 | --- | --- |
 | **Fingerprint** | `FB35 C8D0 2B47 24DA DA23  DE0A FD11 6C19 69FC CFF3` |
 | **Long key ID** | `FD116C1969FCCFF3` |
-| **Expires**.    | `2035-12-12 |
+| **Expires**.    | `2035-12-12` |
 | **Keyserver**   | `hkps://keyserver.ubuntu.com` |
 
 The full 40-character fingerprint above is the canonical identifier for the key. Always pin or compare against the full fingerprint rather than the long or short key ID.
