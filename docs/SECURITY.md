@@ -14,6 +14,7 @@ All releases of `org.json:json` published to Maven Central are signed with PGP. 
 | --- | --- |
 | **Fingerprint** | `FB35 C8D0 2B47 24DA DA23  DE0A FD11 6C19 69FC CFF3` |
 | **Long key ID** | `FD116C1969FCCFF3` |
+| **Expires**.    | `2035-12-12 |
 | **Keyserver**   | `hkps://keyserver.ubuntu.com` |
 
 The full 40-character fingerprint above is the canonical identifier for the key. Always pin or compare against the full fingerprint rather than the long or short key ID.
@@ -55,6 +56,22 @@ If you are using Gradle's [dependency verification](https://docs.gradle.org/curr
 
 Gradle also accepts the long key ID (`FD116C1969FCCFF3`), but pinning the full fingerprint is recommended.
 
+### Troubleshooting: Expired Key (`EXPKEYSIG`)
+
+If GPG reports `EXPKEYSIG` or says the key has expired, your local copy of the public key is likely out of date. The key's expiration date is extended periodically; extending it does not change the fingerprint, and signatures on earlier releases remain valid. Refresh the key from the keyserver and verify again. For example:
+
+```bash
+gpg --keyserver hkps://keyserver.ubuntu.com \
+    --refresh-keys FB35C8D02B4724DADA23DE0AFD116C1969FCCFF3
+gpg --verify json-20260814.jar.asc json-20260814.jar
+```
+
+If you use Gradle dependency verification with a cached keyring, regenerate it after refreshing. For example:
+
+`./gradlew --write-verification-metadata pgp,sha256 --export-keys help`
+
+If the expiration date shown by `gpg --list-keys` after refreshing does not match the date in the table above, please open an issue.
+
 ### Key Rotation
 
-If the signing key is ever rotated or revoked, this document will be updated in the `master` branch with the new fingerprint, and the change will be visible in the file's commit history. Always check this file directly in the repository for the current authoritative value before trusting any third-party copy of the fingerprint.
+If the signing key's expiration date is extended, the **Expires** value above will be updated and the refreshed public key will be published to the keyserver; the fingerprint stays the same. If the signing key is ever rotated or revoked, this document will be updated in the `master` branch with the new fingerprint, and the change will be visible in the file's commit history. Always check this file directly in the repository for the current authoritative value before trusting any third-party copy of the fingerprint.
